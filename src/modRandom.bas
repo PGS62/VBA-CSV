@@ -1,7 +1,7 @@
 Attribute VB_Name = "modRandom"
 Option Explicit
 
-Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean)
+Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
           Dim length As Long
           Dim i As Long
           Dim Res As String
@@ -23,24 +23,35 @@ Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean)
 13                End If
 14            End If
 15        Next
-16        RandomString = Res
 
-17        Exit Function
+16        If AllowLineFeed Then
+17            If length > 5 Then
+18                If Rnd() < 0.2 Then
+19                    Mid(Res, length / 2, Len(EOL)) = EOL
+20                End If
+21            End If
+22        End If
+
+
+
+23        RandomString = Res
+
+24        Exit Function
 ErrHandler:
-18        Err.Raise vbObjectError + 1, , "#RandomString (line " & CStr(Erl) + "): " & Err.Description & "!"
+25        Err.Raise vbObjectError + 1, , "#RandomString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function RandomStrings(NumRows As Long, NumCols As Long, Unicode As Boolean, AllowLineFeed As Boolean)
+Function RandomStrings(NumRows As Long, NumCols As Long, Unicode As Boolean, AllowLineFeed As Boolean, EOL As String)
           Dim Result() As String, i As Long, j As Long
 1         On Error GoTo ErrHandler
 2         ReDim Result(1 To NumRows, 1 To NumCols)
 3         For i = 1 To NumRows
 4             For j = 1 To NumCols
-5                 Result(i, j) = RandomString(AllowLineFeed, Unicode)
+5                 Result(i, j) = RandomString(AllowLineFeed, Unicode, EOL)
 6             Next j
 7         Next i
 8         If AllowLineFeed Then
-9             Result(1, 1) = "this" & vbLf & "definitely" & vbCr & "has" & vbCrLf & "line feeds"
+9             Result(1, 1) = "Here" & EOL & "be" & EOL & "line" & EOL & "feeds"
 10        End If
 11        RandomStrings = Result
 12        Exit Function
@@ -158,7 +169,7 @@ ErrHandler:
 10        Err.Raise vbObjectError + 1, , "#RandomErrorValues (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Unicode As Boolean)
+Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
 
           Dim n As Long
           Const NUMTYPES = 11
@@ -174,7 +185,7 @@ Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, U
 7             Case 3
 8                 RandomVariant = RandomDouble()
 9             Case 4
-10                RandomVariant = RandomString(AllowLineFeed, Unicode)
+10                RandomVariant = RandomString(AllowLineFeed, Unicode, EOL)
 11            Case 5
 12                RandomVariant = RandomDate()
 13            Case 6
@@ -199,7 +210,10 @@ ErrHandler:
 27        Err.Raise vbObjectError + 1, , "#RandomVariant (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, Unicode As Boolean)
+
+
+
+Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, Unicode As Boolean, ByVal EOL As String)
 
           Const DateFormat = "yyyy-mmm-dd"
           Const MAXCOLS = 5
@@ -208,17 +222,17 @@ Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, 
           Dim j As Long
           Dim Res() As Variant
 
-2         On Error GoTo ErrHandler
-
+1         On Error GoTo ErrHandler
+2         EOL = OStoEOL(EOL, "EOL")
 3         ReDim Res(1 To NRows, 1 To NCols)
 
 4         For i = 1 To NRows
 5             For j = 1 To NCols
-6                 Res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Unicode)
+6                 Res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Unicode, EOL)
 7             Next j
 8         Next i
 9         If AllowLineFeed Then
-10            Res(1, 1) = "this" & vbLf & "definitely" & vbCr & "has" & vbCrLf & "line feeds"
+10            Res(1, 1) = "Here" & EOL & "be" & EOL & "line" & EOL & "feeds"
 11        End If
 
 12        RandomVariants = Res

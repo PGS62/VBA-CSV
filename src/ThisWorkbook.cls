@@ -11,4 +11,5 @@ Option Explicit
 
 Private Sub Workbook_Open()
     RegisterCSVRead
+    RegisterCSVWrite
 End Sub

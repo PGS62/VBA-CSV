@@ -153,77 +153,80 @@ End Function
 '           *  That line endings are automatically detected.
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub AnotherWay()
-    Dim OS As Variant
-    Dim Unicode As Variant
-    Dim NRows As Variant
-    Dim NCols As Variant
-    Dim Data As Variant
-    Dim k As Long
-    Dim DateFormat As Variant
-    Dim AllowLineFeed As Variant
-    Const WholeFile = True
-    Dim Ragged As Variant
-    Dim ExtraInfo As String
+          Dim OS As Variant
+          Dim Unicode As Variant
+          Dim NRows As Variant
+          Dim NCols As Variant
+          Dim Data As Variant
+          Dim k As Long
+          Dim DateFormat As Variant
+          Dim AllowLineFeed As Variant
+          Const WholeFile = True
+          Dim Ragged As Variant
+          Dim ExtraInfo As String
+          Dim EOL As String
 
-    On Error GoTo ErrHandler
+1         On Error GoTo ErrHandler
 
-    ThrowIfError CreatePath(m_FolderOriginals)
-    ThrowIfError CreatePath(m_FolderReadAndRewrite)
+2         ThrowIfError CreatePath(m_FolderOriginals)
+3         ThrowIfError CreatePath(m_FolderReadAndRewrite)
 
-    For Each OS In Array("Windows", "Unix", "Mac")
-        For Each Unicode In Array(True, False)
-            For Each Ragged In Array(True, False)
-                For Each NRows In Array(1, 2, 20)
-                    For Each NCols In Array(1, 2, 10)
-              
-                        'For Variants we need to vary AllowLineFeed and DateFormat
-                        For Each AllowLineFeed In Array(True, False)
-                            For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
-                                Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode))
-                                ExtraInfo = "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
-                                CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
-                            Next DateFormat
-                        Next AllowLineFeed
+4         For Each OS In Array("Windows", "Unix", "Mac")
+5             EOL = IIf(OS = "Windows", vbCrLf, IIf(OS = "Unix", vbLf, vbCr))
+          
+6             For Each Unicode In Array(True, False)
+7                 For Each Ragged In Array(True, False)
+8                     For Each NRows In Array(1, 2, 20)
+9                         For Each NCols In Array(1, 2, 10)
+                    
+                              'For Variants we need to vary AllowLineFeed and DateFormat
+10                            For Each AllowLineFeed In Array(True, False)
+11                                For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
+12                                    Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode), EOL)
+13                                    ExtraInfo = "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
+14                                    CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+15                                Next DateFormat
+16                            Next AllowLineFeed
 
-                        'For Dates, we need to vary DateFormat
-                        For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
-                            Data = RandomDates(CLng(NRows), CLng(NCols))
-                            ExtraInfo = "RandomDates"
-                            CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
-                        Next DateFormat
+                              'For Dates, we need to vary DateFormat
+17                            For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
+18                                Data = RandomDates(CLng(NRows), CLng(NCols))
+19                                ExtraInfo = "RandomDates"
+20                                CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+21                            Next DateFormat
 
-                        'For Strings, we need to vary AllowLineFeed
-                        For Each AllowLineFeed In Array(True, False)
-                            Data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed))
-                            ExtraInfo = IIf(AllowLineFeed, "RandomStringsWithLineFeeds", "RandomStrings")
-                            CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
-                        Next AllowLineFeed
+                              'For Strings, we need to vary AllowLineFeed
+22                            For Each AllowLineFeed In Array(True, False)
+23                                Data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed), EOL)
+24                                ExtraInfo = IIf(AllowLineFeed, "RandomStringsWithLineFeeds", "RandomStrings")
+25                                CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+26                            Next AllowLineFeed
 
-                        For k = 1 To 4
-                            If k = 1 Then
-                                Data = RandomBooleans(CLng(NRows), CLng(NCols))
-                                ExtraInfo = "RandomBooleans"
-                            ElseIf k = 2 Then
-                                Data = RandomDoubles(CLng(NRows), CLng(NCols))
-                                ExtraInfo = "RandomDoubles"
-                            ElseIf k = 3 Then
-                                Data = RandomErrorValues(CLng(NRows), CLng(NCols))
-                                ExtraInfo = "RandomErrorValues"
-                            ElseIf k = 4 Then
-                                Data = RandomLongs(CLng(NRows), CLng(NCols))
-                                ExtraInfo = "RandomLongs"
-                            End If
-                            CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
-                        Next k
-                    Next NCols
-                Next NRows
-            Next Ragged
-        Next Unicode
-    Next OS
+27                            For k = 1 To 4
+28                                If k = 1 Then
+29                                    Data = RandomBooleans(CLng(NRows), CLng(NCols))
+30                                    ExtraInfo = "RandomBooleans"
+31                                ElseIf k = 2 Then
+32                                    Data = RandomDoubles(CLng(NRows), CLng(NCols))
+33                                    ExtraInfo = "RandomDoubles"
+34                                ElseIf k = 3 Then
+35                                    Data = RandomErrorValues(CLng(NRows), CLng(NCols))
+36                                    ExtraInfo = "RandomErrorValues"
+37                                ElseIf k = 4 Then
+38                                    Data = RandomLongs(CLng(NRows), CLng(NCols))
+39                                    ExtraInfo = "RandomLongs"
+40                                End If
+41                                CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+42                            Next k
+43                        Next NCols
+44                    Next NRows
+45                Next Ragged
+46            Next Unicode
+47        Next OS
 
-    Exit Sub
+48        Exit Sub
 ErrHandler:
-    Throw "#AnotherWay (line " & CStr(Erl) + "): " & Err.Description & "!"
+49        Throw "#AnotherWay (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
 

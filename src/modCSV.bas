@@ -8,7 +8,7 @@ Private Const Err_EmptyFile = "File is empty"
 ' Procedure  : RegisterCSVRead
 ' Author     : Philip Swannell
 ' Date       : 30-Jul-2021
-' Purpose    : Register the function CSV read with the Excel Function Wizard. Suggest this function is called from a
+' Purpose    : Register the function CSVRead with the Excel Function Wizard. Suggest this function is called from a
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub RegisterCSVRead()
@@ -30,6 +30,31 @@ Sub RegisterCSVRead()
     ArgDescs(13) = "For use from VBA, sets the lower bound for indexing into the returned array and must be 1 or 0. Optional, defaults to 1."
     Application.MacroOptions "CSVRead", FnDesc, , , , , , , , , ArgDescs
 End Sub
+
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : RegisterCSVWrite
+' Author     : Philip Swannell
+' Date       : 31-Jul-2021
+' Purpose    : Register the function CSVWrite with the Excel Function Wizard. Suggest this function is called from a
+'              WorkBook_Open event.
+' -----------------------------------------------------------------------------------------------------------------------
+Sub RegisterCSVWrite()
+    Const FnDesc = "Creates a csv file on disk containing the data in the array Data. Any existing file of the same name is overwritten. If successful, the function returns the name of the file written, otherwise an error string. "
+    Dim ArgDescs() As String
+    ReDim ArgDescs(1 To 9)
+    ArgDescs(1) = "The full name of the file, including the path."
+    ArgDescs(2) = "An array of arbitrary data. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values."
+    ArgDescs(3) = "If TRUE (the default) then ALL strings are quoted before being written to file. Otherwise (FALSE) only strings containing characters comma, line feed, carriage return or double quote are quoted. Double quotes are always escaped by a second double quote."
+    ArgDescs(4) = "A format string, such as 'yyyy-mm-dd' that determine how dates (e.g. cells formatted as dates) appear in the file."
+    ArgDescs(5) = "A format string, such as 'yyyy-mm-dd hh:mm:ss' that determine how elements of dates with time appear in the file. Currently the companion function CVSRead is not capable of interpreting fields written in DateTime format."
+    ArgDescs(6) = "If TRUE then the file written is encoded as unicode. Defaults to FALSE for an ascii file."
+    ArgDescs(7) = "If FALSE (the default) the file written will be ascii. If TRUE the file written will be Unicode."
+    ArgDescs(8) = "Enter the required line ending character as ""Windows"" (or ascii 13 plus ascii 10), or ""Unix"" (or ascii 10) or ""Mac"" (or ascii 13). If omitted defaults to ""Windows""."
+    ArgDescs(9) = "This argument is for develop purposes only, it will soon be removed."
+    Application.MacroOptions "CSVWrite", FnDesc, , , , , , , , , ArgDescs
+End Sub
+
 
 
 
@@ -114,6 +139,8 @@ Function CSVRead(FileName As String, Optional TypeConversion As Variant = False,
           Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, Optional ByVal LineEndings As Variant, _
           Optional ByVal Unicode As Variant, Optional ByVal ShowMissingsAs As Variant = "", _
           Optional DecimalSeparator As String = vbNullString, Optional LowerBounds As Variant = 1)
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter, or else omitted to infer from the file's contents"
           Const Err_FileIsUniCode = "Unicode must be passed as TRUE or FALSE, or omitted to infer from the file's contents"
@@ -375,8 +402,6 @@ Function CSVRead(FileName As String, Optional TypeConversion As Variant = False,
 170       Exit Function
 
 ErrHandler:
-Stop
-Resume
 171       CSVRead = "#CSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
 172       If Not CSVS Is Nothing Then
 173           Set CSVS = Nothing
@@ -1291,17 +1316,36 @@ ErrHandler:
 27        IsUnicodeFile = "#IsUnicodeFile (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
+Function OStoEOL(OS As String, ArgName As String) As String
+
+          Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associented end of line characters."
+
+1         Select Case LCase(OS)
+              Case "windows", vbCrLf
+2                 OStoEOL = vbCrLf
+3             Case "unix", vbLf
+4                 OStoEOL = vbLf
+5             Case "mac", vbCr
+6                 OStoEOL = vbCr
+7             Case Else
+8                 Throw ArgName + Err_Invalid
+9         End Select
+End Function
+
+
+
+
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : CSVWrite
 ' Author    : Philip Swannell
-' Date      : 18-Dec-2015
+' Date      : 31-Jul-2021
 ' Purpose   : Creates a csv file on disk containing the data in the array Data. Any existing file of the
 '             same name is overwritten. If successful, the function returns the name of the
 '             file written, otherwise an error string.
 ' Arguments
 ' FileName  : The full name of the file, including the path.
-' Data      : An array of arbitrary data. Elements may be strings, numbers, Booleans, empty, errors or
-'             null values.
+' Data      : An array of arbitrary data. Elements may be strings, numbers, dates, Booleans, empty,
+'             Excel errors or null values.
 ' QuoteAllStrings: If TRUE (the default) then ALL strings are quoted before being written to file. Otherwise
 '             (FALSE) only strings containing characters comma, line feed, carriage return
 '             or double quote are quoted. Double quotes are always escaped by a second
@@ -1309,17 +1353,27 @@ End Function
 ' DateFormat: A format string, such as 'yyyy-mm-dd' that determine how dates (e.g. cells formatted as
 '             dates) appear in the file.
 ' DateTimeFormat: A format string, such as 'yyyy-mm-dd hh:mm:ss' that determine how elements of dates with
-'             time appear in the file.
-' Unicode   : If TRUE then the file written is encoded as unicode. Defaults to FALSE for an ascii file.
+'             time appear in the file. Currently the companion function CVSRead is not
+'             capable of interpreting fields written in DateTime format.
+' Delimiter : If TRUE then the file written is encoded as unicode. Defaults to FALSE for an ascii file.
+' Unicode   : If FALSE (the default) the file written will be ascii. If TRUE the file written will be
+'             Unicode.
+' EOL       : Enter the required line ending character as "Windows" (or ascii 13 plus ascii 10), or
+'             "Unix" (or ascii 10) or "Mac" (or ascii 13). If omitted defaults to
+'             "Windows".
+' Ragged    : This argument is for development purposes only, it will soon be removed.
 '
 ' Notes     : See also CSVRead which is the inverse of this function.
 '
 '             For definition of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
 '---------------------------------------------------------------------------------------------------------
+
 Function CSVWrite(FileName As String, ByVal Data As Variant, Optional QuoteAllStrings As Boolean = True, _
           Optional DateFormat As String = "yyyy-mm-dd", Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
-          Optional Delimiter As String = ",", Optional Unicode As Boolean, Optional ByVal EOL = vbCrLf, Optional Ragged As Boolean = False)
+          Optional Delimiter As String = ",", Optional Unicode As Boolean, Optional ByVal EOL As String = vbCrLf, Optional Ragged As Boolean = False)
+Attribute CSVWrite.VB_Description = "Creates a csv file on disk containing the data in the array Data. Any existing file of the same name is overwritten. If successful, the function returns the name of the file written, otherwise an error string. "
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Dim FSO As Scripting.FileSystemObject
           Dim i As Long
@@ -1336,66 +1390,57 @@ Function CSVWrite(FileName As String, ByVal Data As Variant, Optional QuoteAllSt
 
 1         On Error GoTo ErrHandler
 
-2         Select Case LCase(EOL)
-              Case "windows", vbCrLf
-3                 EOLIsWindows = True
-4             Case "unix", vbLf
-5                 EOL = vbLf
-6             Case "mac", vbCr
-7                 EOL = vbCr
-8             Case Else
-9                 Throw Err_EOL
-10        End Select
+2         EOL = OStoEOL(EOL, "EOL")
 
-11        If Len(Delimiter) <> 1 Or Delimiter = """" Or Delimiter = vbCr Or Delimiter = vbLf Then
-12            Throw Err_Delimiter
-13        End If
+3         If Len(Delimiter) <> 1 Or Delimiter = """" Or Delimiter = vbCr Or Delimiter = vbLf Then
+4             Throw Err_Delimiter
+5         End If
 
-14        If TypeName(Data) = "Range" Then
+6         If TypeName(Data) = "Range" Then
               'Preserve elements of type Date by using .Value, not .Value2
-15            Data = Data.Value
-16        End If
-17        Force2DArray Data 'Coerce 0-dim & 1-dim to 2-dims.
+7             Data = Data.Value
+8         End If
+9         Force2DArray Data 'Coerce 0-dim & 1-dim to 2-dims.
 
-18        Set FSO = New FileSystemObject
-19        Set T = FSO.CreateTextFile(FileName, True, Unicode)
+10        Set FSO = New FileSystemObject
+11        Set T = FSO.CreateTextFile(FileName, True, Unicode)
 
-20        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
+12        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
 
-21        For i = LBound(Data) To UBound(Data)
-22            For j = LBound(Data, 2) To UBound(Data, 2)
-23                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
-24            Next j
-25            OneLineJoined = VBA.Join(OneLine, Delimiter)
+13        For i = LBound(Data) To UBound(Data)
+14            For j = LBound(Data, 2) To UBound(Data, 2)
+15                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
+16            Next j
+17            OneLineJoined = VBA.Join(OneLine, Delimiter)
 
               'If writing in "Ragged" style, remove terminating delimiters
-26            If Ragged Then
-27                For k = Len(OneLineJoined) To 1 Step -1
-28                    If Mid(OneLineJoined, k, 1) <> Delimiter Then Exit For
-29                Next k
-30                If k < Len(OneLineJoined) Then
-31                    OneLineJoined = Left(OneLineJoined, k)
-32                End If
-33            End If
+18            If Ragged Then
+19                For k = Len(OneLineJoined) To 1 Step -1
+20                    If Mid(OneLineJoined, k, 1) <> Delimiter Then Exit For
+21                Next k
+22                If k < Len(OneLineJoined) Then
+23                    OneLineJoined = Left(OneLineJoined, k)
+24                End If
+25            End If
               
-34            If EOLIsWindows Then
-35                T.WriteLine OneLineJoined
-36            Else
-37                T.Write OneLineJoined
-38                T.Write EOL
-39            End If
-40        Next i
+26            If EOLIsWindows Then
+27                T.WriteLine OneLineJoined
+28            Else
+29                T.Write OneLineJoined
+30                T.Write EOL
+31            End If
+32        Next i
 
           'Quote from https://tools.ietf.org/html/rfc4180#section-2
           'The last record in the file may or may not have an ending line break. _
            We follow Excel (File save as CSV) and *do* put a line break after the last line.
 
-41        T.Close: Set T = Nothing: Set FSO = Nothing
-42        CSVWrite = FileName
-43        Exit Function
+33        T.Close: Set T = Nothing: Set FSO = Nothing
+34        CSVWrite = FileName
+35        Exit Function
 ErrHandler:
-44        CSVWrite = "#CSVWrite (line " & CStr(Erl) + "): " & Err.Description & "!"
-45        If Not T Is Nothing Then Set T = Nothing: Set FSO = Nothing
+36        CSVWrite = "#CSVWrite (line " & CStr(Erl) + "): " & Err.Description & "!"
+37        If Not T Is Nothing Then Set T = Nothing: Set FSO = Nothing
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
