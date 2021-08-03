@@ -33,6 +33,16 @@ Private Const m_FolderSpeedTest = "C:\Temp\CSVTest\SpeedTest"
 '2021-07-27 11:16:21.069   2.97768730006646 seconds to write 1000 files. Each file has 70 rows and 6 columns.
 '2021-07-27 11:16:22.194   1.12387880007736 seconds to read 1000 files. Each file has 70 rows and 6 columns.
 '2021-07-27 11:16:22.194   ====================================================================================================
+'====================================================================================================
+'Time of test = 02-Aug-2021 17:41:42 Computer = PHILIP-LAPTOP
+'1.83393520000027 seconds to read 1 file containing random doubles 10,000 rows, 100 cols.
+'1.6036654999989 seconds to read 1 file containing UNquoted 10-char strings 10,000 rows, 100 cols. File size =
+'4.82088320000184 seconds to read 1 file containing QUOTED 10-char strings 10,000 rows, 100 cols. File size =
+'5.52146999999968 seconds to read 1 file containing 10-char strings, all with line-feeds 10,000 rows, 100 cols. File size =
+'3.71276379999836 seconds to write 1000 files. Each file has 70 rows and 6 columns.
+'10.0182820000009 seconds to read 1000 files. Each file has 70 rows and 6 columns.
+'====================================================================================================
+
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CSVSpeedTest()
 

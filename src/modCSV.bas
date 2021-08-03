@@ -56,8 +56,6 @@ Sub RegisterCSVWrite()
 End Sub
 
 
-
-
 Private Function CreateCSVStream(FileName As String, Optional ByVal EOL As String, Optional ByVal FileIsUnicode As Variant) As clsCSVStream
           Dim CSVS As New clsCSVStream
 
@@ -276,140 +274,145 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 71        If VarType(ShowMissingsAs) = vbString Then
 72            ShowMissingAsNullString = ShowMissingsAs = ""
 73        End If
-          If TypeName(LowerBounds) = "Range" Then LowerBounds = LowerBounds.Value
-74        If IsMissing(LowerBounds) Or IsEmpty(LowerBounds) Then
-75            LB = 1
-76        ElseIf IsNumeric(LowerBounds) Then
-77            LB = CLng(LowerBounds)
-78            If LB <> 0 And LB <> 1 Then Throw Err_LowerBounds
-79        Else
-80            Throw Err_LowerBounds
-81        End If
+74        If TypeName(LowerBounds) = "Range" Then LowerBounds = LowerBounds.Value
+75        If IsMissing(LowerBounds) Or IsEmpty(LowerBounds) Then
+76            LB = 1
+77        ElseIf IsNumeric(LowerBounds) Then
+78            LB = CLng(LowerBounds)
+79            If LB <> 0 And LB <> 1 Then Throw Err_LowerBounds
+80        Else
+81            Throw Err_LowerBounds
+82        End If
           'End of input validation
                 
-82        If NotDelimited Then
-83            CSVRead = ShowTextFile(FileName, StartRow, NumRows, MixedLineEndings, EOL, CBool(Unicode))
-84            Exit Function
-85        End If
+83        If NotDelimited Then
+84            CSVRead = ShowTextFile(FileName, StartRow, NumRows, MixedLineEndings, EOL, CBool(Unicode))
+85            Exit Function
+86        End If
                 
           'In this case (reading the entire file) performance is better if we don't use _
            clsCSVStream but instead use method SplitContents on the entire file contents.
-86        If StartRow = 1 And StartCol = 1 And NumRows = 0 And NumCols = 0 Then
-87            Set F = FSO.GetFile(FileName)
-88            Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
-89            If T.AtEndOfStream Then
-90                T.Close: Set T = Nothing: Set F = Nothing
-91                Throw Err_EmptyFile
-92            End If
+87        If StartRow = 1 And StartCol = 1 And NumRows = 0 And NumCols = 0 Then
+88            Set F = FSO.GetFile(FileName)
+89            Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+90            If T.AtEndOfStream Then
+91                T.Close: Set T = Nothing: Set F = Nothing
+92                Throw Err_EmptyFile
+93            End If
 
-93            ReadAll = T.ReadAll
-94            T.Close: Set T = Nothing: Set F = Nothing
-95            Lines = SplitContents(ReadAll, EOL, AltDelimiter, NoQuotesInFile)
+94            ReadAll = T.ReadAll
+95            T.Close: Set T = Nothing: Set F = Nothing
+96            If Not Unicode Then
+97                AltDelimiter = String(Len(EOL), ChrW(9986))
+98            Else
+99                AltDelimiter = CharNotInString(ReadAll)
+100           End If
+101           Lines = SplitNew(ReadAll, EOL, """", , AltDelimiter)
 
-96            If NoQuotesInFile Then
-97                RemoveQuotes = False
-98            End If
-99        Else
-100           Set CSVS = CreateCSVStream(FileName, EOL, Unicode)
-101           For i = 1 To StartRow - 1
-102               CSVS.ReadLine
-103           Next i
-104           CSVS.StartRecording
-105           If NumRows > 0 Then
-106               For i = 1 To NumRows
-107                   CSVS.ReadLine
-108               Next
-109           Else
-110               While Not CSVS.AtEndOfStream
-111                   CSVS.ReadLine
-112               Wend
-113           End If
+102       Else
+103           Set CSVS = CreateCSVStream(FileName, EOL, Unicode)
+104           For i = 1 To StartRow - 1
+105               CSVS.ReadLine
+106           Next i
+107           CSVS.StartRecording
+108           If NumRows > 0 Then
+109               For i = 1 To NumRows
+110                   CSVS.ReadLine
+111               Next
+112           Else
+113               While Not CSVS.AtEndOfStream
+114                   CSVS.ReadLine
+115               Wend
+116           End If
 
-114           Lines = CSVS.ReportAllLinesRead()
-115           If Not CSVS.QuotesEncountered Then
-116               RemoveQuotes = False
-117           End If
-118           Set CSVS = Nothing
-119       End If
-120       NumRowsInReturn = UBound(Lines) - LBound(Lines) + 1
+117           Lines = CSVS.ReportAllLinesRead()
+118           If Not CSVS.QuotesEncountered Then
+119               RemoveQuotes = False
+120           End If
+121           Set CSVS = Nothing
+122       End If
+123       NumRowsInReturn = UBound(Lines) - LBound(Lines) + 1
           
-121       If NumCols = 0 Then
-122           NumColsInReturn = 1
-123           SplitLimit = -1
-124       Else
-125           NumColsInReturn = NumCols
-126           SplitLimit = StartCol - 1 + NumCols + 1
-127       End If
+124       If NumCols = 0 Then
+125           NumColsInReturn = 1
+126           SplitLimit = -1
+127       Else
+128           NumColsInReturn = NumCols
+129           SplitLimit = StartCol - 1 + NumCols + 1
+130       End If
 
-128       AnyConversion = RemoveQuotes Or ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+131       AnyConversion = RemoveQuotes Or ShowNumbersAsNumbers Or ShowDatesAsDates Or _
               ShowLogicalsAsLogicals Or ShowErrorsAsErrors Or (Not ShowMissingAsNullString)
 
-129       LB = LowerBounds
-130       ReDim ReturnArray(LB To LB + NumRowsInReturn - 1, LB To LB + NumColsInReturn - 1)
+132       LB = LowerBounds
+133       ReDim ReturnArray(LB To LB + NumRowsInReturn - 1, LB To LB + NumColsInReturn - 1)
 
-131       For i = LBound(Lines) To UBound(Lines)
-132           OneRow = SplitLine(Lines(i), strDelimiter, AltDelimiter, NoQuotesInFile, SplitLimit)
-133           NumInRow = UBound(OneRow) - LBound(OneRow) + 1
-134           If SplitLimit > 0 Then
-135               If NumInRow = SplitLimit Then
-136                   NumInRow = SplitLimit - 1
-137               End If
-138           End If
+134       For i = LBound(Lines) To UBound(Lines)
+              ' OneRow = SplitLine(Lines(i), strDelimiter, AltDelimiter, NoQuotesInFile, SplitLimit)
+135           OneRow = SplitNew(Lines(i), strDelimiter, , SplitLimit)
+
+
+136           NumInRow = UBound(OneRow) - LBound(OneRow) + 1
+137           If SplitLimit > 0 Then
+138               If NumInRow = SplitLimit Then
+139                   NumInRow = SplitLimit - 1
+140               End If
+141           End If
 
               'Ragged files: Current line has more elements than maximum length of prior lines. _
                First we need to append columns on the right of ReturnArray (Redim Preserve) then for _
                cells in rows < i, populate the columns just added with ShowMissingsAs..
-139           If NumCols = 0 Then
-140               If NumInRow - StartCol + 1 > NumColsInReturn Then
-141                   ReDim Preserve ReturnArray(LB To LB + NumRowsInReturn - 1, LB To NumInRow - StartCol + LB)
-142                   If Not IsEmpty(ShowMissingsAs) Then
-143                       For p = 1 To i
-144                           For q = NumColsInReturn + 1 To NumInRow
-145                               ReturnArray(p + LB - 1, q + LB - 1) = ShowMissingsAs
-146                           Next q
-147                       Next p
-148                   End If
-149                   NumColsInReturn = NumInRow - StartCol + 1
-150               End If
-151           End If
+142           If NumCols = 0 Then
+143               If NumInRow - StartCol + 1 > NumColsInReturn Then
+144                   ReDim Preserve ReturnArray(LB To LB + NumRowsInReturn - 1, LB To NumInRow - StartCol + LB)
+145                   If Not IsEmpty(ShowMissingsAs) Then
+146                       For p = 1 To i
+147                           For q = NumColsInReturn + 1 To NumInRow
+148                               ReturnArray(p + LB - 1, q + LB - 1) = ShowMissingsAs
+149                           Next q
+150                       Next p
+151                   End If
+152                   NumColsInReturn = NumInRow - StartCol + 1
+153               End If
+154           End If
 
-152           If AnyConversion Then
-153               For j = 1 To MinLngs(NumColsInReturn, NumInRow - StartCol + 1)
-154                   ReturnArray(i + LB, j + LB - 1) = CastToVariant(OneRow(j + StartCol - 2), _
+155           If AnyConversion Then
+156               For j = 1 To MinLngs(NumColsInReturn, NumInRow - StartCol + 1)
+157                   ReturnArray(i + LB, j + LB - 1) = CastToVariant(OneRow(j + StartCol - 2), _
                           RemoveQuotes, ShowNumbersAsNumbers, SepsStandard, DecimalSeparator, SysDecimalSeparator, _
                           ShowDatesAsDates, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
                           ShowLogicalsAsLogicals, ShowErrorsAsErrors, ShowMissingAsNullString, ShowMissingsAs)
-155               Next j
-156           Else
-157               For j = 1 To MinLngs(NumColsInReturn, NumInRow - StartCol + 1)
-158                   ReturnArray(i + LB, j + LB - 1) = OneRow(j + StartCol - 2)
-159               Next j
-160           End If
+158               Next j
+159           Else
+160               For j = 1 To MinLngs(NumColsInReturn, NumInRow - StartCol + 1)
+161                   ReturnArray(i + LB, j + LB - 1) = OneRow(j + StartCol - 2)
+162               Next j
+163           End If
 
               'Ragged files: Current line has fewer elements than maximum length of prior lines. _
                We need to pad the remainder of the current line with ShowMissingsAs.
-161           If NumInRow - StartCol + 1 < NumColsInReturn Then
-162               If Not IsEmpty(ShowMissingsAs) Then
-163                   For j = NumInRow - StartCol + 2 To NumColsInReturn
-164                       ReturnArray(i + LB, j + LB - 1) = ShowMissingsAs
-165                   Next j
-166               End If
-167           End If
-168       Next i
+164           If NumInRow - StartCol + 1 < NumColsInReturn Then
+165               If Not IsEmpty(ShowMissingsAs) Then
+166                   For j = NumInRow - StartCol + 2 To NumColsInReturn
+167                       ReturnArray(i + LB, j + LB - 1) = ShowMissingsAs
+168                   Next j
+169               End If
+170           End If
+171       Next i
 
-169       CSVRead = ReturnArray
+172       CSVRead = ReturnArray
 
-170       Exit Function
+173       Exit Function
 
 ErrHandler:
-171       CSVRead = "#CSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
-172       If Not CSVS Is Nothing Then
-173           Set CSVS = Nothing
-174       End If
-175       If Not T Is Nothing Then
-176           T.Close
-177           Set T = Nothing
-178       End If
+174       CSVRead = "#CSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
+175       If Not CSVS Is Nothing Then
+176           Set CSVS = Nothing
+177       End If
+178       If Not T Is Nothing Then
+179           T.Close
+180           Set T = Nothing
+181       End If
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -644,158 +647,161 @@ ErrHandler:
 50        Throw "#InferEOL (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : SplitLine
-' Author     : Philip Swannell
-' Date       : 27-Jul-2021
-' Purpose    : Split one line of a csv file, splitting on those delimiter characters that are preceded by an odd number
-'              of double quote characters.
-' Parameters :
-'  Line          : The string to be split.
-'  Delimiter     : The delimiter.
-'  Limit         : Passed to VBA.split in the event that we are reading some but not all columns of a file.
-'  AltDelimiter  : A 1-character string known not to be contained in Line.
-'  NoQuotesInFile: Pass as true if there are no double quotes in the file and therefore necessarily no double quotes
-'                  in Line.
-'  SplitLimit    : For a speed up when we are reading fewer than all the columns in the file has to be passed as
-'                  StartCol + NumCols, i.e. one more than the number of columns we are interested in since the
-'                  remaining columns appear (unsplit) in the last element of the return. For all columns pass
-'                  SplitLimit = -1.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function SplitLine(ByVal Line As String, Delimiter As String, ByVal AltDelimiter As String, _
-          NoQuotesInFile As Boolean, SplitLimit As Long)
-          
-          Dim EvenQuotes As Boolean
-          Dim i As Long
-          Dim RetForEmptyLine(0 To 0) As String
-          Dim NoQuotesInLine As Boolean
-          
-1         On Error GoTo ErrHandler
+'PGS 2 Aug 2021. Old approach, examined every character. Delete after testing new approach
+'' -----------------------------------------------------------------------------------------------------------------------
+'' Procedure  : SplitLine
+'' Author     : Philip Swannell
+'' Date       : 27-Jul-2021
+'' Purpose    : Split one line of a csv file, splitting on those delimiter characters that are preceded by an odd number
+''              of double quote characters.
+'' Parameters :
+''  Line          : The string to be split.
+''  Delimiter     : The delimiter.
+''  Limit         : Passed to VBA.split in the event that we are reading some but not all columns of a file.
+''  AltDelimiter  : A 1-character string known not to be contained in Line.
+''  NoQuotesInFile: Pass as true if there are no double quotes in the file and therefore necessarily no double quotes
+''                  in Line.
+''  SplitLimit    : For a speed up when we are reading fewer than all the columns in the file has to be passed as
+''                  StartCol + NumCols, i.e. one more than the number of columns we are interested in since the
+''                  remaining columns appear (unsplit) in the last element of the return. For all columns pass
+''                  SplitLimit = -1.
+'' -----------------------------------------------------------------------------------------------------------------------
+'Private Function SplitLine(Line As String, Delimiter As String, ByVal AltDelimiter As String, _
+'          NoQuotesInFile As Boolean, SplitLimit As Long)
+'
+'          Dim EvenQuotes As Boolean
+'          Dim i As Long
+'          Dim RetForEmptyLine(0 To 0) As String
+'          Dim NoQuotesInLine As Boolean
+'
+'1         On Error GoTo ErrHandler
+'
+'2         If NoQuotesInFile Then
+'3             NoQuotesInLine = True
+'4         ElseIf InStr(Line, DQ) = 0 Then
+'5             NoQuotesInLine = True
+'6         End If
+'
+'7         If NoQuotesInLine Then
+'8             If Len(Line) = 0 Then
+'                  'VBA.Split has undesirable behaviour when passed the null string.
+'                  'Return has zero elements (LBound = 0, UBound = -1).
+'                  'We need return to be a zero-based, one-element array of
+'                  'strings, whose single element is the empty string.
+'9                 SplitLine = RetForEmptyLine
+'10            Else
+'11                SplitLine = VBA.Split(Line, Delimiter, SplitLimit)
+'12            End If
+'13        Else
+'14            If Len(AltDelimiter) = 0 Then
+'15                AltDelimiter = CharNotInString(Line)
+'16            End If
+'17            EvenQuotes = True
+'18            For i = 1 To Len(Line)
+'19                Select Case Mid$(Line, i, 1)
+'                      Case DQ
+'20                        EvenQuotes = Not EvenQuotes
+'21                    Case Delimiter
+'22                        If EvenQuotes Then
+'23                            Mid$(Line, i, 1) = AltDelimiter
+'24                        End If
+'25                End Select
+'26            Next i
+'27            SplitLine = VBA.Split(Line, AltDelimiter, SplitLimit)
+'28        End If
+'
+'29        Exit Function
+'ErrHandler:
+'30        Throw "#SplitLine (line " & CStr(Erl) + "): " & Err.Description & "!"
+'31    End Function
 
-2         If NoQuotesInFile Then
-3             NoQuotesInLine = True
-4         ElseIf InStr(Line, DQ) = 0 Then
-5             NoQuotesInLine = True
-6         End If
 
-7         If NoQuotesInLine Then
-8             If Len(Line) = 0 Then
-                  'VBA.Split has undesirable behaviour when passed the null string.
-                  'Return has zero elements (LBound = 0, UBound = -1).
-                  'We need return to be a zero-based, one-element array of
-                  'strings, whose single element is the empty string.
-9                 SplitLine = RetForEmptyLine
-10            Else
-11                SplitLine = VBA.Split(Line, Delimiter, SplitLimit)
-12            End If
-13        Else
-14            If Len(AltDelimiter) = 0 Then
-15                AltDelimiter = CharNotInString(Line)
-16            End If
-17            EvenQuotes = True
-18            For i = 1 To Len(Line)
-19                Select Case Mid$(Line, i, 1)
-                      Case DQ
-20                        EvenQuotes = Not EvenQuotes
-21                    Case Delimiter
-22                        If EvenQuotes Then
-23                            Mid$(Line, i, 1) = AltDelimiter
-24                        End If
-25                End Select
-26            Next i
-27            SplitLine = VBA.Split(Line, AltDelimiter, SplitLimit)
-28        End If
-
-29        Exit Function
-ErrHandler:
-30        Throw "#SplitLine (line " & CStr(Erl) + "): " & Err.Description & "!"
-31    End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : SplitContents
-' Author     : Philip Swannell
-' Date       : 27-Jul-2021
-' Purpose    : Split the contents of a text file into an array, one element per line but only splitting on EOL characters
-'              that appear after an even number of double quote characters.
-' Parameters :
-'  Contents         : The contents of a file as a string.
-'  EOL              : The end of line character(s).
-'  CharNotInContents: Passed by reference. If contents contains double quotes then this is set to a character known not
-'                     to be in Contents - useful for subsequent calls to SplitLine.
-'  NoQuotesInFile   : Passed by reference and set to indicate if Contents contains no double quotes.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function SplitContents(ByVal Contents As String, EOL As String, ByRef CharNotInContents As String, _
-          ByRef NoQuotesInFile As Boolean) As String()
-          
-          Dim AltEOL As String
-          Dim EvenQuotes As Boolean
-          Dim i As Long
-          Dim Result() As String
-          Dim RetForNullString(0 To 0) As String
-          Dim TrailingEOL As Boolean
-          
-1         On Error GoTo ErrHandler
-
-2         TrailingEOL = Right$(Contents, Len(EOL)) = EOL
-
-3         If Len(Contents) = 0 Then
-              'VBA.Split has strange behaviour when passed an empty string.
-              'Return has zero elements (LBound = 0, UBound = -1).
-              'We need return to be a zero-based, one-element array of
-              'strings, whose single element is the empty string.
-4             Result = RetForNullString
-5         ElseIf InStr(Contents, DQ) = 0 Then
-6             Result = VBA.Split(Contents, EOL)
-7             NoQuotesInFile = True
-8         ElseIf EOL = vbLf Or EOL = vbCr Then
-9             AltEOL = CharNotInString(Contents)
-10            CharNotInContents = AltEOL
-11            EvenQuotes = True
-12            For i = 1 To Len(Contents)
-13                Select Case Mid$(Contents, i, 1)
-                      Case DQ
-14                        EvenQuotes = Not EvenQuotes
-15                    Case EOL
-16                        If EvenQuotes Then
-17                            Mid$(Contents, i, 1) = AltEOL
-18                        End If
-19                End Select
-20            Next i
-21            Result = VBA.Split(Contents, AltEOL)
-22        ElseIf EOL = vbCrLf Then
-23            AltEOL = CharNotInString(Contents)
-24            CharNotInContents = AltEOL
-25            EvenQuotes = True
-26            For i = 1 To Len(Contents)
-27                Select Case Mid$(Contents, i, 1)
-                      Case DQ
-28                        EvenQuotes = Not EvenQuotes
-29                    Case vbLf
-30                        If Mid$(Contents, i - 1, 1) = vbCr Then
-31                            If EvenQuotes Then
-32                                Mid$(Contents, i, 1) = AltEOL
-33                                Mid$(Contents, i - 1, 1) = AltEOL
-34                            End If
-35                        End If
-36                End Select
-37            Next i
-38            Result = VBA.Split(Contents, AltEOL + AltEOL)
-39        Else
-40            Throw "Unexpected error, Line ending character must be ascii 10 (for Unix), ascii 13 (Mac) or ascii 10 plus ascii 13 (Windows)"
-41        End If
-
-42        If TrailingEOL Then
-43            If Len(Result(UBound(Result))) = 0 Then
-44                ReDim Preserve Result(LBound(Result) To UBound(Result) - 1)
-45            End If
-46        End If
-        
-47        SplitContents = Result
-
-48        Exit Function
-ErrHandler:
-49        Throw "#SplitContents (line " & CStr(Erl) + "): " & Err.Description & "!"
-End Function
+'PGS 2 Aug 2021 OLD approach, examined every character. Delete when finished testing of new approach.
+'' -----------------------------------------------------------------------------------------------------------------------
+'' Procedure  : SplitContents
+'' Author     : Philip Swannell
+'' Date       : 27-Jul-2021
+'' Purpose    : Split the contents of a text file into an array, one element per line but only splitting on EOL characters
+''              that appear after an even number of double quote characters.
+'' Parameters :
+''  Contents         : The contents of a file as a string.
+''  EOL              : The end of line character(s).
+''  CharNotInContents: Passed by reference. If contents contains double quotes then this is set to a character known not
+''                     to be in Contents - useful for subsequent calls to SplitLine.
+''  NoQuotesInFile   : Passed by reference and set to indicate if Contents contains no double quotes.
+'' -----------------------------------------------------------------------------------------------------------------------
+'Private Function SplitContents(ByVal Contents As String, EOL As String, ByRef CharNotInContents As String, _
+'          ByRef NoQuotesInFile As Boolean) As String()
+'
+'          Dim AltEOL As String
+'          Dim EvenQuotes As Boolean
+'          Dim i As Long
+'          Dim Result() As String
+'          Dim RetForNullString(0 To 0) As String
+'          Dim TrailingEOL As Boolean
+'
+'1         On Error GoTo ErrHandler
+'
+'2         TrailingEOL = Right$(Contents, Len(EOL)) = EOL
+'
+'3         If Len(Contents) = 0 Then
+'              'VBA.Split has strange behaviour when passed an empty string.
+'              'Return has zero elements (LBound = 0, UBound = -1).
+'              'We need return to be a zero-based, one-element array of
+'              'strings, whose single element is the empty string.
+'4             Result = RetForNullString
+'5         ElseIf InStr(Contents, DQ) = 0 Then
+'6             Result = VBA.Split(Contents, EOL)
+'7             NoQuotesInFile = True
+'8         ElseIf EOL = vbLf Or EOL = vbCr Then
+'9             AltEOL = CharNotInString(Contents)
+'10            CharNotInContents = AltEOL
+'11            EvenQuotes = True
+'12            For i = 1 To Len(Contents)
+'13                Select Case Mid$(Contents, i, 1)
+'                      Case DQ
+'14                        EvenQuotes = Not EvenQuotes
+'15                    Case EOL
+'16                        If EvenQuotes Then
+'17                            Mid$(Contents, i, 1) = AltEOL
+'18                        End If
+'19                End Select
+'20            Next i
+'21            Result = VBA.Split(Contents, AltEOL)
+'22        ElseIf EOL = vbCrLf Then
+'23            AltEOL = CharNotInString(Contents)
+'24            CharNotInContents = AltEOL
+'25            EvenQuotes = True
+'26            For i = 1 To Len(Contents)
+'27                Select Case Mid$(Contents, i, 1)
+'                      Case DQ
+'28                        EvenQuotes = Not EvenQuotes
+'29                    Case vbLf
+'30                        If Mid$(Contents, i - 1, 1) = vbCr Then
+'31                            If EvenQuotes Then
+'32                                Mid$(Contents, i, 1) = AltEOL
+'33                                Mid$(Contents, i - 1, 1) = AltEOL
+'34                            End If
+'35                        End If
+'36                End Select
+'37            Next i
+'38            Result = VBA.Split(Contents, AltEOL + AltEOL)
+'39        Else
+'40            Throw "Unexpected error, Line ending character must be ascii 10 (for Unix), ascii 13 (Mac) or ascii 10 plus ascii 13 (Windows)"
+'41        End If
+'
+'42        If TrailingEOL Then
+'43            If Len(Result(UBound(Result))) = 0 Then
+'44                ReDim Preserve Result(LBound(Result) To UBound(Result) - 1)
+'45            End If
+'46        End If
+'
+'47        SplitContents = Result
+'
+'48        Exit Function
+'ErrHandler:
+'49        Throw "#SplitContents (line " & CStr(Erl) + "): " & Err.Description & "!"
+'End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseDateFormat
@@ -900,32 +906,23 @@ End Function
 ' Procedure  : CharNotInString
 ' Author     : Philip Swannell
 ' Date       : 27-Jul-2021
-' Purpose    : Return a character not contained in specified string, or throw an error if not possible.
+' Purpose    : Return a character not contained in specified string, or throw an error if attempt fails.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CharNotInString(Str As String) As String
+Function CharNotInString(Str As String) As String
           Dim i As Long
           Dim TheChar As String
-          Const Err_NoAltDelimiter = "Cannot parse files which contain all characters from ascii 0 to ascii 255"
+          Const Err_NoAltDelimiter = "Unexpected error in method CharNotInString"
           
 1         On Error GoTo ErrHandler
 
-          'Character chr(0) is rare in text files so good idea to try that first. _
-          See https://stackoverflow.com/questions/30825491/does-0-appear-naturally-in-text-files
-
-2         For i = 0 To 7
-3             TheChar = Chr(i)
+          'Try 100 unicode characters spaced by 100, starting with a scissors emoji, scissors seem appropriate for markers at which we split a string.
+2         For i = 9986 To 19886 Step 100
+3             TheChar = ChrW(i)
 4             If InStr(Str, TheChar) = 0 Then
 5                 CharNotInString = TheChar
 6                 Exit Function
 7             End If
 8         Next i
-9         For i = 255 To 8 Step -1
-10            TheChar = Chr(i)
-11            If InStr(Str, TheChar) = 0 Then
-12                CharNotInString = TheChar
-13                Exit Function
-14            End If
-15        Next i
 
 16        Throw Err_NoAltDelimiter
 
