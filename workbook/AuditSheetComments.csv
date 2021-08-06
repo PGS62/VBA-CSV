@@ -1,0 +1,7 @@
+"Version","Date","Time","Author","Comment"
+6,06-Aug-2021,15:59:09,"Philip Swannell","Addd sheet ""TimingResults"" and module modCompareAgainstAlternatives."
+5,04-Aug-2021,08:22:44,"Philip Swannell","Added code to compare against https://github.com/sdkn104/VBA-CSV"
+4,03-Aug-2021,09:02:38,"Philip Swannell","Rewrote code to split a string, rather than examining each character in VBA code, use InStr in a while loop to push the character examination down to C code."
+3,29-Jul-2021,14:21:44,"Philip Swannell","Code now compiles."
+2,29-Jul-2021,13:50:33,"Philip Swannell","Reimported sFileSaveCSV and sFileShow from SolumAddin verison 2199. Code does not yet compile"
+1,23-Jul-2021,14:07:46,"Philip Swannell","First version. Start with SolumAddin's sFileShow to create CSVParse."

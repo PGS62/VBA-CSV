@@ -39,8 +39,8 @@ Private m_LEOL As Long
 Private m_QuotesEncountered As Boolean
 Private m_T As Scripting.TextStream
 
-Public Property Get AtEndOfStream() As Boolean
-    AtEndOfStream = m_AtEndOfStream
+Public Property Get atEndOfStream() As Boolean
+    atEndOfStream = m_AtEndOfStream
 End Property
 
 Public Property Get QuotesEncountered() As Boolean
@@ -49,8 +49,6 @@ End Property
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : StartRecording
-' Author     : Philip Swannell
-' Date       : 27-Jul-2021
 ' Purpose    : Set flags so that subsequent call to ReportAllLinesRead returns lines read starting from the point
 '              StartRecording is called.
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -60,169 +58,160 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Init
-' Author     : Philip Swannell
-' Date       : 27-Jul-2021
 ' Purpose    : Initializer, wrapped by function CreateCSVStream.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub Init(FileName As String, EOL As String, FileIsUnicode As Boolean)
-          Dim FSO As New Scripting.FileSystemObject
-          Dim F As Scripting.File
+    Dim FSO As New Scripting.FileSystemObject
+    Dim F As Scripting.File
 
-          Const Err_EOL = "EOL not recognized. Allowed values are ""Windows"" (or ascii characters 13 and 10), ""Unix"" (or ascii character 10) or ""Mac"" (or ascii character 13)"
-          Const Err_Delimiter = "Delimiter must be one character, and cannot be a double quote or a new line character"
+    Const Err_EOL = "EOL not recognized. Allowed values are ""Windows"" (or ascii characters 13 and 10), ""Unix"" (or ascii character 10) or ""Mac"" (or ascii character 13)"
 
-1         On Error GoTo ErrHandler
-2         Select Case LCase(EOL)
-              Case "windows", vbCrLf
-3                 m_EOL = vbCrLf
-4                 m_EOL2ndChar = vbLf
-5                 m_AltEOL = Chr(0) + Chr(0)
-6             Case "unix", vbLf
-7                 m_EOL = vbLf
-8                 m_AltEOL = Chr(0)
-9             Case "mac", vbCr
-10                m_EOL = vbCr
-11                m_AltEOL = Chr(0)
-12            Case Else
-13                Throw Err_EOL
-14        End Select
-15        m_EOL1stChar = Left(m_EOL, 1)
+    On Error GoTo ErrHandler
+    Select Case LCase(EOL)
+        Case "windows", vbCrLf
+            m_EOL = vbCrLf
+            m_EOL2ndChar = vbLf
+            m_AltEOL = Chr(0) + Chr(0)
+        Case "unix", vbLf
+            m_EOL = vbLf
+            m_AltEOL = Chr(0)
+        Case "mac", vbCr
+            m_EOL = vbCr
+            m_AltEOL = Chr(0)
+        Case Else
+            Throw Err_EOL
+    End Select
+    m_EOL1stChar = Left(m_EOL, 1)
 
-16        m_LEOL = Len(m_EOL)
-17        m_BufferReadTo = -m_LEOL
-18        m_BufferReadFrom = 1
+    m_LEOL = Len(m_EOL)
+    m_BufferReadTo = -m_LEOL
+    m_BufferReadFrom = 1
 
-19        Set F = FSO.GetFile(FileName)
-20        Set m_T = F.OpenAsTextStream(ForReading, IIf(FileIsUnicode, TristateTrue, TristateFalse))
-21        m_CHUNK_SIZE = MaxLngs(1000, F.Size / 100)
+    Set F = FSO.GetFile(FileName)
+    Set m_T = F.OpenAsTextStream(ForReading, IIf(FileIsUnicode, TristateTrue, TristateFalse))
+    m_CHUNK_SIZE = MaxLngs(1000, F.Size / 100)
 
-22        Exit Sub
+    Exit Sub
 ErrHandler:
-23        Throw "#clsCSVStream.init (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#clsCSVStream.init: " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : GetMoreFromFile
-' Author     : Philip Swannell
-' Date       : 27-Jul-2021
 ' Purpose    : Read data from the file into the buffer. If necessary the buffer is doubled in size.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function GetMoreFromFile()
-          Dim NewChars As String
+    Dim NewChars As String
 
-1         On Error GoTo ErrHandler
-          Dim i As Long
-          Dim ReadOneMore As Boolean
-          Const Err_Ascii0 = "File contains ascii character zero. In the current implementation, such files " + _
-          "can only br read if arguments StartRow, StartCol, NumRows and NumCols are omitted to read the whole file. Sorry"
+    On Error GoTo ErrHandler
+    Dim i As Long
+    Dim ReadOneMore As Boolean
+    Const Err_Ascii0 = "File contains ascii character zero. In the current implementation, such files " + _
+        "can only br read if arguments StartRow, StartCol, NumRows and NumCols are omitted to read the whole file. Sorry"
 
-2         For i = 1 To 2
-3             NewChars = m_T.Read(IIf(i = 1, m_CHUNK_SIZE, 1))
-4             If InStr(NewChars, Chr(0)) > 0 Then
-5                 Throw Err_Ascii0
-6             End If
+    For i = 1 To 2
+        NewChars = m_T.Read(IIf(i = 1, m_CHUNK_SIZE, 1))
+        If InStr(NewChars, Chr(0)) > 0 Then
+            Throw Err_Ascii0
+        End If
 
-7             If (Len(m_Buffer) - m_BufferUpdatedTo) < Len(NewChars) Then
-8                 m_Buffer = m_Buffer & String(MaxLngs(Len(NewChars), Len(m_Buffer)), " ")
-9             End If
-10            Mid$(m_Buffer, m_BufferUpdatedTo + 1, Len(NewChars)) = NewChars
-11            m_BufferUpdatedTo = m_BufferUpdatedTo + Len(NewChars)
+        If (Len(m_Buffer) - m_BufferUpdatedTo) < Len(NewChars) Then
+            m_Buffer = m_Buffer & String(MaxLngs(Len(NewChars), Len(m_Buffer)), " ")
+        End If
+        Mid$(m_Buffer, m_BufferUpdatedTo + 1, Len(NewChars)) = NewChars
+        m_BufferUpdatedTo = m_BufferUpdatedTo + Len(NewChars)
 
-12            If m_T.AtEndOfStream Then
-13                Exit Function
-14            End If
+        If m_T.atEndOfStream Then
+            Exit Function
+        End If
 
-15            If i = 1 Then
-                  'Have to be careful that we don't split a two-character EOL marker in half. _
-                  If the last character read was vbCr then do a second pass through the _
-                  loop, reading only one further character from the file.
-16                ReadOneMore = (m_EOL = vbCrLf) And (Right(NewChars, 1) = vbCr)
-17                If Not ReadOneMore Then Exit For
-18            End If
+        If i = 1 Then
+            'Have to be careful that we don't split a two-character EOL marker in half. _
+             If the last character read was vbCr then do a second pass through the _
+             loop, reading only one further character from the file.
+            ReadOneMore = (m_EOL = vbCrLf) And (Right(NewChars, 1) = vbCr)
+            If Not ReadOneMore Then Exit For
+        End If
 
-19        Next i
+    Next i
 
-20        Exit Function
+    Exit Function
 ErrHandler:
-21        Throw "#clsCSVStream.GetMoreFromFile (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#clsCSVStream.GetMoreFromFile: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ReportAllLinesRead
-' Author     : Philip Swannell
-' Date       : 25-Jul-2021
 ' Purpose    : Return 1-dim array of all lines read since the last call to StartRecording.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function ReportAllLinesRead()
-1         On Error GoTo ErrHandler
-          Dim ZeroReturn() As String
+    On Error GoTo ErrHandler
+    Dim ZeroReturn() As String
 
-2         If m_BufferReadTo = m_BufferReadFrom - 1 Then
-3             ReDim ZeroReturn(0 To 0)
-4             ReportAllLinesRead = ZeroReturn
-7         Else
-8             ReportAllLinesRead = VBA.Split(GetChars(m_Buffer, m_BufferReadFrom, m_BufferReadTo), m_AltEOL)
-11        End If
+    If m_BufferReadTo = m_BufferReadFrom - 1 Then
+        ReDim ZeroReturn(0 To 0)
+        ReportAllLinesRead = ZeroReturn
+    Else
+        ReportAllLinesRead = VBA.Split(GetChars(m_Buffer, m_BufferReadFrom, m_BufferReadTo), m_AltEOL)
+    End If
 
-12        Exit Function
+    Exit Function
 ErrHandler:
-13        Throw "#ReportAllLinesRead (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#ReportAllLinesRead: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ReadLine
-' Author     : Philip Swannell
-' Date       : 27-Jul-2021
 ' Purpose    : Read a line. Unlike Scripting.TextStream.ReadLine this method has no return. Instead it prepares the buffer
 '              for subsequent parsing by ReportAllLinesRead by a) reading more data from file (if necessary) and b) replacing
 '              instances of the the end of line characters (m_EOL) with the alternative (m_AltEOL).
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub ReadLine()
-          Dim i As Long
-          
-          Dim EvenQuotes As Boolean
-          
-1         On Error GoTo ErrHandler
-2         EvenQuotes = True
-3         i = m_BufferReadTo + m_LEOL + 1
-4         While True
-5             If i > m_BufferUpdatedTo Then 'what if zero chars in file?
-6                 If Not m_T.AtEndOfStream Then
-7                     GetMoreFromFile
-8                 Else
-9                     Throw "attempt to read past end of file"
-10                End If
-11            End If
-12            If Mid$(m_Buffer, i, 1) = DQ Then
-13                m_QuotesEncountered = True
-14                EvenQuotes = Not EvenQuotes
-15            End If
-16            If EvenQuotes Then
-17                If Mid$(m_Buffer, i, 1) = m_EOL1stChar Then
-18                    If m_LEOL = 1 Or (i < m_BufferUpdatedTo And Mid$(m_Buffer, i + 1, 1) = m_EOL2ndChar) Then
-19                        m_BufferReadTo = i - 1
-20                        SetChars m_Buffer, m_BufferReadTo + 1, m_AltEOL
-21                        If i = m_BufferUpdatedTo - m_LEOL + 1 Then
-22                            If m_T.AtEndOfStream Then
-23                                m_AtEndOfStream = True
-24                            End If
-25                        End If
-26                        Exit Sub
-27                    End If
-28                End If
-29            End If
-30            If i = m_BufferUpdatedTo Then
-31                If m_T.AtEndOfStream Then 'Reading the last line of the file, which was not terminated with EOL
-32                    m_BufferReadTo = i
-33                    m_AtEndOfStream = True
-34                    Exit Sub
-35                End If
-36            End If
-37            i = i + 1
-38        Wend
-39        Exit Sub
+    Dim i As Long
+    
+    Dim EvenQuotes As Boolean
+    
+    On Error GoTo ErrHandler
+    EvenQuotes = True
+    i = m_BufferReadTo + m_LEOL + 1
+    While True
+        If i > m_BufferUpdatedTo Then 'what if zero chars in file?
+            If Not m_T.atEndOfStream Then
+                GetMoreFromFile
+            Else
+                Throw "attempt to read past end of file"
+            End If
+        End If
+        If Mid$(m_Buffer, i, 1) = DQ Then
+            m_QuotesEncountered = True
+            EvenQuotes = Not EvenQuotes
+        End If
+        If EvenQuotes Then
+            If Mid$(m_Buffer, i, 1) = m_EOL1stChar Then
+                If m_LEOL = 1 Or (i < m_BufferUpdatedTo And Mid$(m_Buffer, i + 1, 1) = m_EOL2ndChar) Then
+                    m_BufferReadTo = i - 1
+                    SetChars m_Buffer, m_BufferReadTo + 1, m_AltEOL
+                    If i = m_BufferUpdatedTo - m_LEOL + 1 Then
+                        If m_T.atEndOfStream Then
+                            m_AtEndOfStream = True
+                        End If
+                    End If
+                    Exit Sub
+                End If
+            End If
+        End If
+        If i = m_BufferUpdatedTo Then
+            If m_T.atEndOfStream Then 'Reading the last line of the file, which was not terminated with EOL
+                m_BufferReadTo = i
+                m_AtEndOfStream = True
+                Exit Sub
+            End If
+        End If
+        i = i + 1
+    Wend
+    Exit Sub
 ErrHandler:
-40        Throw "#clsCSVStream.ReadLine (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#clsCSVStream.ReadLine: " & Err.Description & "!"
 End Sub
 
 Private Function GetChars(x As String, First As Long, Last As Long)
@@ -234,22 +223,22 @@ Private Function SetChars(x As String, First As Long, InsertThis As String)
 End Function
 
 Private Function MaxLngs(x As Long, y As Long) As Long
-1         If x > y Then
-2             MaxLngs = x
-3         Else
-4             MaxLngs = y
-5         End If
+    If x > y Then
+        MaxLngs = x
+    Else
+        MaxLngs = y
+    End If
 End Function
 
 Private Sub Class_Terminate()
-1         On Error Resume Next
-2         m_T.Close
-3         Set m_T = Nothing
-4         m_Buffer = ""
+    On Error Resume Next
+    m_T.Close
+    Set m_T = Nothing
+    m_Buffer = ""
 End Sub
 
 'Copy of Throw, to make this module  self-contained.
 Private Sub Throw(ByVal ErrorString As String)
-1         Err.Raise vbObjectError + 1, , ErrorString
+    Throw ErrorString
 End Sub
 
