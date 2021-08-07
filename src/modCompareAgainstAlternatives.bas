@@ -35,7 +35,7 @@ Const m_FolderSpeedTest = "C:\Temp\CSVTest\CompareAgainstAlternatives"
 Private Sub CompareAgainstAlternatives()
 
     Dim data As Variant
-    Dim DataReread1, DataReread2, DataReread3
+    Dim DataReread1, DataReread2, DataReread3, DataReread4
     Dim FileName As String
     Dim i As Long
     Dim j As Long
@@ -43,7 +43,7 @@ Private Sub CompareAgainstAlternatives()
     Dim NumRows As Long
     Dim OS As String
     Dim SmallFileName As String
-    Dim t1 As Double, t2 As Double, t3 As Double, tstart As Double, tend As Double
+    Dim t1 As Double, t2 As Double, t3 As Double, t4 As Double, tstart As Double, tend As Double
     Const Unicode = False
     Dim QuoteAllStrings As Boolean
     Dim ExtraInfo As String
@@ -87,9 +87,9 @@ Private Sub CompareAgainstAlternatives()
         
         Debug.Print "FileName = " & FileName
         Debug.Print "Contains " + ExtraInfo + " " + _
-                Format(NumRows, "###,##0") + " rows, " + Format(NumCols, "###,##0") + " cols. " '+ _
-                "File size = " + Format(sFileInfo(FileName, "size"), "###,##0") + " bytes."
-        For j = 1 To 3
+            Format(NumRows, "###,##0") + " rows, " + Format(NumCols, "###,##0") + " cols. " '+ _
+            "File size = " + Format(sFileInfo(FileName, "size"), "###,##0") + " bytes."
+        For j = 1 To 4
             tstart = sElapsedTime
             Select Case j
                 Case 1
@@ -101,6 +101,8 @@ Private Sub CompareAgainstAlternatives()
                 Case 3
                     DataReread3 = ThrowIfError(CSVRead_ws_garcia(FileName, ",", vbCrLf))
                     FnName = "CSVRead_ws_garcia"
+                Case 4
+                    DataReread4 = CSVRead2(FileName, ",")
             End Select
             tend = sElapsedTime()
             Select Case j
@@ -110,12 +112,15 @@ Private Sub CompareAgainstAlternatives()
                     t2 = tend - tstart
                 Case 3
                     t3 = tend - tstart
+                Case 4
+                    t4 = tend - tstart
             End Select
             
             Debug.Print FnName + " " + CStr(tend - tstart)
         Next j
         Debug.Print "v sdk104          " & CStr(t2 / t1) & "           >1 = CSVRead faster"
         Debug.Print "v garcia          " & CStr(t3 / t1) & "           >1 = CSVRead faster"
+        Debug.Print "v CSVRead2          " & CStr(t4 / t1) & "           >1 = CSVRead faster"
 
         'Hook in to SolumAddin
         If Not Application.Run("sArraysIdentical", DataReread1, DataReread2) Then
@@ -127,7 +132,7 @@ Private Sub CompareAgainstAlternatives()
         End If
         Debug.Print String(10, "-")
     Next i
-Debug.Print "Done"
+    Debug.Print "Done"
 
     Exit Sub
 ErrHandler:
@@ -138,18 +143,24 @@ End Sub
 
 
 
-Function TimeFourParsers(EachFieldContains As Variant, NumRows As Long, NumCols As Long, CheckReturnsIdentical As Boolean)
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : TimeFiveParsers
+' Author     : Philip Swannell
+' Date       : 07-Aug-2021
+' Purpose    : For use from sheet TimingResults - compares speed of 5 CSV parsing functions
+' -----------------------------------------------------------------------------------------------------------------------
+Function TimeFiveParsers(EachFieldContains As Variant, NumRows As Long, NumCols As Long, CheckReturnsIdentical As Boolean)
 
     Dim data As Variant
     Dim FileName As String
     Dim i As Long
     Dim j As Long
     Dim OS As String
-    Dim t1 As Double, t2 As Double, t3 As Double, t4 As Double, tstart As Double, tend As Double
+    Dim t1 As Double, t2 As Double, t3 As Double, t4 As Double, t5 As Double, tstart As Double, tend As Double
     Const Unicode = False
     Dim ExtraInfo As String
     Dim FnName As String
-    Dim DataReread1, DataReread2, DataReread3, DataReread4
+    Dim DataReread1, DataReread2, DataReread3, DataReread4, DataReread5
 
 
     On Error GoTo ErrHandler
@@ -173,7 +184,7 @@ Function TimeFourParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, Replace(ExtraInfo, " ", "-"), Unicode, False)
     ThrowIfError sFileSave(FileName, data, ",", , , , True)
         
-    For j = 1 To 4
+    For j = 1 To 5
         tstart = sElapsedTime
         Select Case j
             Case 1
@@ -184,6 +195,8 @@ Function TimeFourParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
                 DataReread3 = ThrowIfError(CSVRead_ws_garcia(FileName, ",", vbCrLf))
             Case 4
                 DataReread4 = ThrowIfError(sFileShow(FileName, ",", False, False, False, vbCrLf))
+            Case 5
+                DataReread5 = ThrowIfError(CSVRead2(FileName, ","))
         End Select
         tend = sElapsedTime()
         Select Case j
@@ -195,11 +208,13 @@ Function TimeFourParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
                 t3 = tend - tstart
             Case 4
                 t4 = tend - tstart
+            Case 5
+                t5 = tend - tstart
         End Select
             
     Next j
 
-    Dim OneEqTwo, OneEqThree, OneEqFour
+    Dim OneEqTwo, OneEqThree, OneEqFour, OneEqFive
 
     'Hook in to SolumAddin
     If CheckReturnsIdentical Then
@@ -207,28 +222,32 @@ Function TimeFourParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
         'Comparing arrays but allowing for different lower bounds
         OneEqThree = Application.Run("sArraysIdentical", DataReread1, DataReread3, True, True)
         OneEqFour = Application.Run("sArraysIdentical", DataReread1, DataReread4)
+        OneEqFive = Application.Run("sArraysIdentical", DataReread1, DataReread5)
     Else
         OneEqTwo = "-"
         OneEqThree = "-"
         OneEqFour = "-"
+        OneEqFive = "-"
     End If
 
-    Dim Ret(1 To 1, 1 To 9) As Variant
+    Dim Ret(1 To 1, 1 To 11) As Variant
     Ret(1, 1) = t1
     Ret(1, 2) = t2
     Ret(1, 3) = t3
     Ret(1, 4) = t4
-    Ret(1, 5) = OneEqTwo
-    Ret(1, 6) = OneEqThree
-    Ret(1, 7) = OneEqFour
-    Ret(1, 8) = FileName
-    Ret(1, 9) = sFileInfo(FileName, "Size")
+    Ret(1, 5) = t5
+    Ret(1, 6) = OneEqTwo
+    Ret(1, 7) = OneEqThree
+    Ret(1, 8) = OneEqFour
+    Ret(1, 9) = OneEqFive
+    Ret(1, 10) = FileName
+    Ret(1, 11) = sFileInfo(FileName, "Size")
 
-    TimeFourParsers = Ret
+    TimeFiveParsers = Ret
 
     Exit Function
 ErrHandler:
-    TimeFourParsers = "#TimeFourParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
+    TimeFiveParsers = "#TimeFiveParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 

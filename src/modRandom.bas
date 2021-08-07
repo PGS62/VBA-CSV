@@ -196,7 +196,7 @@ Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, U
             RandomVariant = Format(CLng(RandomDate()), DateFormat)
         Case 9
             'String that looks like Boolean
-            RandomVariant = CStr(RandomBoolean())
+            RandomVariant = UCase(CStr(RandomBoolean()))
         Case 10
             RandomVariant = Empty
         Case 11

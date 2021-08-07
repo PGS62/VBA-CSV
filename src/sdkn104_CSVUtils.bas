@@ -90,7 +90,7 @@ Public Function ParseCSVToCollection(ByRef CSVtext As String, Optional ByRef all
 Head:
     Dim csvPos As Long
     Dim fieldText As String
-    Dim nextSep As Long, nextSepType As Long, quoteCount As Long, fieldStart As Long, fieldLen As Long
+    Dim nextSep As Long, nextSepType As Long, QuoteCount As Long, fieldStart As Long, fieldLen As Long
     Dim fields As Collection
     Dim csvCollection As Collection
     Set csvCollection = New Collection 'empty collection
@@ -109,13 +109,13 @@ Head:
     csvPos = 1
     Set fields = New Collection
     Call FindNextSeparatorInit(CSVtext)
-    Do While FindNextSeparator(CSVtext, csvPos, fieldStart, fieldLen, nextSepType, quoteCount)
+    Do While FindNextSeparator(CSVtext, csvPos, fieldStart, fieldLen, nextSepType, QuoteCount)
         fieldText = Mid(CSVtext, fieldStart, fieldLen)
         If Err.Number <> 0 Then Exit Do
         
-        If quoteCount > 0 Then ' the field includes " (double-quote)
+        If QuoteCount > 0 Then ' the field includes " (double-quote)
             fieldText = TrimQuotes(fieldText) 'get internal of ""
-            If quoteCount > 2 Then 'the field includes double-quote in internal of ""
+            If QuoteCount > 2 Then 'the field includes double-quote in internal of ""
                 fieldText = Replace(fieldText, """""", """") 'un-escape double quote
                 If fieldText Like "=""*""" Then fieldText = Mid(fieldText, 3, Len(fieldText) - 3) 'remove MS quote (="...")
             End If
@@ -161,7 +161,7 @@ Head:
     Dim csvArray() As String
     Dim ri As Long, fi As Long
     Dim sepIndex As Long
-    Dim fieldStart As Long, fieldLen As Long, nextSepType As Long, quoteCount As Long
+    Dim fieldStart As Long, fieldLen As Long, nextSepType As Long, QuoteCount As Long
     Dim fieldText As String
     
     ParseCSVToArray = Null 'for error
@@ -201,11 +201,11 @@ Head:
         
         fieldLen = sepArray2(sepIndex)
         nextSepType = sepArray3(sepIndex)
-        quoteCount = sepArray4(sepIndex)
+        QuoteCount = sepArray4(sepIndex)
         fieldText = Mid(CSVtext, fieldStart, fieldLen)
-        If quoteCount > 0 Then ' the field includes " (double-quote)
+        If QuoteCount > 0 Then ' the field includes " (double-quote)
             fieldText = TrimQuotes(fieldText) 'get internal of ""
-            If quoteCount > 2 Then 'the field includes double-quote in internal of ""
+            If QuoteCount > 2 Then 'the field includes double-quote in internal of ""
                 fieldText = Replace(fieldText, """""", """") 'un-escape double quote
                 If fieldText Like "=""*""" Then fieldText = Mid(fieldText, 3, Len(fieldText) - 3) 'remove MS quote (="...")
             End If
@@ -337,7 +337,7 @@ Private Sub ParseCSV(ByRef rowCount As Long, ByRef colCount As Long, ByRef sepAr
 Head:
     Dim csvPos As Long
     Dim fieldText As String
-    Dim nextSep As Long, nextSepType As Long, quoteCount As Long, fieldStart As Long, fieldLen As Long
+    Dim nextSep As Long, nextSepType As Long, QuoteCount As Long, fieldStart As Long, fieldLen As Long
     Dim colCountTmp As Long
     Dim sepIndex As Long, sepSize As Long
     
@@ -359,7 +359,7 @@ Head:
     'extract records and fields
     csvPos = 1
     Call FindNextSeparatorInit(CSVtext)
-    Do While FindNextSeparator(CSVtext, csvPos, fieldStart, fieldLen, nextSepType, quoteCount)
+    Do While FindNextSeparator(CSVtext, csvPos, fieldStart, fieldLen, nextSepType, QuoteCount)
         If Err.Number <> 0 Then Exit Do
         
         ' enhance array size if it is short
@@ -373,7 +373,7 @@ Head:
         sepArray1(sepIndex) = fieldStart
         sepArray2(sepIndex) = fieldLen
         sepArray3(sepIndex) = nextSepType
-        sepArray4(sepIndex) = quoteCount
+        sepArray4(sepIndex) = QuoteCount
         sepIndex = sepIndex + 1
         
         colCountTmp = colCountTmp + 1
@@ -417,7 +417,7 @@ Private Function FindNextSeparator(ByRef inText As String, _
                     ByRef start As Long, _
                     ByRef fieldStart As Long, _
                     ByRef fieldLen As Long, _
-                    nextSepType As Long, ByRef quoteCount As Long) As Boolean
+                    nextSepType As Long, ByRef QuoteCount As Long) As Boolean
     Dim init_start As Long, lenText As Long
     Dim nextSep As Long, nextStart As Long
     
@@ -427,7 +427,7 @@ Private Function FindNextSeparator(ByRef inText As String, _
         
     If start > lenText Then Exit Function  'over run (no separator found in previous call)
         
-    quoteCount = 0
+    QuoteCount = 0
     fieldStart = start
     
     Do While start <= lenText
@@ -471,10 +471,10 @@ Private Function FindNextSeparator(ByRef inText As String, _
             Exit Function
         End If
         
-        Call StrCount(inText, start - 1, nextSep - 1, quoteCount) 'update number of double quates in [fieldStart, nextSep-1]
+        Call StrCount(inText, start - 1, nextSep - 1, QuoteCount) 'update number of double quates in [fieldStart, nextSep-1]
         start = nextStart
         
-        If quoteCount Mod 2 = 0 Then  'if the number of double-quates is even, then the separator is not fake
+        If QuoteCount Mod 2 = 0 Then  'if the number of double-quates is even, then the separator is not fake
             FindNextSeparator = True
             fieldLen = nextSep - fieldStart
             Exit Function
@@ -487,7 +487,7 @@ End Function
 '
 ' add number of double quotes in [n+1, p1] of Source to quoteCount
 '
-Private Sub StrCount(Source As String, n As Long, p1 As Long, ByRef quoteCount As Long)
+Private Sub StrCount(Source As String, n As Long, p1 As Long, ByRef QuoteCount As Long)
     Dim ss As String
     Dim nn As Long
     Do
@@ -495,7 +495,7 @@ Private Sub StrCount(Source As String, n As Long, p1 As Long, ByRef quoteCount A
         nn = InStr(1, ss, """")
         If nn = 0 Then Exit Do
         n = n + nn
-        quoteCount = quoteCount + 1
+        QuoteCount = QuoteCount + 1
     Loop
 End Sub
 

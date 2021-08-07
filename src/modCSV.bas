@@ -418,14 +418,14 @@ End Function
 '  ShowNumbersAsNumbers  : Should fields in the file that look like numbers be returned as Numbers? (Doubles)
 '  ShowDatesAsDates      : Should fields in the file that look like dates with the specified DateFormat be returned as Dates?
 '  ShowLogicalsAsLogicals: Should fields in the file that are TRUE or FALSE (case insensitive) be returned as Booleans?
-'  ShowErrorsAsErrors    : Should fields in the file that looklike Excel errors (#N/A #REF! etc) be returned as errors?
+'  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
 '  RemoveQuotes          : Should quoted fields be unquoted?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseTypeConversion(ByVal TypeConversion As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
     ByRef ShowDatesAsDates As Boolean, ByRef ShowLogicalsAsLogicals As Boolean, _
     ByRef ShowErrorsAsErrors As Boolean, ByRef RemoveQuotes As Boolean)
 
-    Const Err_TypeConversion = "Enter N to show Numbers as Numbers, D to show Dates as Dates, L to show Logicals as Logicals, E to show Excel Errors as Errors, Q to show Quoted fields with Quotes."
+    Const Err_TypeConversion = "TypeConversion must be TRUE (convert all types), FALSE (no conversion) or a string of letter: 'N' to show numbers as numbers, 'D' to show dates as dates, 'L' to show logicals as logicals, `E` to show Excel errors as errors, Q to show quoted fields with their quotes."
     Dim i As Long
 
     On Error GoTo ErrHandler
@@ -459,7 +459,7 @@ Private Function ParseTypeConversion(ByVal TypeConversion As Variant, ByRef Show
                     ShowNumbersAsNumbers = True
                 Case "D"
                     ShowDatesAsDates = True
-                Case "L"
+                Case "L", "B" 'Logicals aka Booleans
                     ShowLogicalsAsLogicals = True
                 Case "E"
                     ShowErrorsAsErrors = True
@@ -470,7 +470,7 @@ Private Function ParseTypeConversion(ByVal TypeConversion As Variant, ByRef Show
             End Select
         Next i
     Else
-        Throw "TypeConversion must be TRUE (convert all types), FALSE (no conversion) or a string, " + Err_TypeConversion
+        Throw Err_TypeConversion
     End If
 
     Exit Function
@@ -648,7 +648,7 @@ End Function
 '               a string satisfying those two conditions.
 '            4) QuotesEncountered (optional and passed by reference) is set to indicate if string DQ is found in Expression.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function SplitNew(ByVal Expression As String, Optional Delimiter As String = vbCrLf, Optional DQ As String = """", _
+Private Function SplitNew(ByVal Expression As String, Optional Delimiter As String = vbCrLf, Optional DQ As String = """", _
           Optional Limit As Long = -1, Optional ByRef AltDelim As String, Optional ByRef QuotesEncountered As Boolean)
 
     Dim DelimPos As Long
@@ -816,7 +816,7 @@ End Function
 ' Procedure  : CharNotInString
 ' Purpose    : Return a character not contained in specified string, or throw an error if attempt fails.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function CharNotInString(Str As String) As String
+Private Function CharNotInString(Str As String) As String
     Dim i As Long
     Dim TheChar As String
     Const Err_NoAltDelimiter = "Unexpected error in method CharNotInString"
@@ -1047,7 +1047,7 @@ End Sub
 Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSeparator As String, _
     SysDateOrder As Long, SysDateSeparator As String, ByRef Converted As Boolean)
     
-    Dim D As String
+    Dim d As String
     Dim m As String
     Dim pos1 As Long
     Dim pos2 As Long
@@ -1061,27 +1061,27 @@ Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, 
 
     If DateOrder = 0 Then
         m = Left$(strIn, pos1 - 1)
-        D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+        d = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
         y = Mid$(strIn, pos2 + 1)
     ElseIf DateOrder = 1 Then
-        D = Left$(strIn, pos1 - 1)
+        d = Left$(strIn, pos1 - 1)
         m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
         y = Mid$(strIn, pos2 + 1)
     ElseIf DateOrder = 2 Then
         y = Left$(strIn, pos1 - 1)
         m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-        D = Mid$(strIn, pos2 + 1)
+        d = Mid$(strIn, pos2 + 1)
     Else
         Throw "DateOrder must be 0, 1, or 2"
     End If
     If SysDateOrder = 0 Then
-        dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y)
+        dtOut = CDate(m + SysDateSeparator + d + SysDateSeparator + y)
         Converted = True
     ElseIf SysDateOrder = 1 Then
-        dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y)
+        dtOut = CDate(d + SysDateSeparator + m + SysDateSeparator + y)
         Converted = True
     ElseIf SysDateOrder = 2 Then
-        dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D)
+        dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + d)
         Converted = True
     End If
 
@@ -1269,13 +1269,15 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim T As TextStream
     Dim EOLIsWindows As Boolean
     
-    Const Err_Delimiter = "Delimiter must be one character, and cannot be double quote or line feed characters"
+    'Const Err_Delimiter = "Delimiter must be one character, and cannot be double quote or line feed characters"
+    Const Err_Delimiter = "Delimiter must not contain double quote or line feed characters"
 
     On Error GoTo ErrHandler
 
     EOL = OStoEOL(EOL, "EOL")
 
-    If Len(Delimiter) <> 1 Or Delimiter = """" Or Delimiter = vbCr Or Delimiter = vbLf Then
+    'If Len(Delimiter) <> 1 Or Delimiter = """" Or Delimiter = vbCr Or Delimiter = vbLf Then
+    If InStr(Delimiter, DQ) > 0 Or InStr(Delimiter, vbLf) > 0 Or InStr(Delimiter, vbCr) > 0 Then
         Throw Err_Delimiter
     End If
 
