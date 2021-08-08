@@ -30,8 +30,6 @@ Const m_FolderSpeedTest = "C:\Temp\CSVTest\CompareAgainstAlternatives"
 '----------
 'Done
 
-
-
 Private Sub CompareAgainstAlternatives()
 
     Dim data As Variant
@@ -93,7 +91,7 @@ Private Sub CompareAgainstAlternatives()
             tstart = sElapsedTime
             Select Case j
                 Case 1
-                    DataReread1 = ThrowIfError(CSVRead(FileName, False, ",", , , , , , vbCrLf, False))
+                    DataReread1 = ThrowIfError(CSVRead_V2(FileName, False, ",", , , , , , Unicode))
                     FnName = "CSVRead          "
                 Case 2
                     DataReread2 = ThrowIfError(CSVRead_sdkn104(FileName, Unicode))
@@ -102,7 +100,7 @@ Private Sub CompareAgainstAlternatives()
                     DataReread3 = ThrowIfError(CSVRead_ws_garcia(FileName, ",", vbCrLf))
                     FnName = "CSVRead_ws_garcia"
                 Case 4
-                    DataReread4 = CSVRead2(FileName, ",")
+                    DataReread4 = CSVRead_V2(FileName, ",")
             End Select
             tend = sElapsedTime()
             Select Case j
@@ -120,7 +118,7 @@ Private Sub CompareAgainstAlternatives()
         Next j
         Debug.Print "v sdk104          " & CStr(t2 / t1) & "           >1 = CSVRead faster"
         Debug.Print "v garcia          " & CStr(t3 / t1) & "           >1 = CSVRead faster"
-        Debug.Print "v CSVRead2          " & CStr(t4 / t1) & "           >1 = CSVRead faster"
+        Debug.Print "v CSVRead_V2          " & CStr(t4 / t1) & "           >1 = CSVRead faster"
 
         'Hook in to SolumAddin
         If Not Application.Run("sArraysIdentical", DataReread1, DataReread2) Then
@@ -138,10 +136,6 @@ Private Sub CompareAgainstAlternatives()
 ErrHandler:
     MsgBox "#CompareAgainstAlternatives: " & Err.Description & "!", vbCritical
 End Sub
-
-
-
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : TimeFiveParsers
@@ -162,7 +156,6 @@ Function TimeFiveParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
     Dim FnName As String
     Dim DataReread1, DataReread2, DataReread3, DataReread4, DataReread5
 
-
     On Error GoTo ErrHandler
     OS = "Windows"
     
@@ -182,21 +175,21 @@ Function TimeFiveParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
 
     data = sFill(EachFieldContains, NumRows, NumCols)
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, Replace(ExtraInfo, " ", "-"), Unicode, False)
-    ThrowIfError sFileSave(FileName, data, ",", , , , True)
+    ThrowIfError Application.Run("sFileSave", FileName, data, ",", , , , True)
         
     For j = 1 To 5
         tstart = sElapsedTime
         Select Case j
             Case 1
-                DataReread1 = ThrowIfError(CSVRead(FileName, False, ",", , , , , , vbCrLf, False))
+                DataReread1 = ThrowIfError(CSVRead_V1(FileName, False, ",", , , , , , , Unicode))
             Case 2
                 DataReread2 = ThrowIfError(CSVRead_sdkn104(FileName, Unicode))
             Case 3
                 DataReread3 = ThrowIfError(CSVRead_ws_garcia(FileName, ",", vbCrLf))
             Case 4
-                DataReread4 = ThrowIfError(sFileShow(FileName, ",", False, False, False, vbCrLf))
+                'DataReread4 = ThrowIfError(sFileShow(FileName, ",", False, False, False, vbCrLf))
             Case 5
-                DataReread5 = ThrowIfError(CSVRead2(FileName, ","))
+                DataReread5 = ThrowIfError(CSVRead_V2(FileName, False, ",", , , , , , Unicode))
         End Select
         tend = sElapsedTime()
         Select Case j
@@ -241,7 +234,7 @@ Function TimeFiveParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
     Ret(1, 8) = OneEqFour
     Ret(1, 9) = OneEqFive
     Ret(1, 10) = FileName
-    Ret(1, 11) = sFileInfo(FileName, "Size")
+    'Ret(1, 11) = sFileInfo(FileName, "Size")
 
     TimeFiveParsers = Ret
 
@@ -249,17 +242,3 @@ Function TimeFiveParsers(EachFieldContains As Variant, NumRows As Long, NumCols 
 ErrHandler:
     TimeFiveParsers = "#TimeFiveParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
-
-
-
-
-
-
-
-
-
-
-
-
-
-

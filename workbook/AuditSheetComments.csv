@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+8,08-Aug-2021,13:11:08,"Philip Swannell","Now have two functions CSVRead_V1 and CSVRead_V2"
 7,07-Aug-2021,23:04:23,"Philip Swannell","Settled on fastest algo."
 6,06-Aug-2021,15:59:09,"Philip Swannell","Addd sheet ""TimingResults"" and module modCompareAgainstAlternatives."
 5,04-Aug-2021,08:22:44,"Philip Swannell","Added code to compare against https://github.com/sdkn104/VBA-CSV"

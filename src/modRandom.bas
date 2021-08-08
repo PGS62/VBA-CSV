@@ -49,7 +49,9 @@ Function RandomStrings(NumRows As Long, NumCols As Long, Unicode As Boolean, All
         Next j
     Next i
     If AllowLineFeed Then
-        Result(1, 1) = "Here" & EOL & "be" & EOL & "line" & EOL & "feeds"
+        i = 0.5 + Rnd() * NumRows
+        j = 0.5 + Rnd() * NumCols
+        Result(i, j) = "Here's a carriage return (ascii 13):" & vbCr & "and here's a line feed (ascii 10):" & vbLf & "and here's both together:" & vbCrLf
     End If
     RandomStrings = Result
     Exit Function
@@ -246,7 +248,9 @@ Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, 
         Next j
     Next i
     If AllowLineFeed Then
-        res(1, 1) = "Here" & EOL & "be" & EOL & "line" & EOL & "feeds"
+        i = 0.5 + Rnd() * NRows
+        j = 0.5 + Rnd() * NCols
+        res(i, j) = "Here's a carriage return (ascii 13):" & vbCr & "and here's a line feed (ascii 10):" & vbLf & "and here's both together:" & vbCrLf
     End If
 
     RandomVariants = res

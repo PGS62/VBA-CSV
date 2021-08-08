@@ -10,6 +10,7 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private Sub Workbook_Open()
-    RegisterCSVRead
+    RegisterCSVRead_V1
+    RegisterCSVRead_V2
     RegisterCSVWrite
 End Sub

@@ -1,15 +1,15 @@
-Attribute VB_Name = "modCSV"
+Attribute VB_Name = "modCSV_V1"
 Option Explicit
 Private Const DQ = """"
 Private Const DQ2 = """"""
 Private Const Err_EmptyFile = "File is empty"
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : RegisterCSVRead
-' Purpose    : Register the function CSVRead with the Excel Function Wizard. Suggest this function is called from a
+' Procedure  : RegisterCSVRead_V1
+' Purpose    : Register the function CSVRead_V1 with the Excel Function Wizard. Suggest this function is called from a
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub RegisterCSVRead()
+Sub RegisterCSVRead_V1()
     Const FnDesc = "Returns the contents of a comma-separated file on disk as an array."
     Dim ArgDescs() As String
     ReDim ArgDescs(1 To 12)
@@ -25,7 +25,7 @@ Sub RegisterCSVRead()
     ArgDescs(10) = "Enter TRUE if the file is unicode, FALSE if the file is ascii. Omit to guess (via function sFileIsUnicode)."
     ArgDescs(11) = "Value to represent empty fields (successive delimiters) in the file. May be a string or an Empty value. Optional and defaults to the zero-length string."
     ArgDescs(12) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
-    Application.MacroOptions "CSVRead", FnDesc, , , , , , , , , ArgDescs
+    Application.MacroOptions "CSVRead_V1", FnDesc, , , , , , , , , ArgDescs
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -73,11 +73,11 @@ Sub Throw(ByVal ErrorString As String)
 End Sub
 
 '---------------------------------------------------------------------------------------------------------
-' Procedure : CSVRead
+' Procedure : CSVRead_V1
 ' Purpose   : Returns the contents of a comma-separated file on disk as an array.
 ' Arguments
 ' FileName  : The full name of the file, including the path.
-' TypeConversion: TRUE to convert Numbers, Dates, Logicals and Excel Errors into their typed values, or
+' ConvertTypes: TRUE to convert Numbers, Dates, Logicals and Excel Errors into their typed values, or
 '             FALSE to leave as strings. For more control enter a string containing the
 '             letters N,D,L, and E eg "NL" to convert just numbers and logicals, not dates
 '             or errors.
@@ -121,13 +121,13 @@ End Sub
 '             * The standard states that csv files should have Windows-style line endings,
 '             but the function supports Windows, Unix and (old) Mac line endings.
 '---------------------------------------------------------------------------------------------------------
-Function CSVRead(FileName As String, Optional TypeConversion As Variant = False, Optional ByVal Delimiter As Variant, _
+Function CSVRead_V1(FileName As String, Optional ConvertTypes As Variant = False, Optional ByVal Delimiter As Variant, _
         Optional DateFormat As String, Optional ByVal StartRow As Long = 1, Optional ByVal StartCol As Long = 1, _
         Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, Optional ByVal LineEndings As Variant, _
         Optional ByVal Unicode As Variant, Optional ByVal ShowMissingsAs As Variant = "", _
         Optional DecimalSeparator As String = vbNullString)
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
+Attribute CSVRead_V1.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead_V1.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter, or else omitted to infer from the file's contents"
     Const Err_FileIsUniCode = "Unicode must be passed as TRUE or FALSE, or omitted to infer from the file's contents"
@@ -183,7 +183,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     On Error GoTo ErrHandler
 
     If FunctionWizardActive() Then
-        CSVRead = Err_InFuncWiz
+        CSVRead_V1 = Err_InFuncWiz
         Exit Function
     End If
 
@@ -235,7 +235,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         Throw Err_Delimiter
     End If
 
-    ParseTypeConversion TypeConversion, ShowNumbersAsNumbers, _
+    ParseTypeConversion ConvertTypes, ShowNumbersAsNumbers, _
         ShowDatesAsDates, ShowLogicalsAsLogicals, ShowErrorsAsErrors, RemoveQuotes
 
     If ShowNumbersAsNumbers Then
@@ -269,7 +269,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     'End of input validation
           
     If NotDelimited Then
-        CSVRead = ShowTextFile(FileName, StartRow, NumRows, MixedLineEndings, EOL, CBool(Unicode))
+        CSVRead_V1 = ShowTextFile(FileName, StartRow, NumRows, MixedLineEndings, EOL, CBool(Unicode))
         Exit Function
     End If
           
@@ -394,12 +394,12 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         End If
     Next i
 
-    CSVRead = ReturnArray
+    CSVRead_V1 = ReturnArray
 
     Exit Function
 
 ErrHandler:
-    CSVRead = "#CSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
+    CSVRead_V1 = "#CSVRead_V1 (line " & CStr(Erl) + "): " & Err.Description & "!"
     If Not CSVS Is Nothing Then
         Set CSVS = Nothing
     End If
@@ -412,29 +412,29 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseTypeConversion
-' Purpose    : Parse the input TypeConversion to set five Boolean flags which are passed by reference
+' Purpose    : Parse the input ConvertTypes to set five Boolean flags which are passed by reference
 ' Parameters :
-'  TypeConversion        :
+'  ConvertTypes        :
 '  ShowNumbersAsNumbers  : Should fields in the file that look like numbers be returned as Numbers? (Doubles)
 '  ShowDatesAsDates      : Should fields in the file that look like dates with the specified DateFormat be returned as Dates?
 '  ShowLogicalsAsLogicals: Should fields in the file that are TRUE or FALSE (case insensitive) be returned as Booleans?
 '  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
 '  RemoveQuotes          : Should quoted fields be unquoted?
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseTypeConversion(ByVal TypeConversion As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
+Private Sub ParseTypeConversion(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
     ByRef ShowDatesAsDates As Boolean, ByRef ShowLogicalsAsLogicals As Boolean, _
     ByRef ShowErrorsAsErrors As Boolean, ByRef RemoveQuotes As Boolean)
 
-    Const Err_TypeConversion = "TypeConversion must be TRUE (convert all types), FALSE (no conversion) or a string of letter: 'N' to show numbers as numbers, 'D' to show dates as dates, 'L' to show logicals as logicals, `E` to show Excel errors as errors, Q to show quoted fields with their quotes."
+    Const Err_ConvertTypes = "ConvertTypes must be TRUE (convert all types), FALSE (no conversion) or a string of letter: 'N' to show numbers as numbers, 'D' to show dates as dates, 'L' to show logicals as logicals, `E` to show Excel errors as errors, Q to show quoted fields with their quotes."
     Dim i As Long
 
     On Error GoTo ErrHandler
-    If TypeName(TypeConversion) = "Range" Then
-        TypeConversion = TypeConversion.value
+    If TypeName(ConvertTypes) = "Range" Then
+        ConvertTypes = ConvertTypes.value
     End If
 
-    If VarType(TypeConversion) = vbBoolean Then
-        If TypeConversion Then
+    If VarType(ConvertTypes) = vbBoolean Then
+        If ConvertTypes Then
             ShowNumbersAsNumbers = True
             ShowDatesAsDates = True
             ShowLogicalsAsLogicals = True
@@ -447,14 +447,14 @@ Private Function ParseTypeConversion(ByVal TypeConversion As Variant, ByRef Show
             ShowErrorsAsErrors = False
             RemoveQuotes = True
         End If
-    ElseIf VarType(TypeConversion) = vbString Then
+    ElseIf VarType(ConvertTypes) = vbString Then
         ShowNumbersAsNumbers = False
         ShowDatesAsDates = False
         ShowLogicalsAsLogicals = False
         ShowErrorsAsErrors = False
         RemoveQuotes = True
-        For i = 1 To Len(TypeConversion)
-            Select Case UCase(Mid(TypeConversion, i, 1))
+        For i = 1 To Len(ConvertTypes)
+            Select Case UCase(Mid(ConvertTypes, i, 1))
                 Case "N"
                     ShowNumbersAsNumbers = True
                 Case "D"
@@ -466,17 +466,17 @@ Private Function ParseTypeConversion(ByVal TypeConversion As Variant, ByRef Show
                 Case "Q"
                     RemoveQuotes = False
                 Case Else
-                    Throw "Unrecognised character '" + Mid(TypeConversion, i, 1) + "' in TypeConversion."
+                    Throw "Unrecognised character '" + Mid(ConvertTypes, i, 1) + "' in ConvertTypes."
             End Select
         Next i
     Else
-        Throw Err_TypeConversion
+        Throw Err_ConvertTypes
     End If
 
-    Exit Function
+    Exit Sub
 ErrHandler:
     Throw "#ParseTypeConversion: " & Err.Description & "!"
-End Function
+End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : MinLngs
@@ -670,8 +670,7 @@ Private Function SplitNew(ByVal Expression As String, Optional Delimiter As Stri
     DQPos = 0
     LDelim = Len(Delimiter)
     DelimPos = 1 - LDelim
-
-
+    
     DQPos = InStr(DQPos + 1, Expression, DQ)
     DelimPos = InStr(DelimPos + LDelim, Expression, Delimiter)
     If DelimPos = 0 Then
@@ -681,9 +680,7 @@ Private Function SplitNew(ByVal Expression As String, Optional Delimiter As Stri
         SplitNew = Ret
         Exit Function
     End If
-
-
-
+    
     If DQPos = 0 Then
         QuotesEncountered = False
         SplitNew = VBA.Split(Expression, Delimiter, Limit)
@@ -691,9 +688,7 @@ Private Function SplitNew(ByVal Expression As String, Optional Delimiter As Stri
     Else
         QuotesEncountered = True
     End If
-
-
-
+    
     EvenDQs = True
     If Len(AltDelim) <> Len(Delimiter) Then
         AltDelim = String(Len(Delimiter), CharNotInString(Expression))
@@ -717,15 +712,13 @@ Private Function SplitNew(ByVal Expression As String, Optional Delimiter As Stri
         SplitNew = Ret
         Exit Function
     End If
-
-
+    
     SplitNew = VBA.Split(Expression, AltDelim, Limit)
 
     Exit Function
 ErrHandler:
     Throw "#SplitNew: " & Err.Description & "!"
 End Function
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseDateFormat
@@ -1247,7 +1240,7 @@ End Function
 '             "Windows".
 ' Ragged    : This argument is for development purposes only, it will soon be removed.
 '
-' Notes     : See also CSVRead which is the inverse of this function.
+' Notes     : See also CSVRead_V1 which is the inverse of this function.
 '
 '             For definition of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2

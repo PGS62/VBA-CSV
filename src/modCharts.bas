@@ -1,8 +1,6 @@
 Attribute VB_Name = "modCharts"
 Option Explicit
 
-
-
 Sub AddChart2()
     Dim ch As Chart
     Dim sh As Shape
@@ -13,7 +11,6 @@ Sub AddChart2()
     Set ch = sh.Chart
     Set topLeftCell = Application.Intersect(Selection.Areas(1).Cells(1, 1).EntireRow, ActiveSheet.Range("R:R"))
 
-
     ch.SetSourceData Selection
     ch.Axes(xlCategory).ScaleType = xlLogarithmic
     ch.Axes(xlValue).ScaleType = xlLogarithmic
@@ -23,9 +20,8 @@ Sub AddChart2()
     sh.Height = 337
     sh.Width = 561
 
-
     Exit Sub
 ErrHandler:
-    SomethingWentWrong "#AddChart2 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MsgBox "#AddChart2 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 

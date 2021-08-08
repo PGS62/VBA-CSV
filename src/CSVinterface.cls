@@ -3268,15 +3268,15 @@ Private Function TypeData(ByRef data As Variant, _
                 Loop While typingIdx <= maxTypingIdx And Not typingNeed
                 If typingNeed Then
                     Select Case dTTemplate(typingIdx - 1)
-                        Case TypeConversion.None 'Strings
+                        Case ConvertTypes.None 'Strings
                             TypeData = data
-                        Case TypeConversion.ToLong
+                        Case ConvertTypes.ToLong
                             TypeData = CLng(data)
-                        Case TypeConversion.ToDouble
+                        Case ConvertTypes.ToDouble
                             TypeData = CDbl(data)
-                        Case TypeConversion.ToDate
+                        Case ConvertTypes.ToDate
                             TypeData = CDate(data)
-                        Case TypeConversion.ToBoolean
+                        Case ConvertTypes.ToBoolean
                             TypeData = CBool(data)
                         Case Else
                             TypeData = data

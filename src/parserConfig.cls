@@ -60,7 +60,7 @@ Public Enum EscapeTokens
     DoubleQuotes = 2
     Tilde = 3
 End Enum
-Public Enum TypeConversion
+Public Enum ConvertTypes
     None = -1
     ToLong = 0
     ToDouble = 1

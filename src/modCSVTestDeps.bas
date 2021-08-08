@@ -159,8 +159,6 @@ ExitPoint:
     NumDimensions = i - 1
 End Function
 
-
-
 '---------------------------------------------------------------------------------------
 ' Procedure : sNRows
 ' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.

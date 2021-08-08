@@ -23,8 +23,7 @@ Sub TestInStrIdea()
 
     ShortStr = String(10, "x")
     Mid(ShortStr, 5, 1) = "y"
-
-
+    
     t1 = sElapsedTime()
     For i = 1 To NumTests
         res = InStr(LongStr, "y")
@@ -38,7 +37,6 @@ Sub TestInStrIdea()
     Next i
     t2 = sElapsedTime()
     Debug.Print t2 - t1
-
 
 End Sub
 
@@ -105,14 +103,13 @@ Sub TestSplitVsConstruct()
         Next j
     Next i
     t3 = sElapsedTime()
-
-
+    
     Debug.Print String(50, "=")
     Debug.Print "NumRows = " & NumRows & ", NumCols = " & NumCols & ", CellLength = " & LCellContents
     Debug.Print "Not using Split", t2 - t1
     Debug.Print "Using Split    ", t3 - t2
     Debug.Print "Ratio          ", (t3 - t2) / (t2 - t1)
-    Debug.Print "Results Identical", sArraysIdentical(Result1, Result2)
+    Debug.Print "Results Identical", Application.Run("sArraysIdentical", Result1, Result2)
 
 End Sub
 
