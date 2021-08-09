@@ -39,8 +39,8 @@ Private m_LEOL As Long
 Private m_QuotesEncountered As Boolean
 Private m_T As Scripting.TextStream
 
-Public Property Get atEndOfStream() As Boolean
-    atEndOfStream = m_AtEndOfStream
+Public Property Get AtEndOfStream() As Boolean
+    AtEndOfStream = m_AtEndOfStream
 End Property
 
 Public Property Get QuotesEncountered() As Boolean
@@ -121,7 +121,7 @@ Private Function GetMoreFromFile()
         Mid$(m_Buffer, m_BufferUpdatedTo + 1, Len(NewChars)) = NewChars
         m_BufferUpdatedTo = m_BufferUpdatedTo + Len(NewChars)
 
-        If m_T.atEndOfStream Then
+        If m_T.AtEndOfStream Then
             Exit Function
         End If
 
@@ -176,7 +176,7 @@ Public Sub ReadLine()
     i = m_BufferReadTo + m_LEOL + 1
     While True
         If i > m_BufferUpdatedTo Then 'what if zero chars in file?
-            If Not m_T.atEndOfStream Then
+            If Not m_T.AtEndOfStream Then
                 GetMoreFromFile
             Else
                 Throw "attempt to read past end of file"
@@ -192,7 +192,7 @@ Public Sub ReadLine()
                     m_BufferReadTo = i - 1
                     SetChars m_Buffer, m_BufferReadTo + 1, m_AltEOL
                     If i = m_BufferUpdatedTo - m_LEOL + 1 Then
-                        If m_T.atEndOfStream Then
+                        If m_T.AtEndOfStream Then
                             m_AtEndOfStream = True
                         End If
                     End If
@@ -201,7 +201,7 @@ Public Sub ReadLine()
             End If
         End If
         If i = m_BufferUpdatedTo Then
-            If m_T.atEndOfStream Then 'Reading the last line of the file, which was not terminated with EOL
+            If m_T.AtEndOfStream Then 'Reading the last line of the file, which was not terminated with EOL
                 m_BufferReadTo = i
                 m_AtEndOfStream = True
                 Exit Sub

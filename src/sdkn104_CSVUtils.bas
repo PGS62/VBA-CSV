@@ -414,7 +414,7 @@ End Sub
 
 
 Private Function FindNextSeparator(ByRef inText As String, _
-                    ByRef start As Long, _
+                    ByRef Start As Long, _
                     ByRef fieldStart As Long, _
                     ByRef fieldLen As Long, _
                     nextSepType As Long, ByRef QuoteCount As Long) As Boolean
@@ -425,12 +425,12 @@ Private Function FindNextSeparator(ByRef inText As String, _
     
     lenText = Len(inText)
         
-    If start > lenText Then Exit Function  'over run (no separator found in previous call)
+    If Start > lenText Then Exit Function  'over run (no separator found in previous call)
         
     QuoteCount = 0
-    fieldStart = start
+    fieldStart = Start
     
-    Do While start <= lenText
+    Do While Start <= lenText
         ' update nextSep(min of nextSep123), nextSepType, nextStart(next pos of next separator), nextSep123
         If nextSep1 < nextSep2 Then
             If nextSep1 < nextSep3 Then ' nextSep1 is smallest
@@ -471,8 +471,8 @@ Private Function FindNextSeparator(ByRef inText As String, _
             Exit Function
         End If
         
-        Call StrCount(inText, start - 1, nextSep - 1, QuoteCount) 'update number of double quates in [fieldStart, nextSep-1]
-        start = nextStart
+        Call StrCount(inText, Start - 1, nextSep - 1, QuoteCount) 'update number of double quates in [fieldStart, nextSep-1]
+        Start = nextStart
         
         If QuoteCount Mod 2 = 0 Then  'if the number of double-quates is even, then the separator is not fake
             FindNextSeparator = True

@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+9,09-Aug-2021,13:06:19,"Philip Swannell","CSVRead_V2 now supports SkipToCol and NumCols, not yet SkipToRow and NumRows though."
 8,08-Aug-2021,13:11:08,"Philip Swannell","Now have two functions CSVRead_V1 and CSVRead_V2"
 7,07-Aug-2021,23:04:23,"Philip Swannell","Settled on fastest algo."
 6,06-Aug-2021,15:59:09,"Philip Swannell","Addd sheet ""TimingResults"" and module modCompareAgainstAlternatives."

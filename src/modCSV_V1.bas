@@ -235,7 +235,7 @@ Attribute CSVRead_V1.VB_ProcData.VB_Invoke_Func = " \n14"
         Throw Err_Delimiter
     End If
 
-    ParseTypeConversion ConvertTypes, ShowNumbersAsNumbers, _
+    ParseConvertTypes ConvertTypes, ShowNumbersAsNumbers, _
         ShowDatesAsDates, ShowLogicalsAsLogicals, ShowErrorsAsErrors, RemoveQuotes
 
     If ShowNumbersAsNumbers Then
@@ -278,7 +278,7 @@ Attribute CSVRead_V1.VB_ProcData.VB_Invoke_Func = " \n14"
     If StartRow = 1 And StartCol = 1 And NumRows = 0 And NumCols = 0 Then
         Set F = FSO.GetFile(FileName)
         Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
-        If T.atEndOfStream Then
+        If T.AtEndOfStream Then
             T.Close: Set T = Nothing: Set F = Nothing
             Throw Err_EmptyFile
         End If
@@ -317,7 +317,7 @@ Attribute CSVRead_V1.VB_ProcData.VB_Invoke_Func = " \n14"
                 CSVS.ReadLine
             Next
         Else
-            While Not CSVS.atEndOfStream
+            While Not CSVS.AtEndOfStream
                 CSVS.ReadLine
             Wend
         End If
@@ -411,7 +411,7 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : ParseTypeConversion
+' Procedure  : ParseConvertTypes
 ' Purpose    : Parse the input ConvertTypes to set five Boolean flags which are passed by reference
 ' Parameters :
 '  ConvertTypes        :
@@ -421,7 +421,7 @@ End Function
 '  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
 '  RemoveQuotes          : Should quoted fields be unquoted?
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub ParseTypeConversion(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
+Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
     ByRef ShowDatesAsDates As Boolean, ByRef ShowLogicalsAsLogicals As Boolean, _
     ByRef ShowErrorsAsErrors As Boolean, ByRef RemoveQuotes As Boolean)
 
@@ -475,7 +475,7 @@ Private Sub ParseTypeConversion(ByVal ConvertTypes As Variant, ByRef ShowNumbers
 
     Exit Sub
 ErrHandler:
-    Throw "#ParseTypeConversion: " & Err.Description & "!"
+    Throw "#ParseConvertTypes: " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -513,13 +513,13 @@ Private Function InferDelimiter(FileName As String, Unicode As Boolean)
     Set F = FSO.GetFile(FileName)
     Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
 
-    If T.atEndOfStream Then
+    If T.AtEndOfStream Then
         T.Close: Set T = Nothing: Set F = Nothing
         Throw "File is empty"
     End If
 
     EvenQuotes = True
-    While Not T.atEndOfStream
+    While Not T.AtEndOfStream
         Contents = T.Read(CHUNK_SIZE)
         For i = 1 To Len(Contents)
             Select Case Mid$(Contents, i, 1)
@@ -575,13 +575,13 @@ Private Function InferEOL(FileName As String, Unicode As Boolean) As String
 
     Set F = FSO.GetFile(FileName)
     Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
-    If T.atEndOfStream Then
+    If T.AtEndOfStream Then
         T.Close: Set T = Nothing: Set F = Nothing
         Throw Err_EmptyFile
     End If
     
     EvenQuotes = True
-    While Not T.atEndOfStream
+    While Not T.AtEndOfStream
         FileContents = T.Read(CHUNK_SIZE)
         LenChunk = Len(FileContents)
         If CheckFirstCharOfNextChunk Then
@@ -606,7 +606,7 @@ Private Function InferEOL(FileName As String, Unicode As Boolean) As String
                                 InferEOL = vbCr
                             End If
                             GoTo EarlyExit
-                        ElseIf T.atEndOfStream Then 'Mac file with only one line
+                        ElseIf T.AtEndOfStream Then 'Mac file with only one line
                             InferEOL = vbCr
                             GoTo EarlyExit
                         Else
@@ -1174,13 +1174,13 @@ Private Function IsUnicodeFile(FilePath As String)
 
     ' 1=Read-only, False=do not create if not exist, -1=Unicode 0=ASCII
     Set T = FSO.OpenTextFile(FilePath, 1, False, 0)
-    If T.atEndOfStream Then
+    If T.AtEndOfStream Then
         T.Close: Set T = Nothing
         IsUnicodeFile = False
         Exit Function
     End If
     intAsc1Chr = Asc(T.Read(1))
-    If T.atEndOfStream Then
+    If T.AtEndOfStream Then
         T.Close: Set T = Nothing
         IsUnicodeFile = False
         Exit Function
@@ -1247,79 +1247,118 @@ End Function
 '---------------------------------------------------------------------------------------------------------
 
 Function CSVWrite(FileName As String, ByVal data As Variant, Optional QuoteAllStrings As Boolean = True, _
-    Optional DateFormat As String = "yyyy-mm-dd", Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
-    Optional Delimiter As String = ",", Optional Unicode As Boolean, Optional ByVal EOL As String = vbCrLf, Optional Ragged As Boolean = False)
+        Optional DateFormat As String = "yyyy-mm-dd", Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
+        Optional Delimiter As String = ",", Optional Unicode As Boolean, Optional ByVal EOL As String = vbCrLf, Optional Ragged As Boolean = False)
 Attribute CSVWrite.VB_Description = "Creates a csv file on disk containing the data in the array Data. Any existing file of the same name is overwritten. If successful, the function returns the name of the file written, otherwise an error string. "
 Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
-    Dim FSO As Scripting.FileSystemObject
-    Dim i As Long
-    Dim j As Long
-    Dim k As Long
-    
-    Dim OneLine() As String
-    Dim OneLineJoined As String
-    Dim T As TextStream
-    Dim EOLIsWindows As Boolean
-    
-    'Const Err_Delimiter = "Delimiter must be one character, and cannot be double quote or line feed characters"
-    Const Err_Delimiter = "Delimiter must not contain double quote or line feed characters"
+          Dim FSO As Scripting.FileSystemObject
+          Dim i As Long
+          Dim j As Long
+          Dim k As Long
+          
+          Dim OneLine() As String
+          Dim OneLineJoined As String
+          Dim T As TextStream
+          Dim EOLIsWindows As Boolean
+          
+          'Const Err_Delimiter = "Delimiter must be one character, and cannot be double quote or line feed characters"
+          Const Err_Delimiter = "Delimiter must not contain double quote or line feed characters"
 
-    On Error GoTo ErrHandler
+1         On Error GoTo ErrHandler
 
-    EOL = OStoEOL(EOL, "EOL")
+2         EOL = OStoEOL(EOL, "EOL")
+3         EOLIsWindows = EOL = vbCrLf
 
-    'If Len(Delimiter) <> 1 Or Delimiter = """" Or Delimiter = vbCr Or Delimiter = vbLf Then
-    If InStr(Delimiter, DQ) > 0 Or InStr(Delimiter, vbLf) > 0 Or InStr(Delimiter, vbCr) > 0 Then
-        Throw Err_Delimiter
-    End If
+          'If Len(Delimiter) <> 1 Or Delimiter = """" Or Delimiter = vbCr Or Delimiter = vbLf Then
+4         If InStr(Delimiter, DQ) > 0 Or InStr(Delimiter, vbLf) > 0 Or InStr(Delimiter, vbCr) > 0 Then
+5             Throw Err_Delimiter
+6         End If
 
-    If TypeName(data) = "Range" Then
-        'Preserve elements of type Date by using .Value, not .Value2
-        data = data.value
-    End If
-    Force2DArray data 'Coerce 0-dim & 1-dim to 2-dims.
+7         If TypeName(data) = "Range" Then
+              'Preserve elements of type Date by using .Value, not .Value2
+8             data = data.value
+9         End If
+10        Force2DArray data 'Coerce 0-dim & 1-dim to 2-dims.
 
-    Set FSO = New FileSystemObject
-    Set T = FSO.CreateTextFile(FileName, True, Unicode)
+11        Set FSO = New FileSystemObject
+12        Set T = FSO.CreateTextFile(FileName, True, Unicode)
 
-    ReDim OneLine(LBound(data, 2) To UBound(data, 2))
+13        ReDim OneLine(LBound(data, 2) To UBound(data, 2))
 
-    For i = LBound(data) To UBound(data)
-        For j = LBound(data, 2) To UBound(data, 2)
-            OneLine(j) = Encode(data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
-        Next j
-        OneLineJoined = VBA.Join(OneLine, Delimiter)
+14        For i = LBound(data) To UBound(data)
+15            For j = LBound(data, 2) To UBound(data, 2)
+16                OneLine(j) = Encode(data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
+17            Next j
+18            OneLineJoined = VBA.Join(OneLine, Delimiter)
 
-        'If writing in "Ragged" style, remove terminating delimiters
-        If Ragged Then
-            For k = Len(OneLineJoined) To 1 Step -1
-                If Mid(OneLineJoined, k, 1) <> Delimiter Then Exit For
-            Next k
-            If k < Len(OneLineJoined) Then
-                OneLineJoined = Left(OneLineJoined, k)
-            End If
-        End If
-        
-        If EOLIsWindows Then
-            T.WriteLine OneLineJoined
-        Else
-            T.Write OneLineJoined
-            T.Write EOL
-        End If
-    Next i
+              'If writing in "Ragged" style, remove terminating delimiters
+19            If Ragged Then
+20                For k = Len(OneLineJoined) To 1 Step -1
+21                    If Mid(OneLineJoined, k, 1) <> Delimiter Then Exit For
+22                Next k
+23                If k < Len(OneLineJoined) Then
+24                    OneLineJoined = Left(OneLineJoined, k)
+25                End If
+26            End If
+              
+27            WriteLineWrap T, OneLineJoined, EOLIsWindows, EOL, Unicode
+28        Next i
 
-    'Quote from https://tools.ietf.org/html/rfc4180#section-2
-    'The last record in the file may or may not have an ending line break. _
-     We follow Excel (File save as CSV) and *do* put a line break after the last line.
+          'Quote from https://tools.ietf.org/html/rfc4180#section-2 : _
+          "The last record in the file may or may not have an ending line break." _
+           We follow Excel (File save as CSV) and *do* put a line break after the last line.
 
-    T.Close: Set T = Nothing: Set FSO = Nothing
-    CSVWrite = FileName
-    Exit Function
+29        T.Close: Set T = Nothing: Set FSO = Nothing
+30        CSVWrite = FileName
+31        Exit Function
 ErrHandler:
-    CSVWrite = "#CSVWrite: " & Err.Description & "!"
-    If Not T Is Nothing Then Set T = Nothing: Set FSO = Nothing
+32        CSVWrite = "#CSVWrite (line " & CStr(Erl) + "): " & Err.Description & "!"
+33        If Not T Is Nothing Then Set T = Nothing: Set FSO = Nothing
+
 End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : WriteLineWrap
+' Author     : Philip Swannell
+' Date       : 08-Aug-2021
+' Purpose    : Wrapper to TextStream.Write(Line) to give more informative error message than "invalid procedure call or
+'              argument" if the error is caused by attempting to write Unicode characters to ascii file
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, Unicode As Boolean)
+          Dim ErrDesc As String
+          Dim ErrNum As Long
+          Dim i As Long
+          Dim ErrLN As String
+
+1         On Error GoTo ErrHandler
+2         If EOLIsWindows Then
+3             T.WriteLine text
+4         Else
+5             T.Write text
+6             T.Write EOL
+7         End If
+
+8         Exit Sub
+
+ErrHandler:
+9         ErrNum = Err.Number
+10        ErrDesc = Err.Description
+11        ErrLN = CStr(Erl)
+12        If Not Unicode Then
+13            If ErrNum = 5 Then
+14                For i = 1 To Len(text)
+15                    If AscW(Mid(text, i, 1)) > 255 Then
+16                        ErrDesc = "Data contains unicode characters (first found has code " & CStr(AscW(Mid(text, i, 1))) & ") which cannot be written to an ascii file. Set argument Unicode to True"
+17                        Exit For
+18                    End If
+19                Next i
+20            End If
+21        End If
+22        Throw "#WriteLineWrap (line " & ErrLN + "): " & ErrDesc & "!"
+End Sub
+
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Encode
