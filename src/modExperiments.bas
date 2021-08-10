@@ -11,7 +11,7 @@ Option Explicit
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub TestInStrIdea()
 
-    Dim LongStr As String, t1 As Double, t2 As Double, res As Long
+    Dim LongStr As String, t1 As Double, t2 As Double, Res As Long
     Dim ShortStr As String
     Dim NumTests As Long, i As Long
 
@@ -26,14 +26,14 @@ Sub TestInStrIdea()
     
     t1 = sElapsedTime()
     For i = 1 To NumTests
-        res = InStr(LongStr, "y")
+        Res = InStr(LongStr, "y")
     Next i
     t2 = sElapsedTime()
     Debug.Print t2 - t1
 
     t1 = sElapsedTime()
     For i = 1 To NumTests
-        res = InStr(ShortStr, "y")
+        Res = InStr(ShortStr, "y")
     Next i
     t2 = sElapsedTime()
     Debug.Print t2 - t1

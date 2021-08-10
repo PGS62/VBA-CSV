@@ -83,7 +83,7 @@ ErrHandler:
     HelpForVBE = "#HelpVBE: " & Err.Description & "!"
 End Function
 
-Function InsertBreaks(ByVal TheString As String)
+Private Function InsertBreaks(ByVal TheString As String)
 
     Const FirstTab = 0
     Const NextTabs = 13
@@ -91,7 +91,7 @@ Function InsertBreaks(ByVal TheString As String)
     Dim DoNewLine As Boolean
     Dim i As Long
     Dim LineLength As Long
-    Dim res As String
+    Dim Res As String
     Dim Words
     Dim WordsNLB
     
@@ -105,7 +105,7 @@ Function InsertBreaks(ByVal TheString As String)
     TheString = Replace(TheString, vbLf, vbLf + " ")
     TheString = Replace(TheString, vbLf + "  ", vbLf + " ")
     
-    res = String(FirstTab, " ")
+    Res = String(FirstTab, " ")
     LineLength = FirstTab
 
     Words = VBA.Split(TheString, " ")
@@ -123,14 +123,14 @@ Function InsertBreaks(ByVal TheString As String)
         End If
 
         If DoNewLine Then
-            res = res + vbLf + "'" + String(NextTabs, " ") + WordsNLB(i)
+            Res = Res + vbLf + "'" + String(NextTabs, " ") + WordsNLB(i)
             LineLength = 1 + NextTabs + Len(WordsNLB(i))
         Else
-            res = res + " " + WordsNLB(i)
+            Res = Res + " " + WordsNLB(i)
             LineLength = LineLength + 1 + Len(WordsNLB(i))
         End If
     Next
-    InsertBreaks = res
+    InsertBreaks = Res
 
     Exit Function
 ErrHandler:

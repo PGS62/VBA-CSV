@@ -95,7 +95,7 @@ Sub PrepareForRelease()
 
     For Each ws In ThisWorkbook.Worksheets
         If ws.Visible = xlSheetVisible Then
-            Application.GoTo ws.Cells(1, 1)
+            Application.Goto ws.Cells(1, 1)
             ActiveWindow.DisplayGridlines = False
             ActiveWindow.DisplayHeadings = False
         End If
@@ -103,7 +103,7 @@ Sub PrepareForRelease()
     Next
     For i = 1 To ThisWorkbook.Worksheets.count
         If ThisWorkbook.Worksheets(i).Visible Then
-            Application.GoTo ThisWorkbook.Worksheets(i).Cells(1, 1)
+            Application.Goto ThisWorkbook.Worksheets(i).Cells(1, 1)
             Exit For
         End If
     Next i

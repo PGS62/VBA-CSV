@@ -94,7 +94,7 @@ End Property
 Public Property Let bufferSize(value As Single)
     P_BUFFERSIZE = value
     P_BUFFERLENGTH = CLng(P_BUFFERSIZE * SizeFactor)
-    Buffer = SPACE$(P_BUFFERLENGTH)
+    Buffer = Space$(P_BUFFERLENGTH)
 End Property
 Public Property Get bufferString() As String
 Attribute bufferString.VB_Description = "Gets the text data stored in the buffer."
@@ -160,9 +160,9 @@ Private Sub DoubleBufferSize()
     LCSt = P_STREAMLENGTH - P_BUFFERLENGTH
     Select Case LCSt
         Case Is > 0
-            Buffer = SPACE$(P_BUFFERLENGTH)
+            Buffer = Space$(P_BUFFERLENGTH)
         Case Else
-            Buffer = SPACE$(P_STREAMLENGTH)
+            Buffer = Space$(P_STREAMLENGTH)
     End Select
 End Sub
 Private Sub FindEOLcharacter()
@@ -285,7 +285,7 @@ Attribute ReadText.VB_Description = "Reads a number of characters from the strea
                     P_TEXT = Buffer
                 End If
             Case Else
-                Buffer = SPACE$(LCS + 1)
+                Buffer = Space$(LCS + 1)
                 Get #FileHandled, , Buffer
                 NullCharPos = InStrB(Buffer, NullChar)
                 If NullCharPos Then
@@ -319,7 +319,7 @@ End Sub
 Private Sub StartVariables()
     CorrectedPos = 0
     P_BUFFERLENGTH = CLng(P_BUFFERSIZE * SizeFactor)
-    Buffer = SPACE$(P_BUFFERLENGTH)
+    Buffer = Space$(P_BUFFERLENGTH)
     LCS = P_STREAMLENGTH
     P_ATENDOFSTREAM = False
 End Sub
@@ -358,7 +358,7 @@ Private Sub Class_Initialize()
     P_ENDSTREAMONLINEBREAK = False
     P_LINEBREAKMATCHINGBEHAVIOR = EndLineMatchingBehavior.Bidirectional
     P_UNIFIEDLFOUTPUT = False
-    Buffer = SPACE$(P_BUFFERLENGTH)
+    Buffer = Space$(P_BUFFERLENGTH)
     NullChar = ChrW(0)
 End Sub
 Private Sub Class_Terminate()

@@ -737,7 +737,7 @@ Public Function GetDataFromCSV(csvPathAndFilename As String) As String
     On Error GoTo ErrHandler_GetDataFromCSV
     FileHandled = FreeFile
     Open csvPathAndFilename For Binary As #FileHandled
-    GetDataFromCSV = SPACE$(LOF(FileHandled))
+    GetDataFromCSV = Space$(LOF(FileHandled))
     Get #FileHandled, , GetDataFromCSV
     Close #FileHandled
 ErrHandler_GetDataFromCSV:

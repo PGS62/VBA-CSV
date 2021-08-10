@@ -4,22 +4,22 @@ Option Explicit
 Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
     Dim length As Long
     Dim i As Long
-    Dim res As String
+    Dim Res As String
     Const MAXLEN = 20
     On Error GoTo ErrHandler
     length = CLng(1 + Rnd() * MAXLEN)
-    res = String(length, " ")
+    Res = String(length, " ")
 
     For i = 1 To length
         If Unicode Then
-            Mid(res, i, 1) = ChrW(33 + Rnd() * 370)
+            Mid(Res, i, 1) = ChrW(33 + Rnd() * 370)
         Else
-            Mid(res, i, 1) = Chr(34 + Rnd() * 88)
+            Mid(Res, i, 1) = Chr(34 + Rnd() * 88)
         End If
 
         If Not AllowLineFeed Then
-            If Mid(res, i, 1) = vbLf Or Mid(res, i, 1) = vbCr Then
-                Mid(res, i, 1) = " "
+            If Mid(Res, i, 1) = vbLf Or Mid(Res, i, 1) = vbCr Then
+                Mid(Res, i, 1) = " "
             End If
         End If
     Next
@@ -27,12 +27,12 @@ Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL 
     If AllowLineFeed Then
         If length > 5 Then
             If Rnd() < 0.2 Then
-                Mid(res, length / 2, Len(EOL)) = EOL
+                Mid(Res, length / 2, Len(EOL)) = EOL
             End If
         End If
     End If
     
-    RandomString = res
+    RandomString = Res
 
     Exit Function
 ErrHandler:
@@ -235,25 +235,25 @@ Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, 
     Const DateFormat = "yyyy-mmm-dd"
     Dim i As Long
     Dim j As Long
-    Dim res() As Variant
+    Dim Res() As Variant
 
     On Error GoTo ErrHandler
 
     EOL = OStoEOL(EOL, "EOL")
-    ReDim res(1 To NRows, 1 To NCols)
+    ReDim Res(1 To NRows, 1 To NCols)
 
     For i = 1 To NRows
         For j = 1 To NCols
-            res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Unicode, EOL)
+            Res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Unicode, EOL)
         Next j
     Next i
     If AllowLineFeed Then
         i = 0.5 + Rnd() * NRows
         j = 0.5 + Rnd() * NCols
-        res(i, j) = "Here's a carriage return (ascii 13):" & vbCr & "and here's a line feed (ascii 10):" & vbLf & "and here's both together:" & vbCrLf
+        Res(i, j) = "Here's a carriage return (ascii 13):" & vbCr & "and here's a line feed (ascii 10):" & vbLf & "and here's both together:" & vbCrLf
     End If
 
-    RandomVariants = res
+    RandomVariants = Res
 
     Exit Function
 ErrHandler:

@@ -28,3 +28,21 @@ Function CSVRead_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As
 ErrHandler:
     CSVRead_ws_garcia = "#CSVRead_ws_garcia (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
+
+
+Private Function OStoEOL(OS As String, ArgName As String) As String
+
+    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associented end of line characters."
+
+    Select Case LCase(OS)
+        Case "windows", vbCrLf
+            OStoEOL = vbCrLf
+        Case "unix", vbLf
+            OStoEOL = vbLf
+        Case "mac", vbCr
+            OStoEOL = vbCr
+        Case Else
+            Throw ArgName + Err_Invalid
+    End Select
+End Function
+

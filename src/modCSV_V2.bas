@@ -72,15 +72,17 @@ End Sub
 '             but the function supports Windows, Unix and (old) Mac line endings.
 '---------------------------------------------------------------------------------------------------------
 Function CSVRead_V2(FileName As String, Optional ConvertTypes As Variant = False, Optional ByVal Delimiter As Variant, _
-    Optional DateFormat As String, Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
-    Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString)
+        Optional DateFormat As String, Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
+        Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
+        Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString)
+Attribute CSVRead_V2.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead_V2.VB_ProcData.VB_Invoke_Func = " \n14"
 
-          Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter, or else omitted to infer from the file's contents"
-          Const Err_FileIsUniCode = "Unicode must be passed as TRUE or FALSE, or omitted to infer from the file's contents"
+          Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
+          Const Err_FileIsUniCode = "Unicode must be passed as TRUE or FALSE. Omit to infer from file contents"
           Const Err_InFuncWiz = "#Disabled in Function Dialog!"
-          Const Err_NumCols = "NumCols must be positive to read a given number or columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered."
-          Const Err_NumRows = "NumRows must be positive to read a given number or rows, or zero or omitted to read all rows from SkipToRow to the end of the file."
+          Const Err_NumCols = "NumCols must be positive to read a given number of columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered."
+          Const Err_NumRows = "NumRows must be positive to read a given number of rows, or zero or omitted to read all rows from SkipToRow to the end of the file."
           Const Err_Seps = "DecimalSeparator must be different from Delimiter"
           Const Err_SkipToCol = "SkipToCol must be at least 1."
           Const Err_SkipToRow = "SkipToRow must be at least 1."
@@ -352,6 +354,7 @@ ErrHandler:
     Throw "#ParseConvertTypes: " & Err.Description & "!"
 End Sub
 
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Min4
 ' Author     : Philip Swannell
@@ -399,7 +402,7 @@ End Function
 '  QuoteCounts : Set to an array of size at least NumFields. Element k gives the number of QuoteChars that appear in the
 '                kth field.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function ParseCSVContents(ByVal CSVContents As String, QuoteChar As String, Delimiter As String, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, _
+Private Function ParseCSVContents(ByVal CSVContents As String, QuoteChar As String, Delimiter As String, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, _
     ByRef NumFields As Long, ByRef Starts() As Long, ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long)
 
 
@@ -430,9 +433,9 @@ Function ParseCSVContents(ByVal CSVContents As String, QuoteChar As String, Deli
     ReDim ColIndexes(1 To 8)
     ReDim QuoteCounts(1 To 8)
     
-    'Ensure CSVContents terminates with vbCrLf
     LDlm = Len(Delimiter)
     OrigLen = Len(CSVContents)
+    'Ensure CSVContents terminates with vbCrLf
     If Right(CSVContents, 1) <> vbCr And Right(CSVContents, 1) <> vbLf Then
         CSVContents = CSVContents + vbCrLf
     ElseIf Right(CSVContents, 1) = vbCr Then
@@ -972,8 +975,6 @@ ErrHandler:
     WindowsDefaultDateFormat = "Cannot determine!"
 End Function
 
-
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ShowTextFile
 ' Purpose    : Parse any text file to a 1-column two-dimensional array of strings. No splitting into columns and no
@@ -1024,7 +1025,6 @@ Private Function ShowTextFile(FileName, StartRow As Long, NumRows As Long, _
         ReDim Contents2D(1 To NumRows, 1 To 1)
 
         For i = 1 To NumRows 'BUG, won't work for Mac files. TODO Fix this?
-        
             Contents2D(i, 1) = T.ReadLine
         Next i
 
@@ -1037,5 +1037,4 @@ Private Function ShowTextFile(FileName, StartRow As Long, NumRows As Long, _
 ErrHandler:
     Throw "#ShowTextFile: " & Err.Description & "!"
 End Function
-
 
