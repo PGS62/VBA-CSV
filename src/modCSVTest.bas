@@ -48,7 +48,7 @@ Private Sub CSVSpeedTest()
     Const NumColsSmall = 6
     Const NumFilesToReadAndWrite = 1000
     Const NumRowsSmall = 70
-    Dim data, DataReread
+    Dim Data, DataReread
     Dim FileName As String
     Dim i As Long
     Dim NumCols As Long
@@ -69,9 +69,9 @@ Private Sub CSVSpeedTest()
         Format(Now, "dd-mmm-yyyy hh:mm:ss") + " Computer = " + Environ("COMPUTERNAME")
 
     'Doubles only, cast back to doubles
-    data = RandomDoubles(NumRows, NumCols)
+    Data = RandomDoubles(NumRows, NumCols)
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "Doubles", False, False)
-    ThrowIfError CSVWrite(FileName, data, True, , , , False, OS, False)
+    ThrowIfError CSVWrite(FileName, Data, True, , , , False, OS)
     t1 = sElapsedTime
     'DataReread = ThrowIfError(CSVRead_V2(FileName, True))
     t2 = sElapsedTime
@@ -80,9 +80,9 @@ Private Sub CSVSpeedTest()
         "File size = " + Format(sFileInfo(FileName, "size"), "###,##0") + " bytes."
 
     '10-character strings, unquoted
-    data = sFill("abcdefghij", NumRows, NumCols)
+    Data = sFill("abcdefghij", NumRows, NumCols)
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "10-char-strings-unquoted", False, False)
-    ThrowIfError CSVWrite(FileName, data, False, , , , , OS)
+    ThrowIfError CSVWrite(FileName, Data, False, , , , , OS)
     t1 = sElapsedTime
     'DataReread = ThrowIfError(CSVRead_V2(FileName, False))
     t2 = sElapsedTime
@@ -92,9 +92,9 @@ Private Sub CSVSpeedTest()
         Format(sFileInfo(FileName, "size"), "###,##0") + " bytes."
 
     '10-character strings...
-    data = sFill("abcdefghij", NumRows, NumCols)
+    Data = sFill("abcdefghij", NumRows, NumCols)
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "10-char-strings", False, False)
-    ThrowIfError CSVWrite(FileName, data, , , , , , OS, False)
+    ThrowIfError CSVWrite(FileName, Data, , , , , , OS)
     t1 = sElapsedTime
     'DataReread = ThrowIfError(CSVRead_V2(FileName, False))
     t2 = sElapsedTime
@@ -104,9 +104,9 @@ Private Sub CSVSpeedTest()
         Format(sFileInfo(FileName, "size"), "###,##0") + " bytes."
 
     '10-character strings ALL with linefeeds
-    data = sFill("abcd+" + vbCrLf + "efghi", NumRows, NumCols)
+    Data = sFill("abcd+" + vbCrLf + "efghi", NumRows, NumCols)
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "10-char-strings-with-line-feeds", False, False)
-    ThrowIfError CSVWrite(FileName, data, , , , , , OS, False)
+    ThrowIfError CSVWrite(FileName, Data, , , , , , OS)
     t1 = sElapsedTime
     'DataReread = ThrowIfError(CSVRead_V2(FileName))
     t2 = sElapsedTime
@@ -120,8 +120,8 @@ Private Sub CSVSpeedTest()
     t1 = sElapsedTime()
     For i = 1 To NumFilesToReadAndWrite
         SmallFileName = NameThatFile(m_FolderSpeedTest, OS, NumRowsSmall, NumColsSmall, Format(i, "0000"), False, False)
-        data = RandomDoubles(NumRowsSmall, NumColsSmall)
-        ThrowIfError CSVWrite(SmallFileName, data)
+        Data = RandomDoubles(NumRowsSmall, NumColsSmall)
+        ThrowIfError CSVWrite(SmallFileName, Data)
     Next i
     t2 = sElapsedTime()
     Debug.Print CStr(t2 - t1) + " seconds to write " + CStr(NumFilesToReadAndWrite) + " files. " + _
@@ -164,7 +164,7 @@ Sub AnotherWay()
     Dim Unicode As Variant
     Dim NRows As Variant
     Dim NCols As Variant
-    Dim data As Variant
+    Dim Data As Variant
     Dim k As Long
     Dim DateFormat As Variant
     Dim AllowLineFeed As Variant
@@ -188,41 +188,41 @@ Sub AnotherWay()
                         'For Variants we need to vary AllowLineFeed and DateFormat
                         For Each AllowLineFeed In Array(True, False)
                             For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
-                                data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode), EOL)
+                                Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode), EOL)
                                 ExtraInfo = "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
-                                CSVRoundTripTest CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+                                CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
                             Next DateFormat
                         Next AllowLineFeed
 
                         'For Dates, we need to vary DateFormat
                         For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
-                            data = RandomDates(CLng(NRows), CLng(NCols))
+                            Data = RandomDates(CLng(NRows), CLng(NCols))
                             ExtraInfo = "RandomDates"
-                            CSVRoundTripTest CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+                            CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
                         Next DateFormat
 
                         'For Strings, we need to vary AllowLineFeed
                         For Each AllowLineFeed In Array(True, False)
-                            data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed), EOL)
+                            Data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed), EOL)
                             ExtraInfo = IIf(AllowLineFeed, "RandomStringsWithLineFeeds", "RandomStrings")
-                            CSVRoundTripTest CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+                            CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
                         Next AllowLineFeed
 
                         For k = 1 To 4
                             If k = 1 Then
-                                data = RandomBooleans(CLng(NRows), CLng(NCols))
+                                Data = RandomBooleans(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "RandomBooleans"
                             ElseIf k = 2 Then
-                                data = RandomDoubles(CLng(NRows), CLng(NCols))
+                                Data = RandomDoubles(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "RandomDoubles"
                             ElseIf k = 3 Then
-                                data = RandomErrorValues(CLng(NRows), CLng(NCols))
+                                Data = RandomErrorValues(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "RandomErrorValues"
                             ElseIf k = 4 Then
-                                data = RandomLongs(CLng(NRows), CLng(NCols))
+                                Data = RandomLongs(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "RandomLongs"
                             End If
-                            CSVRoundTripTest CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
+                            CSVRoundTripTest CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), vbTab, CBool(Ragged), ExtraInfo
                         Next k
                     Next NCols
                 Next NRows
@@ -249,7 +249,7 @@ End Sub
 '  Ragged    :
 '  ExtraInfo :
 ' -----------------------------------------------------------------------------------------------------------------------
-Function CSVRoundTripTest(OS As String, ByVal data As Variant, DateFormat As String, Unicode As Boolean, EOL As String, Delimiter As String, Ragged As Boolean, ExtraInfo As String)
+Function CSVRoundTripTest(OS As String, ByVal Data As Variant, DateFormat As String, Unicode As Boolean, EOL As String, Delimiter As String, Ragged As Boolean, ExtraInfo As String)
 
     Dim DataReadBack
 
@@ -259,20 +259,23 @@ Function CSVRoundTripTest(OS As String, ByVal data As Variant, DateFormat As Str
     Dim NR As Long
     Dim NC As Long
 
-    NR = sNRows(data)
-    NC = sNCols(data)
+    NR = sNRows(Data)
+    NC = sNCols(Data)
 
     FileName1 = NameThatFile(m_FolderOriginals, OS, NR, NC, ExtraInfo, CBool(Unicode), CBool(Ragged))
     FileName2 = NameThatFile(m_FolderReadAndRewrite, OS, NR, NC, ExtraInfo, CBool(Unicode), CBool(Ragged))
 
-    If Ragged Then data = MakeArrayRagged(data)
+    If Ragged Then
+    Data = MakeArrayRagged(Data)
 
-    ThrowIfError CSVWrite(FileName1, data, True, DateFormat, , Delimiter, Unicode, EOL, Ragged)
+    ThrowIfError CSVWriteRagged(FileName1, Data, True, DateFormat, , Delimiter, Unicode, EOL, Ragged)
+    Else
+    ThrowIfError CSVWrite(FileName1, Data, True, DateFormat, , Delimiter, Unicode, EOL)
+    End If
 
     'The Call to CSVRead has to infer both Unicode and EOL
     'DataReadBack = CSVRead_V2(FileName1, True, , DateFormat, , , , , , Empty)
 
-    ThrowIfError CSVWrite(FileName2, data, True, DateFormat, , Delimiter, Unicode, EOL, Ragged)
 
     If Not TextFilesIdentical(FileName1, FileName2, IIf(Unicode, TristateTrue, TristateFalse)) Then
         Stop
@@ -288,29 +291,29 @@ End Function
 ' Purpose    : For each row of an array choose random number n less than number of cols and make the n right most columns empty
 '              also guarantee that one row will not have an empty right-most column.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function MakeArrayRagged(data)
+Private Function MakeArrayRagged(Data)
 
     Dim NR As Long, NC As Long
     Dim i As Long, j As Long
     Dim RowToLeaveUnchanged As Long
 
     On Error GoTo ErrHandler
-    NR = sNRows(data)
-    NC = sNCols(data)
+    NR = sNRows(Data)
+    NC = sNCols(Data)
     RowToLeaveUnchanged = CLng(0.5 + Rnd() * (NR))
 
     For i = 1 To NR
         If i = RowToLeaveUnchanged Then
-            If IsEmpty(data(i, NC)) Then
-                data(i, NC) = "Not empty!"
+            If IsEmpty(Data(i, NC)) Then
+                Data(i, NC) = "Not empty!"
             End If
         Else
             For j = CLng(0.5 + Rnd() * NC) To NC
-                data(i, j) = Empty
+                Data(i, j) = Empty
             Next
         End If
     Next
-    MakeArrayRagged = data
+    MakeArrayRagged = Data
 
     Exit Function
 ErrHandler:
@@ -341,77 +344,73 @@ ErrHandler:
     Throw CopyOfErr
 End Function
 
-
-
-
-Function CSVWriteMaybeRagged(FileName As String, ByVal data As Variant, Optional QuoteAllStrings As Boolean = True, _
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : CSVWriteMaybeRagged
+' Author     : Philip Swannell
+' Date       : 11-Aug-2021
+' Purpose    : Amended verson of CSVWrite that can write in ragged style. Needed only for testing that CSVRead handles such files sensibly.
+' -----------------------------------------------------------------------------------------------------------------------
+Function CSVWriteRagged(FileName As String, ByVal Data As Variant, Optional QuoteAllStrings As Boolean = True, _
         Optional DateFormat As String = "yyyy-mm-dd", Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
         Optional Delimiter As String = ",", Optional Unicode As Boolean, Optional ByVal EOL As String = vbCrLf, Optional Ragged As Boolean = False)
 
-          Dim FSO As Scripting.FileSystemObject
-          Dim i As Long
-          Dim j As Long
-          Dim k As Long
-          
-          Dim OneLine() As String
-          Dim OneLineJoined As String
-          Dim T As TextStream
-          Dim EOLIsWindows As Boolean
-          Const DQ = """"
-          
-          'Const Err_Delimiter = "Delimiter must be one character, and cannot be double quote or line feed characters"
-          Const Err_Delimiter = "Delimiter must not contain double quote or line feed characters"
+    Dim FSO As Scripting.FileSystemObject
+    Dim i As Long
+    Dim j As Long
+    Dim k As Long
+    
+    Dim OneLine() As String
+    Dim OneLineJoined As String
+    Dim T As TextStream
+    Dim EOLIsWindows As Boolean
+    Const DQ = """"
+    
+    Const Err_Delimiter = "Delimiter must not contain double quote or line feed characters"
 
-1         On Error GoTo ErrHandler
+    On Error GoTo ErrHandler
 
-2         EOL = OStoEOL(EOL, "EOL")
-3         EOLIsWindows = EOL = vbCrLf
+    EOL = OStoEOL(EOL, "EOL")
+    EOLIsWindows = EOL = vbCrLf
 
-          'If Len(Delimiter) <> 1 Or Delimiter = """" Or Delimiter = vbCr Or Delimiter = vbLf Then
-4         If InStr(Delimiter, DQ) > 0 Or InStr(Delimiter, vbLf) > 0 Or InStr(Delimiter, vbCr) > 0 Then
-5             Throw Err_Delimiter
-6         End If
+    If InStr(Delimiter, DQ) > 0 Or InStr(Delimiter, vbLf) > 0 Or InStr(Delimiter, vbCr) > 0 Then
+        Throw Err_Delimiter
+    End If
 
-7         If TypeName(data) = "Range" Then
-              'Preserve elements of type Date by using .Value, not .Value2
-8             data = data.value
-9         End If
-10        Force2DArray data 'Coerce 0-dim & 1-dim to 2-dims.
+    If TypeName(Data) = "Range" Then
+        'Preserve elements of type Date by using .Value, not .Value2
+        Data = Data.value
+    End If
 
-11        Set FSO = New FileSystemObject
-12        Set T = FSO.CreateTextFile(FileName, True, Unicode)
+    Set FSO = New FileSystemObject
+    Set T = FSO.CreateTextFile(FileName, True, Unicode)
 
-13        ReDim OneLine(LBound(data, 2) To UBound(data, 2))
+    ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
 
-14        For i = LBound(data) To UBound(data)
-15            For j = LBound(data, 2) To UBound(data, 2)
-16                OneLine(j) = Encode(data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
-17            Next j
-18            OneLineJoined = VBA.Join(OneLine, Delimiter)
+    For i = LBound(Data) To UBound(Data)
+        For j = LBound(Data, 2) To UBound(Data, 2)
+            OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
+        Next j
+        OneLineJoined = VBA.Join(OneLine, Delimiter)
 
-              'If writing in "Ragged" style, remove terminating delimiters
-19            If Ragged Then
-20                For k = Len(OneLineJoined) To 1 Step -1
-21                    If Mid(OneLineJoined, k, 1) <> Delimiter Then Exit For
-22                Next k
-23                If k < Len(OneLineJoined) Then
-24                    OneLineJoined = Left(OneLineJoined, k)
-25                End If
-26            End If
-              
-27            WriteLineWrap T, OneLineJoined, EOLIsWindows, EOL, Unicode
-28        Next i
+        'If writing in "Ragged" style, remove terminating delimiters
+        If Ragged Then
+            For k = Len(OneLineJoined) To 1 Step -1
+                If Mid(OneLineJoined, k, 1) <> Delimiter Then Exit For
+            Next k
+            If k < Len(OneLineJoined) Then
+                OneLineJoined = Left(OneLineJoined, k)
+            End If
+        End If
+        
+        WriteLineWrap T, OneLineJoined, EOLIsWindows, EOL, Unicode
+    Next i
 
-          'Quote from https://tools.ietf.org/html/rfc4180#section-2 : _
-          "The last record in the file may or may not have an ending line break." _
-           We follow Excel (File save as CSV) and *do* put a line break after the last line.
-
-29        T.Close: Set T = Nothing: Set FSO = Nothing
-30        CSVWriteMaybeRagged = FileName
-31        Exit Function
+    T.Close: Set T = Nothing: Set FSO = Nothing
+    CSVWriteRagged = FileName
+    Exit Function
 ErrHandler:
-32        CSVWriteMaybeRagged = "#CSVWriteMaybeRagged (line " & CStr(Erl) + "): " & Err.Description & "!"
-33        If Not T Is Nothing Then Set T = Nothing: Set FSO = Nothing
+    CSVWriteRagged = "#CSVWriteRagged: " & Err.Description & "!"
+    If Not T Is Nothing Then Set T = Nothing: Set FSO = Nothing
 
 End Function
 
@@ -422,36 +421,36 @@ End Function
 '              argument" if the error is caused by attempting to write Unicode characters to ascii file
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, Unicode As Boolean)
-          Dim ErrDesc As String
-          Dim ErrNum As Long
-          Dim i As Long
-          Dim ErrLN As String
+    Dim ErrDesc As String
+    Dim ErrNum As Long
+    Dim i As Long
+    Dim ErrLN As String
 
-1         On Error GoTo ErrHandler
-2         If EOLIsWindows Then
-3             T.WriteLine text
-4         Else
-5             T.Write text
-6             T.Write EOL
-7         End If
+    On Error GoTo ErrHandler
+    If EOLIsWindows Then
+        T.WriteLine text
+    Else
+        T.Write text
+        T.Write EOL
+    End If
 
-8         Exit Sub
+    Exit Sub
 
 ErrHandler:
-9         ErrNum = Err.Number
-10        ErrDesc = Err.Description
-11        ErrLN = CStr(Erl)
-12        If Not Unicode Then
-13            If ErrNum = 5 Then
-14                For i = 1 To Len(text)
-15                    If AscW(Mid(text, i, 1)) > 255 Then
-16                        ErrDesc = "Data contains unicode characters (first found has code " & CStr(AscW(Mid(text, i, 1))) & ") which cannot be written to an ascii file. Set argument Unicode to True"
-17                        Exit For
-18                    End If
-19                Next i
-20            End If
-21        End If
-22        Throw "#WriteLineWrap (line " & ErrLN + "): " & ErrDesc & "!"
+    ErrNum = Err.Number
+    ErrDesc = Err.Description
+    ErrLN = CStr(Erl)
+    If Not Unicode Then
+        If ErrNum = 5 Then
+            For i = 1 To Len(text)
+                If AscW(Mid(text, i, 1)) > 255 Then
+                    ErrDesc = "Data contains unicode characters (first found has code " & CStr(AscW(Mid(text, i, 1))) & ") which cannot be written to an ascii file. Set argument Unicode to True"
+                    Exit For
+                End If
+            Next i
+        End If
+    End If
+    Throw "#WriteLineWrap (line " & ErrLN + "): " & ErrDesc & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------

@@ -72,7 +72,7 @@ Public Function CSVRead_sdkn104(FileName As String, Unicode As Boolean)
     
     Exit Function
 ErrHandler:
-    CSVRead_sdkn104 = "#CSVRead_sdkn104 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    CSVRead_sdkn104 = "#CSVRead_sdkn104: " & Err.Description & "!"
 End Function
 
 

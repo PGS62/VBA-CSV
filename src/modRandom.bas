@@ -2,11 +2,14 @@ Attribute VB_Name = "modRandom"
 Option Explicit
 
 Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
-    Dim length As Long
-    Dim i As Long
-    Dim Res As String
+
     Const MAXLEN = 20
+    Dim i As Long
+    Dim length As Long
+    Dim Res As String
+    
     On Error GoTo ErrHandler
+    
     length = CLng(1 + Rnd() * MAXLEN)
     Res = String(length, " ")
 
@@ -40,8 +43,13 @@ ErrHandler:
 End Function
 
 Function RandomStrings(NumRows As Long, NumCols As Long, Unicode As Boolean, AllowLineFeed As Boolean, EOL As String)
-    Dim Result() As String, i As Long, j As Long
+
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As String
+    
     On Error GoTo ErrHandler
+    
     ReDim Result(1 To NumRows, 1 To NumCols)
     For i = 1 To NumRows
         For j = 1 To NumCols
@@ -54,6 +62,7 @@ Function RandomStrings(NumRows As Long, NumCols As Long, Unicode As Boolean, All
         Result(i, j) = "Here's a carriage return (ascii 13):" & vbCr & "and here's a line feed (ascii 10):" & vbLf & "and here's both together:" & vbCrLf
     End If
     RandomStrings = Result
+    
     Exit Function
 ErrHandler:
     Throw "#RandomStrings: " & Err.Description & "!"
@@ -64,8 +73,13 @@ Private Function RandomLong() As Long
 End Function
 
 Function RandomLongs(NumRows As Long, NumCols As Long)
-    Dim Result() As Long, i As Long, j As Long
+
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Long
+    
     On Error GoTo ErrHandler
+    
     ReDim Result(1 To NumRows, 1 To NumCols)
     For i = 1 To NumRows
         For j = 1 To NumCols
@@ -88,8 +102,13 @@ ErrHandler:
 End Function
 
 Function RandomDoubles(NumRows As Long, NumCols As Long)
-    Dim Result() As Double, i As Long, j As Long
+
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Double
+    
     On Error GoTo ErrHandler
+    
     ReDim Result(1 To NumRows, 1 To NumCols)
     For i = 1 To NumRows
         For j = 1 To NumCols
@@ -98,6 +117,7 @@ Function RandomDoubles(NumRows As Long, NumCols As Long)
     Next i
     RandomDoubles = Result
     Exit Function
+    
 ErrHandler:
     Throw "#RandomDoubles: " & Err.Description & "!"
 End Function
@@ -107,8 +127,13 @@ Private Function RandomBoolean() As Boolean
 End Function
 
 Function RandomBooleans(NumRows As Long, NumCols As Long)
-    Dim Result() As Boolean, i As Long, j As Long
+    
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Boolean
+    
     On Error GoTo ErrHandler
+    
     ReDim Result(1 To NumRows, 1 To NumCols)
     For i = 1 To NumRows
         For j = 1 To NumCols
@@ -130,8 +155,13 @@ ErrHandler:
 End Function
 
 Function RandomDates(NumRows As Long, NumCols As Long)
-    Dim Result() As Date, i As Long, j As Long
+    
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Date
+    
     On Error GoTo ErrHandler
+    
     ReDim Result(1 To NumRows, 1 To NumCols)
     For i = 1 To NumRows
         For j = 1 To NumCols
@@ -140,6 +170,7 @@ Function RandomDates(NumRows As Long, NumCols As Long)
     Next i
     RandomDates = Result
     Exit Function
+    
 ErrHandler:
     Throw "#RandomDates: " & Err.Description & "!"
 End Function
@@ -148,14 +179,19 @@ Private Function RandomErrorValue()
     Dim n As Long
     On Error GoTo ErrHandler
     n = CLng(0.5 + Rnd() * 14)
-    RandomErrorValue = CVErr(Choose(n, xlErrBlocked, xlErrCalc, xlErrConnect, xlErrDiv0, xlErrField, xlErrGettingData, xlErrNA, xlErrName, xlErrNull, xlErrNum, xlErrRef, xlErrSpill, xlErrUnknown, xlErrValue))
+    RandomErrorValue = CVErr(Choose(n, xlErrBlocked, xlErrCalc, xlErrConnect, xlErrDiv0, xlErrField, xlErrGettingData, _
+        xlErrNA, xlErrName, xlErrNull, xlErrNum, xlErrRef, xlErrSpill, xlErrUnknown, xlErrValue))
     Exit Function
 ErrHandler:
     Throw "#RandomErrorValue: " & Err.Description & "!"
 End Function
 
 Function RandomErrorValues(NumRows As Long, NumCols As Long)
-    Dim Result() As Variant, i As Long, j As Long
+    
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Variant
+    
     On Error GoTo ErrHandler
     ReDim Result(1 To NumRows, 1 To NumCols)
     For i = 1 To NumRows
@@ -165,6 +201,7 @@ Function RandomErrorValues(NumRows As Long, NumCols As Long)
     Next i
     RandomErrorValues = Result
     Exit Function
+    
 ErrHandler:
     Throw "#RandomErrorValues: " & Err.Description & "!"
 End Function
@@ -225,10 +262,10 @@ Private Function OStoEOL(OS As String, ArgName As String) As String
         Case Else
             Throw ArgName + Err_Invalid
     End Select
+    
 End Function
 
 Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, Unicode As Boolean, ByVal EOL As String)
-
 
     Application.Volatile
 
@@ -259,3 +296,5 @@ Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, 
 ErrHandler:
     Throw "#RandomVariants: " & Err.Description & "!"
 End Function
+
+

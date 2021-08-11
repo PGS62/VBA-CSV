@@ -140,7 +140,7 @@ Function sNCols(Optional TheArray) As Long
     End If
 End Function
 
-'Copy of identical function in modCVS
+'Copy of identical function in modCVSReadWrite
 Private Function NumDimensions(x As Variant) As Long
     Dim i As Long
     Dim y As Long
@@ -206,3 +206,52 @@ Function sFill(ByVal x As Variant, ByVal NumRows As Long, ByVal NumCols As Long)
 ErrHandler:
     sFill = "#sFill: " & Err.Description & "!"
 End Function
+
+
+Function RawFileContents(FileName As String)
+            Dim FSO As New FileSystemObject, F As Scripting.File, T As Scripting.TextStream
+            Set F = FSO.GetFile(FileName)
+            Set T = F.OpenAsTextStream()
+            RawFileContents = T.ReadAll
+            T.Close
+End Function
+
+Function FileSize(FileName As String)
+    Static FSO As Scripting.FileSystemObject
+
+    On Error GoTo ErrHandler
+    If FSO Is Nothing Then Set FSO = New FileSystemObject
+
+    FileSize = FSO.GetFile(FileName).Size
+
+    Exit Function
+ErrHandler:
+    Throw "#FileSize (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : Throw
+' Purpose    : Simple error handling.
+' -----------------------------------------------------------------------------------------------------------------------
+Sub Throw(ByVal ErrorString As String)
+    Err.Raise vbObjectError + 1, , ErrorString
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : ThrowIfError
+' Purpose   : In the event of an error, methods intended to be callable from spreadsheets
+'             return an error string (starts with "#", ends with "!"). ThrowIfError allows such
+'             methods to be used from VBA code while keeping error handling robust
+'             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
+'---------------------------------------------------------------------------------------
+Function ThrowIfError(Data As Variant)
+    ThrowIfError = Data
+    If VarType(Data) = vbString Then
+        If Left$(Data, 1) = "#" Then
+            If Right$(Data, 1) = "!" Then
+                Throw CStr(Data)
+            End If
+        End If
+    End If
+End Function
+

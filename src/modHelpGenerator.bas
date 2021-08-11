@@ -7,8 +7,8 @@ Option Explicit
 ' -----------------------------------------------------------------------------------------------------------------------
 Function CodeToRegister(FunctionName, FunctionDescription As String, ArgDescriptions)
 
-    Dim code As String
     Const DQ = """"
+    Dim code As String
     Dim i As Long
     
     If TypeName(ArgDescriptions) = "Range" Then ArgDescriptions = ArgDescriptions.value
@@ -42,10 +42,12 @@ End Function
 ' Purpose    : Generate a header to paste into the VBE. The header generated will be consistent with the registration
 '              created by calling CodeToRegister.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function HelpForVBE(FunctionName As String, FunctionDescription As String, ArgNames, ArgDescriptions, Optional ExtraHelp As String, Optional Author As String, Optional DateWritten As Long)
+Function HelpForVBE(FunctionName As String, FunctionDescription As String, ArgNames, ArgDescriptions, _
+    Optional ExtraHelp As String, Optional Author As String, Optional DateWritten As Long)
+
+    Dim Hlp As String
     Dim i As Long
     Dim NumArgs As Long
-    Dim Hlp As String
     
     On Error GoTo ErrHandler
 
@@ -136,4 +138,5 @@ Private Function InsertBreaks(ByVal TheString As String)
 ErrHandler:
     Throw "#InsertBreaks: " & Err.Description & "!"
 End Function
+
 

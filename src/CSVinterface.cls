@@ -3251,7 +3251,7 @@ TwoDimToJaggedArray_Err_Handler:
     P_ERROR_DESC = Err.Description
     P_ERROR_SOURCE = Err.Source
 End Sub
-Private Function TypeData(ByRef data As Variant, _
+Private Function TypeData(ByRef Data As Variant, _
                             ByVal fieldIdx As Long, _
                             ByVal IsHeader As Boolean) As Variant
     If TemplateDefined Then
@@ -3269,23 +3269,23 @@ Private Function TypeData(ByRef data As Variant, _
                 If typingNeed Then
                     Select Case dTTemplate(typingIdx - 1)
                         Case ConvertTypes.None 'Strings
-                            TypeData = data
+                            TypeData = Data
                         Case ConvertTypes.ToLong
-                            TypeData = CLng(data)
+                            TypeData = CLng(Data)
                         Case ConvertTypes.ToDouble
-                            TypeData = CDbl(data)
+                            TypeData = CDbl(Data)
                         Case ConvertTypes.ToDate
-                            TypeData = CDate(data)
+                            TypeData = CDate(Data)
                         Case ConvertTypes.ToBoolean
-                            TypeData = CBool(data)
+                            TypeData = CBool(Data)
                         Case Else
-                            TypeData = data
+                            TypeData = Data
                     End Select
                 Else
-                    TypeData = data
+                    TypeData = Data
                 End If
             Else 'Not type headers
-                TypeData = data
+                TypeData = Data
             End If
         End If
     End If

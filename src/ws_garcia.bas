@@ -26,7 +26,7 @@ Function CSVRead_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As
 
     Exit Function
 ErrHandler:
-    CSVRead_ws_garcia = "#CSVRead_ws_garcia (line " & CStr(Erl) + "): " & Err.Description & "!"
+    CSVRead_ws_garcia = "#CSVRead_ws_garcia: " & Err.Description & "!"
 End Function
 
 

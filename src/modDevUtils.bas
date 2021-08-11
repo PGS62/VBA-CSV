@@ -7,13 +7,16 @@ Option Explicit
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub SaveWorkbookAndExportModules()
 
-    Dim wb As Workbook
+    Const Title = "VBA-CSV"
+    Dim AuditData
+    Dim BackUpBookName
     Dim bExport As Boolean
     Dim c As VBIDE.VBComponent
     Dim FileName As String
     Dim Folder As String
+    Dim i As Long
     Dim Prompt As String
-    Const Title = "VBA-CSV"
+    Dim wb As Workbook
 
     On Error GoTo ErrHandler
 
@@ -69,7 +72,7 @@ Sub SaveWorkbookAndExportModules()
     Kill Folder & "*.frx"        'These are binary files that we don't want to check in to Git
     On Error GoTo ErrHandler
     
-    Dim AuditData, i As Long
+    
     AuditData = Range(shAudit.Range("Headers").Cells(1, 1), shAudit.Range("Headers").Cells(1, 1).End(xlToRight).End(xlDown))
     For i = LBound(AuditData, 1) + 1 To UBound(AuditData, 1)
         AuditData(i, 3) = CDate(AuditData(i, 3))
@@ -80,11 +83,11 @@ Sub SaveWorkbookAndExportModules()
     PrepareForRelease
     ThisWorkbook.Save
     
-    Dim BackUpBookName
+    
     
     BackUpBookName = Environ("OneDriveConsumer") + "\Excel Sheets\VBA-CSV_Backups\" + Replace(ThisWorkbook.Name, ".", "_v" & shAudit.Range("B6") & ".")
     
-    ThrowIfError sfilecopy(ThisWorkbook.FullName, BackUpBookName)
+    ThrowIfError Application.Run("sfilecopy", ThisWorkbook.FullName, BackUpBookName)
 
     Exit Sub
 ErrHandler:
@@ -92,6 +95,7 @@ ErrHandler:
 End Sub
 
 Sub PrepareForRelease()
+
     Dim i As Long
     Dim ws As Worksheet
     
@@ -117,4 +121,5 @@ Sub PrepareForRelease()
 ErrHandler:
     Throw "#PrepareForRelease: " & Err.Description & "!"
 End Sub
+
 
