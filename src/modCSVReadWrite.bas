@@ -99,6 +99,8 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Optional DateFormat As String, Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
     Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
     Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString)
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const DQ2 = """"""
@@ -630,7 +632,8 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseCSVContents
-' Purpose    : Parse the contents of a CSV file.
+' Purpose    : Parse the contents of a CSV file. Returns a string Buffer together with arrays which assist splitting Buffer
+'              into a two-dimensional array.
 ' Parameters :
 '  ContentsOrStream: The contents of a CSV file as a string, or else a Scripting.TextStream.
 '  QuoteChar       : The quote character, usually ascii 34 ("), which allow fields to contain characters that would
@@ -642,15 +645,13 @@ End Function
 '  NumColsFound    : Set to the number of columns in the file, i.e. the maximum number of fields in any single line.
 '  NumFields       : Set to the number of fields in the file that are on or after SkipToRow.  May be less than
 '                    NumRowsFound times NumColsFound if not all lines have the same number of fields.
-'  Starts          : Set to an array of size at least NumFields. Element k gives the point in CSVContents at which the
+'  Starts          : Set to an array of size at least NumFields. Element k gives the point in Buffer at which the
 '                    kth field starts.
 '  Lengths         : Set to an array of size at least NumFields. Element k gives the length of the kth field.
 '  RowIndexes      : Set to an array of size at least NumFields. Element k gives the row at which the kth field should
 '                    appear in the return from CSVRead.
 '  ColIndexes      : Set to an array of size at least NumFields. Element k gives the column at which the kth field would
 '                    appear in the return from CSVRead under the assumption that argument SkipToCol is 1.
-'  IsLasts         : Set to an array of size at least NumFields. Element k indicates whether the kth field is the last
-'                    field in its line.
 '  QuoteCounts     : Set to an array of size at least NumFields. Element k gives the number of QuoteChars that appear in the
 '                    kth field.
 ' -----------------------------------------------------------------------------------------------------------------------
