@@ -3,7 +3,7 @@ Option Explicit
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : SaveWorkbookAndExportModules
-' Purpose    : Export the modules of this workbook to the src folder, also save the workbook in its current location
+' Purpose    : Export the modules of this workbook to the src folder, also save the workbook in its current location, and save a backup of the workbook to my OneDrive folder.
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub SaveWorkbookAndExportModules()
 
@@ -79,6 +79,12 @@ Sub SaveWorkbookAndExportModules()
     
     PrepareForRelease
     ThisWorkbook.Save
+    
+    Dim BackUpBookName
+    
+    BackUpBookName = Environ("OneDriveConsumer") + "\Excel Sheets\VBA-CSV_Backups\" + Replace(ThisWorkbook.Name, ".", "_v" & shAudit.Range("B6") & ".")
+    
+    ThrowIfError sfilecopy(ThisWorkbook.FullName, BackUpBookName)
 
     Exit Sub
 ErrHandler:
@@ -95,7 +101,7 @@ Sub PrepareForRelease()
 
     For Each ws In ThisWorkbook.Worksheets
         If ws.Visible = xlSheetVisible Then
-            Application.Goto ws.Cells(1, 1)
+            Application.GoTo ws.Cells(1, 1)
             ActiveWindow.DisplayGridlines = False
             ActiveWindow.DisplayHeadings = False
         End If
@@ -103,7 +109,7 @@ Sub PrepareForRelease()
     Next
     For i = 1 To ThisWorkbook.Worksheets.count
         If ThisWorkbook.Worksheets(i).Visible Then
-            Application.Goto ThisWorkbook.Worksheets(i).Cells(1, 1)
+            Application.GoTo ThisWorkbook.Worksheets(i).Cells(1, 1)
             Exit For
         End If
     Next i

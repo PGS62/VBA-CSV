@@ -178,6 +178,7 @@ Function CSVRead_V3(FileName As String, Optional ConvertTypes As Variant = False
                 
 45        Set F = FSO.GetFile(FileName)
 46        Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+
 47        If T.AtEndOfStream Then
 48            T.Close: Set T = Nothing: Set F = Nothing
 49            Throw Err_FileEmpty
@@ -192,54 +193,64 @@ Function CSVRead_V3(FileName As String, Optional ConvertTypes As Variant = False
 57            T.Close
 58        End If
           
+          
+          '   If True Then
+          '   CSVRead_V3 = sArrayRange(sArrayStack(NumRowsFound, NumColsFound, NumFields), sArrayTranspose(Starts), sArrayTranspose(Lengths), sArrayTranspose(RowIndexes), sArrayTranspose(ColIndexes), sArrayTranspose(QuoteCounts))
+          '   Exit Function
+          '   End If
+          
 59        AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
               ShowLogicalsAsLogicals Or ShowErrorsAsErrors Or (Not ShowMissingAsNullString)
               
 60        If NumCols = 0 Then
 61            NumColsInReturn = NumColsFound - SkipToCol + 1
-62        Else
-63            NumColsInReturn = NumCols
-64        End If
-65        If NumRows = 0 Then
-66            NumRowsInReturn = NumRowsFound
-67        Else
-68            NumRowsInReturn = NumRows
-69        End If
+62            If NumColsInReturn <= 0 Then
+63                Throw "SkipToCol (" + CStr(SkipToCol) + ") exceeds the number of columns in the file (" + CStr(NumColsFound) + ")"
+64            End If
+65        Else
+66            NumColsInReturn = NumCols
+67        End If
+68        If NumRows = 0 Then
+69            NumRowsInReturn = NumRowsFound
+70        Else
+71            NumRowsInReturn = NumRows
+72        End If
               
-70        ReDim ReturnArray(1 To NumRowsInReturn, 1 To NumColsInReturn)
+73        ReDim ReturnArray(1 To NumRowsInReturn, 1 To NumColsInReturn)
               
-71        For k = 1 To NumFields
-72            i = RowIndexes(k)
-73            j = ColIndexes(k) - SkipToCol + 1
-74            If j >= 1 And j <= NumColsInReturn Then
-75                If QuoteCounts(k) = 0 Or Not RemoveQuotes Then
-76                    ThisField = Mid(CSVContents, Starts(k), Lengths(k))
-77                ElseIf Mid(CSVContents, Starts(k), 1) = DQ And Mid(CSVContents, Starts(k) + Lengths(k) - 1, 1) = DQ Then
-78                    ThisField = Mid(CSVContents, Starts(k) + 1, Lengths(k) - 2)
-79                    If QuoteCounts(k) > 2 Then
-80                        ThisField = Replace(ThisField, DQ2, DQ)
-81                    End If
-82                Else 'Field which does not start with quote but contains quotes, so not RFC4180 compliant. We do not replace DQ2 by DQ in this case.
-83                    ThisField = Mid(CSVContents, Starts(k), Lengths(k))
-84                End If
+74        For k = 1 To NumFields
+75            i = RowIndexes(k)
+76            j = ColIndexes(k) - SkipToCol + 1
+77            If j >= 1 And j <= NumColsInReturn Then
+78                If QuoteCounts(k) = 0 Or Not RemoveQuotes Then
+79                    ThisField = Mid(CSVContents, Starts(k), Lengths(k))
+80                ElseIf Mid(CSVContents, Starts(k), 1) = DQ And Mid(CSVContents, Starts(k) + Lengths(k) - 1, 1) = DQ Then
+81                    ThisField = Mid(CSVContents, Starts(k) + 1, Lengths(k) - 2)
+82                    If QuoteCounts(k) > 2 Then
+83                        ThisField = Replace(ThisField, DQ2, DQ)
+84                    End If
+85                Else 'Field which does not start with quote but contains quotes, so not RFC4180 compliant. We do not replace DQ2 by DQ in this case.
+86                    ThisField = Mid(CSVContents, Starts(k), Lengths(k))
+87                End If
               
-85                If AnyConversion And QuoteCounts(k) = 0 Then
-86                    ReturnArray(i, j) = CastToVariant(ThisField, _
+88                If AnyConversion And QuoteCounts(k) = 0 Then
+89                    ReturnArray(i, j) = CastToVariant(ThisField, _
                           ShowNumbersAsNumbers, SepsStandard, DecimalSeparator, SysDecimalSeparator, _
                           ShowDatesAsDates, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
                           ShowLogicalsAsLogicals, ShowErrorsAsErrors)
-87                Else
-88                    ReturnArray(i, j) = ThisField
-89                End If
-90            End If
-91        Next k
+90                Else
+91                    ReturnArray(i, j) = ThisField
+92                End If
+93            End If
+94        Next k
 
-92        CSVRead_V3 = ReturnArray
+95        CSVRead_V3 = ReturnArray
 
-93        Exit Function
+96        Exit Function
 
 ErrHandler:
-94        CSVRead_V3 = "#CSVRead_V3 (line " & CStr(Erl) + "): " & Err.Description & "!"
+97        CSVRead_V3 = "#CSVRead_V3 (line " & CStr(Erl) + "): " & Err.Description & "!"
+98        If Not T Is Nothing Then T.Close
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -636,7 +647,7 @@ End Function
 '                    kth field.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, Delimiter As String, SkipToRow As Long, NumRows As Long, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, _
-    ByRef NumFields As Long, ByRef Starts() As Long, ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long) As String
+          ByRef NumFields As Long, ByRef Starts() As Long, ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long) As String
 
           Const Err_ContentsOrStream = "ContentsOrStream must either be a string or a TextStream"
           Dim Buffer As String
@@ -660,176 +671,185 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
           Dim T As Scripting.TextStream
           Dim tmp As Long
           Dim Which As Long
+          Dim NumRowsInFile As Long
 
 1         On Error GoTo ErrHandler
           
 2         If VarType(ContentsOrStream) = vbString Then
-              'TODO Remove this bodge, useful for testing
-3             If LCase(Left(ContentsOrStream, 3)) = "c:\" Then
-                  Dim FSO As New FileSystemObject, F As Scripting.File
-4                 Set F = FSO.GetFile(ContentsOrStream)
-5                 Set T = F.OpenAsTextStream()
-6                 Streaming = True
-7             Else
-8                 Buffer = ContentsOrStream
-9                 Streaming = False
-10            End If
-11        ElseIf TypeName(ContentsOrStream) = "TextStream" Then
-12            Set T = ContentsOrStream
-13            If NumRows = 0 Then
-14                Buffer = T.ReadAll
-15                T.Close
-16                Streaming = False
-17            Else
-18                Call GetMoreFromStream(T, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
-19                Streaming = True
-20            End If
-21        Else
-22            Throw Err_ContentsOrStream
-23        End If
+3             Buffer = ContentsOrStream
+4             Streaming = False
+5         ElseIf TypeName(ContentsOrStream) = "TextStream" Then
+6             Set T = ContentsOrStream
+7             If NumRows = 0 Then
+8                 Buffer = T.ReadAll
+9                 T.Close
+10                Streaming = False
+11            Else
+12                Call GetMoreFromStream(T, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
+13                Streaming = True
+14            End If
+15        Else
+16            Throw Err_ContentsOrStream
+17        End If
              
-24        If Streaming Then
-25            ReDim SearchFor(1 To 4)
-26            SearchFor(1) = Delimiter
-27            SearchFor(2) = vbLf
-28            SearchFor(3) = vbCr
-29            SearchFor(4) = QuoteChar
-30            ReDim QuoteArray(1 To 1)
-31            QuoteArray(1) = QuoteChar
-32        End If
+18        If Streaming Then
+19            ReDim SearchFor(1 To 4)
+20            SearchFor(1) = Delimiter
+21            SearchFor(2) = vbLf
+22            SearchFor(3) = vbCr
+23            SearchFor(4) = QuoteChar
+24            ReDim QuoteArray(1 To 1)
+25            QuoteArray(1) = QuoteChar
+26        End If
 
-33        ReDim Starts(1 To 8)
-34        ReDim Lengths(1 To 8)
-35        ReDim RowIndexes(1 To 8)
-36        ReDim ColIndexes(1 To 8)
-37        ReDim QuoteCounts(1 To 8)
+27        ReDim Starts(1 To 8)
+28        ReDim Lengths(1 To 8)
+29        ReDim RowIndexes(1 To 8)
+30        ReDim ColIndexes(1 To 8)
+31        ReDim QuoteCounts(1 To 8)
           
-38        LDlm = Len(Delimiter)
-39        OrigLen = Len(Buffer)
-40        If Not Streaming Then
+32        LDlm = Len(Delimiter)
+33        OrigLen = Len(Buffer)
+34        If Not Streaming Then
               'Ensure Buffer terminates with vbCrLf
-41            If Right(Buffer, 1) <> vbCr And Right(Buffer, 1) <> vbLf Then
-42                Buffer = Buffer + vbCrLf
-43            ElseIf Right(Buffer, 1) = vbCr Then
-44                Buffer = Buffer + vbLf
-45            End If
-46            BufferUpdatedTo = Len(Buffer)
-47        End If
+35            If Right(Buffer, 1) <> vbCr And Right(Buffer, 1) <> vbLf Then
+36                Buffer = Buffer + vbCrLf
+37            ElseIf Right(Buffer, 1) = vbCr Then
+38                Buffer = Buffer + vbLf
+39            End If
+40            BufferUpdatedTo = Len(Buffer)
+41        End If
           
-48        j = 1
-49        ColNum = 1: RowNum = 1
-50        EvenQuotes = True
-51        Starts(1) = 1
-52        If SkipToRow = 1 Then HaveReachedSkipToRow = True
+42        j = 1
+43        ColNum = 1: RowNum = 1
+44        EvenQuotes = True
+45        Starts(1) = 1
+46        If SkipToRow = 1 Then HaveReachedSkipToRow = True
 
-53        Do
-54            If EvenQuotes Then
-55                If Not Streaming Then
-56                    If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
-57                    If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
-58                    If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
-59                    If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
-60                    i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
-61                Else
-62                    i = SearchInBuffer(SearchFor, i + 1, T, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
-63                End If
+47        Do
+48            If EvenQuotes Then
+49                If Not Streaming Then
+50                    If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
+51                    If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
+52                    If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
+53                    If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
+54                    i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
+55                Else
+56                    i = SearchInBuffer(SearchFor, i + 1, T, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
+57                End If
 
-64                If i = BufferUpdatedTo + 1 Then
-65                    Exit Do
-66                End If
+58                If i = BufferUpdatedTo + 1 Then
+59                    Exit Do
+60                End If
 
-67                If j + 1 > UBound(Starts) Then
-68                    ReDim Preserve Starts(1 To UBound(Starts) * 2)
-69                    ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
-70                    ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
-71                    ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
-72                    ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
-73                End If
+61                If j + 1 > UBound(Starts) Then
+62                    ReDim Preserve Starts(1 To UBound(Starts) * 2)
+63                    ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
+64                    ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
+65                    ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
+66                    ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
+67                End If
 
-74                Select Case Which
+68                Select Case Which
                       Case 1
                           'Found Delimiter
-75                        Lengths(j) = i - Starts(j)
-76                        Starts(j + 1) = i + LDlm
-77                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-78                        ColNum = ColNum + 1
-79                        QuoteCounts(j) = QuoteCount: QuoteCount = 0
-80                        j = j + 1
-81                        NumFields = NumFields + 1
-82                        i = i + LDlm - 1
-83                    Case 2, 3
-84                        Lengths(j) = i - Starts(j)
-85                        If Which = 2 Then
+69                        Lengths(j) = i - Starts(j)
+70                        Starts(j + 1) = i + LDlm
+71                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+72                        ColNum = ColNum + 1
+73                        QuoteCounts(j) = QuoteCount: QuoteCount = 0
+74                        j = j + 1
+75                        NumFields = NumFields + 1
+76                        i = i + LDlm - 1
+77                    Case 2, 3
+78                        Lengths(j) = i - Starts(j)
+79                        If Which = 2 Then
                               'Unix line ending
-86                            Starts(j + 1) = i + 1
-87                        ElseIf Mid(Buffer, i + 1, 1) = vbLf Then
+80                            Starts(j + 1) = i + 1
+81                        ElseIf Mid(Buffer, i + 1, 1) = vbLf Then
                               'Windows line ending. - it is safe to look one character ahead since Buffer terminates with vbCrLf
-88                            Starts(j + 1) = i + 2
-89                            i = i + 1
-90                        Else
+82                            Starts(j + 1) = i + 2
+83                            i = i + 1
+84                        Else
                               'Mac line ending (Mac pre OSX)
-91                            Starts(j + 1) = i + 1
-92                        End If
+85                            Starts(j + 1) = i + 1
+86                        End If
 
-93                        If ColNum > NumColsFound Then NumColsFound = ColNum
-94                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-95                        ColNum = 1: RowNum = RowNum + 1
+87                        If ColNum > NumColsFound Then NumColsFound = ColNum
+88                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+89                        ColNum = 1: RowNum = RowNum + 1
                           
-96                        QuoteCounts(j) = QuoteCount: QuoteCount = 0
-97                        j = j + 1
-98                        NumFields = NumFields + 1
+90                        QuoteCounts(j) = QuoteCount: QuoteCount = 0
+91                        j = j + 1
+92                        NumFields = NumFields + 1
                           
-99                        If HaveReachedSkipToRow Then
-100                           If RowNum = NumRows + 1 Then
-101                               Exit Do
-102                           End If
-103                       Else
-104                           If RowNum = SkipToRow Then
-105                               HaveReachedSkipToRow = True
-106                               tmp = Starts(j)
-107                               ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8): ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
-108                               RowNum = 1: j = 1
-109                               Starts(1) = tmp
-110                           End If
-111                       End If
-112                   Case 4
+93                        If HaveReachedSkipToRow Then
+94                            If RowNum = NumRows + 1 Then
+95                                Exit Do
+96                            End If
+97                        Else
+98                            If RowNum = SkipToRow Then
+99                                HaveReachedSkipToRow = True
+100                               tmp = Starts(j)
+101                               ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8): ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
+102                               RowNum = 1: j = 1: NumFields = 0
+103                               Starts(1) = tmp
+104                           End If
+105                       End If
+106                   Case 4
                           'Found QuoteChar
-113                       EvenQuotes = False
-114                       QuoteCount = QuoteCount + 1
-115               End Select
-116           Else
-117               If Not Streaming Then
-118                   PosQC = InStr(i + 1, Buffer, QuoteChar)
-119               Else
-120                   If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray(), i + 1, T, Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
-121               End If
+107                       EvenQuotes = False
+108                       QuoteCount = QuoteCount + 1
+109               End Select
+110           Else
+111               If Not Streaming Then
+112                   PosQC = InStr(i + 1, Buffer, QuoteChar)
+113               Else
+114                   If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray(), i + 1, T, Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
+115               End If
                   
-122               If PosQC = 0 Then
+116               If PosQC = 0 Then
                       'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes. _
                        If there are an odd number then all text after the last double quote in the file will be (part of) _
                        the last field in the last line.
-123                   Lengths(j) = OrigLen - Starts(j) + 1
-124                   ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+117                   Lengths(j) = OrigLen - Starts(j) + 1
+118                   ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
                       
-125                   RowNum = RowNum + 1
-126                   If ColNum > NumColsFound Then NumColsFound = ColNum
-127                   NumFields = NumFields + 1
-128                   Exit Do
-129               Else
-130                   i = PosQC
-131                   EvenQuotes = True
-132                   QuoteCount = QuoteCount + 1
-133               End If
-134           End If
-135       Loop
+119                   RowNum = RowNum + 1
+120                   If ColNum > NumColsFound Then NumColsFound = ColNum
+121                   NumFields = NumFields + 1
+122                   Exit Do
+123               Else
+124                   i = PosQC
+125                   EvenQuotes = True
+126                   QuoteCount = QuoteCount + 1
+127               End If
+128           End If
+129       Loop
+
+          NumRowsFound = RowNum - 1
           
-136       NumRowsFound = RowNum - 1
+130       If HaveReachedSkipToRow Then
+131           NumRowsInFile = SkipToRow - 1 + RowNum - 1
+132       Else
+133           NumRowsInFile = RowNum - 1
+134       End If
+          
+135       If SkipToRow > NumRowsInFile Then
+136           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be a zero or negative number of rows
+137               Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of rows in the file (" + CStr(NumRowsInFile) + ")"
+138           Else
+                  'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
+139               NumFields = 0
+140               NumRowsFound = 0
+141           End If
+142       End If
 
-137       ParseCSVContents = Buffer
+143       ParseCSVContents = Buffer
 
-138       Exit Function
+144       Exit Function
 ErrHandler:
-139       Throw "#ParseCSVContents (line " & CStr(Erl) + "): " & Err.Description & "!"
+145       Throw "#ParseCSVContents (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

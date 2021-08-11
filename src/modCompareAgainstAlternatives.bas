@@ -189,11 +189,11 @@ Function TimeSixParsers(EachFieldContains As Variant, NumRows As Long, NumCols A
 19            tstart = sElapsedTime
 20            Select Case j
                   Case 1
-21                    FnName1 = "CSVRead_V1"
-22                    DataReread1 = ThrowIfError(CSVRead_V1(FileName, False, ",", , , , , , , Unicode))
+21            '        FnName1 = "CSVRead_V1"
+22            '        DataReread1 = ThrowIfError(CSVRead_V1(FileName, False, ",", , , , , , , Unicode))
 23                Case 2
 24                    FnName2 = "CSVRead_V2"
-25                    DataReread2 = ThrowIfError(CSVRead_V2(FileName, False, ",", , , , , , Unicode))
+25       '             DataReread2 = ThrowIfError(CSVRead_V2(FileName, False, ",", , , , , , Unicode))
 26                Case 3
 27                    FnName3 = "CSVRead_V3"
 28                    DataReread3 = ThrowIfError(CSVRead_V3(FileName, False, ",", , , , , , Unicode))
@@ -229,10 +229,11 @@ Function TimeSixParsers(EachFieldContains As Variant, NumRows As Long, NumCols A
           'Hook in to SolumAddin
 54        If CheckReturnsIdentical Then
 55            OneEqTwo = Application.Run("sArraysIdentical", DataReread1, DataReread2)
-              'Comparing arrays but allowing for different lower bounds
-56            OneEqThree = Application.Run("sArraysIdentical", DataReread1, DataReread3, True, True)
+
+56            OneEqThree = Application.Run("sArraysIdentical", DataReread1, DataReread3)
 57            OneEqFour = Application.Run("sArraysIdentical", DataReread1, DataReread4)
-58            OneEqFive = Application.Run("sArraysIdentical", DataReread1, DataReread5)
+              'Comparing arrays but allowing for different lower bounds
+58            OneEqFive = Application.Run("sArraysIdentical", DataReread1, DataReread5, True, True)
 59            OneEqSix = Application.Run("sArraysIdentical", DataReread1, DataReread6)
 60        Else
 61            OneEqTwo = "-"

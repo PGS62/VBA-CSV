@@ -73,7 +73,7 @@ Private Sub CSVSpeedTest()
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "Doubles", False, False)
     ThrowIfError CSVWrite(FileName, data, True, , , , False, OS, False)
     t1 = sElapsedTime
-    DataReread = ThrowIfError(CSVRead_V2(FileName, True))
+    'DataReread = ThrowIfError(CSVRead_V2(FileName, True))
     t2 = sElapsedTime
     Debug.Print CStr(t2 - t1) + " seconds to read 1 file containing random doubles " + _
         Format(NumRows, "###,##0") + " rows, " + Format(NumCols, "###,##0") + " cols. " '+ _
@@ -84,7 +84,7 @@ Private Sub CSVSpeedTest()
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "10-char-strings-unquoted", False, False)
     ThrowIfError CSVWrite(FileName, data, False, , , , , OS)
     t1 = sElapsedTime
-    DataReread = ThrowIfError(CSVRead_V2(FileName, False))
+    'DataReread = ThrowIfError(CSVRead_V2(FileName, False))
     t2 = sElapsedTime
     Debug.Print CStr(t2 - t1) + " seconds to read 1 file containing UNquoted 10-char strings " + _
         Format(NumRows, "###,##0") + " rows, " + _
@@ -96,7 +96,7 @@ Private Sub CSVSpeedTest()
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "10-char-strings", False, False)
     ThrowIfError CSVWrite(FileName, data, , , , , , OS, False)
     t1 = sElapsedTime
-    DataReread = ThrowIfError(CSVRead_V2(FileName, False))
+    'DataReread = ThrowIfError(CSVRead_V2(FileName, False))
     t2 = sElapsedTime
     Debug.Print CStr(t2 - t1) + " seconds to read 1 file containing QUOTED 10-char strings " + _
         Format(NumRows, "###,##0") + " rows, " + _
@@ -108,7 +108,7 @@ Private Sub CSVSpeedTest()
     FileName = NameThatFile(m_FolderSpeedTest, OS, NumRows, NumCols, "10-char-strings-with-line-feeds", False, False)
     ThrowIfError CSVWrite(FileName, data, , , , , , OS, False)
     t1 = sElapsedTime
-    DataReread = ThrowIfError(CSVRead_V2(FileName))
+    'DataReread = ThrowIfError(CSVRead_V2(FileName))
     t2 = sElapsedTime
     Debug.Print CStr(t2 - t1) + " seconds to read 1 file containing 10-char strings, all with line-feeds " + _
         Format(NumRows, "###,##0") + " rows, " + Format(NumCols, "###,##0") + " cols. File size = " ' + _
@@ -131,7 +131,7 @@ Private Sub CSVSpeedTest()
     t1 = sElapsedTime()
     For i = 1 To NumFilesToReadAndWrite
         SmallFileName = NameThatFile(m_FolderSpeedTest, OS, NumRowsSmall, NumColsSmall, Format(i, "0000"), False, False)
-        data = ThrowIfError(CSVRead_V2(SmallFileName, True, ","))
+        'data = ThrowIfError(CSVRead_V2(SmallFileName, True, ","))
     Next i
     t2 = sElapsedTime()
     Debug.Print CStr(t2 - t1) + " seconds to read " + CStr(NumFilesToReadAndWrite) + " files. " + _
@@ -270,7 +270,7 @@ Function CSVRoundTripTest(OS As String, ByVal data As Variant, DateFormat As Str
     ThrowIfError CSVWrite(FileName1, data, True, DateFormat, , Delimiter, Unicode, EOL, Ragged)
 
     'The Call to CSVRead has to infer both Unicode and EOL
-    DataReadBack = CSVRead_V2(FileName1, True, , DateFormat, , , , , , Empty)
+    'DataReadBack = CSVRead_V2(FileName1, True, , DateFormat, , , , , , Empty)
 
     ThrowIfError CSVWrite(FileName2, data, True, DateFormat, , Delimiter, Unicode, EOL, Ragged)
 

@@ -50,7 +50,7 @@ Sub RunSpeedTests()
 2         If MsgBox("Run Speed Tests?", vbOKCancel) <> vbOK Then Exit Sub
 3         For Each n In ActiveSheet.Names
 4             If InStr(n.Name, "PutFormulasHere") > 1 Then
-5                 Application.Goto n.RefersToRange
+5                 Application.GoTo n.RefersToRange
 6                 For Each c In n.RefersToRange.Cells
 7                     c.Resize(1, 13).ClearContents
 8                     c.Formula2R1C1 = "=TimeSixParsers(RC[-4],RC[-3],RC[-2],RC[-1])"

@@ -1,4 +1,8 @@
 "Version","Date","Time","Author","Comment"
+15,11-Aug-2021,11:53:55,"Philip Swannell","Deleted functions CSVRead_V1 and CSVRead_V2"
+14,11-Aug-2021,11:48:07,"Philip Swannell","Deleted 2 of the 3 sheets with timing results."
+13,11-Aug-2021,11:46:06,"Philip Swannell","Changed method SaveWorkbookAndExportModules to also save a backup to OneDrive."
+12,11-Aug-2021,11:33:57,"Philip Swannell","Bug fixes to handling of SkipNumRows etc."
 11,10-Aug-2021,22:54:44,"Philip Swannell","Added sheet `TimingResults (3)`"
 10,10-Aug-2021,17:37:29,"Philip Swannell","CSVRead_V3 now supports SkipToRow and NumRows."
 9,09-Aug-2021,13:06:19,"Philip Swannell","CSVRead_V2 now supports SkipToCol and NumCols, not yet SkipToRow and NumRows though."
