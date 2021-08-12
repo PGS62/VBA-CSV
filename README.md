@@ -1,12 +1,17 @@
 # VBA-CSV
-CSV reading and writing for VBA and Excel spreadsheet formulas.
+CSV reading and writing for VBA and Excel spreadsheets.
+
+# Installation
+1. Download the latest release
+2. Import `modCSVReadWrite` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
+3. Include a reference to "Microsoft Scripting Runtime". (In VBA Editor Tools > References).
 
 
 # Documentation
 #### _CSVRead_
 Returns the contents of a comma-separated file on disk as an array.
 ```vba
-"Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
+Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional DateFormat As String, _
     Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
     Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
@@ -33,7 +38,7 @@ Returns the contents of a comma-separated file on disk as an array.
 #### _CSVWrite_
 Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an "error string" (starts with #, ends with !) describing what went wrong.
 ```vba
-"Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
+Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = ""yyyy-mm-dd"", _
     Optional DateTimeFormat As String = ""yyyy-mm-dd hh:mm:ss"", _
     Optional Delimiter As String = "","", Optional UTF16 As Boolean, _
