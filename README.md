@@ -5,7 +5,7 @@ CSV reading and writing for VBA and Excel spreadsheets, via two functions `CSVRe
 1. Download the latest release.
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
 3. Include a reference to "Microsoft Scripting Runtime" (In VBA Editor Tools > References).
-4. If you plan to call the functions spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event. Example:
+4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event. Example:
 ```vba
 Private Sub Workbook_Open()
     RegisterCSVWrite
