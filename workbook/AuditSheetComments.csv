@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+22,12-Aug-2021,17:56:51,"Philip Swannell","Added argument ShowMissingsAs to CSVRead. Simplification of this workbook."
 21,11-Aug-2021,23:43:30,"Philip Swannell","Corrections to code comments."
 20,11-Aug-2021,23:33:09,"Philip Swannell","Code formatting."
 19,11-Aug-2021,19:44:43,"Philip Swannell","Method TimeThreeParsers now has TimeOut argument so that time to execute is averaged over the number of calls required to take (in total) the TimeOut value."
