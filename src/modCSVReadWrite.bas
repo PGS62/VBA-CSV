@@ -1399,11 +1399,11 @@ End Function
 '             For definition of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
 '---------------------------------------------------------------------------------------------------------
-Public Function CSVWrite(FileName As String, ByVal Data As Variant, Optional QuoteAllStrings As Boolean = True, _
-    Optional DateFormat As String = "yyyy-mm-dd", Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
-    Optional Delimiter As String = ",", Optional UTF16 As Boolean, Optional ByVal EOL As String = vbCrLf)
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with #, ends with !) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
+Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
+    Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
+    Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
+    Optional Delimiter As String = ",", Optional UTF16 As Boolean, _
+    Optional ByVal EOL As String = vbCrLf)
 
     Const DQ = """"
     Dim EOLIsWindows As Boolean

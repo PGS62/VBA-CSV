@@ -5,7 +5,7 @@ CSV reading and writing for VBA and Excel spreadsheet formulas.
 # Documentation
 #### _CSVRead_
 Returns the contents of a comma-separated file on disk as an array.
-```
+```vba
 "Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional DateFormat As String, _
     Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
@@ -28,12 +28,16 @@ Returns the contents of a comma-separated file on disk as an array.
 |`UTF16`|Enter TRUE if the file is UTF-16 encoded, FALSE otherwise. Omit to guess from the file's contents.|
 |`DecimalSeparator`|The character that represents a decimal point. If omitted, then the value from Windows regional settings is used.|
 
+
+
 #### _CSVWrite_
 Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an "error string" (starts with #, ends with !) describing what went wrong.
-```
-Public Function CSVWrite(FileName As String, ByVal Data As Variant, Optional QuoteAllStrings As Boolean = True, _
-    Optional DateFormat As String = ""yyyy-mm-dd"", Optional DateTimeFormat As String = ""yyyy-mm-dd hh:mm:ss"", _
-    Optional Delimiter As String = ",", Optional UTF16 As Boolean, Optional ByVal EOL As String = vbCrLf)
+```vba
+"Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
+    Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = ""yyyy-mm-dd"", _
+    Optional DateTimeFormat As String = ""yyyy-mm-dd hh:mm:ss"", _
+    Optional Delimiter As String = "","", Optional UTF16 As Boolean, _
+    Optional ByVal EOL As String = vbCrLf)
 ```
 
 |Argument|Description|
@@ -46,5 +50,3 @@ Public Function CSVWrite(FileName As String, ByVal Data As Variant, Optional Quo
 |`Delimiter`|The `Delimiter` string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
 |`UTF16`|If FALSE (the default) the file written will be UTF-8. If TRUE the file written will be UTF-16 LE BOM. An error will result if this argument is FALSE but `Data` contains characters with code points above 255.|
 |`EOL`|Enter the line ending as "Windows" (or CRLF), or "Unix" (or LF) or "Mac" (or CR). If omitted defaults to "Windows".|
-
-
