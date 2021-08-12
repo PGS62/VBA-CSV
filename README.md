@@ -1,11 +1,17 @@
 # VBA-CSV
-CSV reading and writing for VBA and Excel spreadsheets.
+CSV reading and writing for VBA and Excel spreadsheets, via two functions `CSVRead` and `CSVWrite`.
 
 # Installation
-1. Download the latest release
-2. Import `modCSVReadWrite` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
-3. Include a reference to "Microsoft Scripting Runtime". (In VBA Editor Tools > References).
-
+1. Download the latest release.
+2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
+3. Include a reference to "Microsoft Scripting Runtime" (In VBA Editor Tools > References).
+4. If you plan to call the functions spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event. Example:
+```
+Private Sub Workbook_Open()
+    RegisterCSVWrite
+    RegisterCSVRead
+End Sub
+```
 
 # Documentation
 #### _CSVRead_
@@ -32,8 +38,6 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`ShowMissingsAs`|Fields which are missing in the file (i.e. consecutive delimiters) are represented by `ShowMissingsAs`. Defaults to the null string, but can be any string or Empty.|
 |`UTF16`|Enter TRUE if the file is UTF-16 encoded, FALSE otherwise. Omit to guess from the file's contents.|
 |`DecimalSeparator`|The character that represents a decimal point. If omitted, then the value from Windows regional settings is used.|
-
-
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an "error string" (starts with #, ends with !) describing what went wrong.
