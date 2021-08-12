@@ -18,9 +18,9 @@ Sub RegisterCSVRead()
     Dim ArgDescs() As String
     ReDim ArgDescs(1 To 11)
     ArgDescs(1) = "The full name of the file, including the path."
-    ArgDescs(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values, or FALSE to leave as strings. Or letters N, D, B, E, Q. E.g. ""BN"" to convert just Booleans and numbers. Q indicates quoted strings should retain their quotes."
+    ArgDescs(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values, or FALSE to leave as strings. Or a string of characters N, D, B, E, Q. E.g. ""BN"" to convert just Booleans and numbers. Q indicates quoted strings should retain their quotes."
     ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions. Enter FALSE to  see the file's raw contents as would be displayed in a text editor. Delimiter may have more than one character."
-    ArgDescs(4) = "The format of dates in the file such as D-M-Y, M-D-Y or Y/M/D. If omitted a value is read from Windows regional settings. Repeated D's (or M's or Y's) are equivalent to single instances, so that d-m-y and DD-MMM-YYYY are equivalent."
+    ArgDescs(4) = "The format of dates in the file such as ""D-M-Y"", ""M-D-Y"" or ""Y/M/D"". If omitted a value is read from Windows regional settings. Repeated D's (or M's or Y's) are equivalent to single instances, so that ""d-m-y"" and ""DD-MMM-YYYY"" are equivalent."
     ArgDescs(5) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first row."
     ArgDescs(6) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
     ArgDescs(7) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
@@ -56,15 +56,17 @@ End Sub
 ' Arguments
 ' FileName  : The full name of the file, including the path.
 ' ConvertTypes: TRUE to convert Numbers, Dates, Booleans and Errors into their typed values, or FALSE to
-'             leave as strings. Or letters N, D, B, E, Q. E.g. "BN" to convert just
-'             Booleans and numbers. Q indicates quoted strings should retain their quotes.
+'             leave as strings. Or a string of characters N, D, B, E, Q. E.g. "BN" to
+'             convert just Booleans and numbers. Q indicates quoted strings should retain
+'             their quotes.
 ' Delimiter : Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe
 '             found outside quoted regions. Enter FALSE to  see the file's raw contents as
 '             would be displayed in a text editor. Delimiter may have more than one
 '             character.
-' DateFormat: The format of dates in the file such as D-M-Y, M-D-Y or Y/M/D. If omitted a value is read
-'             from Windows regional settings. Repeated D's (or M's or Y's) are equivalent
-'             to single instances, so that d-m-y and DD-MMM-YYYY are equivalent.
+' DateFormat: The format of dates in the file such as "D-M-Y", "M-D-Y" or "Y/M/D". If omitted a value is
+'             read from Windows regional settings. Repeated D's (or M's or Y's) are
+'             equivalent to single instances, so that "d-m-y" and "DD-MMM-YYYY" are
+'             equivalent.
 ' SkipToRow : The row in the file at which reading starts. Optional and defaults to 1 to read from the
 '             first row.
 ' SkipToCol : The column in the file at which reading starts. Optional and defaults to 1 to read from
@@ -97,10 +99,14 @@ End Sub
 '             but the function supports files with Windows, Unix and (old) Mac line
 '             endings. Files may also have mixed line endings.
 '---------------------------------------------------------------------------------------------------------
-Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, Optional ByVal Delimiter As Variant, _
-    Optional DateFormat As String, Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
-    Optional ByVal UTF16 As Variant, Optional DecimalSeparator As String = vbNullString)
+Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
+    Optional ByVal Delimiter As Variant, Optional DateFormat As String, _
+    Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
+    Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
+    Optional ByVal ShowMissingsAs As Variant = "", Optional ByVal UTF16 As Variant, _
+    Optional DecimalSeparator As String = vbNullString)
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const DQ2 = """"""
@@ -1382,7 +1388,7 @@ End Function
 '             not currently capable of interpreting fields written in DateTime format.
 ' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
 '             character.
-' UTF-16    : If FALSE (the default) the file written will be UTF-8. If TRUE the file written will be
+' UTF16     : If FALSE (the default) the file written will be UTF-8. If TRUE the file written will be
 '             UTF-16 LE BOM. An error will result if this argument is FALSE but Data
 '             contains characters with code points above 255.
 ' EOL       : Enter the line ending as "Windows" (or CRLF), or "Unix" (or LF) or "Mac" (or CR). If
@@ -1396,6 +1402,8 @@ End Function
 Public Function CSVWrite(FileName As String, ByVal Data As Variant, Optional QuoteAllStrings As Boolean = True, _
     Optional DateFormat As String = "yyyy-mm-dd", Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
     Optional Delimiter As String = ",", Optional UTF16 As Boolean, Optional ByVal EOL As String = vbCrLf)
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with #, ends with !) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Dim EOLIsWindows As Boolean
