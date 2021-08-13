@@ -13,9 +13,9 @@ Private Sub Workbook_Open()
 End Sub
 ```
 # Acknowledgements
-I re-wrote the parsing code of `CSVRead` after examining "sdkn104"'s code available here, and now take a similar approach to parsing as the approach used by sdkn104.
+I re-wrote the parsing code of `CSVRead` after examining "sdkn104"'s code available [here](https://github.com/sdkn104/VBA-CSV); my approach is now similar to the one employed there.
 
-The documentation borrows freely from that of Julia's CSV.jl, though sadly VBA is not capable of Julia's extremely high performance. More on performance here.
+The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance here.
 
 
 # Documentation
