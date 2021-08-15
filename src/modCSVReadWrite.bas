@@ -14,21 +14,22 @@ Option Explicit
 '              WorkBook_Open event.
 '---------------------------------------------------------------------------------------------------------
 Sub RegisterCSVRead()
-    Const FnDesc = "Returns the contents of a comma-separated file on disk as an array."
-    Dim ArgDescs() As String
-    ReDim ArgDescs(1 To 11)
-    ArgDescs(1) = "The full name of the file, including the path."
-    ArgDescs(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values, or FALSE to leave as strings. Or a string of characters N, D, B, E, Q. E.g. ""BN"" to convert just Booleans and numbers. Q indicates quoted strings should retain their quotes."
-    ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions. Enter FALSE to  see the file's raw contents as would be displayed in a text editor. Delimiter may have more than one character."
-    ArgDescs(4) = "The format of dates in the file such as ""D-M-Y"", ""M-D-Y"" or ""Y/M/D"". If omitted a value is read from Windows regional settings. Repeated D's (or M's or Y's) are equivalent to single instances, so that ""d-m-y"" and ""DD-MMM-YYYY"" are equivalent."
-    ArgDescs(5) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first row."
-    ArgDescs(6) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
-    ArgDescs(7) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
-    ArgDescs(8) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
-    ArgDescs(9) = "Fields which are missing in the file (i.e. consecutive delimiters) are represented by ShowMissingsAs. Defaults to the null string, but can be any string or Empty."
-    ArgDescs(10) = "Enter TRUE if the file is UTF-16 encoded, FALSE otherwise. Omit to guess from the file's contents."
-    ArgDescs(11) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
-    Application.MacroOptions "CSVRead", FnDesc, , , , , , , , , ArgDescs
+    Const Description = "Returns the contents of a comma-separated file on disk as an array."
+    Dim ArgumentDescriptions() As String
+    ReDim ArgumentDescriptions(1 To 12)
+    ArgumentDescriptions(1) = "The full name of the file, including the path."
+    ArgumentDescriptions(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values, or FALSE to leave as strings. Or a string of characters N, D, B, E, Q. E.g. ""BN"" to convert just Booleans and numbers. Q indicates quoted strings should retain their quotes."
+    ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
+    ArgumentDescriptions(4) = "Whether delimiters which appear immediately after another delimiter, or at the start of a line, should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
+    ArgumentDescriptions(5) = "The format of dates in the file such as ""D-M-Y"", ""M-D-Y"" or ""Y/M/D"". If omitted a value is read from Windows regional settings. Repeated D's (or M's or Y's) are equivalent to single instances, so that ""d-m-y"" and ""DD-MMM-YYYY"" are equivalent."
+    ArgumentDescriptions(6) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first row."
+    ArgumentDescriptions(7) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
+    ArgumentDescriptions(8) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
+    ArgumentDescriptions(9) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
+    ArgumentDescriptions(10) = "Fields which are missing in the file (consecutive delimiters) are represented by ShowMissingsAs. Defaults to the null string, but can be any string or Empty."
+    ArgumentDescriptions(11) = "Enter TRUE if the file is Unicode, FALSE otherwise. Omit to guess from the file's contents."
+    ArgumentDescriptions(12) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
+    Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
 End Sub
 '---------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVWrite
@@ -36,18 +37,18 @@ End Sub
 '              WorkBook_Open event.
 '---------------------------------------------------------------------------------------------------------
 Sub RegisterCSVWrite()
-    Const FnDesc = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with #, ends with !) describing what went wrong."
-    Dim ArgDescs() As String
-    ReDim ArgDescs(1 To 8)
-    ArgDescs(1) = "The full name of the file, including the path."
-    ArgDescs(2) = "An array of data. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values."
-    ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. Double quotes are always escaped by another double quote."
-    ArgDescs(4) = "A format string that determine how dates, including cells formatted as dates, appear in the file. If omitted, defaults to ""yyyy-mm-dd""."
-    ArgDescs(5) = "A format string that determines how dates with non-zero time part appear in the file. If omitted defaults to ""yyyy-mm-dd hh:mm:ss"".The companion function CVSRead is not currently capable of interpreting fields written in DateTime format."
-    ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one character."
-    ArgDescs(7) = "If FALSE (the default) the file written will be UTF-8. If TRUE the file written will be UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains characters with code points above 255."
-    ArgDescs(8) = "Enter the line ending as ""Windows"" (or CRLF), or ""Unix"" (or LF) or ""Mac"" (or CR). If omitted defaults to ""Windows""."
-    Application.MacroOptions "CSVWrite", FnDesc, , , , , , , , , ArgDescs
+    Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with #, ends with !) describing what went wrong."
+    Dim ArgumentDescriptions() As String
+    ReDim ArgumentDescriptions(1 To 8)
+    ArgumentDescriptions(1) = "The full name of the file, including the path."
+    ArgumentDescriptions(2) = "An array of data. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values."
+    ArgumentDescriptions(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. Double quotes are always escaped by another double quote."
+    ArgumentDescriptions(4) = "A format string that determine how dates, including cells formatted as dates, appear in the file. If omitted, defaults to ""yyyy-mm-dd""."
+    ArgumentDescriptions(5) = "A format string that determines how dates with non-zero time part appear in the file. If omitted defaults to ""yyyy-mm-dd hh:mm:ss"".The companion function CSVRead is not capable of converting fields written in DateTime format back from strings into Dates."
+    ArgumentDescriptions(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one character."
+    ArgumentDescriptions(7) = "If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains strings with characters whose code points exceed 255."
+    ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter ""Windows"" (the default), ""Unix"" or ""Mac"". Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings ""CRLF"", ""LF"" or ""CR""."
+    Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgumentDescriptions
 End Sub
 
 '---------------------------------------------------------------------------------------------------------
@@ -55,56 +56,78 @@ End Sub
 ' Purpose   : Returns the contents of a comma-separated file on disk as an array.
 ' Arguments
 ' FileName  : The full name of the file, including the path.
-' ConvertTypes: TRUE to convert Numbers, Dates, Booleans and Errors into their typed values, or FALSE to
-'             leave as strings. Or a string of characters N, D, B, E, Q. E.g. "BN" to
-'             convert just Booleans and numbers. Q indicates quoted strings should retain
-'             their quotes.
-' Delimiter : Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe
-'             found outside quoted regions. Enter FALSE to  see the file's raw contents as
-'             would be displayed in a text editor. Delimiter may have more than one
-'             character.
+' ConvertTypes: ConvertTypes provides control over whether fields in the file are converted to typed values
+'             in the returned array or remain as strings.
+'
+'             In all cases, only "unquoted" fields are converted. A field is "quoted" if its first and last
+'             characters are double-quotes, otherwise it is unquoted.
+'
+'             ConvertTypes may take values FALSE (the default), TRUE, or a string made up of the letters
+'             "N", "D", "B", "E" or "Q".
+'
+'             Four possible type conversions are available:
+'             1) If ConvertTypes includes the letter "N" then unquoted fields that represent numbers are
+'             converted to numbers (of type Double).
+'             2) If ConvertTypes includes the letter "D" then unquoted fields that represent dates
+'             (respecting DateFormat) are converted to Dates.
+'             3) If ConvertTypes includes the letter "B" then unquoted fields that read "true" or "false"
+'             are converted to Booleans. The match is not case sensitive so "TRUE", "FALSE", "True" and
+'             "False" are also converted.
+'             4) If ConvertTypes includes the letter "E" then unquoted fields that match Excel"s
+'             representation of error values are converted to error values. There are fourteen such
+'             strings, including "#N/A", "#NAME?", "#VALUE!" and "#DIV/0!".
+'
+'             For convenience, ConvertTypes can also take the value TRUE - all four conversions take place,
+'             or FALSE - no type conversion takes place. If ConvertTypes is omitted no type conversion
+'             takes place.
+'
+'             Quoted fields are returned with their leading and trailing double-quote characters removed
+'             and consecutive pairs of double-quotes replaced by single double-quotes. But if ConvertTypes
+'             contains the letter "Q" then this behaviour is changed so that quoted fields are returned
+'             exactly as they appear in the file, with all double-quotes retained.
+' Delimiter : By default, CSVRead will try to detect a file's delimiter as the first instance of comma, tab,
+'             semi-colon, colon or pipe found outside quoted regions in the first 10,000 characters of the
+'             file. If it can't auto-detect the delimiter, it will assume comma. If your file includes a
+'             different character or string delimiter you should pass that as the Delimiter argument.
+'
+'             Alternatively, enter FALSE as the delimiter to treat the file as "not a delimited file". In
+'             this case the return will mimic how the file would appear in a text editor such as NotePad.
+'             The file will by split into lines at all line breaks (irrespective of double-quotes) and each
+'             element of the return will be a line of the file.
+' IgnoreRepeated: Whether delimiters which appear immediately after another delimiter, or at the start of a
+'             line, should be ignored while parsing; useful-for fixed-width files with delimiter padding
+'             between fields.
 ' DateFormat: The format of dates in the file such as "D-M-Y", "M-D-Y" or "Y/M/D". If omitted a value is
-'             read from Windows regional settings. Repeated D's (or M's or Y's) are
-'             equivalent to single instances, so that "d-m-y" and "DD-MMM-YYYY" are
-'             equivalent.
-' SkipToRow : The row in the file at which reading starts. Optional and defaults to 1 to read from the
-'             first row.
-' SkipToCol : The column in the file at which reading starts. Optional and defaults to 1 to read from
-'             the first column.
-' NumRows   : The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to
-'             the end of the file are read.
-' NumCols   : The number of columns to read from the file. If omitted (or zero), all columns from
-'             SkipToCol are read.
-' ShowMissingsAs: Fields which are missing in the file (i.e. consecutive delimiters) are represented by
-'             ShowMissingsAs. Defaults to the null string, but can be any string or Empty.
-' UTF16     : Enter TRUE if the file is UTF-16 encoded, FALSE otherwise. Omit to guess from the file's
-'             contents.
-' DecimalSeparator: The character that represents a decimal point. If omitted, then the value from Windows
-'             regional settings is used.
-'
-' Notes     : See also companion function CSVWrite.
-'
-'             The function handles all csv files that conform to the standards described in
-'             RFC4180  https://www.rfc-editor.org/rfc/rfc4180.txt including files with
-'             quoted fields.
-'
-'             In addition the function handles files which break some of those standards:
-'             * Not all lines of the file need have the same number of fields. The function
-'             "pads" with Empty values.
-'             * Fields which start with a double quote but do not end with a double quote
-'             are handled by being returned unchanged. Necessarily such fields have an even
-'             number of double quotes, or otherwise the field will be treated as the last
-'             field in the file.
-'             * The standard states that csv files should have Windows-style line endings,
-'             but the function supports files with Windows, Unix and (old) Mac line
-'             endings. Files may also have mixed line endings.
+'             read from Windows regional settings. Repeated D's (or M's or Y's) are equivalent to single
+'             instances, so that "d-m-y" and "DD-MMM-YYYY" are equivalent.
+' SkipToRow : The row in the file at which reading starts. Optional and defaults to 1 to read from the first
+'             row.
+' SkipToCol : The column in the file at which reading starts. Optional and defaults to 1 to read from the
+'             first column.
+' NumRows   : The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the
+'             end of the file are read.
+' NumCols   : The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol
+'             are read.
+' ShowMissingsAs: Fields which are missing in the file (consecutive delimiters) are represented by
+'             ShowMissingsAs. Defaults to the null string, but can be any string or Empty. If NumRows is
+'             greater than the number of rows in the file then the return is "padded" with the value of
+'             ShowMissingsAs. Likewise if NumCols is greater than the number of columns in the file.
+' Unicode   : In most cases, this argument can be omitted, in which case CSVRead will examine the file's
+'             byte order mark to guess how the file should be opened - i.e. the correct "format" argument
+'             to pass to VBA's method OpenAsTextStream, which requires an argument indicating whether the
+'             file is Unicode or ASCII. Alternatively, enter TRUE for a Unicode file or FALSE for an ASCII
+'             file.
+' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
+'             instead of a period (3,14 vs. 3.14). CSVRead can correctly parse these numbers by passing in
+'             the DecimalSeparator as a comma. Note that you probably need to explicitly pass Delimiter in
+'             this case, since the parser will probably think that it detected comma as the delimiter.
 '---------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional DateFormat As String, _
-    Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
-    Optional ByVal ShowMissingsAs As Variant = "", Optional ByVal UTF16 As Variant, _
-    Optional DecimalSeparator As String = vbNullString)
+    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
+    Optional DateFormat As String, Optional ByVal SkipToRow As Long = 1, _
+    Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
+    Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
+    Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString)
 Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
 Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
@@ -113,11 +136,12 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
     Const Err_Delimiter2 = "Delimiter must have at least one character and cannot start with a double quote, line feed or carriage return"
     Const Err_FileEmpty = "File is empty"
-    Const Err_UTF16 = "UTF16 must be passed as TRUE or FALSE to indicate whether the file is UTF-16 encoded. Omit to guess from the file's contents"
+    Const Err_Unicode = "Unicode must be passed as TRUE or FALSE to indicate whether the file is Unicode encoded. Omit to guess from the file's contents"
     Const Err_FunctionWizard = "Disabled in Function Wizard"
     Const Err_NumCols = "NumCols must be positive to read a given number of columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered."
     Const Err_NumRows = "NumRows must be positive to read a given number of rows, or zero or omitted to read all rows from SkipToRow to the end of the file."
-    Const Err_Seps = "DecimalSeparator must be different from Delimiter"
+    Const Err_Seps1 = "DecimalSeparator must be a single character"
+    Const Err_Seps2 = "DecimalSpearator must not be equal to the first character of Delimiter or to a line-feed or carriage-return"
     Const Err_ShowMissings = "ShowMissingsAs must be either Empty or a string (typically the zero-length string)"
     Const Err_SkipToCol = "SkipToCol must be at least 1."
     Const Err_SkipToRow = "SkipToRow must be at least 1."
@@ -132,7 +156,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim j As Long
     Dim k As Long
     Dim Lengths() As Long
-    Dim M As Long
+    Dim m As Long
     Dim NotDelimited As Boolean
     Dim NumColsFound As Long
     Dim NumColsInReturn As Long
@@ -144,7 +168,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim RemoveQuotes As Boolean
     Dim ReturnArray() As Variant
     Dim RowIndexes() As Long
-    Dim SepsStandard As Boolean
+    Dim SepStandard As Boolean
     Dim ShowBooleansAsBooleans As Boolean
     Dim ShowDatesAsDates As Boolean
     Dim ShowErrorsAsErrors As Boolean
@@ -162,10 +186,10 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     On Error GoTo ErrHandler
 
     'Parse and validate inputs...
-    If IsEmpty(UTF16) Or IsMissing(UTF16) Then
-        UTF16 = IsFileUTF16(FileName)
-    ElseIf VarType(UTF16) <> vbBoolean Then
-        Throw Err_UTF16
+    If IsEmpty(Unicode) Or IsMissing(Unicode) Then
+        Unicode = IsFileUnicode(FileName)
+    ElseIf VarType(Unicode) <> vbBoolean Then
+        Throw Err_Unicode
     End If
 
     If VarType(Delimiter) = vbBoolean Then
@@ -175,12 +199,15 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             Throw Err_Delimiter
         End If
     ElseIf VarType(Delimiter) = vbString Then
-        If Len(Delimiter) = 0 Or Left(Delimiter, 1) = DQ Or Left(Delimiter, 1) = vbLf Or Left(Delimiter, 1) = vbCr Then
+        If Len(Delimiter) = 0 Then
+            strDelimiter = InferDelimiter(FileName, CBool(Unicode))
+        ElseIf Left(Delimiter, 1) = DQ Or Left(Delimiter, 1) = vbLf Or Left(Delimiter, 1) = vbCr Then
             Throw Err_Delimiter2
+        Else
+            strDelimiter = Delimiter
         End If
-        strDelimiter = Delimiter
     ElseIf IsEmpty(Delimiter) Or IsMissing(Delimiter) Then
-        strDelimiter = InferDelimiter(FileName, CBool(UTF16))
+        strDelimiter = InferDelimiter(FileName, CBool(Unicode))
     Else
         Throw Err_Delimiter
     End If
@@ -189,10 +216,13 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         ShowDatesAsDates, ShowBooleansAsBooleans, ShowErrorsAsErrors, RemoveQuotes
 
     If ShowNumbersAsNumbers Then
-        If ((DecimalSeparator = Application.DecimalSeparator) Or DecimalSeparator = vbNullString) Then
-            SepsStandard = True
-        ElseIf DecimalSeparator = strDelimiter Then
-            Throw Err_Seps
+        SysDecimalSeparator = Application.DecimalSeparator
+        If ((DecimalSeparator = SysDecimalSeparator) Or DecimalSeparator = vbNullString) Then
+            SepStandard = True
+        ElseIf Len(DecimalSeparator) <> 1 Then
+            Throw Err_Seps1
+        ElseIf DecimalSeparator = strDelimiter Or DecimalSeparator = vbLf Or DecimalSeparator = vbCr Then
+            Throw Err_Seps2
         End If
     End If
 
@@ -226,7 +256,9 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         End If
     End If
     
-    Set T = F.OpenAsTextStream(ForReading, IIf(UTF16, TristateTrue, TristateFalse))
+    Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+    
+    If T.AtEndOfStream Then Throw Err_FileEmpty
     
     If NotDelimited Then
         CSVRead = ShowTextFile(T, SkipToRow, NumRows)
@@ -241,10 +273,10 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     If SkipToRow = 1 And NumRows = 0 Then
         CSVContents = T.ReadAll
         T.Close: Set T = Nothing: Set F = Nothing
-        Call ParseCSVContents(CSVContents, DQ, strDelimiter, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
+        Call ParseCSVContents(CSVContents, DQ, strDelimiter, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
             Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
     Else
-        CSVContents = ParseCSVContents(T, DQ, strDelimiter, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
+        CSVContents = ParseCSVContents(T, DQ, strDelimiter, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
             Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
         T.Close
     End If
@@ -303,7 +335,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         
                 If AnyConversion And QuoteCounts(k) = 0 Then
                     ReturnArray(i, j) = CastToVariant(ThisField, _
-                        ShowNumbersAsNumbers, SepsStandard, DecimalSeparator, SysDecimalSeparator, _
+                        ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
                         ShowDatesAsDates, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
                         ShowBooleansAsBooleans, ShowErrorsAsErrors, ShowMissingsAs)
                 Else
@@ -322,9 +354,9 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                         NeedToFill = False
                     End If
                     If NeedToFill Then
-                        For M = j + 1 To NumColsInReturn
-                            ReturnArray(i, M) = ShowMissingsAs
-                        Next M
+                        For m = j + 1 To NumColsInReturn
+                            ReturnArray(i, m) = ShowMissingsAs
+                        Next m
                     End If
                 End If
             End If
@@ -454,14 +486,22 @@ Private Function Min4(N1 As Long, N2 As Long, N3 As Long, N4 As Long, ByRef Whic
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : IsFileUTF16
-' Purpose    : Guesses whether a file is UTF-16 encoded, in which case it should be opened using .OpenAsTextStream(TriStateTrue)
-'              or UTF-8 encoded in which case it should be opened using .OpenAsTextStream(TriStateFalse)
-'              Adapted from
+' Procedure  : IsFileUnicode
+' Purpose    : Guesses whether a file needs to be opened with the "format" argument to File.OpenAsTextStream set to
+'              TriStateTrue or TriStateFalse.
+'              The documentation at
+'              https://docs.microsoft.com/en-us/office/vba/language/reference/user-interface-help/openastextstream-method
+'              is limited but I believe that:
+'            * TriStateTrue needs to passed for files which (as reported by NotePad++) are encoded as either
+'              "UTF-16 LE BOM" or "UTF-16 BE BOM"
+'            * TristateFalse needs to be passed for files encoded as "UTF-8" or "ANSI"
+'            * Files encoded "UTF-8 BOM" are not correctly handled by OpenAsTextStream: the characters of the byte order
+'              mark (BOM) are returned as part of the file's contents.
+'              This method is adapted from
 '              https://stackoverflow.com/questions/36188224/vba-test-encoding-of-a-text-file
 '              but with changes following experimentation using NotePad++ to create files with various encodings.
 ' -----------------------------------------------------------------------------------------------------------------------
- Private Function IsFileUTF16(FilePath As String) As Boolean
+ Private Function IsFileUnicode(FilePath As String) As Boolean
 
     Dim intAsc1Chr As Long
     Dim intAsc2Chr As Long
@@ -478,13 +518,13 @@ End Function
     Set T = FSO.OpenTextFile(FilePath, 1, False, 0)
     If T.AtEndOfStream Then
         T.Close: Set T = Nothing
-        IsFileUTF16 = False
+        IsFileUnicode = False
         Exit Function
     End If
     intAsc1Chr = Asc(T.Read(1))
     If T.AtEndOfStream Then
         T.Close: Set T = Nothing
-        IsFileUTF16 = False
+        IsFileUnicode = False
         Exit Function
     End If
     intAsc2Chr = Asc(T.Read(1))
@@ -492,28 +532,30 @@ End Function
     
     If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
         'File is probably encoded UTF-16 LE BOM (little endian, with Byte Option Marker)
-        IsFileUTF16 = True
+        IsFileUnicode = True
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
-        IsFileUTF16 = True
+        IsFileUnicode = True
     Else
         'File is probably encoded UTF-8. Hopefully not UTF-8-BOM since VBA's File.OpenAsTextStream does not cope well with that.
-        IsFileUTF16 = False
+        IsFileUnicode = False
     End If
 
     Exit Function
 ErrHandler:
-    Throw "#IsFileUTF16: " & Err.Description & "!"
+    Throw "#IsFileUnicode: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : InferDelimiter
 ' Purpose    : Infer the delimiter in a file by looking for first occurrence outside quoted regions of comma, tab,
-'              semi-colon, colon or pipe (|).
+'              semi-colon, colon or pipe (|). Only look in the first 10,000 characters, Would prefer to look at the first
+'              10 lines, but that presents a problem for files with mac line endings as T.ReadLine doesn't work for them...
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function InferDelimiter(FileName As String, UTF16 As Boolean)
+Private Function InferDelimiter(FileName As String, Unicode As Boolean)
     
     Const CHUNK_SIZE = 1000
+    Const MAX_CHUNKS = 10
     Const QuoteChar As String = """"
     Dim Contents As String
     Dim CopyOfErr As String
@@ -521,14 +563,14 @@ Private Function InferDelimiter(FileName As String, UTF16 As Boolean)
     Dim F As Scripting.File
     Dim FoundInEven As Boolean
     Dim FSO As Scripting.FileSystemObject
-    Dim i As Long
+    Dim i As Long, j As Long
     Dim T As TextStream
 
     On Error GoTo ErrHandler
 
     Set FSO = New FileSystemObject
     Set F = FSO.GetFile(FileName)
-    Set T = F.OpenAsTextStream(ForReading, IIf(UTF16, TristateTrue, TristateFalse))
+    Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
 
     If T.AtEndOfStream Then
         T.Close: Set T = Nothing: Set F = Nothing
@@ -536,7 +578,8 @@ Private Function InferDelimiter(FileName As String, UTF16 As Boolean)
     End If
 
     EvenQuotes = True
-    While Not T.AtEndOfStream
+    While Not T.AtEndOfStream And j <= MAX_CHUNKS
+        j = j + 1
         Contents = T.Read(CHUNK_SIZE)
         For i = 1 To Len(Contents)
             Select Case Mid$(Contents, i, 1)
@@ -554,9 +597,10 @@ Private Function InferDelimiter(FileName As String, UTF16 As Boolean)
         Next i
     Wend
 
-    'No commonly-used delimiter found in the file outside quoted regions. There are two possibilities: _
-    either the file has only one column or some other character(s) has been used, returning comma is _
-        equivalent to assuming the former.
+    'No commonly-used delimiter found in the file outside quoted regions _
+     and in the first MAX_CHUNKS * CHUNK_SIZE characters. Assume comma in this case.
+
+    T.Close
 
     InferDelimiter = ","
 
@@ -738,11 +782,12 @@ End Function
 '  QuoteCounts     : Set to an array of size at least NumFields. Element k gives the number of QuoteChars that appear in the
 '                    kth field.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, Delimiter As String, SkipToRow As Long, _
+Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, Delimiter As String, IgnoreRepeated As Boolean, SkipToRow As Long, _
     NumRows As Long, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, ByRef Starts() As Long, _
     ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long) As String
 
     Const Err_ContentsOrStream = "ContentsOrStream must either be a string or a TextStream"
+    Const Err_Delimiter = "Delimiter must not be the null string"
     Dim Buffer As String
     Dim BufferUpdatedTo As Long
     Dim ColNum As Long
@@ -767,7 +812,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
     Dim Which As Long
 
     On Error GoTo ErrHandler
-
+    
     If VarType(ContentsOrStream) = vbString Then
         Buffer = ContentsOrStream
         Streaming = False
@@ -802,6 +847,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
     ReDim QuoteCounts(1 To 8)
     
     LDlm = Len(Delimiter)
+    If LDlm = 0 Then Throw Err_Delimiter 'Avoid infinite loop!
     OrigLen = Len(Buffer)
     If Not Streaming Then
         'Ensure Buffer terminates with vbCrLf
@@ -813,13 +859,21 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
         BufferUpdatedTo = Len(Buffer)
     End If
     
-    j = 1
+    j = 1: i = 0
+    If IgnoreRepeated Then
+        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+            i = i + LDlm
+        Loop
+    End If
+
+    
     ColNum = 1: RowNum = 1
     EvenQuotes = True
-    Starts(1) = 1
+    Starts(1) = i + 1
     If SkipToRow = 1 Then HaveReachedSkipToRow = True
 
     Do
+    
         If EvenQuotes Then
             If Not Streaming Then
                 If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
@@ -831,7 +885,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
                 i = SearchInBuffer(SearchFor, i + 1, T, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
             End If
 
-            If i = BufferUpdatedTo + 1 Then
+            If i >= BufferUpdatedTo + 1 Then
                 Exit Do
             End If
 
@@ -847,6 +901,12 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
                 Case 1
                     'Found Delimiter
                     Lengths(j) = i - Starts(j)
+                    If IgnoreRepeated Then
+                        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+                            i = i + LDlm
+                        Loop
+                    End If
+                    
                     Starts(j + 1) = i + LDlm
                     ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
                     ColNum = ColNum + 1
@@ -855,28 +915,29 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
                     NumFields = NumFields + 1
                     i = i + LDlm - 1
                 Case 2, 3
-                    Lengths(j) = i - Starts(j)
-                    If Which = 2 Then
-                        'Unix line ending
-                        Starts(j + 1) = i + 1
-                    ElseIf Mid(Buffer, i + 1, 1) = vbLf Then
-                        'Windows line ending. - it is safe to look one character ahead since Buffer terminates with vbCrLf
-                        Starts(j + 1) = i + 2
+                    Lengths(j) = i - Starts(j) 'Line Ending
+                    If Mid(Buffer, i + 1, 1) = vbLf Then
+                        'Ending is Windows rather than Mac or Unix.
                         i = i + 1
-                    Else
-                        'Mac line ending (Mac pre OSX)
-                        Starts(j + 1) = i + 1
                     End If
+                    If IgnoreRepeated Then
+                        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+                            i = i + LDlm
+                        Loop
+                    End If
+                    Starts(j + 1) = i + 1
 
                     If ColNum > NumColsFound Then
                         If NumColsFound > 0 Then
                             Ragged = True
                         End If
                         NumColsFound = ColNum
+                    ElseIf ColNum < NumColsFound Then
+                        Ragged = True
                     End If
+                    
                     ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
                     ColNum = 1: RowNum = RowNum + 1
-                    
                     QuoteCounts(j) = QuoteCount: QuoteCount = 0
                     j = j + 1
                     NumFields = NumFields + 1
@@ -1128,7 +1189,7 @@ End Function
 '  strIn                    : The input string.
 'Numbers
 '  ShowNumbersAsNumbers     : If inStr is a string representation of a number should the function return that number?
-'  SepsStandard             : Is the decimal separator the same as the system defaults? If True then the next two
+'  SepStandard             : Is the decimal separator the same as the system defaults? If True then the next two
 '                             arguments are ignored.
 '  DecimalSeparator         : The decimal separator used in the input string.
 '  SysDecimalSeparator      : The default decimal separator on the system.
@@ -1145,7 +1206,7 @@ End Function
 '  ShowErrorsAsErrors       : Should strings that match how errors are represented in Excel worksheets be converted to
 '                             those errors values?
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CastToVariant(strIn As String, ShowNumbersAsNumbers As Boolean, SepsStandard As Boolean, _
+Private Function CastToVariant(strIn As String, ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, _
     DecimalSeparator As String, SysDecimalSeparator As String, _
     ShowDatesAsDates As Boolean, DateOrder As Long, DateSeparator As String, SysDateOrder As Long, _
     SysDateSeparator As String, ShowBooleansAsBooleans As Boolean, _
@@ -1158,7 +1219,7 @@ Private Function CastToVariant(strIn As String, ShowNumbersAsNumbers As Boolean,
     Dim eResult As Variant
 
     If ShowNumbersAsNumbers Then
-        CastToDouble strIn, dblResult, SepsStandard, DecimalSeparator, SysDecimalSeparator, Converted
+        CastToDouble strIn, dblResult, SepStandard, DecimalSeparator, SysDecimalSeparator, Converted
         If Converted Then
             CastToVariant = dblResult
             Exit Function
@@ -1201,11 +1262,11 @@ End Function
 ' Procedure  : CastToDouble
 ' Purpose    : Casts strIn to double where strIn has specified decimals separator.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToDouble(strIn As String, ByRef dblOut As Double, SepsStandard As Boolean, DecimalSeparator As String, _
+Private Sub CastToDouble(strIn As String, ByRef dblOut As Double, SepStandard As Boolean, DecimalSeparator As String, _
     SysDecimalSeparator As String, ByRef Converted As Boolean)
     
     On Error GoTo ErrHandler
-    If SepsStandard Then
+    If SepStandard Then
         dblOut = CDbl(strIn)
     Else
         dblOut = CDbl(Replace(strIn, DecimalSeparator, SysDecimalSeparator))
@@ -1232,7 +1293,7 @@ Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, 
     SysDateOrder As Long, SysDateSeparator As String, ByRef Converted As Boolean)
     
     Dim D As String
-    Dim M As String
+    Dim m As String
     Dim pos1 As Long
     Dim pos2 As Long
     Dim y As String
@@ -1244,28 +1305,28 @@ Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, 
     If pos2 = 0 Then Exit Sub
 
     If DateOrder = 0 Then
-        M = Left$(strIn, pos1 - 1)
+        m = Left$(strIn, pos1 - 1)
         D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
         y = Mid$(strIn, pos2 + 1)
     ElseIf DateOrder = 1 Then
         D = Left$(strIn, pos1 - 1)
-        M = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+        m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
         y = Mid$(strIn, pos2 + 1)
     ElseIf DateOrder = 2 Then
         y = Left$(strIn, pos1 - 1)
-        M = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+        m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
         D = Mid$(strIn, pos2 + 1)
     Else
         Throw "DateOrder must be 0, 1, or 2"
     End If
     If SysDateOrder = 0 Then
-        dtOut = CDate(M + SysDateSeparator + D + SysDateSeparator + y)
+        dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y)
         Converted = True
     ElseIf SysDateOrder = 1 Then
-        dtOut = CDate(D + SysDateSeparator + M + SysDateSeparator + y)
+        dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y)
         Converted = True
     ElseIf SysDateOrder = 2 Then
-        dtOut = CDate(y + SysDateSeparator + M + SysDateSeparator + D)
+        dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D)
         Converted = True
     End If
 
@@ -1302,6 +1363,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastToError(strIn As String, ByRef eOut As Variant, ByRef Converted As Boolean)
     On Error GoTo ErrHandler
+    
     If Left(strIn, 1) = "#" Then
         Converted = True
         Select Case strIn 'Editing this function? Then its inverse function Encode!!!!
@@ -1371,28 +1433,29 @@ End Function
 
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : CSVWrite
-' Purpose   : Creates a comma-separated file on disk containing Data. Any existing file of the same name
-'             is overwritten. If successful, the function returns FileName, otherwise an
-'             "error string" (starts with #, ends with !) describing what went wrong.
+' Purpose   : Creates a comma-separated file on disk containing Data. Any existing file of the same
+'             name is overwritten. If successful, the function returns FileName, otherwise an "error
+'             string" (starts with #, ends with !) describing what went wrong.
 ' Arguments
 ' FileName  : The full name of the file, including the path.
-' Data      : An array of data. Elements may be strings, numbers, dates, Booleans, empty, Excel errors
-'             or null values.
-' QuoteAllStrings: If TRUE (the default) then all strings in Data are quoted before being written to file. If
-'             FALSE only strings containing Delimiter, line feed, carriage return or double
-'             quote are quoted. Double quotes are always escaped by another double quote.
-' DateFormat: A format string that determine how dates, including cells formatted as dates, appear in
-'             the file. If omitted, defaults to "yyyy-mm-dd".
+' Data      : An array of data. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or
+'             null values.
+' QuoteAllStrings: If TRUE (the default) then all strings in Data are quoted before being written to file.
+'             If FALSE only strings containing Delimiter, line feed, carriage return or double quote are
+'             quoted. Double quotes are always escaped by another double quote.
+' DateFormat: A format string that determine how dates, including cells formatted as dates, appear in the
+'             file. If omitted, defaults to "yyyy-mm-dd".
 ' DateTimeFormat: A format string that determines how dates with non-zero time part appear in the file. If
-'             omitted defaults to "yyyy-mm-dd hh:mm:ss".The companion function CVSRead is
-'             not currently capable of interpreting fields written in DateTime format.
+'             omitted defaults to "yyyy-mm-dd hh:mm:ss".The companion function CSVRead is not capable of
+'             converting fields written in DateTime format back from strings into Dates.
 ' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
 '             character.
-' UTF16     : If FALSE (the default) the file written will be UTF-8. If TRUE the file written will be
-'             UTF-16 LE BOM. An error will result if this argument is FALSE but Data
-'             contains characters with code points above 255.
-' EOL       : Enter the line ending as "Windows" (or CRLF), or "Unix" (or LF) or "Mac" (or CR). If
-'             omitted defaults to "Windows".
+' Unicode   : If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will
+'             be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains
+'             strings with characters whose code points exceed 255.
+' EOL       : Controls the line endings of the file written. Enter "Windows" (the default), "Unix" or "Mac".
+'             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
+'             or the strings "CRLF", "LF" or "CR".
 '
 ' Notes     : See also companion function CSVRead.
 '
@@ -1402,8 +1465,10 @@ End Function
 Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
     Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
-    Optional Delimiter As String = ",", Optional UTF16 As Boolean, _
+    Optional Delimiter As String = ",", Optional Unicode As Boolean, _
     Optional ByVal EOL As String = vbCrLf)
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with #, ends with !) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Dim EOLIsWindows As Boolean
@@ -1434,7 +1499,7 @@ Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
     If NumDimensions(Data) <> 2 Then Throw Err_Dimensions
     
     Set FSO = New FileSystemObject
-    Set T = FSO.CreateTextFile(FileName, True, UTF16)
+    Set T = FSO.CreateTextFile(FileName, True, Unicode)
 
     ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
 
@@ -1443,7 +1508,7 @@ Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
             OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
         Next j
         OneLineJoined = VBA.Join(OneLine, Delimiter)
-        WriteLineWrap T, OneLineJoined, EOLIsWindows, EOL, UTF16
+        WriteLineWrap T, OneLineJoined, EOLIsWindows, EOL, Unicode
     Next i
 
     T.Close: Set T = Nothing: Set FSO = Nothing
@@ -1460,7 +1525,7 @@ End Function
 ' Purpose    : Wrapper to TextStream.Write[Line] to give more informative error message than "invalid procedure call or
 '              argument" if the error is caused by attempting to write characters with code>255 to a stream opened with TriStateFalse.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, UTF16 As Boolean)
+Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, Unicode As Boolean)
 
     Dim ErrDesc As String
     Dim ErrNum As Long
@@ -1479,12 +1544,12 @@ Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boole
 ErrHandler:
     ErrNum = Err.Number
     ErrDesc = Err.Description
-    If Not UTF16 Then
+    If Not Unicode Then
         If ErrNum = 5 Then
             For i = 1 To Len(text)
                 If AscW(Mid(text, i, 1)) > 255 Then
                     ErrDesc = "Data contains characters with code points above 255 (first found has code " & CStr(AscW(Mid(text, i, 1))) & _
-                        ") which cannot be written to an ascii file. Try calling CSVWrite with argument UTF16 as True"
+                        ") which cannot be written to an ascii file. Try calling CSVWrite with argument Unicode as True"
                     Exit For
                 End If
             Next i
@@ -1623,7 +1688,7 @@ End Function
 ' Purpose    : Test if Excel's Function Wizard is active to allow early exit in slow functions.
 '              https://stackoverflow.com/questions/20866484/can-i-disable-a-vba-udf-calculation-when-the-insert-function-function-arguments
 ' -----------------------------------------------------------------------------------------------------------------------
-Function FunctionWizardActive() As Boolean
+Private Function FunctionWizardActive() As Boolean
     
     On Error GoTo ErrHandler
     If Not Application.CommandBars("Standard").Controls(1).Enabled Then

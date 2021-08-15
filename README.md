@@ -15,7 +15,7 @@ End Sub
 # Acknowledgements
 I re-wrote the parsing code of `CSVRead` after examining "sdkn104"'s code available [here](https://github.com/sdkn104/VBA-CSV); my approach is now similar to the one employed there.
 
-The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance here.
+The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance here. For testing `CSVRead`, I also make use of the suite of test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
 
 # Documentation
@@ -43,8 +43,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`NumCols`|The number of columns to read from the file. If omitted (or zero), all columns from `SkipToCol` are read.|
 |`ShowMissingsAs`|Fields which are missing in the file (consecutive delimiters) are represented by `ShowMissingsAs`. Defaults to the null string, but can be any string or Empty. If `NumRows` is greater than the number of rows in the file then the return is "padded" with the value of `ShowMissingsAs`. Likewise if `NumCols` is greater than the number of columns in the file.|
 |`Unicode`|In most cases, this argument can be omitted, in which case `CSVRead` will examine the file's byte order mark to guess how the file should be opened - i.e. the correct "format" argument to pass to VBA's method OpenAsTextStream, which requires an argument indicating whether the file is `Unicode` or ASCII. Alternatively, enter TRUE for a `Unicode` file or FALSE for an ASCII file.|
-|`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma. Note that you probably need to explicitly pass `Delimiter` in this case, since the parser will probably think that it detected comma as the delimiter.|
-
+|`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an "error string" (starts with #, ends with !) describing what went wrong.
