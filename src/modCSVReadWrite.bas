@@ -57,34 +57,27 @@ End Sub
 ' Arguments
 ' FileName  : The full name of the file, including the path.
 ' ConvertTypes: ConvertTypes provides control over whether fields in the file are converted to typed values
-'             in the returned array or remain as strings.
+'             in the return or remain as strings, and the treatment of quoted fields, defined as fields
+'             with double-quotes as both their first and last characters.
 '
-'             In all cases, only "unquoted" fields are converted. A field is "quoted" if its first and last
-'             characters are double-quotes, otherwise it is unquoted.
+'             ConvertTypes may take values FALSE (the default), TRUE, or a string of zero or more letters
+'             from "NDBEQR".
 '
-'             ConvertTypes may take values FALSE (the default), TRUE, or a string made up of the letters
-'             "N", "D", "B", "E" or "Q".
+'             If ConvertTypes is:
+'             * FALSE then no conversion takes place other than quoted fields being unquoted.
+'             * TRUE then unquoted numbers, dates, Booleans and errors are converted.
 '
-'             Four possible type conversions are available:
-'             1) If ConvertTypes includes the letter "N" then unquoted fields that represent numbers are
-'             converted to numbers (of type Double).
-'             2) If ConvertTypes includes the letter "D" then unquoted fields that represent dates
-'             (respecting DateFormat) are converted to Dates.
-'             3) If ConvertTypes includes the letter "B" then unquoted fields that read "true" or "false"
-'             are converted to Booleans. The match is not case sensitive so "TRUE", "FALSE", "True" and
-'             "False" are also converted.
-'             4) If ConvertTypes includes the letter "E" then unquoted fields that match Excel"s
-'             representation of error values are converted to error values. There are fourteen such
-'             strings, including "#N/A", "#NAME?", "#VALUE!" and "#DIV/0!".
-'
-'             For convenience, ConvertTypes can also take the value TRUE - all four conversions take place,
-'             or FALSE - no type conversion takes place. If ConvertTypes is omitted no type conversion
-'             takes place.
-'
-'             Quoted fields are returned with their leading and trailing double-quote characters removed
-'             and consecutive pairs of double-quotes replaced by single double-quotes. But if ConvertTypes
-'             contains the letter "Q" then this behaviour is changed so that quoted fields are returned
-'             exactly as they appear in the file, with all double-quotes retained.
+'             If ConvertTypes is a string including:
+'             1) "N" then fields that represent numbers are converted to numbers (Doubles).
+'             2) "D" then fields that represent dates (respecting DateFormat) are converted to Dates.
+'             3) "B" then fields that read true or false are converted to Booleans. The match is not case
+'             sensitive so TRUE, FALSE, True and False are also converted.
+'             4) "E" then fields that match Excel"s representation of error values are converted to error
+'             values. There are fourteen such strings, including #N/A, #NAME?, #VALUE! and #DIV/0!.
+'             5) "Q" then conversion happens for both quoted and unquoted fields; otherwise only unquoted
+'             fields are converted.
+'             6) "R" then quoted fields retain their quotes, otherwise they have their leading and trailing
+'             characters removed and consecutive pairs of double-quotes replaced by a single double quote.
 ' Delimiter : By default, CSVRead will try to detect a file's delimiter as the first instance of comma, tab,
 '             semi-colon, colon or pipe found outside quoted regions in the first 10,000 characters of the
 '             file. If it can't auto-detect the delimiter, it will assume comma. If your file includes a
@@ -119,8 +112,8 @@ End Sub
 '             file.
 ' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
 '             instead of a period (3,14 vs. 3.14). CSVRead can correctly parse these numbers by passing in
-'             the DecimalSeparator as a comma. Note that you probably need to explicitly pass Delimiter in
-'             this case, since the parser will probably think that it detected comma as the delimiter.
+'             the DecimalSeparator as a comma, in which case comma ceases to be a candidate if the parser
+'             needs to guess the Delimiter.
 '---------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
@@ -128,8 +121,6 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
     Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
     Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString)
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const DQ2 = """"""
@@ -142,21 +133,22 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Const Err_NumRows = "NumRows must be positive to read a given number of rows, or zero or omitted to read all rows from SkipToRow to the end of the file."
     Const Err_Seps1 = "DecimalSeparator must be a single character"
     Const Err_Seps2 = "DecimalSpearator must not be equal to the first character of Delimiter or to a line-feed or carriage-return"
-    Const Err_ShowMissings = "ShowMissingsAs must be either Empty or a string (typically the zero-length string)"
+    Const Err_ShowMissings = "ShowMissingsAs has an illegal value, such as an array or an object"
     Const Err_SkipToCol = "SkipToCol must be at least 1."
     Const Err_SkipToRow = "SkipToRow must be at least 1."
+    
     Dim AnyConversion As Boolean
     Dim ColIndexes() As Long
+    Dim ConvertQuoted As Boolean
     Dim CSVContents As String
     Dim DateOrder As Long
     Dim DateSeparator As String
-    Dim F As Scripting.File
-    Dim FSO As New Scripting.FileSystemObject
     Dim i As Long
     Dim j As Long
     Dim k As Long
     Dim Lengths() As Long
     Dim m As Long
+    Dim NeedToFill As Boolean
     Dim NotDelimited As Boolean
     Dim NumColsFound As Long
     Dim NumColsInReturn As Long
@@ -165,22 +157,23 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim NumRowsInReturn As Long
     Dim QuoteCounts() As Long
     Dim Ragged As Boolean
-    Dim RemoveQuotes As Boolean
+    Dim RetainQuotes As Boolean
     Dim ReturnArray() As Variant
     Dim RowIndexes() As Long
     Dim SepStandard As Boolean
+    Dim SF As Scripting.File
+    Dim SFSO As New Scripting.FileSystemObject
     Dim ShowBooleansAsBooleans As Boolean
     Dim ShowDatesAsDates As Boolean
     Dim ShowErrorsAsErrors As Boolean
-    Dim ShowMissingAsNullString As Boolean
     Dim ShowMissingsAsEmpty As Boolean
     Dim ShowNumbersAsNumbers As Boolean
     Dim Starts() As Long
     Dim strDelimiter As String
+    Dim STS As Scripting.TextStream
     Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     Dim SysDecimalSeparator As String
-    Dim T As Scripting.TextStream
     Dim ThisField As String
     
     On Error GoTo ErrHandler
@@ -192,6 +185,16 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         Throw Err_Unicode
     End If
 
+    SysDecimalSeparator = Application.DecimalSeparator
+    If DecimalSeparator = vbNullString Then DecimalSeparator = SysDecimalSeparator
+    If DecimalSeparator = SysDecimalSeparator Then
+        SepStandard = True
+    ElseIf Len(DecimalSeparator) <> 1 Then
+        Throw Err_Seps1
+    ElseIf DecimalSeparator = strDelimiter Or DecimalSeparator = vbLf Or DecimalSeparator = vbCr Then
+        Throw Err_Seps2
+    End If
+
     If VarType(Delimiter) = vbBoolean Then
         If Not Delimiter Then
             NotDelimited = True
@@ -200,31 +203,20 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         End If
     ElseIf VarType(Delimiter) = vbString Then
         If Len(Delimiter) = 0 Then
-            strDelimiter = InferDelimiter(FileName, CBool(Unicode))
+            strDelimiter = InferDelimiter(FileName, CBool(Unicode), DecimalSeparator)
         ElseIf Left(Delimiter, 1) = DQ Or Left(Delimiter, 1) = vbLf Or Left(Delimiter, 1) = vbCr Then
             Throw Err_Delimiter2
         Else
             strDelimiter = Delimiter
         End If
     ElseIf IsEmpty(Delimiter) Or IsMissing(Delimiter) Then
-        strDelimiter = InferDelimiter(FileName, CBool(Unicode))
+        strDelimiter = InferDelimiter(FileName, CBool(Unicode), DecimalSeparator)
     Else
         Throw Err_Delimiter
     End If
 
     ParseConvertTypes ConvertTypes, ShowNumbersAsNumbers, _
-        ShowDatesAsDates, ShowBooleansAsBooleans, ShowErrorsAsErrors, RemoveQuotes
-
-    If ShowNumbersAsNumbers Then
-        SysDecimalSeparator = Application.DecimalSeparator
-        If ((DecimalSeparator = SysDecimalSeparator) Or DecimalSeparator = vbNullString) Then
-            SepStandard = True
-        ElseIf Len(DecimalSeparator) <> 1 Then
-            Throw Err_Seps1
-        ElseIf DecimalSeparator = strDelimiter Or DecimalSeparator = vbLf Or DecimalSeparator = vbCr Then
-            Throw Err_Seps2
-        End If
-    End If
+        ShowDatesAsDates, ShowBooleansAsBooleans, ShowErrorsAsErrors, ConvertQuoted, RetainQuotes
 
     If ShowDatesAsDates Then
         ParseDateFormat DateFormat, DateOrder, DateSeparator
@@ -237,66 +229,59 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     If NumRows < 0 Then Throw Err_NumRows
     If NumCols < 0 Then Throw Err_NumCols
     
-    If IsEmpty(ShowMissingsAs) Then
+    Select Case VarType(ShowMissingsAs)
+    Case vbEmpty
         ShowMissingsAsEmpty = True
-    ElseIf VarType(ShowMissingsAs) = vbString Then
-        If Len(ShowMissingsAs) = 0 Then
-            ShowMissingAsNullString = True
-        End If
-    Else
+        Case Is < vbArray
+    Case Else
         Throw Err_ShowMissings
-    End If
+    End Select
     'End of input validation
           
-    Set F = FSO.GetFile(FileName)
+    Set SF = SFSO.GetFile(FileName)
     If FunctionWizardActive() Then
-        If F.Size > 1000000 Then
+        If SF.Size > 1000000 Then
             CSVRead = "#" & Err_FunctionWizard & "!"
             Exit Function
         End If
     End If
     
-    Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+    Set STS = SF.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
     
-    If T.AtEndOfStream Then Throw Err_FileEmpty
+    If STS.AtEndOfStream Then Throw Err_FileEmpty
     
     If NotDelimited Then
-        CSVRead = ShowTextFile(T, SkipToRow, NumRows)
+        CSVRead = ShowTextFile(STS, SkipToRow, NumRows)
         Exit Function
     End If
 
-    If T.AtEndOfStream Then
-        T.Close: Set T = Nothing: Set F = Nothing
+    If STS.AtEndOfStream Then
+        STS.Close: Set STS = Nothing: Set SF = Nothing
         Throw Err_FileEmpty
     End If
           
     If SkipToRow = 1 And NumRows = 0 Then
-        CSVContents = T.ReadAll
-        T.Close: Set T = Nothing: Set F = Nothing
+        CSVContents = STS.ReadAll
+        STS.Close: Set STS = Nothing: Set SF = Nothing
         Call ParseCSVContents(CSVContents, DQ, strDelimiter, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
             Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
     Else
-        CSVContents = ParseCSVContents(T, DQ, strDelimiter, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
+        CSVContents = ParseCSVContents(STS, DQ, strDelimiter, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
             Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
-        T.Close
+        STS.Close
     End If
     
-    'Useful for debugging...
-    If False Then
-        Dim Chars() As String, Numbers() As Long
-        ReDim Numbers(1 To Len(CSVContents))
-        ReDim Chars(1 To Len(CSVContents))
-        For i = 1 To Len(CSVContents)
-            Chars(i, 1) = Mid(CSVContents, i, 1)
-            Numbers(i, 1) = i
-        Next i
-        CSVRead = sArrayRange(sArrayStack(NumRowsFound, NumColsFound, NumFields, strDelimiter), sArrayTranspose(Starts), _
-            sArrayTranspose(Lengths), sArrayTranspose(RowIndexes), sArrayTranspose(ColIndexes), sArrayTranspose(QuoteCounts), Numbers, Chars)
-        Exit Function
-    End If
-    
-    AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
-        ShowBooleansAsBooleans Or ShowErrorsAsErrors Or (Not ShowMissingAsNullString)
+    'Useful for debugging, TODO remove this block in due course
+   ' Dim Chars() As String, Numbers() As Long
+   ' ReDim Numbers(1 To Len(CSVContents))
+   ' ReDim Chars(1 To Len(CSVContents))
+   ' For i = 1 To Len(CSVContents)
+   '     Chars(i, 1) = Mid(CSVContents, i, 1)
+   '     Numbers(i, 1) = i
+   ' Next i
+   ' CSVRead = HStack(VStack(NumRowsFound, NumColsFound, NumFields, strDelimiter), Transpose(Starts), _
+   '     Transpose(Lengths), Transpose(RowIndexes), Transpose(ColIndexes), Transpose(QuoteCounts), Numbers, Chars)
+   ' Exit Function
         
     If NumCols = 0 Then
         NumColsInReturn = NumColsFound - SkipToCol + 1
@@ -312,6 +297,9 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         NumRowsInReturn = NumRows
     End If
         
+    AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+        ShowBooleansAsBooleans Or ShowErrorsAsErrors
+        
     ReDim ReturnArray(1 To NumRowsInReturn, 1 To NumColsInReturn)
         
     For k = 1 To NumFields
@@ -319,33 +307,15 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         j = ColIndexes(k) - SkipToCol + 1
         If j >= 1 And j <= NumColsInReturn Then
         
-            If Lengths(k) = 0 Then
-                ReturnArray(i, j) = ShowMissingsAs
-            Else
-                If QuoteCounts(k) = 0 Or Not RemoveQuotes Then
-                    ThisField = Mid(CSVContents, Starts(k), Lengths(k))
-                ElseIf Mid(CSVContents, Starts(k), 1) = DQ And Mid(CSVContents, Starts(k) + Lengths(k) - 1, 1) = DQ Then
-                    ThisField = Mid(CSVContents, Starts(k) + 1, Lengths(k) - 2)
-                    If QuoteCounts(k) > 2 Then
-                        ThisField = Replace(ThisField, DQ2, DQ)
-                    End If
-                Else 'Field which does not start with quote but contains quotes, so not RFC4180 compliant. We do not replace DQ2 by DQ in this case.
-                    ThisField = Mid(CSVContents, Starts(k), Lengths(k))
-                End If
-        
-                If AnyConversion And QuoteCounts(k) = 0 Then
-                    ReturnArray(i, j) = CastToVariant(ThisField, _
-                        ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
-                        ShowDatesAsDates, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
-                        ShowBooleansAsBooleans, ShowErrorsAsErrors, ShowMissingsAs)
-                Else
-                    ReturnArray(i, j) = ThisField
-                End If
-            End If
-            'File has variable number of fields per line...
+            ReturnArray(i, j) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
+                Lengths(k), DQ, QuoteCounts(k), RetainQuotes, ConvertQuoted, _
+                ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
+                ShowDatesAsDates, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
+                ShowBooleansAsBooleans, ShowErrorsAsErrors, ShowMissingsAs)
+            
+            'File is ragged with variable number of fields per line...
             If Ragged Then
                 If Not ShowMissingsAsEmpty Then
-                    Dim NeedToFill As Boolean
                     If k = NumFields Then
                         NeedToFill = j < NumColsInReturn
                     ElseIf RowIndexes(k + 1) > RowIndexes(k) Then
@@ -363,6 +333,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         End If
     Next k
 
+    'Pad if necessary
     If Not ShowMissingsAsEmpty Then
         If NumColsInReturn > NumColsFound - SkipToCol + 1 Then
             For i = 1 To NumRowsInReturn
@@ -386,7 +357,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
 ErrHandler:
     CSVRead = "#CSVRead: " & Err.Description & "!"
-    If Not T Is Nothing Then T.Close
+    If Not STS Is Nothing Then STS.Close
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -398,15 +369,18 @@ End Function
 '  ShowDatesAsDates      : Should fields in the file that look like dates with the specified DateFormat be returned as Dates?
 '  ShowBooleansAsBooleans: Should fields in the file that are TRUE or FALSE (case insensitive) be returned as Booleans?
 '  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
-'  RemoveQuotes          : Should quoted fields be unquoted?
+'  ConvertQuoted         : Should the four conversion rules above apply even to quoted fields?
+'  RetainQuotes          : Should quotes in quoted fields be retained?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
     ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
-    ByRef ShowErrorsAsErrors As Boolean, ByRef RemoveQuotes As Boolean)
+    ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef RetainQuotes As Boolean)
 
-    Const Err_ConvertTypes = "ConvertTypes must be TRUE (convert all types), FALSE (no conversion) or a string " & _
-        "containing letters: 'N' to show numbers as numbers, 'D' to show dates as dates, 'B' to show Booleans " & _
-        "as Booleans, `E` to show Excel errors as errors, Q for quoted fields to retain their quotes."
+    Const Err_ConvertTypes = "ConvertTypes must be Boolean or string with allowed letters NDBEQR. " & _
+        "'N' show numbers as numbers, 'D' show dates as dates, 'B' show Booleans " & _
+        "as Booleans, 'E' show Excel errors as errors, 'Q' rules NDBE apply even to quoted fields, 'R' quoted fields retain their quotes, TRUE = NDBE (convert unquoted numbers, dates, Booleans and errors), FALSE = no conversion"
+    Const Err_Quoted = "ConvertTypes cannot contain both 'Q' and 'R' since 'Q' indicates that type conversion should apply to quoted fields, but 'R' indicates that quoted fields should retain their quotes."
+    Const Err_Quoted2 = "ConvertTypes is incorrect, 'Q' indicates that conversion should apply even to quoted fields, but none of 'N', 'D', 'B' or 'E' are present to indicate which type conversion to apply"
     Dim i As Long
 
     On Error GoTo ErrHandler
@@ -414,6 +388,8 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
     If TypeName(ConvertTypes) = "Range" Then
         ConvertTypes = ConvertTypes.value
     End If
+    
+    If IsEmpty(ConvertTypes) Then ConvertTypes = False
 
     If VarType(ConvertTypes) = vbBoolean Then
         If ConvertTypes Then
@@ -421,20 +397,23 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
             ShowDatesAsDates = True
             ShowBooleansAsBooleans = True
             ShowErrorsAsErrors = True
-            RemoveQuotes = True
+            RetainQuotes = False
+            ConvertQuoted = False
         Else
             ShowNumbersAsNumbers = False
             ShowDatesAsDates = False
             ShowBooleansAsBooleans = False
             ShowErrorsAsErrors = False
-            RemoveQuotes = True
+            RetainQuotes = False
+            ConvertQuoted = False
         End If
     ElseIf VarType(ConvertTypes) = vbString Then
         ShowNumbersAsNumbers = False
         ShowDatesAsDates = False
         ShowBooleansAsBooleans = False
         ShowErrorsAsErrors = False
-        RemoveQuotes = True
+        RetainQuotes = False
+        ConvertQuoted = False
         For i = 1 To Len(ConvertTypes)
             Select Case UCase(Mid(ConvertTypes, i, 1))
                 Case "N"
@@ -446,13 +425,23 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
                 Case "E"
                     ShowErrorsAsErrors = True
                 Case "Q"
-                    RemoveQuotes = False
+                    ConvertQuoted = True
+                Case "R"
+                    RetainQuotes = True
                 Case Else
-                    Throw Err_ConvertTypes + " Found unrecognised character '" + Mid(ConvertTypes, i, 1) + "'"
+                    Throw Err_ConvertTypes + " Found unrecognised character '" _
+                        + Mid(ConvertTypes, i, 1) + "'"
             End Select
         Next i
     Else
         Throw Err_ConvertTypes
+    End If
+    
+    If RetainQuotes And ConvertQuoted Then
+        Throw Err_Quoted
+    ElseIf ConvertQuoted And Not (ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+        ShowBooleansAsBooleans Or ShowErrorsAsErrors) Then
+        Throw Err_Quoted2
     End If
 
     Exit Sub
@@ -550,9 +539,9 @@ End Function
 ' Procedure  : InferDelimiter
 ' Purpose    : Infer the delimiter in a file by looking for first occurrence outside quoted regions of comma, tab,
 '              semi-colon, colon or pipe (|). Only look in the first 10,000 characters, Would prefer to look at the first
-'              10 lines, but that presents a problem for files with mac line endings as T.ReadLine doesn't work for them...
+'              10 lines, but that presents a problem for files with Mac line endings as T.ReadLine doesn't work for them...
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function InferDelimiter(FileName As String, Unicode As Boolean)
+Private Function InferDelimiter(FileName As String, Unicode As Boolean, DecimalSeparator As String)
     
     Const CHUNK_SIZE = 1000
     Const MAX_CHUNKS = 10
@@ -561,7 +550,6 @@ Private Function InferDelimiter(FileName As String, Unicode As Boolean)
     Dim CopyOfErr As String
     Dim EvenQuotes As Boolean
     Dim F As Scripting.File
-    Dim FoundInEven As Boolean
     Dim FSO As Scripting.FileSystemObject
     Dim i As Long, j As Long
     Dim T As TextStream
@@ -586,12 +574,12 @@ Private Function InferDelimiter(FileName As String, Unicode As Boolean)
                 Case QuoteChar
                     EvenQuotes = Not EvenQuotes
                 Case ",", vbTab, "|", ";", ":"
-                    If EvenQuotes Then
-                        InferDelimiter = Mid$(Contents, i, 1)
-                        T.Close: Set T = Nothing: Set F = Nothing
-                        Exit Function
-                    Else
-                        FoundInEven = True
+                    If Mid$(Contents, i, 1) <> DecimalSeparator Then
+                        If EvenQuotes Then
+                            InferDelimiter = Mid$(Contents, i, 1)
+                            T.Close: Set T = Nothing: Set F = Nothing
+                            Exit Function
+                        End If
                     End If
             End Select
         Next i
@@ -601,8 +589,12 @@ Private Function InferDelimiter(FileName As String, Unicode As Boolean)
      and in the first MAX_CHUNKS * CHUNK_SIZE characters. Assume comma in this case.
 
     T.Close
-
-    InferDelimiter = ","
+    
+    If DecimalSeparator = "," Then
+        InferDelimiter = ";"
+    Else
+        InferDelimiter = ","
+    End If
 
     Exit Function
 ErrHandler:
@@ -947,7 +939,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
                             Exit Do
                         End If
                     Else
-                        If RowNum = SkipToRow Then
+                        If RowNum = SkipToRow - 1 Then
                             HaveReachedSkipToRow = True
                             tmp = Starts(j)
                             ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
@@ -1182,14 +1174,18 @@ Private Function MaxLngs(x As Long, y As Long) As Long
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : CastToVariant
-' Purpose    : Convert a string to the value that it represents, or return the string unchanged if conversion not
-'              possible. Note that this function is passed only those fields in the file that are not quoted.
+' Procedure  : ConvertField
+' Purpose    : Process one field of the file, applying type conversion, quote removal etc.
 ' Parameters :
-'  strIn                    : The input string.
+'  Field                    : The input string.
+'Quote handling
+'  QuoteCount               : How many quote characters does Field contain
+'  RetainQuotes             : Should quoted fields keep their quote characters?
+'  ConvertQuoted            : Should quoted fields (after quote removal) be converted according to args
+'                             ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans and ShowErrorsAsErrors?
 'Numbers
 '  ShowNumbersAsNumbers     : If inStr is a string representation of a number should the function return that number?
-'  SepStandard             : Is the decimal separator the same as the system defaults? If True then the next two
+'  SepStandard              : Is the decimal separator the same as the system defaults? If True then the next two
 '                             arguments are ignored.
 '  DecimalSeparator         : The decimal separator used in the input string.
 '  SysDecimalSeparator      : The default decimal separator on the system.
@@ -1206,7 +1202,8 @@ End Function
 '  ShowErrorsAsErrors       : Should strings that match how errors are represented in Excel worksheets be converted to
 '                             those errors values?
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CastToVariant(strIn As String, ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, _
+Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, QuoteChar As String, QuoteCount As Long, RetainQuotes As Boolean, ConvertQuoted As Boolean, _
+    ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, _
     DecimalSeparator As String, SysDecimalSeparator As String, _
     ShowDatesAsDates As Boolean, DateOrder As Long, DateSeparator As String, SysDateOrder As Long, _
     SysDateSeparator As String, ShowBooleansAsBooleans As Boolean, _
@@ -1217,45 +1214,71 @@ Private Function CastToVariant(strIn As String, ShowNumbersAsNumbers As Boolean,
     Dim dblResult As Double
     Dim dtResult As Date
     Dim eResult As Variant
+    Dim isQuoted As Boolean
+
+    If FieldLength = 0 Then
+        ConvertField = ShowMissingsAs
+        Exit Function
+    ElseIf Left(Field, 1) = QuoteChar Then 'NOTE definition of quoted is both first and last characters must be quote characters
+        If Right(QuoteChar, 1) = QuoteChar Then
+            isQuoted = True
+            If Not RetainQuotes Then
+                Field = Mid$(Field, 2, FieldLength - 2)
+                If QuoteCount > 2 Then
+                    Field = Replace(Field, QuoteChar + QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
+                End If
+            End If
+        End If
+    End If
+
+    If Not AnyConversion Then
+        ConvertField = Field
+        Exit Function
+    ElseIf Not ConvertQuoted Then
+        If QuoteCount > 0 Then
+            ConvertField = Field
+            Exit Function
+        End If
+    End If
 
     If ShowNumbersAsNumbers Then
-        CastToDouble strIn, dblResult, SepStandard, DecimalSeparator, SysDecimalSeparator, Converted
+        CastToDouble Field, dblResult, SepStandard, DecimalSeparator, SysDecimalSeparator, Converted
         If Converted Then
-            CastToVariant = dblResult
+            ConvertField = dblResult
             Exit Function
         End If
     End If
 
     If ShowDatesAsDates Then
-        CastToDate strIn, dtResult, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+        CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
         If Converted Then
-            CastToVariant = dtResult
+            ConvertField = dtResult
             Exit Function
         End If
     End If
 
     If ShowBooleansAsBooleans Then
-        CastToBool strIn, bResult, Converted
+        CastToBool Field, bResult, Converted
         If Converted Then
-            CastToVariant = bResult
+            ConvertField = bResult
             Exit Function
         End If
     End If
 
     If ShowErrorsAsErrors Then
-        CastToError strIn, eResult, Converted
+        CastToError Field, eResult, Converted
         If Converted Then
-            CastToVariant = eResult
+            ConvertField = eResult
             Exit Function
         End If
     End If
     
-    If Len(strIn) = 0 Then
-        CastToVariant = ShowMissingsAs
+    If Len(Field) = 0 Then
+        ConvertField = ShowMissingsAs
         Exit Function
     End If
 
-    CastToVariant = strIn
+    ConvertField = Field
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1455,7 +1478,7 @@ End Function
 '             strings with characters whose code points exceed 255.
 ' EOL       : Controls the line endings of the file written. Enter "Windows" (the default), "Unix" or "Mac".
 '             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
-'             or the strings "CRLF", "LF" or "CR".
+'             or the strings "CRLF", "LF" or "CR". The last line of the file is written with a line ending.
 '
 ' Notes     : See also companion function CSVRead.
 '
@@ -1649,7 +1672,7 @@ End Sub
 '             methods to be used from VBA code while keeping error handling robust
 '             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
 '---------------------------------------------------------------------------------------
-Private Function ThrowIfError(Data As Variant)
+Public Function ThrowIfError(Data As Variant)
     ThrowIfError = Data
     If VarType(Data) = vbString Then
         If Left$(Data, 1) = "#" Then
