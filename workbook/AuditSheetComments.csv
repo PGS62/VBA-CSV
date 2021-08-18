@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+34,18-Aug-2021,20:19:39,"Philip Swannell","Removed modCVSTestAgainstExcel."
+33,18-Aug-2021,20:15:59,"Philip Swannell","New module modCSVTest"
 32,16-Aug-2021,22:28:23,"Philip Swannell","New argument ""Comment"" to CSVRead."
 31,16-Aug-2021,11:47:07,"Philip Swannell","Changes to type conversion code. Now possible to convert quoted strings."
 30,15-Aug-2021,11:54:09,"Philip Swannell","Got capitalisation of functions CSVRead and CSVWrite called from cells correct. "

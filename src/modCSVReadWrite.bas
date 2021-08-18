@@ -244,7 +244,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
             Throw Err_ShowMissings
     End Select
     
-    If InStr(Comment, DQ) > 0 Or InStr(Comment, vbLf) Or InStr(Comment, crlf) > 0 Then Throw Err_Comment
+    If InStr(Comment, DQ) > 0 Or InStr(Comment, vbLf) > 0 Or InStr(Comment, vbCrLf) > 0 Then Throw Err_Comment
     
     'End of input validation
           
@@ -282,15 +282,19 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     End If
     
     'Useful for debugging, TODO remove this block in due course
-    ' Dim Chars() As String, Numbers() As Long
-    ' ReDim Numbers(1 To Len(CSVContents))
-    ' ReDim Chars(1 To Len(CSVContents))
+    ' Dim Chars() As String, Numbers() As Long, Ascs() As Long
+    ' ReDim Numbers(1 To Len(CSVContents), 1 To 1)
+    ' ReDim Chars(1 To Len(CSVContents), 1 To 1)
+    ' ReDim Ascs(1 To Len(CSVContents), 1 To 1)
     ' For i = 1 To Len(CSVContents)
     '     Chars(i, 1) = Mid(CSVContents, i, 1)
     '     Numbers(i, 1) = i
+    '     Ascs(i, 1) = AscW(Chars(i, 1))
     ' Next i
-    ' CSVRead = HStack(VStack(NumRowsFound, NumColsFound, NumFields, strDelimiter), Transpose(Starts), _
-    '     Transpose(Lengths), Transpose(RowIndexes), Transpose(ColIndexes), Transpose(QuoteCounts), Numbers, Chars)
+    ' Dim Headers
+    ' Headers = HStack("NRF,NCF,NF,Dlm", "Starts", "Lengths", "RowIndexes", "ColIndexes", "QuoteCounts", "i", "Char(i)", "AscW(Char(i))")
+    ' CSVRead = VStack(Headers, HStack(VStack(NumRowsFound, NumColsFound, NumFields, strDelimiter), Transpose(Starts), _
+    '     Transpose(Lengths), Transpose(RowIndexes), Transpose(ColIndexes), Transpose(QuoteCounts), Numbers, Chars, Ascs))
     ' Exit Function
         
     If NumCols = 0 Then
@@ -641,9 +645,12 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
         ReplaceRepeats DateFormat, "Y"
     End If
 
+'TODO stop forgiving DateFor
     If Len(DateFormat) = 0 Then
-        DateOrder = Application.International(xlDateOrder)
-        DateSeparator = Application.International(xlDateSeparator)
+        'https://en.wikipedia.org/wiki/ISO_8601
+        DateOrder = 1
+        DateSeparator = "-"
+        
     ElseIf Len(DateFormat) <> 5 Then
         Throw Err_DateFormat + WindowsDefaultDateFormat
     ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
