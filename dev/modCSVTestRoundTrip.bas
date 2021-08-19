@@ -129,7 +129,7 @@ Function RoundTripTestCore(Folder As String, OS As String, ByVal data As Variant
 
 6         ThrowIfError CSVWrite(FileName, data, True, DateFormat, , Delimiter, Unicode, EOL)
 
-          'The Call to CSVRead has to infer both Unicode and EOL
+          'The Call to CSVRead has to infer both Encoding and EOL
 7         DataReadBack = CSVRead(FileName, True, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
 
 8         If Not sArraysIdentical(data, DataReadBack, True, False, WhatDiffers) Then

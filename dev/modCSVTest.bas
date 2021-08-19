@@ -387,17 +387,17 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("c", 3#, 9#, 12#, 15#))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
             Case 49
-                'NotePad++ identifies the encoding of this file as UTF-16 Little Endian. There is no BOM, so we have to explicitly pass UniCode as True
+                'NotePad++ identifies the encoding of this file as UTF-16 Little Endian. There is no BOM, so we have to explicitly pass Encoding as "UTF-16"
                 TestDescription = "test utf16"
                 FileName = "test_utf16.csv"
                 Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Unicode:=True)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
             Case 50
-                'NotePad++ identifies the encoding of this file as UTF-16 Little Endian. There is no BOM, so we have to explicitly pass UniCode as True
+                'NotePad++ identifies the encoding of this file as UTF-16 Little Endian. There is no BOM, so we have to explicitly explicitly pass Encoding as "UTF-16"
                 TestDescription = "test utf16 le"
                 FileName = "test_utf16_le.csv"
                 Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Unicode:=True)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
             Case 51
                 'TODO amend this test if we implement parsing of DateTime
                 TestDescription = "test types"
@@ -1003,7 +1003,7 @@ ErrHandler:
 End Function
 
 Function GenerateTestCode(ConvertTypes As Variant, Delimiter As String, IgnoreRepeated As Boolean, DateFormat As String, _
-          Comment As String, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, Unicode As Variant, DecimalSeparator As String)
+          Comment As String, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, Encoding As Variant, DecimalSeparator As String)
 
           Dim res As String
           Const IndentBy = 4
@@ -1040,8 +1040,8 @@ Function GenerateTestCode(ConvertTypes As Variant, Delimiter As String, IgnoreRe
 28            res = res + ", _" + vbLf + String(IndentBy, " ") + "NumCols := " & CStr(NumCols)
 29        End If
 31            res = res + ", _" + vbLf + String(IndentBy, " ") + "ShowMissingsAs := Empty"
-33        If Unicode = True Then
-34            res = res + ", _" + vbLf + String(IndentBy, " ") + "Unicode := True"
+33        If Not IsMissing(Encoding) Then
+34            res = res + ", _" + vbLf + String(IndentBy, " ") + "Encoding := " & Encoding
 35        End If
 36        If DecimalSeparator <> "." And DecimalSeparator <> "" Then
 37            res = res + ", _" + vbLf + String(IndentBy, " ") + "DecimalSeparator := " & ElementToVBALitteral(DecimalSeparator)

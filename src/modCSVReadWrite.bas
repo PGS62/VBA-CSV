@@ -28,7 +28,7 @@ Sub RegisterCSVRead()
     ArgumentDescriptions(9) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
     ArgumentDescriptions(10) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
     ArgumentDescriptions(11) = "Fields which are missing in the file (consecutive delimiters) are represented by ShowMissingsAs. Defaults to the null string, but can be any string or Empty."
-    ArgumentDescriptions(12) = "Enter TRUE if the file is Unicode, FALSE otherwise. Omit to guess from the file's contents."
+    ArgumentDescriptions(12) = "Allowed entries are ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"", and ""ANSI"", but for most files this argument can be omitted and CSVRead will detect the file's encoding."
     ArgumentDescriptions(13) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
     Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
 End Sub
@@ -110,11 +110,10 @@ End Sub
 '             ShowMissingsAs. Defaults to the null string, but can be any string or Empty. If NumRows is
 '             greater than the number of rows in the file then the return is "padded" with the value of
 '             ShowMissingsAs. Likewise if NumCols is greater than the number of columns in the file.
-' Unicode   : In most cases, this argument can be omitted, in which case CSVRead will examine the file's
-'             byte order mark to guess how the file should be opened - i.e. the correct "format" argument
-'             to pass to VBA's method OpenAsTextStream, which requires an argument indicating whether the
-'             file is Unicode or ASCII. Alternatively, enter TRUE for a Unicode file or FALSE for an ASCII
-'             file.
+' Encoding  : Allowed entries are "UTF-16", "UTF-8", "UTF-8-BOM", and "ANSI", but for most files this
+'             argument can be omitted and CSVRead will detect the file's encoding. If auto-detection does
+'             not work then it's possible that the file is encoded UTF-16 but without a byte option mark,
+'             so try entering Encoding as "UTF-16".
 ' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
 '             instead of a period (3,14 vs. 3.14). CSVRead can correctly parse these numbers by passing in
 '             the DecimalSeparator as a comma, in which case comma ceases to be a candidate if the parser
@@ -125,18 +124,19 @@ End Sub
 '             For definition of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
 '---------------------------------------------------------------------------------------------------------
+
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-    Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
-    Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
-    Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
-    Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString)
+        Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
+        Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
+        Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
+        Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
+        Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString)
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
     Const Err_Delimiter2 = "Delimiter must have at least one character and cannot start with a double quote, line feed or carriage return"
     Const Err_FileEmpty = "File is empty"
-    Const Err_Unicode = "Unicode must be passed as TRUE or FALSE to indicate whether the file is Unicode encoded. Omit to guess from the file's contents"
+    
     Const Err_FunctionWizard = "Disabled in Function Wizard"
     Const Err_NumCols = "NumCols must be positive to read a given number of columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered."
     Const Err_NumRows = "NumRows must be positive to read a given number of rows, or zero or omitted to read all rows from SkipToRow to the end of the file."
@@ -146,6 +146,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Const Err_SkipToCol = "SkipToCol must be at least 1."
     Const Err_SkipToRow = "SkipToRow must be at least 1."
     Const Err_Comment = "Comment must not contain double-quote, line feed or carriage return"
+    Const Err_UTF8BOM = "Argument Encoding specifies that the file is UTF 8 encoded with Byte Option Mark, but the file has some other encoding"
     
     Dim AnyConversion As Boolean
     Dim ColIndexes() As Long
@@ -185,15 +186,13 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Dim SysDateSeparator As String
     Dim SysDecimalSeparator As String
     Dim TrimFields As Boolean
+    Dim IsUTF8BOM As Boolean
+    Dim TriState As Long
     
     On Error GoTo ErrHandler
 
     'Parse and validate inputs...
-    If IsEmpty(Unicode) Or IsMissing(Unicode) Then
-        Unicode = IsFileUnicode(FileName)
-    ElseIf VarType(Unicode) <> vbBoolean Then
-        Throw Err_Unicode
-    End If
+    ParseEncodingArgument FileName, Encoding, TriState, IsUTF8BOM
 
     SysDecimalSeparator = Application.DecimalSeparator
     If DecimalSeparator = vbNullString Then DecimalSeparator = SysDecimalSeparator
@@ -213,14 +212,14 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
         End If
     ElseIf VarType(Delimiter) = vbString Then
         If Len(Delimiter) = 0 Then
-            strDelimiter = InferDelimiter(FileName, CBool(Unicode), DecimalSeparator)
+            strDelimiter = InferDelimiter(FileName, TriState, DecimalSeparator)
         ElseIf Left(Delimiter, 1) = DQ Or Left(Delimiter, 1) = vbLf Or Left(Delimiter, 1) = vbCr Then
             Throw Err_Delimiter2
         Else
             strDelimiter = Delimiter
         End If
     ElseIf IsEmpty(Delimiter) Or IsMissing(Delimiter) Then
-        strDelimiter = InferDelimiter(FileName, CBool(Unicode), DecimalSeparator)
+        strDelimiter = InferDelimiter(FileName, TriState, DecimalSeparator)
     Else
         Throw Err_Delimiter
     End If
@@ -248,7 +247,6 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     End Select
     
     If InStr(Comment, DQ) > 0 Or InStr(Comment, vbLf) > 0 Or InStr(Comment, vbCrLf) > 0 Then Throw Err_Comment
-    
     'End of input validation
           
     Set SF = SFSO.GetFile(FileName)
@@ -259,7 +257,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
         End If
     End If
     
-    Set STS = SF.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+    Set STS = SF.OpenAsTextStream(ForReading, TriState)
     
     If STS.AtEndOfStream Then Throw Err_FileEmpty
     
@@ -274,6 +272,11 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     End If
           
     If SkipToRow = 1 And NumRows = 0 Then
+        If IsUTF8BOM Then
+            Dim FirstThreeChars
+            FirstThreeChars = STS.Read(3)
+            If FirstThreeChars <> Chr(239) & Chr(187) & Chr(191) Then Throw Err_UTF8BOM
+        End If
         CSVContents = STS.ReadAll
         STS.Close: Set STS = Nothing: Set SF = Nothing
         Call ParseCSVContents(CSVContents, DQ, strDelimiter, Comment, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
@@ -376,6 +379,42 @@ ErrHandler:
     CSVRead = "#CSVRead: " & Err.Description & "!"
     If Not STS Is Nothing Then STS.Close
 End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ParseEncodingArgument
+' Purpose    : Set Booleans Encoding and IsUTF8BOM by parsing user input or calling DetectEncoding
+' -----------------------------------------------------------------------------------------------------------------------
+Sub ParseEncodingArgument(FileName As String, Encoding As Variant, ByRef TriState As Long, ByRef IsUTF8BOM As Boolean)
+
+    Const Err_Encoding = "Encoding argument can usually be omitted, but otherwise Encoding be either ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"" or ""ANSI""."
+    
+    On Error GoTo ErrHandler
+    If IsEmpty(Encoding) Or IsMissing(Encoding) Then
+        DetectEncoding FileName, TriState, IsUTF8BOM
+    ElseIf VarType(Encoding) = vbString Then
+        Select Case UCase(Replace(Replace(Encoding, "-", ""), " ", ""))
+            Case "ANSI", "UTF8"
+                TriState = TristateFalse
+                IsUTF8BOM = False
+            Case "UTF16"
+                TriState = TristateTrue
+                IsUTF8BOM = False
+            Case "UTF8BOM"
+                TriState = TristateFalse
+                IsUTF8BOM = True
+            Case Else
+                Throw Err_Encoding
+        End Select
+    Else
+        Throw Err_Encoding
+    End If
+
+    Exit Sub
+ErrHandler:
+    Throw "#ParseEncodingArgument: " & Err.Description & "!"
+End Sub
+
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseConvertTypes
@@ -495,7 +534,7 @@ Private Function Min4(N1 As Long, N2 As Long, N3 As Long, N4 As Long, ByRef Whic
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : IsFileUnicode
+' Procedure  : DetectEncoding
 ' Purpose    : Guesses whether a file needs to be opened with the "format" argument to File.OpenAsTextStream set to
 '              TriStateTrue or TriStateFalse.
 '              The documentation at
@@ -510,13 +549,15 @@ End Function
 '              https://stackoverflow.com/questions/36188224/vba-test-encoding-of-a-text-file
 '              but with changes following experimentation using NotePad++ to create files with various encodings.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function IsFileUnicode(FilePath As String) As Boolean
+Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef IsUTF8BOM As Boolean)
 
     Dim intAsc1Chr As Long
     Dim intAsc2Chr As Long
+    Dim intAsc3Chr As Long
     Dim T As Scripting.TextStream
     Static FSO As Scripting.FileSystemObject
 
+    On Error GoTo ErrHandler
     On Error GoTo ErrHandler
     If FSO Is Nothing Then Set FSO = New Scripting.FileSystemObject
     If (FSO.FileExists(FilePath) = False) Then
@@ -527,33 +568,51 @@ Private Function IsFileUnicode(FilePath As String) As Boolean
     Set T = FSO.OpenTextFile(FilePath, 1, False, 0)
     If T.AtEndOfStream Then
         T.Close: Set T = Nothing
-        IsFileUnicode = False
-        Exit Function
+        TriState = TristateFalse
+        IsUTF8BOM = False
+        Exit Sub
     End If
     intAsc1Chr = Asc(T.Read(1))
     If T.AtEndOfStream Then
         T.Close: Set T = Nothing
-        IsFileUnicode = False
-        Exit Function
+        TriState = TristateFalse
+        IsUTF8BOM = False
+        Exit Sub
     End If
     intAsc2Chr = Asc(T.Read(1))
-    T.Close
     
     If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
         'File is probably encoded UTF-16 LE BOM (little endian, with Byte Option Marker)
-        IsFileUnicode = True
+        TriState = TristateTrue
+        IsUTF8BOM = False
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
-        IsFileUnicode = True
+        TriState = TristateTrue
+        IsUTF8BOM = False
     Else
-        'File is probably encoded UTF-8. Hopefully not UTF-8-BOM since VBA's File.OpenAsTextStream does not cope well with that.
-        IsFileUnicode = False
+        If T.AtEndOfStream Then
+            TriState = TristateFalse
+            IsUTF8BOM = False
+            Exit Sub
+        End If
+        intAsc3Chr = Asc(T.Read(1))
+        If (intAsc1Chr = 239) And (intAsc2Chr = 187) And (intAsc3Chr = 191) Then
+            'File is probably encoded UTF-8 with BOM
+            TriState = TristateFalse
+            IsUTF8BOM = True
+        Else
+            'File is probably encoded UTF-8 without BOM
+            TriState = TristateFalse
+            IsUTF8BOM = False
+        End If
     End If
 
-    Exit Function
+    T.Close: Set T = Nothing
+    Exit Sub
 ErrHandler:
-    Throw "#IsFileUnicode: " & Err.Description & "!"
-End Function
+    Throw "#DetectEncoding: " & Err.Description & "!"
+End Sub
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : InferDelimiter
@@ -561,7 +620,7 @@ End Function
 '              semi-colon, colon or pipe (|). Only look in the first 10,000 characters, Would prefer to look at the first
 '              10 lines, but that presents a problem for files with Mac line endings as T.ReadLine doesn't work for them...
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function InferDelimiter(FileName As String, Unicode As Boolean, DecimalSeparator As String)
+Private Function InferDelimiter(FileName As String, TriState As Long, DecimalSeparator As String)
     
     Const CHUNK_SIZE = 1000
     Const MAX_CHUNKS = 10
@@ -578,7 +637,7 @@ Private Function InferDelimiter(FileName As String, Unicode As Boolean, DecimalS
 
     Set FSO = New FileSystemObject
     Set F = FSO.GetFile(FileName)
-    Set T = F.OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+    Set T = F.OpenAsTextStream(ForReading, TriState)
 
     If T.AtEndOfStream Then
         T.Close: Set T = Nothing: Set F = Nothing
@@ -801,260 +860,258 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
         NumRows As Long, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, ByRef Starts() As Long, _
         ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long) As String
 
-          Const Err_ContentsOrStream = "ContentsOrStream must either be a string or a TextStream"
-          Const Err_Delimiter = "Delimiter must not be the null string"
-          Dim Buffer As String
-          Dim BufferUpdatedTo As Long
-          Dim CheckForComments As Boolean
-          Dim ColNum As Long
-          Dim EvenQuotes As Boolean
-          Dim HaveReachedSkipToRow As Boolean
-          Dim i As Long 'Index to read from Buffer
-          Dim j As Long 'Index to write to Starts, Lengths, RowIndexes and ColIndexes
-          Dim LComment As Long
-          Dim LDlm As Long
-          Dim NumRowsInFile As Long
-          Dim OrigLen As Long
-          Dim PosCR As Long
-          Dim PosDL As Long
-          Dim PosLF As Long
-          Dim PosQC As Long
-          Dim QuoteArray() As String
-          Dim QuoteCount As Long
-          Dim RowNum As Long
-          Dim SearchFor() As String
-          Dim Streaming As Boolean
-          Dim T As Scripting.TextStream
-          Dim tmp As Long
-          Dim Which As Long
+    Const Err_ContentsOrStream = "ContentsOrStream must either be a string or a TextStream"
+    Const Err_Delimiter = "Delimiter must not be the null string"
+    Dim Buffer As String
+    Dim BufferUpdatedTo As Long
+    Dim CheckForComments As Boolean
+    Dim ColNum As Long
+    Dim EvenQuotes As Boolean
+    Dim HaveReachedSkipToRow As Boolean
+    Dim i As Long 'Index to read from Buffer
+    Dim j As Long 'Index to write to Starts, Lengths, RowIndexes and ColIndexes
+    Dim LComment As Long
+    Dim LDlm As Long
+    Dim NumRowsInFile As Long
+    Dim OrigLen As Long
+    Dim PosCR As Long
+    Dim PosDL As Long
+    Dim PosLF As Long
+    Dim PosQC As Long
+    Dim QuoteArray() As String
+    Dim QuoteCount As Long
+    Dim RowNum As Long
+    Dim SearchFor() As String
+    Dim Streaming As Boolean
+    Dim T As Scripting.TextStream
+    Dim tmp As Long
+    Dim Which As Long
 
-1         On Error GoTo ErrHandler
-2         On Error GoTo ErrHandler
-          
-3         If VarType(ContentsOrStream) = vbString Then
-4             Buffer = ContentsOrStream
-5             Streaming = False
-6         ElseIf TypeName(ContentsOrStream) = "TextStream" Then
-7             Set T = ContentsOrStream
-8             If NumRows = 0 Then
-9                 Buffer = T.ReadAll
-10                T.Close
-11                Streaming = False
-12            Else
-13                Call GetMoreFromStream(T, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
-14                Streaming = True
-15            End If
-16        Else
-17            Throw Err_ContentsOrStream
-18        End If
-             
-19        LComment = Len(Comment)
-20        If LComment > 0 Then
-21            CheckForComments = True
-22        End If
-             
-23        If Streaming Then
-24            ReDim SearchFor(1 To 4)
-25            SearchFor(1) = Delimiter
-26            SearchFor(2) = vbLf
-27            SearchFor(3) = vbCr
-28            SearchFor(4) = QuoteChar
-29            ReDim QuoteArray(1 To 1)
-30            QuoteArray(1) = QuoteChar
-31        End If
+    On Error GoTo ErrHandler
+    On Error GoTo ErrHandler
+    
+    If VarType(ContentsOrStream) = vbString Then
+        Buffer = ContentsOrStream
+        Streaming = False
+    ElseIf TypeName(ContentsOrStream) = "TextStream" Then
+        Set T = ContentsOrStream
+        If NumRows = 0 Then
+            Buffer = T.ReadAll
+            T.Close
+            Streaming = False
+        Else
+            Call GetMoreFromStream(T, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
+            Streaming = True
+        End If
+    Else
+        Throw Err_ContentsOrStream
+    End If
+       
+    LComment = Len(Comment)
+    If LComment > 0 Then
+        CheckForComments = True
+    End If
+       
+    If Streaming Then
+        ReDim SearchFor(1 To 4)
+        SearchFor(1) = Delimiter
+        SearchFor(2) = vbLf
+        SearchFor(3) = vbCr
+        SearchFor(4) = QuoteChar
+        ReDim QuoteArray(1 To 1)
+        QuoteArray(1) = QuoteChar
+    End If
 
-32        ReDim Starts(1 To 8)
-33        ReDim Lengths(1 To 8)
-34        ReDim RowIndexes(1 To 8)
-35        ReDim ColIndexes(1 To 8)
-36        ReDim QuoteCounts(1 To 8)
-          
-37        LDlm = Len(Delimiter)
-38        If LDlm = 0 Then Throw Err_Delimiter 'Avoid infinite loop!
-39        OrigLen = Len(Buffer)
-40        If Not Streaming Then
-              'Ensure Buffer terminates with vbCrLf
-41            If Right(Buffer, 1) <> vbCr And Right(Buffer, 1) <> vbLf Then
-42                Buffer = Buffer + vbCrLf
-43            ElseIf Right(Buffer, 1) = vbCr Then
-44                Buffer = Buffer + vbLf
-45            End If
-46            BufferUpdatedTo = Len(Buffer)
-47        End If
-          
-48        j = 1: i = 0
-          
-49        If CheckForComments Then
-50            SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
-51        End If
-          
-52        If IgnoreRepeated Then
-53            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-54                i = i + LDlm
-55            Loop
-56        End If
-          
-57        ColNum = 1: RowNum = 1
-58        EvenQuotes = True
-59        Starts(1) = i + 1
-60        If SkipToRow = 1 Then HaveReachedSkipToRow = True
+    ReDim Starts(1 To 8)
+    ReDim Lengths(1 To 8)
+    ReDim RowIndexes(1 To 8)
+    ReDim ColIndexes(1 To 8)
+    ReDim QuoteCounts(1 To 8)
+    
+    LDlm = Len(Delimiter)
+    If LDlm = 0 Then Throw Err_Delimiter 'Avoid infinite loop!
+    OrigLen = Len(Buffer)
+    If Not Streaming Then
+        'Ensure Buffer terminates with vbCrLf
+        If Right(Buffer, 1) <> vbCr And Right(Buffer, 1) <> vbLf Then
+            Buffer = Buffer + vbCrLf
+        ElseIf Right(Buffer, 1) = vbCr Then
+            Buffer = Buffer + vbLf
+        End If
+        BufferUpdatedTo = Len(Buffer)
+    End If
+    
+    j = 1: i = 0
+    
+    If CheckForComments Then
+        SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
+    End If
+    
+    If IgnoreRepeated Then
+        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+            i = i + LDlm
+        Loop
+    End If
+    
+    ColNum = 1: RowNum = 1
+    EvenQuotes = True
+    Starts(1) = i + 1
+    If SkipToRow = 1 Then HaveReachedSkipToRow = True
 
-61        Do
-62            If EvenQuotes Then
-63                If Not Streaming Then
-64                    If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
-65                    If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
-66                    If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
-67                    If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
-68                    i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
-69                Else
-70                    i = SearchInBuffer(SearchFor, i + 1, T, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
-71                End If
+    Do
+        If EvenQuotes Then
+            If Not Streaming Then
+                If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
+                If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
+                If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
+                If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
+                i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
+            Else
+                i = SearchInBuffer(SearchFor, i + 1, T, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
+            End If
 
-72                If i >= BufferUpdatedTo + 1 Then
-73                    Exit Do
-74                End If
+            If i >= BufferUpdatedTo + 1 Then
+                Exit Do
+            End If
 
-75                If j + 1 > UBound(Starts) Then
-76                    ReDim Preserve Starts(1 To UBound(Starts) * 2)
-77                    ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
-78                    ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
-79                    ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
-80                    ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
-81                End If
+            If j + 1 > UBound(Starts) Then
+                ReDim Preserve Starts(1 To UBound(Starts) * 2)
+                ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
+                ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
+                ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
+                ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
+            End If
 
-82                Select Case Which
-                      Case 1
-                          'Found Delimiter
-83                        Lengths(j) = i - Starts(j)
-84                        If IgnoreRepeated Then
-85                            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-86                                i = i + LDlm
-87                            Loop
-88                        End If
-                          
-89                        Starts(j + 1) = i + LDlm
-90                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-91                        ColNum = ColNum + 1
-92                        QuoteCounts(j) = QuoteCount: QuoteCount = 0
-93                        j = j + 1
-94                        NumFields = NumFields + 1
-95                        i = i + LDlm - 1
-96                    Case 2, 3 'Line Ending
-97                        Lengths(j) = i - Starts(j)
-98                        If Which = 3 Then 'Found a vbCr
-99                            If Mid(Buffer, i + 1, 1) = vbLf Then
-                                  'Ending is Windows rather than Mac or Unix.
-100                               i = i + 1
-101                           End If
-102                       End If
-                          
-103                       If CheckForComments Then
-104                           SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
-105                       End If
-                          
-106                       If IgnoreRepeated Then
-                              'IgnoreRepeated: Handle lines whose last character before the line ending is a delimiter
-107                           If Lengths(j) = 0 Then
-108                               If ColNum > 1 Then
-109                                   j = j - 1
-110                                   ColNum = ColNum - 1
-111                                   NumFields = NumFields - 1
-112                               End If
-113                           End If
-                              'IgnoreRepeated: handle delimiters at the start of the next line to be parsed
-114                           Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-115                               i = i + LDlm
-116                           Loop
-117                       End If
-118                       Starts(j + 1) = i + 1
+            Select Case Which
+                Case 1
+                    'Found Delimiter
+                    Lengths(j) = i - Starts(j)
+                    If IgnoreRepeated Then
+                        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+                            i = i + LDlm
+                        Loop
+                    End If
+                    
+                    Starts(j + 1) = i + LDlm
+                    ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+                    ColNum = ColNum + 1
+                    QuoteCounts(j) = QuoteCount: QuoteCount = 0
+                    j = j + 1
+                    NumFields = NumFields + 1
+                    i = i + LDlm - 1
+                Case 2, 3 'Line Ending
+                    Lengths(j) = i - Starts(j)
+                    If Which = 3 Then 'Found a vbCr
+                        If Mid(Buffer, i + 1, 1) = vbLf Then
+                            'Ending is Windows rather than Mac or Unix.
+                            i = i + 1
+                        End If
+                    End If
+                    
+                    If CheckForComments Then
+                        SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
+                    End If
+                    
+                    If IgnoreRepeated Then
+                        'IgnoreRepeated: Handle lines whose last character before the line ending is a delimiter
+                        If Lengths(j) = 0 Then
+                            If ColNum > 1 Then
+                                j = j - 1
+                                ColNum = ColNum - 1
+                                NumFields = NumFields - 1
+                            End If
+                        End If
+                        'IgnoreRepeated: handle delimiters at the start of the next line to be parsed
+                        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+                            i = i + LDlm
+                        Loop
+                    End If
+                    Starts(j + 1) = i + 1
 
-119                       If ColNum > NumColsFound Then
-120                           If NumColsFound > 0 Then
-121                               Ragged = True
-122                           End If
-123                           NumColsFound = ColNum
-124                       ElseIf ColNum < NumColsFound Then
-125                           Ragged = True
-126                       End If
-                          
-127                       ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-128                       ColNum = 1: RowNum = RowNum + 1
-129                       QuoteCounts(j) = QuoteCount: QuoteCount = 0
-130                       j = j + 1
-131                       NumFields = NumFields + 1
-                          
-132                       If HaveReachedSkipToRow Then
-133                           If RowNum = NumRows + 1 Then
-134                               Exit Do
-135                           End If
-136                       Else
-137                           If RowNum = SkipToRow Then
-138                               HaveReachedSkipToRow = True
-139                               tmp = Starts(j)
-140                               ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
-141                               ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
-142                               RowNum = 1: j = 1: NumFields = 0
-143                               Starts(1) = tmp
-144                           End If
-145                       End If
-146                   Case 4
-                          'Found QuoteChar
-147                       EvenQuotes = False
-148                       QuoteCount = QuoteCount + 1
-149               End Select
-150           Else
-151               If Not Streaming Then
-152                   PosQC = InStr(i + 1, Buffer, QuoteChar)
-153               Else
-154                   If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray(), i + 1, T, Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
-155               End If
-                  
-156               If PosQC = 0 Then
-                      'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes. _
-                       If there are an odd number then all text after the last double quote in the file will be (part of) _
-                       the last field in the last line.
-157                   Lengths(j) = OrigLen - Starts(j) + 1
-158                   ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-                      
-159                   RowNum = RowNum + 1
-160                   If ColNum > NumColsFound Then NumColsFound = ColNum
-161                   NumFields = NumFields + 1
-162                   Exit Do
-163               Else
-164                   i = PosQC
-165                   EvenQuotes = True
-166                   QuoteCount = QuoteCount + 1
-167               End If
-168           End If
-169       Loop
+                    If ColNum > NumColsFound Then
+                        If NumColsFound > 0 Then
+                            Ragged = True
+                        End If
+                        NumColsFound = ColNum
+                    ElseIf ColNum < NumColsFound Then
+                        Ragged = True
+                    End If
+                    
+                    ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+                    ColNum = 1: RowNum = RowNum + 1
+                    QuoteCounts(j) = QuoteCount: QuoteCount = 0
+                    j = j + 1
+                    NumFields = NumFields + 1
+                    
+                    If HaveReachedSkipToRow Then
+                        If RowNum = NumRows + 1 Then
+                            Exit Do
+                        End If
+                    Else
+                        If RowNum = SkipToRow Then
+                            HaveReachedSkipToRow = True
+                            tmp = Starts(j)
+                            ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
+                            ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
+                            RowNum = 1: j = 1: NumFields = 0
+                            Starts(1) = tmp
+                        End If
+                    End If
+                Case 4
+                    'Found QuoteChar
+                    EvenQuotes = False
+                    QuoteCount = QuoteCount + 1
+            End Select
+        Else
+            If Not Streaming Then
+                PosQC = InStr(i + 1, Buffer, QuoteChar)
+            Else
+                If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray(), i + 1, T, Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
+            End If
+            
+            If PosQC = 0 Then
+                'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes. _
+                 If there are an odd number then all text after the last double quote in the file will be (part of) _
+                 the last field in the last line.
+                Lengths(j) = OrigLen - Starts(j) + 1
+                ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+                
+                RowNum = RowNum + 1
+                If ColNum > NumColsFound Then NumColsFound = ColNum
+                NumFields = NumFields + 1
+                Exit Do
+            Else
+                i = PosQC
+                EvenQuotes = True
+                QuoteCount = QuoteCount + 1
+            End If
+        End If
+    Loop
 
-170       NumRowsFound = RowNum - 1
-          
-171       If HaveReachedSkipToRow Then
-172           NumRowsInFile = SkipToRow - 1 + RowNum - 1
-173       Else
-174           NumRowsInFile = RowNum - 1
-175       End If
-          
-176       If SkipToRow > NumRowsInFile Then
-177           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or _
-                                   a negative number of rows. So throw an error.
-178               Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of rows in the file (" + CStr(NumRowsInFile) + ")"
-179           Else
-                  'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
-180               NumFields = 0
-181               NumRowsFound = 0
-182           End If
-183       End If
+    NumRowsFound = RowNum - 1
+    
+    If HaveReachedSkipToRow Then
+        NumRowsInFile = SkipToRow - 1 + RowNum - 1
+    Else
+        NumRowsInFile = RowNum - 1
+    End If
+    
+    If SkipToRow > NumRowsInFile Then
+        If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or _
+                             a negative number of rows. So throw an error.
+            Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of rows in the file (" + CStr(NumRowsInFile) + ")"
+        Else
+            'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
+            NumFields = 0
+            NumRowsFound = 0
+        End If
+    End If
 
-184       ParseCSVContents = Buffer
+    ParseCSVContents = Buffer
 
-185       Exit Function
+    Exit Function
 ErrHandler:
-186       Stop
-187       Resume
-188       Throw "#ParseCSVContents (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#ParseCSVContents: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

@@ -112,7 +112,7 @@ Function TimeThreeParsers(EachFieldContains As Variant, NumRows As Long, NumCols
             Select Case j
                 Case 1
                     FnName1 = "CSVRead"
-                    DataReread1 = ThrowIfError(CSVRead(FileName, False, ",", , , , , , , , Unicode))
+                    DataReread1 = ThrowIfError(CSVRead(FileName, False, ",", , , , , , , , , Unicode))
                 Case 2
                     FnName2 = "CSVRead_sdkn104"
                     DataReread2 = ThrowIfError(CSVRead_sdkn104(FileName, Unicode))

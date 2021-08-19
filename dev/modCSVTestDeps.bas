@@ -23,7 +23,7 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
           Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
           Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
           Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
-          Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString) As Boolean
+          Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString) As Boolean
 
           Dim Observed As Variant
 
@@ -33,7 +33,7 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
 3         TestDescription = "Case " + CStr(CaseNo) + " " + TestDescription
 
 4         Observed = CSVRead(FileName, ConvertTypes, Delimiter, IgnoreRepeated, DateFormat, Comment, SkipToRow, _
-              SkipToCol, NumRows, NumCols, ShowMissingsAs, Unicode, DecimalSeparator)
+              SkipToCol, NumRows, NumCols, ShowMissingsAs, Encoding, DecimalSeparator)
 
 5         If VarType(Observed) = vbString Then
 6             If VarType(Expected) = vbString Then

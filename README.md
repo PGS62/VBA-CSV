@@ -23,11 +23,11 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 Returns the contents of a comma-separated file on disk as an array.
 ```vba
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-    Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
-    Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
-    Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
-    Optional ByVal Unicode As Variant, Optional DecimalSeparator As String = vbNullString)
+        Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
+        Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
+        Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
+        Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
+        Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString)
 ```
 
 |Argument|Description|
@@ -43,11 +43,11 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`NumRows`|The number of rows to read from the file. If omitted (or zero), all rows from `SkipToRow` to the end of the file are read.|
 |`NumCols`|The number of columns to read from the file. If omitted (or zero), all columns from `SkipToCol` are read.|
 |`ShowMissingsAs`|Fields which are missing in the file (consecutive delimiters) are represented by `ShowMissingsAs`. Defaults to the null string, but can be any string or Empty. If `NumRows` is greater than the number of rows in the file then the return is "padded" with the value of `ShowMissingsAs`. Likewise if `NumCols` is greater than the number of columns in the file.|
-|`Unicode`|In most cases, this argument can be omitted, in which case `CSVRead` will examine the file's byte order mark to guess how the file should be opened - i.e. the correct "format" argument to pass to VBA's method OpenAsTextStream, which requires an argument indicating whether the file is `Unicode` or ASCII. Alternatively, enter TRUE for a `Unicode` file or FALSE for an ASCII file.|
+|`Encoding`|Allowed entries are "UTF-16", "UTF-8", "UTF-8-BOM", and "ANSI", but for most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work then it's possible that the file is encoded UTF-16 but without a byte option mark, so try entering `Encoding` as "UTF-16".|
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 
 #### _CSVWrite_
-Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
+Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an "error string" (starts with #, ends with !) describing what went wrong.
 ```vba
 Public Function CSVWrite(FileName As String, ByVal data As Variant, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
@@ -66,3 +66,4 @@ Public Function CSVWrite(FileName As String, ByVal data As Variant, _
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
 |`Unicode`|If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but `Data` contains strings with characters whose code points exceed 255.|
 |`EOL`|Controls the line endings of the file written. Enter "Windows" (the default), "Unix" or "Mac". Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings "CRLF", "LF" or "CR". The last line of the file is written with a line ending.|
+
