@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+36,19-Aug-2021,17:53:04,"Philip Swannell","Now support ""T"" as a ConvertTypes option."
+35,19-Aug-2021,12:27:39,"Philip Swannell","More work on tests"
 34,18-Aug-2021,20:19:39,"Philip Swannell","Removed modCVSTestAgainstExcel."
 33,18-Aug-2021,20:15:59,"Philip Swannell","New module modCSVTest"
 32,16-Aug-2021,22:28:23,"Philip Swannell","New argument ""Comment"" to CSVRead."

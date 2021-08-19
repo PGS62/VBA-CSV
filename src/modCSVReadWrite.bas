@@ -2,7 +2,7 @@ Attribute VB_Name = "modCSVReadWrite"
 
 ' VBA-CSV
 
-' Copyright (C) 2021 - PGS62 (https://github.com/PGS62/VBA-CSV )
+' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
 
@@ -18,12 +18,12 @@ Sub RegisterCSVRead()
     Dim ArgumentDescriptions() As String
     ReDim ArgumentDescriptions(1 To 13)
     ArgumentDescriptions(1) = "The full name of the file, including the path."
-    ArgumentDescriptions(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values; FALSE to leave as strings. Or string of letters N, D, B, E, Q, R. E.g. ""BN"" to convert just Booleans and numbers. R = quoted strings retain quotes. Q = convert quoted fields."
+    ArgumentDescriptions(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values; FALSE to leave as strings. Or string of letters N, D, B, E, T, Q, R. T = trim leading and trailing spaces. R = quoted strings retain quotes. Q = convert quoted fields."
     ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
-    ArgumentDescriptions(4) = "Whether delimiters which appear immediately after another delimiter, or at the start of a line, should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
-    ArgumentDescriptions(5) = "The format of dates in the file such as ""D-M-Y"", ""M-D-Y"" or ""Y/M/D"". If omitted a value is read from Windows regional settings. Repeated D's (or M's or Y's) are equivalent to single instances, so that ""d-m-y"" and ""DD-MMM-YYYY"" are equivalent."
+    ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line or immediately after another delimiter or at the end of a line, should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
+    ArgumentDescriptions(5) = "The format of dates in the file such as ""Y-M-D"", ""M-D-Y"" or ""Y/M/D"". If omitted, ""Y-M-D"" is assumed. Repeated D's (or M's or Y's) are equivalent to single instances, so that ""Y-M-D"" and ""YYYY-MMM-DD"" are equivalent."
     ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
-    ArgumentDescriptions(7) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first (not commented) row."
+    ArgumentDescriptions(7) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first row."
     ArgumentDescriptions(8) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
     ArgumentDescriptions(9) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
     ArgumentDescriptions(10) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
@@ -58,15 +58,15 @@ End Sub
 ' Arguments
 ' FileName  : The full name of the file, including the path.
 ' ConvertTypes: ConvertTypes provides control over whether fields in the file are converted to typed values
-'             in the return or remain as strings, and also sets the treatment of "quoted fields", i.e.
-'             fields with double-quotes as both their first and last characters.
+'             in the return or remain as strings, and also sets the treatment of "quoted fields" and space
+'             characters.
 '
 '             ConvertTypes may take values FALSE (the default), TRUE, or a string of zero or more letters
-'             from "NDBEQR".
+'             from "NDBETQR".
 '
 '             If ConvertTypes is:
 '             * FALSE then no conversion takes place other than quoted fields being unquoted.
-'             * TRUE then unquoted numbers, dates, Booleans and errors are converted.
+'             * TRUE then unquoted numbers, dates, Booleans and errors are converted, equivalent to "NDBE".
 '
 '             If ConvertTypes is a string including:
 '             1) "N" then fields that represent numbers are converted to numbers (Doubles).
@@ -75,9 +75,11 @@ End Sub
 '             sensitive so TRUE, FALSE, True and False are also converted.
 '             4) "E" then fields that match Excel"s representation of error values are converted to error
 '             values. There are fourteen such strings, including #N/A, #NAME?, #VALUE! and #DIV/0!.
-'             5) "Q" then conversion happens for both quoted and unquoted fields; otherwise only unquoted
+'             5) "T" then leading and trailing spaces are trimmed from fields. In the case of quoted
+'             fields, this will not remove spaces between the quotes.
+'             6) "Q" then conversion happens for both quoted and unquoted fields; otherwise only unquoted
 '             fields are converted.
-'             6) "R" then quoted fields retain their quotes, otherwise they are "unquoted" i.e. have their
+'             7) "R" then quoted fields retain their quotes, otherwise they are "unquoted" i.e. have their
 '             leading and trailing characters removed and consecutive pairs of double-quotes replaced by a
 '             single double quote.
 ' Delimiter : By default, CSVRead will try to detect a file's delimiter as the first instance of comma, tab,
@@ -89,15 +91,15 @@ End Sub
 '             this case the return will mimic how the file would appear in a text editor such as NotePad.
 '             The file will by split into lines at all line breaks (irrespective of double-quotes) and each
 '             element of the return will be a line of the file.
-' IgnoreRepeated: Whether delimiters which appear immediately after another delimiter, or at the start of a
-'             line, should be ignored while parsing; useful-for fixed-width files with delimiter padding
-'             between fields.
-' DateFormat: The format of dates in the file such as "D-M-Y", "M-D-Y" or "Y/M/D". If omitted a value is
-'             read from Windows regional settings. Repeated D's (or M's or Y's) are equivalent to single
-'             instances, so that "d-m-y" and "DD-MMM-YYYY" are equivalent.
+' IgnoreRepeated: Whether delimiters which appear at the start of a line or immediately after another
+'             delimiter or at the end of a line, should be ignored while parsing; useful-for fixed-width
+'             files with delimiter padding between fields.
+' DateFormat: The format of dates in the file such as "Y-M-D", "M-D-Y" or "Y/M/D". If omitted, "Y-M-D" is
+'             assumed. Repeated D's (or M's or Y's) are equivalent to single instances, so that "Y-M-D" and
+'             "YYYY-MMM-DD" are equivalent.
 ' Comment   : Rows that start with this string will be skipped while parsing.
 ' SkipToRow : The row in the file at which reading starts. Optional and defaults to 1 to read from the first
-'             (not commented) row.
+'             row.
 ' SkipToCol : The column in the file at which reading starts. Optional and defaults to 1 to read from the
 '             first column.
 ' NumRows   : The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the
@@ -182,6 +184,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     Dim SysDecimalSeparator As String
+    Dim TrimFields As Boolean
     
     On Error GoTo ErrHandler
 
@@ -223,7 +226,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     End If
 
     ParseConvertTypes ConvertTypes, ShowNumbersAsNumbers, _
-        ShowDatesAsDates, ShowBooleansAsBooleans, ShowErrorsAsErrors, ConvertQuoted, RetainQuotes
+        ShowDatesAsDates, ShowBooleansAsBooleans, ShowErrorsAsErrors, ConvertQuoted, RetainQuotes, TrimFields
 
     If ShowDatesAsDates Then
         ParseDateFormat DateFormat, DateOrder, DateSeparator
@@ -322,7 +325,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
         If j >= 1 And j <= NumColsInReturn Then
         
             ReturnArray(i, j) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
-                Lengths(k), DQ, QuoteCounts(k), RetainQuotes, ConvertQuoted, _
+                Lengths(k), DQ, TrimFields, QuoteCounts(k), RetainQuotes, ConvertQuoted, _
                 ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
                 ShowDatesAsDates, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
                 ShowBooleansAsBooleans, ShowErrorsAsErrors, ShowMissingsAs)
@@ -385,14 +388,15 @@ End Function
 '  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
 '  ConvertQuoted         : Should the four conversion rules above apply even to quoted fields?
 '  RetainQuotes          : Should quotes in quoted fields be retained?
+'  TrimFields            : Should leading and trailing spaces be trimmed from fields?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
     ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
-    ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef RetainQuotes As Boolean)
+    ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef RetainQuotes As Boolean, ByRef TrimFields As Boolean)
 
-    Const Err_ConvertTypes = "ConvertTypes must be Boolean or string with allowed letters NDBEQR. " & _
+    Const Err_ConvertTypes = "ConvertTypes must be Boolean or string with allowed letters NDBETQR. " & _
         "'N' show numbers as numbers, 'D' show dates as dates, 'B' show Booleans " & _
-        "as Booleans, 'E' show Excel errors as errors, 'Q' rules NDBE apply even to quoted fields, 'R' quoted fields retain their quotes, TRUE = NDBE (convert unquoted numbers, dates, Booleans and errors), FALSE = no conversion"
+        "as Booleans, 'E' show Excel errors as errors, 'T' to trim leading and trailing spaces from fields, 'Q' rules NDBE apply even to quoted fields, 'R' quoted fields retain their quotes, TRUE = NDBE (convert unquoted numbers, dates, Booleans and errors), FALSE = no conversion"
     Const Err_Quoted = "ConvertTypes cannot contain both 'Q' and 'R' since 'Q' indicates that type conversion should apply to quoted fields, but 'R' indicates that quoted fields should retain their quotes."
     Const Err_Quoted2 = "ConvertTypes is incorrect, 'Q' indicates that conversion should apply even to quoted fields, but none of 'N', 'D', 'B' or 'E' are present to indicate which type conversion to apply"
     Dim i As Long
@@ -442,6 +446,8 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
                     ConvertQuoted = True
                 Case "R"
                     RetainQuotes = True
+                Case "T"
+                    TrimFields = True
                 Case Else
                     Throw Err_ConvertTypes + " Found unrecognised character '" _
                         + Mid(ConvertTypes, i, 1) + "'"
@@ -792,249 +798,263 @@ End Function
 '                    kth field.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, Delimiter As String, Comment As String, IgnoreRepeated As Boolean, SkipToRow As Long, _
-    NumRows As Long, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, ByRef Starts() As Long, _
-    ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long) As String
+        NumRows As Long, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, ByRef Starts() As Long, _
+        ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long) As String
 
-    Const Err_ContentsOrStream = "ContentsOrStream must either be a string or a TextStream"
-    Const Err_Delimiter = "Delimiter must not be the null string"
-    Dim Buffer As String
-    Dim BufferUpdatedTo As Long
-    Dim CheckForComments As Boolean
-    Dim ColNum As Long
-    Dim EvenQuotes As Boolean
-    Dim HaveReachedSkipToRow As Boolean
-    Dim i As Long 'Index to read from Buffer
-    Dim j As Long 'Index to write to Starts, Lengths, RowIndexes and ColIndexes
-    Dim LComment As Long
-    Dim LDlm As Long
-    Dim NumRowsInFile As Long
-    Dim OrigLen As Long
-    Dim PosCR As Long
-    Dim PosDL As Long
-    Dim PosLF As Long
-    Dim PosQC As Long
-    Dim QuoteArray() As String
-    Dim QuoteCount As Long
-    Dim RowNum As Long
-    Dim SearchFor() As String
-    Dim Streaming As Boolean
-    Dim T As Scripting.TextStream
-    Dim tmp As Long
-    Dim Which As Long
+          Const Err_ContentsOrStream = "ContentsOrStream must either be a string or a TextStream"
+          Const Err_Delimiter = "Delimiter must not be the null string"
+          Dim Buffer As String
+          Dim BufferUpdatedTo As Long
+          Dim CheckForComments As Boolean
+          Dim ColNum As Long
+          Dim EvenQuotes As Boolean
+          Dim HaveReachedSkipToRow As Boolean
+          Dim i As Long 'Index to read from Buffer
+          Dim j As Long 'Index to write to Starts, Lengths, RowIndexes and ColIndexes
+          Dim LComment As Long
+          Dim LDlm As Long
+          Dim NumRowsInFile As Long
+          Dim OrigLen As Long
+          Dim PosCR As Long
+          Dim PosDL As Long
+          Dim PosLF As Long
+          Dim PosQC As Long
+          Dim QuoteArray() As String
+          Dim QuoteCount As Long
+          Dim RowNum As Long
+          Dim SearchFor() As String
+          Dim Streaming As Boolean
+          Dim T As Scripting.TextStream
+          Dim tmp As Long
+          Dim Which As Long
 
-    On Error GoTo ErrHandler
-    
-    If VarType(ContentsOrStream) = vbString Then
-        Buffer = ContentsOrStream
-        Streaming = False
-    ElseIf TypeName(ContentsOrStream) = "TextStream" Then
-        Set T = ContentsOrStream
-        If NumRows = 0 Then
-            Buffer = T.ReadAll
-            T.Close
-            Streaming = False
-        Else
-            Call GetMoreFromStream(T, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
-            Streaming = True
-        End If
-    Else
-        Throw Err_ContentsOrStream
-    End If
-       
-    LComment = Len(Comment)
-    If LComment > 0 Then
-        CheckForComments = True
-    End If
-       
-    If Streaming Then
-        ReDim SearchFor(1 To 4)
-        SearchFor(1) = Delimiter
-        SearchFor(2) = vbLf
-        SearchFor(3) = vbCr
-        SearchFor(4) = QuoteChar
-        ReDim QuoteArray(1 To 1)
-        QuoteArray(1) = QuoteChar
-    End If
+1         On Error GoTo ErrHandler
+2         On Error GoTo ErrHandler
+          
+3         If VarType(ContentsOrStream) = vbString Then
+4             Buffer = ContentsOrStream
+5             Streaming = False
+6         ElseIf TypeName(ContentsOrStream) = "TextStream" Then
+7             Set T = ContentsOrStream
+8             If NumRows = 0 Then
+9                 Buffer = T.ReadAll
+10                T.Close
+11                Streaming = False
+12            Else
+13                Call GetMoreFromStream(T, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
+14                Streaming = True
+15            End If
+16        Else
+17            Throw Err_ContentsOrStream
+18        End If
+             
+19        LComment = Len(Comment)
+20        If LComment > 0 Then
+21            CheckForComments = True
+22        End If
+             
+23        If Streaming Then
+24            ReDim SearchFor(1 To 4)
+25            SearchFor(1) = Delimiter
+26            SearchFor(2) = vbLf
+27            SearchFor(3) = vbCr
+28            SearchFor(4) = QuoteChar
+29            ReDim QuoteArray(1 To 1)
+30            QuoteArray(1) = QuoteChar
+31        End If
 
-    ReDim Starts(1 To 8)
-    ReDim Lengths(1 To 8)
-    ReDim RowIndexes(1 To 8)
-    ReDim ColIndexes(1 To 8)
-    ReDim QuoteCounts(1 To 8)
-    
-    LDlm = Len(Delimiter)
-    If LDlm = 0 Then Throw Err_Delimiter 'Avoid infinite loop!
-    OrigLen = Len(Buffer)
-    If Not Streaming Then
-        'Ensure Buffer terminates with vbCrLf
-        If Right(Buffer, 1) <> vbCr And Right(Buffer, 1) <> vbLf Then
-            Buffer = Buffer + vbCrLf
-        ElseIf Right(Buffer, 1) = vbCr Then
-            Buffer = Buffer + vbLf
-        End If
-        BufferUpdatedTo = Len(Buffer)
-    End If
-    
-    j = 1: i = 0
-    
-    If CheckForComments Then
-        SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
-    End If
-    
-    If IgnoreRepeated Then
-        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-            i = i + LDlm
-        Loop
-    End If
-    
-    ColNum = 1: RowNum = 1
-    EvenQuotes = True
-    Starts(1) = i + 1
-    If SkipToRow = 1 Then HaveReachedSkipToRow = True
+32        ReDim Starts(1 To 8)
+33        ReDim Lengths(1 To 8)
+34        ReDim RowIndexes(1 To 8)
+35        ReDim ColIndexes(1 To 8)
+36        ReDim QuoteCounts(1 To 8)
+          
+37        LDlm = Len(Delimiter)
+38        If LDlm = 0 Then Throw Err_Delimiter 'Avoid infinite loop!
+39        OrigLen = Len(Buffer)
+40        If Not Streaming Then
+              'Ensure Buffer terminates with vbCrLf
+41            If Right(Buffer, 1) <> vbCr And Right(Buffer, 1) <> vbLf Then
+42                Buffer = Buffer + vbCrLf
+43            ElseIf Right(Buffer, 1) = vbCr Then
+44                Buffer = Buffer + vbLf
+45            End If
+46            BufferUpdatedTo = Len(Buffer)
+47        End If
+          
+48        j = 1: i = 0
+          
+49        If CheckForComments Then
+50            SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
+51        End If
+          
+52        If IgnoreRepeated Then
+53            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+54                i = i + LDlm
+55            Loop
+56        End If
+          
+57        ColNum = 1: RowNum = 1
+58        EvenQuotes = True
+59        Starts(1) = i + 1
+60        If SkipToRow = 1 Then HaveReachedSkipToRow = True
 
-    Do
-        If EvenQuotes Then
-            If Not Streaming Then
-                If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
-                If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
-                If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
-                If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
-                i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
-            Else
-                i = SearchInBuffer(SearchFor, i + 1, T, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
-            End If
+61        Do
+62            If EvenQuotes Then
+63                If Not Streaming Then
+64                    If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
+65                    If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
+66                    If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
+67                    If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
+68                    i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
+69                Else
+70                    i = SearchInBuffer(SearchFor, i + 1, T, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
+71                End If
 
-            If i >= BufferUpdatedTo + 1 Then
-                Exit Do
-            End If
+72                If i >= BufferUpdatedTo + 1 Then
+73                    Exit Do
+74                End If
 
-            If j + 1 > UBound(Starts) Then
-                ReDim Preserve Starts(1 To UBound(Starts) * 2)
-                ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
-                ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
-                ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
-                ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
-            End If
+75                If j + 1 > UBound(Starts) Then
+76                    ReDim Preserve Starts(1 To UBound(Starts) * 2)
+77                    ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
+78                    ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
+79                    ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
+80                    ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
+81                End If
 
-            Select Case Which
-                Case 1
-                    'Found Delimiter
-                    Lengths(j) = i - Starts(j)
-                    If IgnoreRepeated Then
-                        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-                            i = i + LDlm
-                        Loop
-                    End If
-                    
-                    Starts(j + 1) = i + LDlm
-                    ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-                    ColNum = ColNum + 1
-                    QuoteCounts(j) = QuoteCount: QuoteCount = 0
-                    j = j + 1
-                    NumFields = NumFields + 1
-                    i = i + LDlm - 1
-                Case 2, 3
-                    Lengths(j) = i - Starts(j) 'Line Ending
-                    If Mid(Buffer, i + 1, 1) = vbLf Then
-                        'Ending is Windows rather than Mac or Unix.
-                        i = i + 1
-                    End If
-                    
-                    If CheckForComments Then
-                        SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
-                    End If
-                    
-                    If IgnoreRepeated Then
-                        Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-                            i = i + LDlm
-                        Loop
-                    End If
-                    Starts(j + 1) = i + 1
+82                Select Case Which
+                      Case 1
+                          'Found Delimiter
+83                        Lengths(j) = i - Starts(j)
+84                        If IgnoreRepeated Then
+85                            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+86                                i = i + LDlm
+87                            Loop
+88                        End If
+                          
+89                        Starts(j + 1) = i + LDlm
+90                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+91                        ColNum = ColNum + 1
+92                        QuoteCounts(j) = QuoteCount: QuoteCount = 0
+93                        j = j + 1
+94                        NumFields = NumFields + 1
+95                        i = i + LDlm - 1
+96                    Case 2, 3 'Line Ending
+97                        Lengths(j) = i - Starts(j)
+98                        If Which = 3 Then 'Found a vbCr
+99                            If Mid(Buffer, i + 1, 1) = vbLf Then
+                                  'Ending is Windows rather than Mac or Unix.
+100                               i = i + 1
+101                           End If
+102                       End If
+                          
+103                       If CheckForComments Then
+104                           SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
+105                       End If
+                          
+106                       If IgnoreRepeated Then
+                              'IgnoreRepeated: Handle lines whose last character before the line ending is a delimiter
+107                           If Lengths(j) = 0 Then
+108                               If ColNum > 1 Then
+109                                   j = j - 1
+110                                   ColNum = ColNum - 1
+111                                   NumFields = NumFields - 1
+112                               End If
+113                           End If
+                              'IgnoreRepeated: handle delimiters at the start of the next line to be parsed
+114                           Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+115                               i = i + LDlm
+116                           Loop
+117                       End If
+118                       Starts(j + 1) = i + 1
 
-                    If ColNum > NumColsFound Then
-                        If NumColsFound > 0 Then
-                            Ragged = True
-                        End If
-                        NumColsFound = ColNum
-                    ElseIf ColNum < NumColsFound Then
-                        Ragged = True
-                    End If
-                    
-                    ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-                    ColNum = 1: RowNum = RowNum + 1
-                    QuoteCounts(j) = QuoteCount: QuoteCount = 0
-                    j = j + 1
-                    NumFields = NumFields + 1
-                    
-                    If HaveReachedSkipToRow Then
-                        If RowNum = NumRows + 1 Then
-                            Exit Do
-                        End If
-                    Else
-                        If RowNum = SkipToRow Then
-                            HaveReachedSkipToRow = True
-                            tmp = Starts(j)
-                            ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
-                            ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
-                            RowNum = 1: j = 1: NumFields = 0
-                            Starts(1) = tmp
-                        End If
-                    End If
-                Case 4
-                    'Found QuoteChar
-                    EvenQuotes = False
-                    QuoteCount = QuoteCount + 1
-            End Select
-        Else
-            If Not Streaming Then
-                PosQC = InStr(i + 1, Buffer, QuoteChar)
-            Else
-                If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray(), i + 1, T, Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
-            End If
-            
-            If PosQC = 0 Then
-                'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes. _
-                 If there are an odd number then all text after the last double quote in the file will be (part of) _
-                 the last field in the last line.
-                Lengths(j) = OrigLen - Starts(j) + 1
-                ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-                
-                RowNum = RowNum + 1
-                If ColNum > NumColsFound Then NumColsFound = ColNum
-                NumFields = NumFields + 1
-                Exit Do
-            Else
-                i = PosQC
-                EvenQuotes = True
-                QuoteCount = QuoteCount + 1
-            End If
-        End If
-    Loop
+119                       If ColNum > NumColsFound Then
+120                           If NumColsFound > 0 Then
+121                               Ragged = True
+122                           End If
+123                           NumColsFound = ColNum
+124                       ElseIf ColNum < NumColsFound Then
+125                           Ragged = True
+126                       End If
+                          
+127                       ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+128                       ColNum = 1: RowNum = RowNum + 1
+129                       QuoteCounts(j) = QuoteCount: QuoteCount = 0
+130                       j = j + 1
+131                       NumFields = NumFields + 1
+                          
+132                       If HaveReachedSkipToRow Then
+133                           If RowNum = NumRows + 1 Then
+134                               Exit Do
+135                           End If
+136                       Else
+137                           If RowNum = SkipToRow Then
+138                               HaveReachedSkipToRow = True
+139                               tmp = Starts(j)
+140                               ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
+141                               ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
+142                               RowNum = 1: j = 1: NumFields = 0
+143                               Starts(1) = tmp
+144                           End If
+145                       End If
+146                   Case 4
+                          'Found QuoteChar
+147                       EvenQuotes = False
+148                       QuoteCount = QuoteCount + 1
+149               End Select
+150           Else
+151               If Not Streaming Then
+152                   PosQC = InStr(i + 1, Buffer, QuoteChar)
+153               Else
+154                   If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray(), i + 1, T, Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
+155               End If
+                  
+156               If PosQC = 0 Then
+                      'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes. _
+                       If there are an odd number then all text after the last double quote in the file will be (part of) _
+                       the last field in the last line.
+157                   Lengths(j) = OrigLen - Starts(j) + 1
+158                   ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+                      
+159                   RowNum = RowNum + 1
+160                   If ColNum > NumColsFound Then NumColsFound = ColNum
+161                   NumFields = NumFields + 1
+162                   Exit Do
+163               Else
+164                   i = PosQC
+165                   EvenQuotes = True
+166                   QuoteCount = QuoteCount + 1
+167               End If
+168           End If
+169       Loop
 
-    NumRowsFound = RowNum - 1
-    
-    If HaveReachedSkipToRow Then
-        NumRowsInFile = SkipToRow - 1 + RowNum - 1
-    Else
-        NumRowsInFile = RowNum - 1
-    End If
-    
-    If SkipToRow > NumRowsInFile Then
-        If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or _
-                             a negative number of rows. So throw an error.
-            Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of rows in the file (" + CStr(NumRowsInFile) + ")"
-        Else
-            'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
-            NumFields = 0
-            NumRowsFound = 0
-        End If
-    End If
+170       NumRowsFound = RowNum - 1
+          
+171       If HaveReachedSkipToRow Then
+172           NumRowsInFile = SkipToRow - 1 + RowNum - 1
+173       Else
+174           NumRowsInFile = RowNum - 1
+175       End If
+          
+176       If SkipToRow > NumRowsInFile Then
+177           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or _
+                                   a negative number of rows. So throw an error.
+178               Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of rows in the file (" + CStr(NumRowsInFile) + ")"
+179           Else
+                  'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
+180               NumFields = 0
+181               NumRowsFound = 0
+182           End If
+183       End If
 
-    ParseCSVContents = Buffer
+184       ParseCSVContents = Buffer
 
-    Exit Function
+185       Exit Function
 ErrHandler:
-    Throw "#ParseCSVContents: " & Err.Description & "!"
+186       Stop
+187       Resume
+188       Throw "#ParseCSVContents (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1270,9 +1290,9 @@ End Function
 '  ShowErrorsAsErrors       : Should strings that match how errors are represented in Excel worksheets be converted to
 '                             those errors values?
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, QuoteChar As String, QuoteCount As Long, RetainQuotes As Boolean, ConvertQuoted As Boolean, _
-    ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, _
-    DecimalSeparator As String, SysDecimalSeparator As String, _
+Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, QuoteChar As String, _
+    TrimFields As Boolean, QuoteCount As Long, RetainQuotes As Boolean, ConvertQuoted As Boolean, _
+    ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, SysDecimalSeparator As String, _
     ShowDatesAsDates As Boolean, DateOrder As Long, DateSeparator As String, SysDateOrder As Long, _
     SysDateSeparator As String, ShowBooleansAsBooleans As Boolean, _
     ShowErrorsAsErrors As Boolean, ShowMissingsAs As Variant)
@@ -1283,6 +1303,14 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
     Dim dtResult As Date
     Dim eResult As Variant
     Dim isQuoted As Boolean
+
+    If TrimFields Then
+        If Left$(Field, 1) = " " Then
+            Field = Trim$(Field)
+        ElseIf Right$(Field, 1) = " " Then
+            Field = Trim$(Field)
+        End If
+    End If
 
     If FieldLength = 0 Then
         ConvertField = ShowMissingsAs
@@ -1553,7 +1581,7 @@ End Function
 '             For definition of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
 '---------------------------------------------------------------------------------------------------------
-Public Function CSVWrite(FileName As String, ByVal Data As Variant, _
+Public Function CSVWrite(FileName As String, ByVal data As Variant, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
     Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
     Optional Delimiter As String = ",", Optional Unicode As Boolean, _
@@ -1582,21 +1610,21 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         Throw Err_Delimiter
     End If
 
-    If TypeName(Data) = "Range" Then
+    If TypeName(data) = "Range" Then
         'Preserve elements of type Date by using .Value, not .Value2
-        Data = Data.value
+        data = data.value
     End If
     
-    If NumDimensions(Data) <> 2 Then Throw Err_Dimensions
+    If NumDimensions(data) <> 2 Then Throw Err_Dimensions
     
     Set FSO = New FileSystemObject
     Set T = FSO.CreateTextFile(FileName, True, Unicode)
 
-    ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
+    ReDim OneLine(LBound(data, 2) To UBound(data, 2))
 
-    For i = LBound(Data) To UBound(Data)
-        For j = LBound(Data, 2) To UBound(Data, 2)
-            OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
+    For i = LBound(data) To UBound(data)
+        For j = LBound(data, 2) To UBound(data, 2)
+            OneLine(j) = Encode(data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat)
         Next j
         OneLineJoined = VBA.Join(OneLine, Delimiter)
         WriteLineWrap T, OneLineJoined, EOLIsWindows, EOL, Unicode
@@ -1740,12 +1768,12 @@ End Sub
 '             methods to be used from VBA code while keeping error handling robust
 '             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
 '---------------------------------------------------------------------------------------
-Public Function ThrowIfError(Data As Variant)
-    ThrowIfError = Data
-    If VarType(Data) = vbString Then
-        If Left$(Data, 1) = "#" Then
-            If Right$(Data, 1) = "!" Then
-                Throw CStr(Data)
+Public Function ThrowIfError(data As Variant)
+    ThrowIfError = data
+    If VarType(data) = vbString Then
+        If Left$(data, 1) = "#" Then
+            If Right$(data, 1) = "!" Then
+                Throw CStr(data)
             End If
         End If
     End If
@@ -1790,4 +1818,12 @@ Private Function FunctionWizardActive() As Boolean
 ErrHandler:
     Throw "#FunctionWizardActive: " & Err.Description & "!"
 End Function
+
+
+Sub g(data)
+
+Application.Run "SolumAddin.xlam!g", data
+
+
+End Sub
 
