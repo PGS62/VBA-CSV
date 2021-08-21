@@ -3,14 +3,14 @@ Option Explicit
 
 Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
 
-    Const MAXLEN = 20
+    Const maxlen = 20
     Dim i As Long
     Dim length As Long
     Dim res As String
     
     On Error GoTo ErrHandler
     
-    length = CLng(1 + Rnd() * MAXLEN)
+    length = CLng(1 + Rnd() * maxlen)
     res = String(length, " ")
 
     For i = 1 To length

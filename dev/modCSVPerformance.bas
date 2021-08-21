@@ -28,7 +28,7 @@ Sub RunSpeedTests()
     
     For Each N In ActiveSheet.Names
         If InStr(N.Name, "PutFormulasHere") > 1 Then
-            Application.Goto N.RefersToRange
+            Application.GoTo N.RefersToRange
             For Each C In N.RefersToRange.Cells
                 C.Resize(1, NumColsInTTPRet).ClearContents
                 TestResults = TimeThreeParsers(C.Offset(0, -3).value, C.Offset(0, -2).value, C.Offset(0, -1).value, Timeout, False)
@@ -57,7 +57,7 @@ Function TimeThreeParsers(EachFieldContains As Variant, NumRows As Long, NumCols
     Optional Timeout As Double = 1, Optional WithHeaders As Boolean)
 
     Const Unicode = False
-    Dim data As Variant
+    Dim Data As Variant
     Dim DataReread1
     Dim DataReread2
     Dim DataReread3
@@ -100,9 +100,9 @@ Function TimeThreeParsers(EachFieldContains As Variant, NumRows As Long, NumCols
 
     ThrowIfError CreatePath(Folder)
 
-    data = sFill(EachFieldContains, NumRows, NumCols)
+    Data = sFill(EachFieldContains, NumRows, NumCols)
     FileName = NameThatFile(Folder, OS, NumRows, NumCols, Replace(ExtraInfo, " ", "-"), Unicode, False)
-    ThrowIfError Application.Run("sFileSave", FileName, data, ",", , , , True)
+    ThrowIfError CSVWrite(Data, FileName, False)
         
     For j = 1 To 6
         k = 0

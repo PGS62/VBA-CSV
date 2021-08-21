@@ -399,19 +399,20 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
             Case 51
-                'TODO amend this test if we implement parsing of DateTime
                 TestDescription = "test types"
                 FileName = "test_types.csv"
                 Expected = HStack( _
                     Array("int", 1#), _
                     Array("float", 1#), _
                     Array("date", CDate("2018-Jan-01")), _
-                    Array("datetime", "2018-01-01T00:00:00"), _
+                    Array("datetime", CDate("2018-Jan-01")), _
                     Array("bool", True), _
                     Array("string", "hey"), _
                     Array("weakrefstring", "there"), _
                     Array("missing", Empty))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty)
             Case 52
                 TestDescription = "test 508"
                 FileName = "test_508.csv"
@@ -420,6 +421,8 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("Medium rare", "Medium", "Medium", "Medium rare", Empty, "Rare"))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
             Case 53
+            
+            
             Case 54
                 'TODO amend this for missingstring
                 TestDescription = "issue 198"
@@ -443,7 +446,6 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("acentric_factor", -0.002, 0.087, 0.225, 0.045, 0.011, -0.217, 0.005, 0.008))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:="N", Comment:="#", ShowMissingsAs:=Empty)
             Case 56
-                'Fail because we put a column of Empties at the right. need to tweak IgnoreRepeated code
                 TestDescription = "bug555.txt"
                 FileName = "bug555.txt"
                 Expected = HStack( _
@@ -457,12 +459,14 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("COOR_Z", 0#, 0#, 0#), _
                     Array("TEMP", 0.0931399, 0.311013, 0.424537))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
+
             Case 57
-                'TODO update this test if we parse DateTime and Time
                 TestDescription = "precompile small"
                 FileName = "precompile_small.csv"
                 Expected = Expected57()
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty)
             Case 58
                 TestDescription = "stocks"
                 FileName = "stocks.csv"
@@ -471,7 +475,6 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
                     ConvertTypes:="T", _
                     ShowMissingsAs:=Empty)
-
             Case 59
                 'Tests handling of lines that start with a delimiter when IgnoreRepeated = true
                 TestDescription = "test repeated delim 371"
@@ -479,11 +482,14 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = Expected59()
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
             Case 60
-                'This parses differently from how it would parse in Julia since there are four fields, two in the FAMILY column, and two in the PERSON column that evidently should be strings but we cast to numbers. The fix would be to implement by-column definition of ConvertTypes
-                TestDescription = "test repeated delim 371"
-                FileName = "test_repeated_delim_371.csv"
+                TestDescription = "TechCrunchcontinentalUSA"
+                FileName = "TechCrunchcontinentalUSA.csv"
                 Expected = Expected60()
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="ND", _
+                    DateFormat:="D-M-Y", _
+                    NumRows:=3, _
+                    ShowMissingsAs:=Empty)
             Case 61
                 TestDescription = "issue 120"
                 FileName = "issue_120.csv"
@@ -567,7 +573,9 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = HStack( _
                     Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
                     Array("44424", CDate("2021-Aug-18"), "True", "#DIV/0!", "1", CDate("2021-Aug-16"), "TRUE", "#DIV/0!", "abc", "abc""def"))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:="DQ", ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="DQ", _
+                    ShowMissingsAs:=Empty)
             Case 74
                 TestDescription = "test converttypes arg"
                 FileName = "test_converttypes_arg.csv"
@@ -623,7 +631,9 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = HStack( _
                     Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
                     Array(44424#, CDate("2021-Aug-18"), True, CVErr(2007), 1#, CDate("2021-Aug-16"), True, CVErr(2007), "abc", "abc""def"))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:="NDBEQ", ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="NDBEQ", _
+                    ShowMissingsAs:=Empty)
             Case 82
                 TestDescription = "test skip args"
                 FileName = "test_skip_args.csv"
@@ -721,8 +731,71 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     ConvertTypes:=True, _
                     NumRows:=1, _
                     ShowMissingsAs:=Empty)
+            Case 93
+                TestDescription = "pandas zeros"
+                FileName = "pandas_zeros.csv"
+                Expected = Empty
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="N", _
+                    ShowMissingsAs:=Empty, _
+                    NumRowsExpected:=100001, _
+                    NumColsExpected:=50)
+            Case 94
+                TestDescription = "heat flux.dat"
+                FileName = "heat_flux.dat"
+                Expected = HStack( _
+                    Array("#t", 0#, 0.05), _
+                    Array("heat_flux", 1.14914917397E-07, 1.14914917397E-07))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    Delimiter:=" ", _
+                    IgnoreRepeated:=True, _
+                    NumRows:=3, _
+                    ShowMissingsAs:=Empty)
+            Case 95
+            
+                'UTF-8 BOM, and streamed
+                TestDescription = "fecal samples"
+                FileName = "fecal_samples.csv"
+                Expected = Expected95()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    NumRows:=2, _
+                    ShowMissingsAs:=Empty)
+            Case 96
+                TestDescription = "test d-m-y with time"
+                FileName = "test_d-m-y_with_time.csv"
+                Expected = Expected96_97_98()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    Delimiter:=",", _
+                    DateFormat:="D-M-Y", _
+                    ShowMissingsAs:=Empty)
+            Case 97
+                TestDescription = "test m-d-y with time"
+                FileName = "test_m-d-y_with_time.csv"
+                Expected = Expected96_97_98()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    Delimiter:=",", _
+                    DateFormat:="M-D-Y", _
+                    ShowMissingsAs:=Empty)
+            Case 98
+                TestDescription = "test y-m-d with time"
+                FileName = "test_y-m-d_with_time.csv"
+                Expected = Expected96_97_98()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    Delimiter:=",", _
+                    DateFormat:="Y-M-D", _
+                    ShowMissingsAs:=Empty)
+
+
+                    
 
         End Select
+        Debug.Print i, TestRes
+        
         If Not IsEmpty(TestRes) Then
             If TestRes Then
                 NumPassed = NumPassed + 1
@@ -756,8 +829,8 @@ Function Expected57()
         Array("string", "RTrBP", "aqbcM", "jN9r4", "aWGyX", "yyBbB", "sJLTp", "7N1Ky", "O8MBD", "EIidc", Empty), _
         Array("bool", True, True, True, True, True, True, True, True, True, Empty), _
         Array("date", CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), Empty), _
-        Array("datetime", "2020-06-20T00:00:00", "2020-06-20T00:00:00", "2020-06-20T00:00:00", "2020-06-20T00:00:00", "2020-06-20T00:00:00", "2020-06-20T00:00:00", "2020-06-20T00:00:00", "2020-06-20T00:00:00", "2020-06-20T00:00:00", Empty), _
-        Array("time", "12:00:00", "12:00:00", "12:00:00", "12:00:00", "12:00:00", "12:00:00", "12:00:00", "12:00:00", "12:00:00", Empty))
+        Array("datetime", CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), Empty), _
+        Array("time", CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), Empty))
 End Function
 
 Function Expected58()
@@ -778,10 +851,16 @@ End Function
 
 Function Expected60()
     Expected60 = HStack( _
-        Array("FAMILY", "A", "A", "A", "A", "A", "A", "EPGP013951", "EPGP014065", "EPGP014065", "EPGP014065", "EP07", "83346_EPGP014244", "83346_EPGP014244", 83506#, 87001#), _
-        Array("PERSON", "EP01223", "EP01227", "EP01228", "EP01228", "EP01227", "EP01228", "EPGP013952", "EPGP014066", "EPGP014065", "EPGP014068", 706#, "T3011", "T3231", "T17255", 301#), _
-        Array("MARKER", "rs710865", "rs11249215", "rs11249215", "rs10903129", "rs621559", "rs1514175", "rs773564", "rs2794520", "rs296547", "rs296547", "rs10927875", "rs2251760", "rs2251760", "rs2475335", "rs2413583"), _
-        Array("RATIO", 0.0214, 0.0107, 0.00253, 0.0116, 0.00842, 0.0202, 0.00955, 0.0193, 0.0135, 0.0239, 0.0157, 0.0154, 0.0154, 0.00784, 0.0112))
+        Array("permalink", "lifelock", "lifelock"), _
+        Array("company", "LifeLock", "LifeLock"), _
+        Array("numEmps", Empty, Empty), _
+        Array("category", "web", "web"), _
+        Array("city", "Tempe", "Tempe"), _
+        Array("state", "AZ", "AZ"), _
+        Array("fundedDate", CDate("2007-May-01"), CDate("2006-Oct-01")), _
+        Array("raisedAmt", 6850000#, 6000000#), _
+        Array("raisedCurrency", "USD", "USD"), _
+        Array("round", "b", "a"))
 End Function
 
 Function Expected61()
@@ -873,6 +952,40 @@ Function Expected92()
         "bias_gsurf_cfg30", "nse_hatmo_cfg30", "r_hatmo_cfg30", "bias_hatmo_cfg30", "nse_latmo_cfg30", "r_latmo_cfg30", "bias_latmo_cfg30", "nse_melt_cfg30", "r_melt_cfg30", "bias_melt_cfg30", "nse_rnet_cfg30", "r_rnet_cfg30", "bias_rnet_cfg30", "nse_rof_cfg30", "r_rof_cfg30", "bias_rof_cfg30", "nse_snowdepth_cfg30", "r_snowdepth_cfg30", "bias_snowdepth_cfg30", "nse_swe_cfg30", "r_swe_cfg30", "bias_swe_cfg30", "nse_gsurf_cfg31", "r_gsurf_cfg31", "bias_gsurf_cfg31", "nse_hatmo_cfg31", "r_hatmo_cfg31", "bias_hatmo_cfg31", "nse_latmo_cfg31", "r_latmo_cfg31", "bias_latmo_cfg31", "nse_melt_cfg31", "r_melt_cfg31", "bias_melt_cfg31", "nse_rnet_cfg31", _
         "r_rnet_cfg31", "bias_rnet_cfg31", "nse_rof_cfg31", "r_rof_cfg31", "bias_rof_cfg31", "nse_snowdepth_cfg31", "r_snowdepth_cfg31", "bias_snowdepth_cfg31", "nse_swe_cfg31", "r_swe_cfg31", "bias_swe_cfg31", "nse_gsurf_cfg32", "r_gsurf_cfg32", "bias_gsurf_cfg32", "nse_hatmo_cfg32", "r_hatmo_cfg32", "bias_hatmo_cfg32", "nse_latmo_cfg32", "r_latmo_cfg32", "bias_latmo_cfg32", "nse_melt_cfg32", "r_melt_cfg32", "bias_melt_cfg32", "nse_rnet_cfg32", "r_rnet_cfg32", "bias_rnet_cfg32", "nse_rof_cfg32", "r_rof_cfg32", "bias_rof_cfg32", "nse_snowdepth_cfg32", "r_snowdepth_cfg32", "bias_snowdepth_cfg32", "nse_swe_cfg32", "r_swe_cfg32", "bias_swe_cfg32"))
 End Function
+
+Function Expected95()
+    Expected95 = HStack( _
+        Array("SampleID", "C0052_5F_1A"), Array("Mother_Child", "C"), _
+        Array("SubjectID", 52#), Array("MaternalID", "0052_m"), _
+        Array("TimePoint", 5#), Array("Fecal_EtOH", "F"), _
+        Array("CollectionRep", 1#), Array("DOC", CDate("2017-Jul-25")), _
+        Array("RAInitials_DOC", Empty), Array("DOF", CDate("2017-Jul-25")), _
+        Array("RAInitials_DOF", Empty), Array("Date_Brought_In", Empty), _
+        Array("RAInitials_Brought", Empty), Array("Date_Shipped", CDate("2017-Aug-17")), _
+        Array("RAInitials_Shipped", "SR"), Array("Date_Aliquoted", CDate("2017-Sep-08")), _
+        Array("Number_Replicates", "A,B,C,D"), Array("RAInitials_Aliquot", "SR"), _
+        Array("StorageBox", "Box 1"), Array("DOE", CDate("2017-Nov-21")), _
+        Array("Extract_number", "5 of 1"), Array("AliquotRep", "A"), _
+        Array("DNABox", "Box 1"), Array("KitUsed", "RNeasy PowerMicrobiome"), _
+        Array("RAInitials_Extract", "SR"), Array("DNAConc", 15#), _
+        Array("DOM", CDate("2018-Feb-20")), Array("Mgx_processed", "Sequenced"), _
+        Array("Mgx_batch", "Batch 1"), Array("DO16S", CDate("2018-Jun-13")), _
+        Array("16S_processed", "Sequenced"), Array("16S_batch", "Batch 1"), _
+        Array("16S_plate", "Plate 4"), Array("Notes", "DOC recorded as DOF"), _
+        Array("Discrepancies", "Written as 52E but needs to be changed to 52F"), _
+        Array("Batch 1 Mapping", "052E.7-25-17.F"), Array("Mgx_batch Mapping", "Mgx_batch001"), _
+        Array("16S_batch Mapping", "16S_batch001"), Array("Mother/Child Dyads", Empty))
+End Function
+
+
+Function Expected96_97_98()
+    Expected96_97_98 = HStack( _
+        Array(CDate("2021-Sep-01 16:23:13"), CDate("2022-Oct-09 04:16:13"), CDate("2022-Dec-27 13:56:15"), CDate("2022-May-07 08:56:31"), CDate("2024-Jan-14 05:29:48"), _
+        CDate("2023-Jan-16 08:12:25"), CDate("2023-Dec-10 13:35:13"), CDate("2023-Jan-11 20:59:27"), CDate("2021-Oct-28 07:31:59"), CDate("2023-Jul-21 00:02:45"), CDate("2021-Dec-16 19:15:38")))
+
+End Function
+
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ArrayToVBALitteral
@@ -967,39 +1080,45 @@ Function ElementToVBALitteral(x)
 
 1         On Error GoTo ErrHandler
 2         If VarType(x) = vbDate Then
-3             ElementToVBALitteral = "CDate(""" + Format(x, "yyyy-mmm-dd") + """)"
+3             If x <= 1 Then
+4                 ElementToVBALitteral = "CDate(""" + Format(x, "hh:mm:ss") + """)"
+5             ElseIf x = CLng(x) Then
+6                 ElementToVBALitteral = "CDate(""" + Format(x, "yyyy-mmm-dd") + """)"
+7             Else
+8                 ElementToVBALitteral = "CDate(""" + Format(x, "yyyy-mmm-dd hh:mm:ss") + """)"
+9             End If
 
-4         ElseIf IsNumberOrDate(x) Then
-5             ElementToVBALitteral = CStr(x) + "#"
-6         ElseIf VarType(x) = vbString Then
-7             If x = vbTab Then
-8                 ElementToVBALitteral = "vbTab"
+10        ElseIf IsNumberOrDate(x) Then
+11            ElementToVBALitteral = CStr(x) + "#"
+12        ElseIf VarType(x) = vbString Then
+13            If x = vbTab Then
+14                ElementToVBALitteral = "vbTab"
 
-9             ElseIf x = "I'm missing!" Then 'Hack
-10                ElementToVBALitteral = "Empty"
-11            Else
-12                If IsWideString(CStr(x)) Then
-13                    ElementToVBALitteral = HandleWideString(CStr(x))
-14                Else
-15                    x = Replace(x, """", """""")
-16                    x = Replace(x, vbCrLf, """ + vbCrLf + """)
-17                    x = Replace(x, vbLf, """ + vbLf + """)
-18                    x = Replace(x, vbCr, """ + vbCr + """)
-19                    x = Replace(x, vbTab, """ + vbTab + """)
-20                    ElementToVBALitteral = """" + x + """"
-21                End If
-22            End If
-23        ElseIf VarType(x) = vbBoolean Then
-24            ElementToVBALitteral = CStr(x)
-25        ElseIf IsEmpty(x) Then
-26            ElementToVBALitteral = "Empty"
-27        ElseIf IsError(x) Then
-28            ElementToVBALitteral = "CVErr(" & Mid(CStr(x), 7) & ")"
-29        End If
+15            ElseIf x = "I'm missing!" Then 'Hack
+16                ElementToVBALitteral = "Empty"
+17            Else
+18                If IsWideString(CStr(x)) Then
+19                    ElementToVBALitteral = HandleWideString(CStr(x))
+20                Else
+21                    x = Replace(x, """", """""")
+22                    x = Replace(x, vbCrLf, """ + vbCrLf + """)
+23                    x = Replace(x, vbLf, """ + vbLf + """)
+24                    x = Replace(x, vbCr, """ + vbCr + """)
+25                    x = Replace(x, vbTab, """ + vbTab + """)
+26                    ElementToVBALitteral = """" + x + """"
+27                End If
+28            End If
+29        ElseIf VarType(x) = vbBoolean Then
+30            ElementToVBALitteral = CStr(x)
+31        ElseIf IsEmpty(x) Then
+32            ElementToVBALitteral = "Empty"
+33        ElseIf IsError(x) Then
+34            ElementToVBALitteral = "CVErr(" & Mid(CStr(x), 7) & ")"
+35        End If
 
-30        Exit Function
+36        Exit Function
 ErrHandler:
-33        Throw "#ElementToVBALitteral (line " & CStr(Erl) + "): " & Err.Description & "!"
+37        Throw "#ElementToVBALitteral (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 Function GenerateTestCode(ConvertTypes As Variant, Delimiter As String, IgnoreRepeated As Boolean, DateFormat As String, _
@@ -1040,8 +1159,8 @@ Function GenerateTestCode(ConvertTypes As Variant, Delimiter As String, IgnoreRe
 28            res = res + ", _" + vbLf + String(IndentBy, " ") + "NumCols := " & CStr(NumCols)
 29        End If
 31            res = res + ", _" + vbLf + String(IndentBy, " ") + "ShowMissingsAs := Empty"
-33        If Not IsMissing(Encoding) Then
-34            res = res + ", _" + vbLf + String(IndentBy, " ") + "Encoding := " & Encoding
+33        If Encoding <> "" And Not IsEmpty(Encoding) Then
+34            res = res + ", _" + vbLf + String(IndentBy, " ") + "Encoding := " & ElementToVBALitteral(Encoding)
 35        End If
 36        If DecimalSeparator <> "." And DecimalSeparator <> "" Then
 37            res = res + ", _" + vbLf + String(IndentBy, " ") + "DecimalSeparator := " & ElementToVBALitteral(DecimalSeparator)
@@ -1054,5 +1173,21 @@ Function GenerateTestCode(ConvertTypes As Variant, Delimiter As String, IgnoreRe
 41        Exit Function
 ErrHandler:
 42        GenerateTestCode = "#GenerateTestCode (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : FolderExists
+' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
+'---------------------------------------------------------------------------------------
+Private Function FolderExists(ByVal FolderPath As String)
+    Dim F As Scripting.Folder
+    Dim FSO As Scripting.FileSystemObject
+    On Error GoTo ErrHandler
+    Set FSO = New FileSystemObject
+    Set F = FSO.GetFolder(FolderPath)
+    FolderExists = True
+    Exit Function
+ErrHandler:
+    FolderExists = False
 End Function
 

@@ -9,7 +9,7 @@ Sub SaveWorkbookAndExportModules()
 
           Const Title = "VBA-CSV"
           Dim AuditData
-          Dim BackUpBookName
+          Dim BackUpBookName As String
           Dim bExport As Boolean
           Dim C As VBIDE.VBComponent
           Dim FileName As String
@@ -42,8 +42,6 @@ Sub SaveWorkbookAndExportModules()
 17        Kill Folder2 & "*.cls*"
 18        On Error GoTo ErrHandler
           
-          'No longer export all modules
-
 19        For Each C In wb.VBProject.VBComponents
 20            bExport = True
 21            FileName = C.Name
@@ -66,7 +64,8 @@ Sub SaveWorkbookAndExportModules()
 36                    bExport = False
 37            End Select
 
-              'only export files of the PGS62 project, not those from other CSV parsers that I have imported for perfromance comparison.
+              'only export files of the PGS62 project, not those from other _
+              CSV parsers that I have imported to compare performance.
 38            If Left(FileName, 6) <> "modCSV" Then
 39                bExport = False
 40            End If
@@ -89,14 +88,14 @@ Sub SaveWorkbookAndExportModules()
 54            AuditData(i, 3) = CDate(AuditData(i, 3))
 55        Next
           
-56        ThrowIfError CSVWrite(ThisWorkbook.path & "\AuditSheetComments.csv", AuditData, True, "dd-mmm-yyyy", "hh:mm:ss")
+56        ThrowIfError CSVWrite(AuditData, ThisWorkbook.path & "\AuditSheetComments.csv", True, "dd-mmm-yyyy", "hh:mm:ss")
           
 57        PrepareForRelease
 58        ThisWorkbook.Save
           
 59        BackUpBookName = Environ("OneDriveConsumer") + "\Excel Sheets\VBA-CSV_Backups\" + Replace(ThisWorkbook.Name, ".", "_v" & shAudit.Range("B6") & ".")
           
-60        ThrowIfError Application.Run("sfilecopy", ThisWorkbook.FullName, BackUpBookName)
+60        FileCopy ThisWorkbook.FullName, BackUpBookName
 
 61        Exit Sub
 ErrHandler:
@@ -114,7 +113,7 @@ Sub PrepareForRelease()
 
     For Each ws In ThisWorkbook.Worksheets
         If ws.Visible = xlSheetVisible Then
-            Application.Goto ws.Cells(1, 1)
+            Application.GoTo ws.Cells(1, 1)
             ActiveWindow.DisplayGridlines = False
             ActiveWindow.DisplayHeadings = False
         End If
@@ -122,7 +121,7 @@ Sub PrepareForRelease()
     Next
     For i = 1 To ThisWorkbook.Worksheets.Count
         If ThisWorkbook.Worksheets(i).Visible Then
-            Application.Goto ThisWorkbook.Worksheets(i).Cells(1, 1)
+            Application.GoTo ThisWorkbook.Worksheets(i).Cells(1, 1)
             Exit For
         End If
     Next i

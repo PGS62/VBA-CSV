@@ -16,7 +16,7 @@ Option Explicit
 Sub RoundTripTest()
 
     Dim AllowLineFeed As Variant
-    Dim data As Variant
+    Dim Data As Variant
     Dim DateFormat As Variant
     Dim Delimiter As Variant
     Dim EOL As String
@@ -47,47 +47,47 @@ Sub RoundTripTest()
                         'For Variants we need to vary AllowLineFeed and DateFormat
                         For Each AllowLineFeed In Array(True, False)
                             For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
-                                data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode), EOL)
+                                Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode), EOL)
                                 NumTests = NumTests + 1
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
-                                RoundTripTestCore Folder, CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
+                                RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
                                     
                             Next DateFormat
                         Next AllowLineFeed
 
                         'For Dates, we need to vary DateFormat
                         For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
-                            data = RandomDates(CLng(NRows), CLng(NCols))
+                            Data = RandomDates(CLng(NRows), CLng(NCols))
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDates"
-                            RoundTripTestCore Folder, CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
                                 
                         Next DateFormat
 
                         'For Strings, we need to vary AllowLineFeed
                         For Each AllowLineFeed In Array(True, False)
-                            data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed), EOL)
+                            Data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed), EOL)
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & IIf(AllowLineFeed, "RandomStringsWithLineFeeds", "RandomStrings")
-                            RoundTripTestCore Folder, CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
                         Next AllowLineFeed
 
                         For k = 1 To 4
                             NumTests = NumTests + 1
                             If k = 1 Then
-                                data = RandomBooleans(CLng(NRows), CLng(NCols))
+                                Data = RandomBooleans(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomBooleans"
                             ElseIf k = 2 Then
-                                data = RandomDoubles(CLng(NRows), CLng(NCols))
+                                Data = RandomDoubles(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDoubles"
                             ElseIf k = 3 Then
-                                data = RandomErrorValues(CLng(NRows), CLng(NCols))
+                                Data = RandomErrorValues(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomErrorValues"
                             ElseIf k = 4 Then
-                                data = RandomLongs(CLng(NRows), CLng(NCols))
+                                Data = RandomLongs(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomLongs"
                             End If
-                            RoundTripTestCore Folder, CStr(OS), data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
                         Next k
                         'Print a heartbeat...
                         If NumTests Mod 10 = 0 Then Debug.Print NumTests
@@ -112,7 +112,7 @@ End Sub
 '              Empty and null string. Also method RandomDoubles only generates doubles that have exact representation as
 '              strings (avoid errors of order 10E-15).
 ' -----------------------------------------------------------------------------------------------------------------------
-Function RoundTripTestCore(Folder As String, OS As String, ByVal data As Variant, DateFormat As String, Unicode As Boolean, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String)
+Function RoundTripTestCore(Folder As String, OS As String, ByVal Data As Variant, DateFormat As String, Unicode As Boolean, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String)
 
           Dim DataReadBack
 
@@ -122,17 +122,17 @@ Function RoundTripTestCore(Folder As String, OS As String, ByVal data As Variant
           Dim NC As Long
 2         WhatDiffers = ""
 
-3         NR = sNRows(data)
-4         NC = sNCols(data)
+3         NR = sNRows(Data)
+4         NC = sNCols(Data)
 
 5         FileName = NameThatFile(Folder, OS, NR, NC, ExtraInfo, CBool(Unicode), False)
 
-6         ThrowIfError CSVWrite(FileName, data, True, DateFormat, , Delimiter, Unicode, EOL)
+6         ThrowIfError CSVWrite(Data, FileName, True, DateFormat, , Delimiter, Unicode, EOL)
 
           'The Call to CSVRead has to infer both Encoding and EOL
 7         DataReadBack = CSVRead(FileName, True, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
 
-8         If Not sArraysIdentical(data, DataReadBack, True, False, WhatDiffers) Then
+8         If Not sArraysIdentical(Data, DataReadBack, True, False, WhatDiffers) Then
 9             Debug.Print FileName
 10            Debug.Print WhatDiffers
 11        End If

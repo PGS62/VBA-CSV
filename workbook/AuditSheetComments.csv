@@ -1,4 +1,8 @@
 "Version","Date","Time","Author","Comment"
+41,21-Aug-2021,19:02:02,"Philip Swannell","Added arguments TrueStrings, FalseStrings and MissingStrings ."
+40,21-Aug-2021,11:55:36,"Philip Swannell","Added module modCVSSentinels, but not yet ""plugged in""."
+39,20-Aug-2021,12:34:24,"Philip Swannell","CSVRead now accepts FileName as URL or a CSV string."
+38,20-Aug-2021,09:00:40,"Philip Swannell","CSVWrite can now write to String."
 37,19-Aug-2021,19:24:31,"Philip Swannell","Now support UTf8 with BOM"
 36,19-Aug-2021,17:53:04,"Philip Swannell","Now support ""T"" as a ConvertTypes option."
 35,19-Aug-2021,12:27:39,"Philip Swannell","More work on tests"

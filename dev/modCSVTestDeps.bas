@@ -23,7 +23,8 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
           Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
           Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
           Optional ByVal NumCols As Long = 0, Optional ByVal ShowMissingsAs As Variant = "", _
-          Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString) As Boolean
+          Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
+          Optional NumRowsExpected As Long, Optional NumColsExpected As Long) As Boolean
 
           Dim Observed As Variant
 
@@ -35,43 +36,55 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
 4         Observed = CSVRead(FileName, ConvertTypes, Delimiter, IgnoreRepeated, DateFormat, Comment, SkipToRow, _
               SkipToCol, NumRows, NumCols, ShowMissingsAs, Encoding, DecimalSeparator)
 
-5         If VarType(Observed) = vbString Then
-6             If VarType(Expected) = vbString Then
-7                 If Observed = Expected Then
-8                     TestCSVRead = True
-9                     Exit Function
-10                Else
-11                    WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + _
-                          "' but expected a different error: '" + Expected + "'"
-12                    GoTo Failed
-13                End If
-14            Else
-15                WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + "'"
-16                GoTo Failed
-17            End If
-18        End If
+5         If NumRowsExpected <> 0 Or NumColsExpected <> 0 Then
+              'In this case we only check the size of the return
+6             If sNRows(Observed) <> NumRowsExpected Or sNCols(Observed) <> NumColsExpected Then
+7                 WhatDiffers = TestDescription + " FAILED, expected dimensions: " + CStr(NumRowsExpected) + _
+                ", " + CStr(NumColsExpected) + " observed dimensions: " + CStr(sNRows(Observed)) + ", " + CStr(sNCols(Observed))
+8                 GoTo Failed
+9             Else
+10                TestCSVRead = True
+11                Exit Function
+12            End If
+13        End If
 
-19        If NumDimensions(Observed) = 2 And NumDimensions(Expected) = 2 Then
-20            If sArraysIdentical(Observed, Expected, True, False, WhatDiffers) Then
-21                TestCSVRead = True
-22                Exit Function
+14        If VarType(Observed) = vbString Then
+15            If VarType(Expected) = vbString Then
+16                If Observed = Expected Then
+17                    TestCSVRead = True
+18                    Exit Function
+19                Else
+20                    WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + _
+                          "' but expected a different error: '" + Expected + "'"
+21                    GoTo Failed
+22                End If
 23            Else
-24                WhatDiffers = TestDescription + " FAILED, observed and expected differed: " + WhatDiffers
+24                WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + "'"
 25                GoTo Failed
 26            End If
-27        Else
-28            TestCSVRead = False
-29            WhatDiffers = TestDescription + " FAILED, observed has " + CStr(NumDimensions(Observed)) + _
+27        End If
+
+28        If NumDimensions(Observed) = 2 And NumDimensions(Expected) = 2 Then
+29            If sArraysIdentical(Observed, Expected, True, False, WhatDiffers) Then
+30                TestCSVRead = True
+31                Exit Function
+32            Else
+33                WhatDiffers = TestDescription + " FAILED, observed and expected differed: " + WhatDiffers
+34                GoTo Failed
+35            End If
+36        Else
+37            TestCSVRead = False
+38            WhatDiffers = TestDescription + " FAILED, observed has " + CStr(NumDimensions(Observed)) + _
                   " dimensions, expected has " + CStr(NumDimensions(Expected)) + " dimensions"
-30        End If
+39        End If
 
 Failed:
-31        Debug.Print WhatDiffers
-32        TestCSVRead = False
+40        Debug.Print WhatDiffers
+41        TestCSVRead = False
 
-33        Exit Function
+42        Exit Function
 ErrHandler:
-34        Throw "#TestCSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
+43        Throw "#TestCSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 
@@ -148,11 +161,12 @@ EarlyExit:
 ErrHandler:
     CreatePath = "#CreatePath: " & Err.Description & "!"
 End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : FolderExists
 ' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
 '---------------------------------------------------------------------------------------
-Function FolderExists(ByVal FolderPath As String)
+Private Function FolderExists(ByVal FolderPath As String)
     Dim F As Scripting.Folder
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler
@@ -163,7 +177,8 @@ Function FolderExists(ByVal FolderPath As String)
 ErrHandler:
     FolderExists = False
 End Function
-'
+
+
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : sElapsedTime
 ' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
@@ -745,5 +760,80 @@ ErrHandler:
 8         CopyOfErr = Err.Description
 9         Set FSO = Nothing: Set F = Nothing
 10        Throw "#" + CopyOfErr + "!"
+End Function
+
+'---------------------------------------------------------------------------------------------------------
+' Procedure : sStringBetweenStrings
+' Purpose   : The function returns the substring of the input TheString which lies between LeftString
+'             and RightString.
+' Arguments
+' TheString : The input string to be searched.
+' LeftString: The returned string will start immediately after the first occurrence of LeftString in
+'             TheString. If LeftString is not found or is the null string or missing, then
+'             the return will start at the first character of TheString.
+' RightString: The return will stop immediately before the first subsequent occurrence of RightString. If
+'             such occurrrence is not found or if RightString is the null string or
+'             missing, then the return will stop at the last character of TheString.
+' IncludeLeftString: If TRUE, then if LeftString appears in TheString, the return will include LeftString. This
+'             argument is optional and defaults to FALSE.
+' IncludeRightString: If TRUE, then if RightString appears in TheString (and appears after the first occurance
+'             of LeftString) then the return will include RightString. This argument is
+'             optional and defaults to FALSE.
+'---------------------------------------------------------------------------------------------------------
+Function StringBetweenStrings(TheString, LeftString, RightString, Optional IncludeLeftString As Boolean, Optional IncludeRightString As Boolean)
+          Dim MatchPoint1 As Long        ' the position of the first character to return
+          Dim MatchPoint2 As Long        ' the position of the last character to return
+          Dim FoundLeft As Boolean
+          Dim FoundRight As Boolean
+          
+1         On Error GoTo ErrHandler
+          
+2         If VarType(TheString) <> vbString Or VarType(LeftString) <> vbString Or VarType(RightString) <> vbString Then Throw "Inputs must be strings"
+3         If LeftString = vbNullString Then
+4             MatchPoint1 = 0
+5         Else
+6             MatchPoint1 = InStr(1, TheString, LeftString, vbTextCompare)
+7         End If
+
+8         If MatchPoint1 = 0 Then
+9             FoundLeft = False
+10            MatchPoint1 = 1
+11        Else
+12            FoundLeft = True
+13        End If
+
+14        If RightString = vbNullString Then
+15            MatchPoint2 = 0
+16        ElseIf FoundLeft Then
+17            MatchPoint2 = InStr(MatchPoint1 + Len(LeftString), TheString, RightString, vbTextCompare)
+18        Else
+19            MatchPoint2 = InStr(1, TheString, RightString, vbTextCompare)
+20        End If
+
+21        If MatchPoint2 = 0 Then
+22            FoundRight = False
+23            MatchPoint2 = Len(TheString)
+24        Else
+25            FoundRight = True
+26            MatchPoint2 = MatchPoint2 - 1
+27        End If
+
+28        If Not IncludeLeftString Then
+29            If FoundLeft Then
+30                MatchPoint1 = MatchPoint1 + Len(LeftString)
+31            End If
+32        End If
+
+33        If IncludeRightString Then
+34            If FoundRight Then
+35                MatchPoint2 = MatchPoint2 + Len(RightString)
+36            End If
+37        End If
+
+38        StringBetweenStrings = Mid$(TheString, MatchPoint1, MatchPoint2 - MatchPoint1 + 1)
+
+39        Exit Function
+ErrHandler:
+40        StringBetweenStrings = "#StringBetweenStrings (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
