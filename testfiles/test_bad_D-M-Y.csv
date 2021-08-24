@@ -1,0 +1,776 @@
+Problem,Bad D-M-Y string
+Month out-of-range,24-0-2021
+Month out-of-range,24-13-2021
+Day out of range,0-8-2021
+Day out of range,32-8-2021
+Hour out of range,24-8-2021 24:18:21
+Minute out of range,24-8-2021 11:60:21
+Seconds out of range,24-8-2021 11:18:60
+Bad character at position 1,x4-8-21
+Bad character at position 2,2x-8-21
+Bad character at position 3,24x8-21
+Bad character at position 4,24-x-21
+Bad character at position 5,24-8x21
+Bad character at position 6,24-8-x1
+Bad character at position 7,24-8-2x 
+Bad character at position 8,24-8-21x 
+Bad character at position 1,x4-8-2021
+Bad character at position 2,2x-8-2021
+Bad character at position 3,24x8-2021
+Bad character at position 4,24-x-2021
+Bad character at position 5,24-8x2021
+Bad character at position 6,24-8-x021
+Bad character at position 7,24-8-2x21
+Bad character at position 8,24-8-20x1
+Bad character at position 9,24-8-202x 
+Bad character at position 10,24-8-2021x 
+Bad character at position 1,x4-08-21
+Bad character at position 2,2x-08-21
+Bad character at position 3,24x08-21
+Bad character at position 4,24-x8-21
+Bad character at position 5,24-0x-21
+Bad character at position 6,24-08x21
+Bad character at position 7,24-08-x1
+Bad character at position 8,24-08-2x 
+Bad character at position 9,24-08-21x 
+Bad character at position 1,x4-08-2021
+Bad character at position 2,2x-08-2021
+Bad character at position 3,24x08-2021
+Bad character at position 4,24-x8-2021
+Bad character at position 5,24-0x-2021
+Bad character at position 6,24-08x2021
+Bad character at position 7,24-08-x021
+Bad character at position 8,24-08-2x21
+Bad character at position 9,24-08-20x1
+Bad character at position 10,24-08-202x 
+Bad character at position 11,24-08-2021x 
+Bad character at position 1,x4-Aug-21
+Bad character at position 2,2x-Aug-21
+Bad character at position 3,24xAug-21
+Bad character at position 4,24-xug-21
+Bad character at position 5,24-Axg-21
+Bad character at position 6,24-Aux-21
+Bad character at position 7,24-Augx21
+Bad character at position 8,24-Aug-x1
+Bad character at position 9,24-Aug-2x 
+Bad character at position 10,24-Aug-21x 
+Bad character at position 1,x4-Aug-2021
+Bad character at position 2,2x-Aug-2021
+Bad character at position 3,24xAug-2021
+Bad character at position 4,24-xug-2021
+Bad character at position 5,24-Axg-2021
+Bad character at position 6,24-Aux-2021
+Bad character at position 7,24-Augx2021
+Bad character at position 8,24-Aug-x021
+Bad character at position 9,24-Aug-2x21
+Bad character at position 10,24-Aug-20x1
+Bad character at position 11,24-Aug-202x 
+Bad character at position 12,24-Aug-2021x 
+Bad character at position 1,x4-August-21
+Bad character at position 2,2x-August-21
+Bad character at position 3,24xAugust-21
+Bad character at position 4,24-xugust-21
+Bad character at position 5,24-Axgust-21
+Bad character at position 6,24-Auxust-21
+Bad character at position 7,24-Augxst-21
+Bad character at position 8,24-Auguxt-21
+Bad character at position 9,24-Augusx-21
+Bad character at position 10,24-Augustx21
+Bad character at position 11,24-August-x1
+Bad character at position 12,24-August-2x 
+Bad character at position 13,24-August-21x 
+Bad character at position 1,x4-August-2021
+Bad character at position 2,2x-August-2021
+Bad character at position 3,24xAugust-2021
+Bad character at position 4,24-xugust-2021
+Bad character at position 5,24-Axgust-2021
+Bad character at position 6,24-Auxust-2021
+Bad character at position 7,24-Augxst-2021
+Bad character at position 8,24-Auguxt-2021
+Bad character at position 9,24-Augusx-2021
+Bad character at position 10,24-Augustx2021
+Bad character at position 11,24-August-x021
+Bad character at position 12,24-August-2x21
+Bad character at position 13,24-August-20x1
+Bad character at position 14,24-August-202x 
+Bad character at position 15,24-August-2021x 
+Bad character at position 1,x4-8-21
+Bad character at position 2,2x-8-21
+Bad character at position 3,24x8-21
+Bad character at position 4,24-x-21
+Bad character at position 5,24-8x21
+Bad character at position 6,24-8-x1
+Bad character at position 7,24-8-2x 
+Bad character at position 8,24-8-21x 
+Bad character at position 1,x4-8-2021
+Bad character at position 2,2x-8-2021
+Bad character at position 3,24x8-2021
+Bad character at position 4,24-x-2021
+Bad character at position 5,24-8x2021
+Bad character at position 6,24-8-x021
+Bad character at position 7,24-8-2x21
+Bad character at position 8,24-8-20x1
+Bad character at position 9,24-8-202x 
+Bad character at position 10,24-8-2021x 
+Bad character at position 1,x4-08-21
+Bad character at position 2,2x-08-21
+Bad character at position 3,24x08-21
+Bad character at position 4,24-x8-21
+Bad character at position 5,24-0x-21
+Bad character at position 6,24-08x21
+Bad character at position 7,24-08-x1
+Bad character at position 8,24-08-2x 
+Bad character at position 9,24-08-21x 
+Bad character at position 1,x4-08-2021
+Bad character at position 2,2x-08-2021
+Bad character at position 3,24x08-2021
+Bad character at position 4,24-x8-2021
+Bad character at position 5,24-0x-2021
+Bad character at position 6,24-08x2021
+Bad character at position 7,24-08-x021
+Bad character at position 8,24-08-2x21
+Bad character at position 9,24-08-20x1
+Bad character at position 10,24-08-202x 
+Bad character at position 11,24-08-2021x 
+Bad character at position 1,x4-Aug-21
+Bad character at position 2,2x-Aug-21
+Bad character at position 3,24xAug-21
+Bad character at position 4,24-xug-21
+Bad character at position 5,24-Axg-21
+Bad character at position 6,24-Aux-21
+Bad character at position 7,24-Augx21
+Bad character at position 8,24-Aug-x1
+Bad character at position 9,24-Aug-2x 
+Bad character at position 10,24-Aug-21x 
+Bad character at position 1,x4-Aug-2021
+Bad character at position 2,2x-Aug-2021
+Bad character at position 3,24xAug-2021
+Bad character at position 4,24-xug-2021
+Bad character at position 5,24-Axg-2021
+Bad character at position 6,24-Aux-2021
+Bad character at position 7,24-Augx2021
+Bad character at position 8,24-Aug-x021
+Bad character at position 9,24-Aug-2x21
+Bad character at position 10,24-Aug-20x1
+Bad character at position 11,24-Aug-202x 
+Bad character at position 12,24-Aug-2021x 
+Bad character at position 1,x4-August-21
+Bad character at position 2,2x-August-21
+Bad character at position 3,24xAugust-21
+Bad character at position 4,24-xugust-21
+Bad character at position 5,24-Axgust-21
+Bad character at position 6,24-Auxust-21
+Bad character at position 7,24-Augxst-21
+Bad character at position 8,24-Auguxt-21
+Bad character at position 9,24-Augusx-21
+Bad character at position 10,24-Augustx21
+Bad character at position 11,24-August-x1
+Bad character at position 12,24-August-2x 
+Bad character at position 13,24-August-21x 
+Bad character at position 1,x4-August-2021
+Bad character at position 2,2x-August-2021
+Bad character at position 3,24xAugust-2021
+Bad character at position 4,24-xugust-2021
+Bad character at position 5,24-Axgust-2021
+Bad character at position 6,24-Auxust-2021
+Bad character at position 7,24-Augxst-2021
+Bad character at position 8,24-Auguxt-2021
+Bad character at position 9,24-Augusx-2021
+Bad character at position 10,24-Augustx2021
+Bad character at position 11,24-August-x021
+Bad character at position 12,24-August-2x21
+Bad character at position 13,24-August-20x1
+Bad character at position 14,24-August-202x 
+Bad character at position 15,24-August-2021x 
+Bad character at position 1,x4-8-21 11:18
+Bad character at position 2,2x-8-21 11:18
+Bad character at position 3,24x8-21 11:18
+Bad character at position 4,24-x-21 11:18
+Bad character at position 5,24-8x21 11:18
+Bad character at position 6,24-8-x1 11:18
+Bad character at position 7,24-8-2x 11:18
+Bad character at position 8,24-8-21x11:18
+Bad character at position 9,24-8-21 x1:18
+Bad character at position 10,24-8-21 1x:18
+Bad character at position 11,24-8-21 11x18
+Bad character at position 12,24-8-21 11:x8
+Bad character at position 13,24-8-21 11:1x 
+Bad character at position 14,24-8-21 11:18x 
+Bad character at position 1,x4-8-2021 11:18
+Bad character at position 2,2x-8-2021 11:18
+Bad character at position 3,24x8-2021 11:18
+Bad character at position 4,24-x-2021 11:18
+Bad character at position 5,24-8x2021 11:18
+Bad character at position 6,24-8-x021 11:18
+Bad character at position 7,24-8-2x21 11:18
+Bad character at position 8,24-8-20x1 11:18
+Bad character at position 9,24-8-202x 11:18
+Bad character at position 10,24-8-2021x11:18
+Bad character at position 11,24-8-2021 x1:18
+Bad character at position 12,24-8-2021 1x:18
+Bad character at position 13,24-8-2021 11x18
+Bad character at position 14,24-8-2021 11:x8
+Bad character at position 15,24-8-2021 11:1x 
+Bad character at position 16,24-8-2021 11:18x 
+Bad character at position 1,x4-08-21 11:18
+Bad character at position 2,2x-08-21 11:18
+Bad character at position 3,24x08-21 11:18
+Bad character at position 4,24-x8-21 11:18
+Bad character at position 5,24-0x-21 11:18
+Bad character at position 6,24-08x21 11:18
+Bad character at position 7,24-08-x1 11:18
+Bad character at position 8,24-08-2x 11:18
+Bad character at position 9,24-08-21x11:18
+Bad character at position 10,24-08-21 x1:18
+Bad character at position 11,24-08-21 1x:18
+Bad character at position 12,24-08-21 11x18
+Bad character at position 13,24-08-21 11:x8
+Bad character at position 14,24-08-21 11:1x 
+Bad character at position 15,24-08-21 11:18x 
+Bad character at position 1,x4-08-2021 11:18
+Bad character at position 2,2x-08-2021 11:18
+Bad character at position 3,24x08-2021 11:18
+Bad character at position 4,24-x8-2021 11:18
+Bad character at position 5,24-0x-2021 11:18
+Bad character at position 6,24-08x2021 11:18
+Bad character at position 7,24-08-x021 11:18
+Bad character at position 8,24-08-2x21 11:18
+Bad character at position 9,24-08-20x1 11:18
+Bad character at position 10,24-08-202x 11:18
+Bad character at position 11,24-08-2021x11:18
+Bad character at position 12,24-08-2021 x1:18
+Bad character at position 13,24-08-2021 1x:18
+Bad character at position 14,24-08-2021 11x18
+Bad character at position 15,24-08-2021 11:x8
+Bad character at position 16,24-08-2021 11:1x 
+Bad character at position 17,24-08-2021 11:18x 
+Bad character at position 1,x4-Aug-21 11:18
+Bad character at position 2,2x-Aug-21 11:18
+Bad character at position 3,24xAug-21 11:18
+Bad character at position 4,24-xug-21 11:18
+Bad character at position 5,24-Axg-21 11:18
+Bad character at position 6,24-Aux-21 11:18
+Bad character at position 7,24-Augx21 11:18
+Bad character at position 8,24-Aug-x1 11:18
+Bad character at position 9,24-Aug-2x 11:18
+Bad character at position 10,24-Aug-21x11:18
+Bad character at position 11,24-Aug-21 x1:18
+Bad character at position 12,24-Aug-21 1x:18
+Bad character at position 13,24-Aug-21 11x18
+Bad character at position 14,24-Aug-21 11:x8
+Bad character at position 15,24-Aug-21 11:1x 
+Bad character at position 16,24-Aug-21 11:18x 
+Bad character at position 1,x4-Aug-2021 11:18
+Bad character at position 2,2x-Aug-2021 11:18
+Bad character at position 3,24xAug-2021 11:18
+Bad character at position 4,24-xug-2021 11:18
+Bad character at position 5,24-Axg-2021 11:18
+Bad character at position 6,24-Aux-2021 11:18
+Bad character at position 7,24-Augx2021 11:18
+Bad character at position 8,24-Aug-x021 11:18
+Bad character at position 9,24-Aug-2x21 11:18
+Bad character at position 10,24-Aug-20x1 11:18
+Bad character at position 11,24-Aug-202x 11:18
+Bad character at position 12,24-Aug-2021x11:18
+Bad character at position 13,24-Aug-2021 x1:18
+Bad character at position 14,24-Aug-2021 1x:18
+Bad character at position 15,24-Aug-2021 11x18
+Bad character at position 16,24-Aug-2021 11:x8
+Bad character at position 17,24-Aug-2021 11:1x 
+Bad character at position 18,24-Aug-2021 11:18x 
+Bad character at position 1,x4-August-21 11:18
+Bad character at position 2,2x-August-21 11:18
+Bad character at position 3,24xAugust-21 11:18
+Bad character at position 4,24-xugust-21 11:18
+Bad character at position 5,24-Axgust-21 11:18
+Bad character at position 6,24-Auxust-21 11:18
+Bad character at position 7,24-Augxst-21 11:18
+Bad character at position 8,24-Auguxt-21 11:18
+Bad character at position 9,24-Augusx-21 11:18
+Bad character at position 10,24-Augustx21 11:18
+Bad character at position 11,24-August-x1 11:18
+Bad character at position 12,24-August-2x 11:18
+Bad character at position 13,24-August-21x11:18
+Bad character at position 14,24-August-21 x1:18
+Bad character at position 15,24-August-21 1x:18
+Bad character at position 16,24-August-21 11x18
+Bad character at position 17,24-August-21 11:x8
+Bad character at position 18,24-August-21 11:1x 
+Bad character at position 19,24-August-21 11:18x 
+Bad character at position 1,x4-August-2021 11:18
+Bad character at position 2,2x-August-2021 11:18
+Bad character at position 3,24xAugust-2021 11:18
+Bad character at position 4,24-xugust-2021 11:18
+Bad character at position 5,24-Axgust-2021 11:18
+Bad character at position 6,24-Auxust-2021 11:18
+Bad character at position 7,24-Augxst-2021 11:18
+Bad character at position 8,24-Auguxt-2021 11:18
+Bad character at position 9,24-Augusx-2021 11:18
+Bad character at position 10,24-Augustx2021 11:18
+Bad character at position 11,24-August-x021 11:18
+Bad character at position 12,24-August-2x21 11:18
+Bad character at position 13,24-August-20x1 11:18
+Bad character at position 14,24-August-202x 11:18
+Bad character at position 15,24-August-2021x11:18
+Bad character at position 16,24-August-2021 x1:18
+Bad character at position 17,24-August-2021 1x:18
+Bad character at position 18,24-August-2021 11x18
+Bad character at position 19,24-August-2021 11:x8
+Bad character at position 20,24-August-2021 11:1x 
+Bad character at position 21,24-August-2021 11:18x 
+Bad character at position 1,x4-8-21 11:18
+Bad character at position 2,2x-8-21 11:18
+Bad character at position 3,24x8-21 11:18
+Bad character at position 4,24-x-21 11:18
+Bad character at position 5,24-8x21 11:18
+Bad character at position 6,24-8-x1 11:18
+Bad character at position 7,24-8-2x 11:18
+Bad character at position 8,24-8-21x11:18
+Bad character at position 9,24-8-21 x1:18
+Bad character at position 10,24-8-21 1x:18
+Bad character at position 11,24-8-21 11x18
+Bad character at position 12,24-8-21 11:x8
+Bad character at position 13,24-8-21 11:1x 
+Bad character at position 14,24-8-21 11:18x 
+Bad character at position 1,x4-8-2021 11:18
+Bad character at position 2,2x-8-2021 11:18
+Bad character at position 3,24x8-2021 11:18
+Bad character at position 4,24-x-2021 11:18
+Bad character at position 5,24-8x2021 11:18
+Bad character at position 6,24-8-x021 11:18
+Bad character at position 7,24-8-2x21 11:18
+Bad character at position 8,24-8-20x1 11:18
+Bad character at position 9,24-8-202x 11:18
+Bad character at position 10,24-8-2021x11:18
+Bad character at position 11,24-8-2021 x1:18
+Bad character at position 12,24-8-2021 1x:18
+Bad character at position 13,24-8-2021 11x18
+Bad character at position 14,24-8-2021 11:x8
+Bad character at position 15,24-8-2021 11:1x 
+Bad character at position 16,24-8-2021 11:18x 
+Bad character at position 1,x4-08-21 11:18
+Bad character at position 2,2x-08-21 11:18
+Bad character at position 3,24x08-21 11:18
+Bad character at position 4,24-x8-21 11:18
+Bad character at position 5,24-0x-21 11:18
+Bad character at position 6,24-08x21 11:18
+Bad character at position 7,24-08-x1 11:18
+Bad character at position 8,24-08-2x 11:18
+Bad character at position 9,24-08-21x11:18
+Bad character at position 10,24-08-21 x1:18
+Bad character at position 11,24-08-21 1x:18
+Bad character at position 12,24-08-21 11x18
+Bad character at position 13,24-08-21 11:x8
+Bad character at position 14,24-08-21 11:1x 
+Bad character at position 15,24-08-21 11:18x 
+Bad character at position 1,x4-08-2021 11:18
+Bad character at position 2,2x-08-2021 11:18
+Bad character at position 3,24x08-2021 11:18
+Bad character at position 4,24-x8-2021 11:18
+Bad character at position 5,24-0x-2021 11:18
+Bad character at position 6,24-08x2021 11:18
+Bad character at position 7,24-08-x021 11:18
+Bad character at position 8,24-08-2x21 11:18
+Bad character at position 9,24-08-20x1 11:18
+Bad character at position 10,24-08-202x 11:18
+Bad character at position 11,24-08-2021x11:18
+Bad character at position 12,24-08-2021 x1:18
+Bad character at position 13,24-08-2021 1x:18
+Bad character at position 14,24-08-2021 11x18
+Bad character at position 15,24-08-2021 11:x8
+Bad character at position 16,24-08-2021 11:1x 
+Bad character at position 17,24-08-2021 11:18x 
+Bad character at position 1,x4-Aug-21 11:18
+Bad character at position 2,2x-Aug-21 11:18
+Bad character at position 3,24xAug-21 11:18
+Bad character at position 4,24-xug-21 11:18
+Bad character at position 5,24-Axg-21 11:18
+Bad character at position 6,24-Aux-21 11:18
+Bad character at position 7,24-Augx21 11:18
+Bad character at position 8,24-Aug-x1 11:18
+Bad character at position 9,24-Aug-2x 11:18
+Bad character at position 10,24-Aug-21x11:18
+Bad character at position 11,24-Aug-21 x1:18
+Bad character at position 12,24-Aug-21 1x:18
+Bad character at position 13,24-Aug-21 11x18
+Bad character at position 14,24-Aug-21 11:x8
+Bad character at position 15,24-Aug-21 11:1x 
+Bad character at position 16,24-Aug-21 11:18x 
+Bad character at position 1,x4-Aug-2021 11:18
+Bad character at position 2,2x-Aug-2021 11:18
+Bad character at position 3,24xAug-2021 11:18
+Bad character at position 4,24-xug-2021 11:18
+Bad character at position 5,24-Axg-2021 11:18
+Bad character at position 6,24-Aux-2021 11:18
+Bad character at position 7,24-Augx2021 11:18
+Bad character at position 8,24-Aug-x021 11:18
+Bad character at position 9,24-Aug-2x21 11:18
+Bad character at position 10,24-Aug-20x1 11:18
+Bad character at position 11,24-Aug-202x 11:18
+Bad character at position 12,24-Aug-2021x11:18
+Bad character at position 13,24-Aug-2021 x1:18
+Bad character at position 14,24-Aug-2021 1x:18
+Bad character at position 15,24-Aug-2021 11x18
+Bad character at position 16,24-Aug-2021 11:x8
+Bad character at position 17,24-Aug-2021 11:1x 
+Bad character at position 18,24-Aug-2021 11:18x 
+Bad character at position 1,x4-August-21 11:18
+Bad character at position 2,2x-August-21 11:18
+Bad character at position 3,24xAugust-21 11:18
+Bad character at position 4,24-xugust-21 11:18
+Bad character at position 5,24-Axgust-21 11:18
+Bad character at position 6,24-Auxust-21 11:18
+Bad character at position 7,24-Augxst-21 11:18
+Bad character at position 8,24-Auguxt-21 11:18
+Bad character at position 9,24-Augusx-21 11:18
+Bad character at position 10,24-Augustx21 11:18
+Bad character at position 11,24-August-x1 11:18
+Bad character at position 12,24-August-2x 11:18
+Bad character at position 13,24-August-21x11:18
+Bad character at position 14,24-August-21 x1:18
+Bad character at position 15,24-August-21 1x:18
+Bad character at position 16,24-August-21 11x18
+Bad character at position 17,24-August-21 11:x8
+Bad character at position 18,24-August-21 11:1x 
+Bad character at position 19,24-August-21 11:18x 
+Bad character at position 1,x4-August-2021 11:18
+Bad character at position 2,2x-August-2021 11:18
+Bad character at position 3,24xAugust-2021 11:18
+Bad character at position 4,24-xugust-2021 11:18
+Bad character at position 5,24-Axgust-2021 11:18
+Bad character at position 6,24-Auxust-2021 11:18
+Bad character at position 7,24-Augxst-2021 11:18
+Bad character at position 8,24-Auguxt-2021 11:18
+Bad character at position 9,24-Augusx-2021 11:18
+Bad character at position 10,24-Augustx2021 11:18
+Bad character at position 11,24-August-x021 11:18
+Bad character at position 12,24-August-2x21 11:18
+Bad character at position 13,24-August-20x1 11:18
+Bad character at position 14,24-August-202x 11:18
+Bad character at position 15,24-August-2021x11:18
+Bad character at position 16,24-August-2021 x1:18
+Bad character at position 17,24-August-2021 1x:18
+Bad character at position 18,24-August-2021 11x18
+Bad character at position 19,24-August-2021 11:x8
+Bad character at position 20,24-August-2021 11:1x 
+Bad character at position 21,24-August-2021 11:18x 
+Bad character at position 1,x4-8-21 11:18:21
+Bad character at position 2,2x-8-21 11:18:21
+Bad character at position 3,24x8-21 11:18:21
+Bad character at position 4,24-x-21 11:18:21
+Bad character at position 5,24-8x21 11:18:21
+Bad character at position 6,24-8-x1 11:18:21
+Bad character at position 7,24-8-2x 11:18:21
+Bad character at position 8,24-8-21x11:18:21
+Bad character at position 9,24-8-21 x1:18:21
+Bad character at position 10,24-8-21 1x:18:21
+Bad character at position 11,24-8-21 11x18:21
+Bad character at position 12,24-8-21 11:x8:21
+Bad character at position 13,24-8-21 11:1x:21
+Bad character at position 14,24-8-21 11:18x21
+Bad character at position 15,24-8-21 11:18:x1
+Bad character at position 16,24-8-21 11:18:2x 
+Bad character at position 17,24-8-21 11:18:21x 
+Bad character at position 1,x4-8-2021 11:18:21
+Bad character at position 2,2x-8-2021 11:18:21
+Bad character at position 3,24x8-2021 11:18:21
+Bad character at position 4,24-x-2021 11:18:21
+Bad character at position 5,24-8x2021 11:18:21
+Bad character at position 6,24-8-x021 11:18:21
+Bad character at position 7,24-8-2x21 11:18:21
+Bad character at position 8,24-8-20x1 11:18:21
+Bad character at position 9,24-8-202x 11:18:21
+Bad character at position 10,24-8-2021x11:18:21
+Bad character at position 11,24-8-2021 x1:18:21
+Bad character at position 12,24-8-2021 1x:18:21
+Bad character at position 13,24-8-2021 11x18:21
+Bad character at position 14,24-8-2021 11:x8:21
+Bad character at position 15,24-8-2021 11:1x:21
+Bad character at position 16,24-8-2021 11:18x21
+Bad character at position 17,24-8-2021 11:18:x1
+Bad character at position 18,24-8-2021 11:18:2x 
+Bad character at position 19,24-8-2021 11:18:21x 
+Bad character at position 1,x4-08-21 11:18:21
+Bad character at position 2,2x-08-21 11:18:21
+Bad character at position 3,24x08-21 11:18:21
+Bad character at position 4,24-x8-21 11:18:21
+Bad character at position 5,24-0x-21 11:18:21
+Bad character at position 6,24-08x21 11:18:21
+Bad character at position 7,24-08-x1 11:18:21
+Bad character at position 8,24-08-2x 11:18:21
+Bad character at position 9,24-08-21x11:18:21
+Bad character at position 10,24-08-21 x1:18:21
+Bad character at position 11,24-08-21 1x:18:21
+Bad character at position 12,24-08-21 11x18:21
+Bad character at position 13,24-08-21 11:x8:21
+Bad character at position 14,24-08-21 11:1x:21
+Bad character at position 15,24-08-21 11:18x21
+Bad character at position 16,24-08-21 11:18:x1
+Bad character at position 17,24-08-21 11:18:2x 
+Bad character at position 18,24-08-21 11:18:21x 
+Bad character at position 1,x4-08-2021 11:18:21
+Bad character at position 2,2x-08-2021 11:18:21
+Bad character at position 3,24x08-2021 11:18:21
+Bad character at position 4,24-x8-2021 11:18:21
+Bad character at position 5,24-0x-2021 11:18:21
+Bad character at position 6,24-08x2021 11:18:21
+Bad character at position 7,24-08-x021 11:18:21
+Bad character at position 8,24-08-2x21 11:18:21
+Bad character at position 9,24-08-20x1 11:18:21
+Bad character at position 10,24-08-202x 11:18:21
+Bad character at position 11,24-08-2021x11:18:21
+Bad character at position 12,24-08-2021 x1:18:21
+Bad character at position 13,24-08-2021 1x:18:21
+Bad character at position 14,24-08-2021 11x18:21
+Bad character at position 15,24-08-2021 11:x8:21
+Bad character at position 16,24-08-2021 11:1x:21
+Bad character at position 17,24-08-2021 11:18x21
+Bad character at position 18,24-08-2021 11:18:x1
+Bad character at position 19,24-08-2021 11:18:2x 
+Bad character at position 20,24-08-2021 11:18:21x 
+Bad character at position 1,x4-Aug-21 11:18:21
+Bad character at position 2,2x-Aug-21 11:18:21
+Bad character at position 3,24xAug-21 11:18:21
+Bad character at position 4,24-xug-21 11:18:21
+Bad character at position 5,24-Axg-21 11:18:21
+Bad character at position 6,24-Aux-21 11:18:21
+Bad character at position 7,24-Augx21 11:18:21
+Bad character at position 8,24-Aug-x1 11:18:21
+Bad character at position 9,24-Aug-2x 11:18:21
+Bad character at position 10,24-Aug-21x11:18:21
+Bad character at position 11,24-Aug-21 x1:18:21
+Bad character at position 12,24-Aug-21 1x:18:21
+Bad character at position 13,24-Aug-21 11x18:21
+Bad character at position 14,24-Aug-21 11:x8:21
+Bad character at position 15,24-Aug-21 11:1x:21
+Bad character at position 16,24-Aug-21 11:18x21
+Bad character at position 17,24-Aug-21 11:18:x1
+Bad character at position 18,24-Aug-21 11:18:2x 
+Bad character at position 19,24-Aug-21 11:18:21x 
+Bad character at position 1,x4-Aug-2021 11:18:21
+Bad character at position 2,2x-Aug-2021 11:18:21
+Bad character at position 3,24xAug-2021 11:18:21
+Bad character at position 4,24-xug-2021 11:18:21
+Bad character at position 5,24-Axg-2021 11:18:21
+Bad character at position 6,24-Aux-2021 11:18:21
+Bad character at position 7,24-Augx2021 11:18:21
+Bad character at position 8,24-Aug-x021 11:18:21
+Bad character at position 9,24-Aug-2x21 11:18:21
+Bad character at position 10,24-Aug-20x1 11:18:21
+Bad character at position 11,24-Aug-202x 11:18:21
+Bad character at position 12,24-Aug-2021x11:18:21
+Bad character at position 13,24-Aug-2021 x1:18:21
+Bad character at position 14,24-Aug-2021 1x:18:21
+Bad character at position 15,24-Aug-2021 11x18:21
+Bad character at position 16,24-Aug-2021 11:x8:21
+Bad character at position 17,24-Aug-2021 11:1x:21
+Bad character at position 18,24-Aug-2021 11:18x21
+Bad character at position 19,24-Aug-2021 11:18:x1
+Bad character at position 20,24-Aug-2021 11:18:2x 
+Bad character at position 21,24-Aug-2021 11:18:21x 
+Bad character at position 1,x4-August-21 11:18:21
+Bad character at position 2,2x-August-21 11:18:21
+Bad character at position 3,24xAugust-21 11:18:21
+Bad character at position 4,24-xugust-21 11:18:21
+Bad character at position 5,24-Axgust-21 11:18:21
+Bad character at position 6,24-Auxust-21 11:18:21
+Bad character at position 7,24-Augxst-21 11:18:21
+Bad character at position 8,24-Auguxt-21 11:18:21
+Bad character at position 9,24-Augusx-21 11:18:21
+Bad character at position 10,24-Augustx21 11:18:21
+Bad character at position 11,24-August-x1 11:18:21
+Bad character at position 12,24-August-2x 11:18:21
+Bad character at position 13,24-August-21x11:18:21
+Bad character at position 14,24-August-21 x1:18:21
+Bad character at position 15,24-August-21 1x:18:21
+Bad character at position 16,24-August-21 11x18:21
+Bad character at position 17,24-August-21 11:x8:21
+Bad character at position 18,24-August-21 11:1x:21
+Bad character at position 19,24-August-21 11:18x21
+Bad character at position 20,24-August-21 11:18:x1
+Bad character at position 21,24-August-21 11:18:2x 
+Bad character at position 22,24-August-21 11:18:21x 
+Bad character at position 1,x4-August-2021 11:18:21
+Bad character at position 2,2x-August-2021 11:18:21
+Bad character at position 3,24xAugust-2021 11:18:21
+Bad character at position 4,24-xugust-2021 11:18:21
+Bad character at position 5,24-Axgust-2021 11:18:21
+Bad character at position 6,24-Auxust-2021 11:18:21
+Bad character at position 7,24-Augxst-2021 11:18:21
+Bad character at position 8,24-Auguxt-2021 11:18:21
+Bad character at position 9,24-Augusx-2021 11:18:21
+Bad character at position 10,24-Augustx2021 11:18:21
+Bad character at position 11,24-August-x021 11:18:21
+Bad character at position 12,24-August-2x21 11:18:21
+Bad character at position 13,24-August-20x1 11:18:21
+Bad character at position 14,24-August-202x 11:18:21
+Bad character at position 15,24-August-2021x11:18:21
+Bad character at position 16,24-August-2021 x1:18:21
+Bad character at position 17,24-August-2021 1x:18:21
+Bad character at position 18,24-August-2021 11x18:21
+Bad character at position 19,24-August-2021 11:x8:21
+Bad character at position 20,24-August-2021 11:1x:21
+Bad character at position 21,24-August-2021 11:18x21
+Bad character at position 22,24-August-2021 11:18:x1
+Bad character at position 23,24-August-2021 11:18:2x 
+Bad character at position 24,24-August-2021 11:18:21x 
+Bad character at position 1,x4-8-21 11:18:21
+Bad character at position 2,2x-8-21 11:18:21
+Bad character at position 3,24x8-21 11:18:21
+Bad character at position 4,24-x-21 11:18:21
+Bad character at position 5,24-8x21 11:18:21
+Bad character at position 6,24-8-x1 11:18:21
+Bad character at position 7,24-8-2x 11:18:21
+Bad character at position 8,24-8-21x11:18:21
+Bad character at position 9,24-8-21 x1:18:21
+Bad character at position 10,24-8-21 1x:18:21
+Bad character at position 11,24-8-21 11x18:21
+Bad character at position 12,24-8-21 11:x8:21
+Bad character at position 13,24-8-21 11:1x:21
+Bad character at position 14,24-8-21 11:18x21
+Bad character at position 15,24-8-21 11:18:x1
+Bad character at position 16,24-8-21 11:18:2x 
+Bad character at position 17,24-8-21 11:18:21x 
+Bad character at position 1,x4-8-2021 11:18:21
+Bad character at position 2,2x-8-2021 11:18:21
+Bad character at position 3,24x8-2021 11:18:21
+Bad character at position 4,24-x-2021 11:18:21
+Bad character at position 5,24-8x2021 11:18:21
+Bad character at position 6,24-8-x021 11:18:21
+Bad character at position 7,24-8-2x21 11:18:21
+Bad character at position 8,24-8-20x1 11:18:21
+Bad character at position 9,24-8-202x 11:18:21
+Bad character at position 10,24-8-2021x11:18:21
+Bad character at position 11,24-8-2021 x1:18:21
+Bad character at position 12,24-8-2021 1x:18:21
+Bad character at position 13,24-8-2021 11x18:21
+Bad character at position 14,24-8-2021 11:x8:21
+Bad character at position 15,24-8-2021 11:1x:21
+Bad character at position 16,24-8-2021 11:18x21
+Bad character at position 17,24-8-2021 11:18:x1
+Bad character at position 18,24-8-2021 11:18:2x 
+Bad character at position 19,24-8-2021 11:18:21x 
+Bad character at position 1,x4-08-21 11:18:21
+Bad character at position 2,2x-08-21 11:18:21
+Bad character at position 3,24x08-21 11:18:21
+Bad character at position 4,24-x8-21 11:18:21
+Bad character at position 5,24-0x-21 11:18:21
+Bad character at position 6,24-08x21 11:18:21
+Bad character at position 7,24-08-x1 11:18:21
+Bad character at position 8,24-08-2x 11:18:21
+Bad character at position 9,24-08-21x11:18:21
+Bad character at position 10,24-08-21 x1:18:21
+Bad character at position 11,24-08-21 1x:18:21
+Bad character at position 12,24-08-21 11x18:21
+Bad character at position 13,24-08-21 11:x8:21
+Bad character at position 14,24-08-21 11:1x:21
+Bad character at position 15,24-08-21 11:18x21
+Bad character at position 16,24-08-21 11:18:x1
+Bad character at position 17,24-08-21 11:18:2x 
+Bad character at position 18,24-08-21 11:18:21x 
+Bad character at position 1,x4-08-2021 11:18:21
+Bad character at position 2,2x-08-2021 11:18:21
+Bad character at position 3,24x08-2021 11:18:21
+Bad character at position 4,24-x8-2021 11:18:21
+Bad character at position 5,24-0x-2021 11:18:21
+Bad character at position 6,24-08x2021 11:18:21
+Bad character at position 7,24-08-x021 11:18:21
+Bad character at position 8,24-08-2x21 11:18:21
+Bad character at position 9,24-08-20x1 11:18:21
+Bad character at position 10,24-08-202x 11:18:21
+Bad character at position 11,24-08-2021x11:18:21
+Bad character at position 12,24-08-2021 x1:18:21
+Bad character at position 13,24-08-2021 1x:18:21
+Bad character at position 14,24-08-2021 11x18:21
+Bad character at position 15,24-08-2021 11:x8:21
+Bad character at position 16,24-08-2021 11:1x:21
+Bad character at position 17,24-08-2021 11:18x21
+Bad character at position 18,24-08-2021 11:18:x1
+Bad character at position 19,24-08-2021 11:18:2x 
+Bad character at position 20,24-08-2021 11:18:21x 
+Bad character at position 1,x4-Aug-21 11:18:21
+Bad character at position 2,2x-Aug-21 11:18:21
+Bad character at position 3,24xAug-21 11:18:21
+Bad character at position 4,24-xug-21 11:18:21
+Bad character at position 5,24-Axg-21 11:18:21
+Bad character at position 6,24-Aux-21 11:18:21
+Bad character at position 7,24-Augx21 11:18:21
+Bad character at position 8,24-Aug-x1 11:18:21
+Bad character at position 9,24-Aug-2x 11:18:21
+Bad character at position 10,24-Aug-21x11:18:21
+Bad character at position 11,24-Aug-21 x1:18:21
+Bad character at position 12,24-Aug-21 1x:18:21
+Bad character at position 13,24-Aug-21 11x18:21
+Bad character at position 14,24-Aug-21 11:x8:21
+Bad character at position 15,24-Aug-21 11:1x:21
+Bad character at position 16,24-Aug-21 11:18x21
+Bad character at position 17,24-Aug-21 11:18:x1
+Bad character at position 18,24-Aug-21 11:18:2x 
+Bad character at position 19,24-Aug-21 11:18:21x 
+Bad character at position 1,x4-Aug-2021 11:18:21
+Bad character at position 2,2x-Aug-2021 11:18:21
+Bad character at position 3,24xAug-2021 11:18:21
+Bad character at position 4,24-xug-2021 11:18:21
+Bad character at position 5,24-Axg-2021 11:18:21
+Bad character at position 6,24-Aux-2021 11:18:21
+Bad character at position 7,24-Augx2021 11:18:21
+Bad character at position 8,24-Aug-x021 11:18:21
+Bad character at position 9,24-Aug-2x21 11:18:21
+Bad character at position 10,24-Aug-20x1 11:18:21
+Bad character at position 11,24-Aug-202x 11:18:21
+Bad character at position 12,24-Aug-2021x11:18:21
+Bad character at position 13,24-Aug-2021 x1:18:21
+Bad character at position 14,24-Aug-2021 1x:18:21
+Bad character at position 15,24-Aug-2021 11x18:21
+Bad character at position 16,24-Aug-2021 11:x8:21
+Bad character at position 17,24-Aug-2021 11:1x:21
+Bad character at position 18,24-Aug-2021 11:18x21
+Bad character at position 19,24-Aug-2021 11:18:x1
+Bad character at position 20,24-Aug-2021 11:18:2x 
+Bad character at position 21,24-Aug-2021 11:18:21x 
+Bad character at position 1,x4-August-21 11:18:21
+Bad character at position 2,2x-August-21 11:18:21
+Bad character at position 3,24xAugust-21 11:18:21
+Bad character at position 4,24-xugust-21 11:18:21
+Bad character at position 5,24-Axgust-21 11:18:21
+Bad character at position 6,24-Auxust-21 11:18:21
+Bad character at position 7,24-Augxst-21 11:18:21
+Bad character at position 8,24-Auguxt-21 11:18:21
+Bad character at position 9,24-Augusx-21 11:18:21
+Bad character at position 10,24-Augustx21 11:18:21
+Bad character at position 11,24-August-x1 11:18:21
+Bad character at position 12,24-August-2x 11:18:21
+Bad character at position 13,24-August-21x11:18:21
+Bad character at position 14,24-August-21 x1:18:21
+Bad character at position 15,24-August-21 1x:18:21
+Bad character at position 16,24-August-21 11x18:21
+Bad character at position 17,24-August-21 11:x8:21
+Bad character at position 18,24-August-21 11:1x:21
+Bad character at position 19,24-August-21 11:18x21
+Bad character at position 20,24-August-21 11:18:x1
+Bad character at position 21,24-August-21 11:18:2x 
+Bad character at position 22,24-August-21 11:18:21x 
+Bad character at position 1,x4-August-2021 11:18:21
+Bad character at position 2,2x-August-2021 11:18:21
+Bad character at position 3,24xAugust-2021 11:18:21
+Bad character at position 4,24-xugust-2021 11:18:21
+Bad character at position 5,24-Axgust-2021 11:18:21
+Bad character at position 6,24-Auxust-2021 11:18:21
+Bad character at position 7,24-Augxst-2021 11:18:21
+Bad character at position 8,24-Auguxt-2021 11:18:21
+Bad character at position 9,24-Augusx-2021 11:18:21
+Bad character at position 10,24-Augustx2021 11:18:21
+Bad character at position 11,24-August-x021 11:18:21
+Bad character at position 12,24-August-2x21 11:18:21
+Bad character at position 13,24-August-20x1 11:18:21
+Bad character at position 14,24-August-202x 11:18:21
+Bad character at position 15,24-August-2021x11:18:21
+Bad character at position 16,24-August-2021 x1:18:21
+Bad character at position 17,24-August-2021 1x:18:21
+Bad character at position 18,24-August-2021 11x18:21
+Bad character at position 19,24-August-2021 11:x8:21
+Bad character at position 20,24-August-2021 11:1x:21
+Bad character at position 21,24-August-2021 11:18x21
+Bad character at position 22,24-August-2021 11:18:x1
+Bad character at position 23,24-August-2021 11:18:2x 
+Bad character at position 24,24-August-2021 11:18:21x 

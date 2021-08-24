@@ -1,6 +1,10 @@
 Attribute VB_Name = "modCSVTest"
 Option Explicit
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : RunTestsFromButton
+' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
+' -----------------------------------------------------------------------------------------------------------------------
 Sub RunTestsFromButton()
           Dim NumPassed As Long
           Dim NumFailed As Long
@@ -169,15 +173,17 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", ShowMissingsAs:=Empty)
             Case 19
-                'TODO update this test when we have support for Sentinels to represent null?
                 TestDescription = "test tab null string.txt"
                 FileName = "test_tab_null_string.txt"
                 Expected = HStack( _
                     Array("A", 1#, 2#), _
-                    Array("B", 2000#, "NULL"), _
+                    Array("B", 2000#, Empty), _
                     Array("C", "x", "y"), _
                     Array("D", 100#, 200#))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    MissingStrings:="NULL", _
+                    ShowMissingsAs:=Empty)
             Case 20
                 TestDescription = "test crlf line endings"
                 FileName = "test_crlf_line_endings.csv"
@@ -245,13 +251,16 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, Empty, 8#), Array("col3", 3#, 6#, 9#))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
             Case 31
-                'This is different to the Julia result, because we don't recognise T or F as indicating Booleans, could use Sentinels?
                 TestDescription = "test truestrings"
                 FileName = "test_truestrings.csv"
                 Expected = HStack( _
                     Array("int", 1#, 2#, 3#, 4#, 5#, 6#), _
-                    Array("bools", "T", True, True, "F", False, False))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+                    Array("bools", True, True, True, False, False, False))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    TrueStrings:=HStack("T", "TRUE", "true"), _
+                    FalseStrings:=HStack("F", "FALSE", "false"), _
+                    ShowMissingsAs:=Empty)
             Case 32
                 TestDescription = "test floats"
                 FileName = "test_floats.csv"
@@ -268,14 +277,13 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
             Case 35
-                'TODO update this test if I implement sentinels
                 TestDescription = "test missing value NULL"
                 FileName = "test_missing_value_NULL.csv"
-                Expected = HStack( _
-                    Array("col1", 1#, 4#, 7#), _
-                    Array("col2", 2#, "NULL", 8#), _
-                    Array("col3", 3#, 6#, 9#))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+                Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, Empty, 8#), Array("col3", 3#, 6#, 9#))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    MissingStrings:="NULL", _
+                    ShowMissingsAs:=Empty)
             Case 36
                 'Note we must pass "Q" option to treat quoted numbers as numbers
                 TestDescription = "test quoted numbers"
@@ -311,15 +319,18 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("col5", 4#, 8#, 12#))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
             Case 40
-                'TODO change this test once we support sentinels, or perhaps "missingstring" (different from showmissingas)
                 TestDescription = "issue 198 part2"
                 FileName = "issue_198_part2.csv"
                 Expected = HStack( _
                     Array("A", "a", "b", "c", "d"), _
-                    Array("B", -0.367, "++", "++", -0.364), _
-                    Array("C", -0.371, "++", "++", -0.371), _
-                    Array(Empty, Empty, "++", "++", Empty))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, DecimalSeparator:=",")
+                    Array("B", -0.367, Empty, Empty, -0.364), _
+                    Array("C", -0.371, Empty, Empty, -0.371), _
+                    Array(Empty, Empty, Empty, Empty, Empty))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    MissingStrings:="++", _
+                    ShowMissingsAs:=Empty, _
+                    DecimalSeparator:=",")
             Case 41
                 'Not sure how julia handles this, could not find in https://github.com/JuliaData/CSV.jl/blob/main/test/testfiles.jl
                 TestDescription = "test mixed date formats"
@@ -328,14 +339,16 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("col1", "01/01/2015", "01/02/2015", "01/03/2015", CDate("2015-Jan-02"), CDate("2015-Jan-03")))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
             Case 42
-                'TODO, change this test once we support missingstrings\sentinels - tests ability to have more than one missingstring
                 TestDescription = "test multiple missing"
                 FileName = "test_multiple_missing.csv"
                 Expected = HStack( _
-                    Array("col1", 1#, 4#, 7#, CDate("1900-Jan-06")), _
-                    Array("col2", 2#, "NULL", "NA", "\N"), _
+                    Array("col1", 1#, 4#, 7#, 7#), _
+                    Array("col2", 2#, Empty, Empty, Empty), _
                     Array("col3", 3#, 6#, 9#, 9#))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    MissingStrings:=HStack("NULL", "NA", "\N"), _
+                    ShowMissingsAs:=Empty)
             Case 43
                 TestDescription = "test string delimiters"
                 FileName = "test_string_delimiters.csv"
@@ -412,6 +425,7 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("missing", Empty))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
                     ConvertTypes:=True, _
+                    DateFormat:="ISO", _
                     ShowMissingsAs:=Empty)
             Case 52
                 TestDescription = "test 508"
@@ -422,20 +436,23 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
             Case 53
             
-            
             Case 54
-                'TODO amend this for missingstring
                 TestDescription = "issue 198"
                 FileName = "issue_198.csv"
                 Expected = HStack( _
-                    Array(Empty, "18/04/2018", "17/04/2018", "16/04/2018", "15/04/2018", "14/04/2018", "13/04/2018"), _
-                    Array("Taux de l'Eonia (moyenne mensuelle)", -0.368, -0.368, -0.367, "-", "-", -0.364), _
-                    Array("EURIBOR à 1 mois", -0.371, -0.371, -0.371, "-", "-", -0.371), _
-                    Array("EURIBOR à 12 mois", -0.189, -0.189, -0.189, "-", "-", -0.19), _
-                    Array("EURIBOR à 3 mois", -0.328, -0.328, -0.329, "-", "-", -0.329), _
-                    Array("EURIBOR à 6 mois", -0.271, -0.27, -0.27, "-", "-", -0.271), _
-                    Array("EURIBOR à 9 mois", -0.219, -0.219, -0.219, "-", "-", -0.219))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, DecimalSeparator:=",")
+                    Array(Empty, CDate("2018-Apr-18"), CDate("2018-Apr-17"), CDate("2018-Apr-16"), CDate("2018-Apr-15"), CDate("2018-Apr-14"), CDate("2018-Apr-13")), _
+                    Array("Taux de l'Eonia (moyenne mensuelle)", -0.368, -0.368, -0.367, Empty, Empty, -0.364), _
+                    Array("EURIBOR à 1 mois", -0.371, -0.371, -0.371, Empty, Empty, -0.371), _
+                    Array("EURIBOR à 12 mois", -0.189, -0.189, -0.189, Empty, Empty, -0.19), _
+                    Array("EURIBOR à 3 mois", -0.328, -0.328, -0.329, Empty, Empty, -0.329), _
+                    Array("EURIBOR à 6 mois", -0.271, -0.27, -0.27, Empty, Empty, -0.271), _
+                    Array("EURIBOR à 9 mois", -0.219, -0.219, -0.219, Empty, Empty, -0.219))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="D/M/Y", _
+                    MissingStrings:="-", _
+                    ShowMissingsAs:=Empty, _
+                    DecimalSeparator:=",")
             Case 55
                 TestDescription = "error comment.txt"
                 FileName = "error_comment.txt"
@@ -459,13 +476,13 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Array("COOR_Z", 0#, 0#, 0#), _
                     Array("TEMP", 0.0931399, 0.311013, 0.424537))
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
-
             Case 57
                 TestDescription = "precompile small"
                 FileName = "precompile_small.csv"
                 Expected = Expected57()
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
                     ConvertTypes:=True, _
+                    DateFormat:="ISO", _
                     ShowMissingsAs:=Empty)
             Case 58
                 TestDescription = "stocks"
@@ -496,7 +513,7 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 Expected = Expected61()
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
             Case 62
-                'We cannot fix this unless we allow trimming of fields
+                'Tests trimming fields
                 TestDescription = "census.txt"
                 FileName = "census.txt"
                 Expected = Expected62()
@@ -731,7 +748,7 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     ConvertTypes:=True, _
                     NumRows:=1, _
                     ShowMissingsAs:=Empty)
-            Case 93
+            Case 93001 'SLOW SO switch off when doing frequent tests
                 TestDescription = "pandas zeros"
                 FileName = "pandas_zeros.csv"
                 Expected = Empty
@@ -753,7 +770,6 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     NumRows:=3, _
                     ShowMissingsAs:=Empty)
             Case 95
-            
                 'UTF-8 BOM, and streamed
                 TestDescription = "fecal samples"
                 FileName = "fecal_samples.csv"
@@ -789,12 +805,278 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     Delimiter:=",", _
                     DateFormat:="Y-M-D", _
                     ShowMissingsAs:=Empty)
+            Case 99
+                TestDescription = "attenu"
+                FileName = "attenu.csv"
+                Expected = HStack( _
+                    Array("Event", 1#, 2#, 2#, 2#, 2#, 2#, 2#, 2#, 2#), _
+                    Array("Mag", 7#, 7.4, 7.4, 7.4, 7.4, 7.4, 7.4, 7.4, 7.4), _
+                    Array("Station", "117", "1083", "1095", "283", "135", "475", "113", "1008", "1028"), _
+                    Array("Dist", 12#, 148#, 42#, 85#, 107#, 109#, 156#, 224#, 293#), _
+                    Array("Accel", 0.359, 0.014, 0.196, 0.135, 0.062, 0.054, 0.014, 0.018, 0.01))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="N", _
+                    NumRows:=10, _
+                    ShowMissingsAs:=Empty)
+            Case 100
+                'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
+                 to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
+                TestDescription = "test good ISO8601"
+                FileName = "test_good_ISO8601.csv"
+                Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
+                Dim k As Long
+                For k = 1 To sNRows(Expected)
+                    Expected(k, 1) = CDate(Expected(k, 1))
+                Next k
 
-
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    Delimiter:=",", _
+                    DateFormat:="ISO", _
+                    SkipToRow:=2, _
+                    NumCols:=1, _
+                    ShowMissingsAs:=Empty, _
+                    AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
                     
+            Case 101
+                'Test that parsing strings that almost but not correct ISO8601 does not convert to dates
+                TestDescription = "test bad ISO8601"
+                FileName = "test_bad_ISO8601.csv"
+                Expected = CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
 
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    Delimiter:=",", _
+                    DateFormat:="ISO", _
+                    SkipToRow:=2, _
+                    SkipToCol:=2, _
+                    ShowMissingsAs:=Empty)
+            Case 102
+                'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
+                 to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
+                TestDescription = "test good Y-M-D"
+                FileName = "test_good_Y-M-D.csv"
+                Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
+                For k = 1 To sNRows(Expected)
+                    Expected(k, 1) = CDate(Expected(k, 1))
+                Next k
+
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    Delimiter:=",", _
+                    DateFormat:="Y-M-D", _
+                    SkipToRow:=2, _
+                    NumCols:=1, _
+                    ShowMissingsAs:=Empty, _
+                    AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
+                    
+            Case 103
+                'Test that parsing strings that almost but not correct Y-M-D does not convert to dates
+                TestDescription = "test bad Y-M-D"
+                FileName = "test_bad_Y-M-D.csv"
+                Expected = CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
+
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    Delimiter:=",", _
+                    DateFormat:="Y-M-D", _
+                    SkipToRow:=2, _
+                    SkipToCol:=2, _
+                    ShowMissingsAs:=Empty)
+            Case 104
+                'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
+                 to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
+                TestDescription = "test good D-M-Y"
+                FileName = "test_good_D-M-Y.csv"
+                Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
+                For k = 1 To sNRows(Expected)
+                    Expected(k, 1) = CDate(Expected(k, 1))
+                Next k
+
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    Delimiter:=",", _
+                    DateFormat:="D-M-Y", _
+                    SkipToRow:=2, _
+                    NumCols:=1, _
+                    ShowMissingsAs:=Empty, _
+                    AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
+                    
+            Case 105
+                'Test that parsing strings that almost but not correct D-M-Y does not convert to dates
+                TestDescription = "test bad D-M-Y"
+                FileName = "test_bad_D-M-Y.csv"
+                Expected = CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
+
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    Delimiter:=",", _
+                    DateFormat:="D-M-Y", _
+                    SkipToRow:=2, _
+                    SkipToCol:=2, _
+                    ShowMissingsAs:=Empty)
+            Case 106
+                'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
+                 to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
+                TestDescription = "test good M-D-Y"
+                FileName = "test_good_M-D-Y.csv"
+                Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
+                For k = 1 To sNRows(Expected)
+                    Expected(k, 1) = CDate(Expected(k, 1))
+                Next k
+
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    Delimiter:=",", _
+                    DateFormat:="M-D-Y", _
+                    SkipToRow:=2, _
+                    NumCols:=1, _
+                    ShowMissingsAs:=Empty, _
+                    AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
+                    
+            Case 107
+                'Test that parsing strings that almost but not correct M-D-Y does not convert to dates
+                TestDescription = "test bad M-D-Y"
+                FileName = "test_bad_M-D-Y.csv"
+                Expected = CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
+
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    Delimiter:=",", _
+                    DateFormat:="M-D-Y", _
+                    SkipToRow:=2, _
+                    SkipToCol:=2, _
+                    ShowMissingsAs:=Empty)
+            Case 108
+                TestDescription = "ampm"
+                FileName = "ampm.csv"
+                Expected = Expected108()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="M/D/Y", _
+                    ShowMissingsAs:=Empty)
+            Case 109
+                TestDescription = "time"
+                FileName = "time.csv"
+                Expected = HStack(Array("time", CDate("00:00:00"), CDate("00:10:00")), Array("value", 1#, 2#))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty)
+            Case 111
+                TestDescription = "dash as null"
+                FileName = "dash_as_null.csv"
+                Expected = HStack(Array("x", 1#, Empty), Array("y", 2#, 4#))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    MissingStrings:="-", _
+                    ShowMissingsAs:=Empty)
+            Case 112
+                'Different from Julia equivalent in that elements of first column have different type whereas Julia parses col 1 to be all strings
+                TestDescription = "test null only column"
+                FileName = "test_null_only_column.csv"
+                Expected = HStack(Array("col1", 123#, "abc", "123abc"), Array("col2", Empty, Empty, Empty))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    MissingStrings:="NA", _
+                    ShowMissingsAs:=Empty)
+            Case 113
+                TestDescription = "test one row of data"
+                FileName = "test_one_row_of_data.csv"
+                Expected = HStack(1#, 2#, 3#)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty)
+            Case 114
+                TestDescription = "plus as null"
+                FileName = "plus_as_null.csv"
+                Expected = HStack(Array("x", 1#, Empty), Array("y", CDate("1900-Jan-01"), CDate("1900-Jan-03")))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    MissingStrings:="+", _
+                    ShowMissingsAs:=Empty)
+            Case 115
+                TestDescription = "categorical"
+                FileName = "categorical.csv"
+                Expected = HStack(Array("cat", "a", "a", "a", "b", "b", "b", "b", "b", "b", "b", "c", "c", "c", "c", "a"))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty)
+            Case 116
+                TestDescription = "test file issue 154"
+                FileName = "test_file_issue_154.csv"
+                Expected = HStack( _
+                    Array("a", 0#, 12#), _
+                    Array(" b", 1#, 5#), _
+                    Array(" ", " ", " "), _
+                    Array(Empty, " comment ", Empty))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty)
+            Case 117
+                TestDescription = "test int sentinel"
+                FileName = "test_int_sentinel.csv"
+                Expected = Expected117()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="ISO", _
+                    NumRows:=20, _
+                    ShowMissingsAs:=Empty)
+            Case 118
+                TestDescription = "escape row starts"
+                FileName = "escape_row_starts.csv"
+                Expected = HStack( _
+                    Array("5111", "escaped row with " + vbLf + " newlines " + vbLf + "  " + vbLf + "  " + vbLf + "  in it", "5113"), _
+                    Array("5112", "5113", "5114"))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    SkipToRow:=5112, _
+                    NumRows:=3, _
+                    ShowMissingsAs:=Empty)
+            Case 119
+                TestDescription = "Sacramentorealestatetransactions"
+                FileName = "Sacramentorealestatetransactions.csv"
+                Expected = Empty
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty, _
+                    NumRowsExpected:=986, _
+                    NumColsExpected:=12)
+            Case 120
+                TestDescription = "log001 vehicle status flags 0.txt"
+                FileName = "log001_vehicle_status_flags_0.txt"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty, _
+                    NumRowsExpected:=282, _
+                    NumColsExpected:=31)
+            Case 121
+                TestDescription = "SalesJan2009"
+                FileName = "SalesJan2009.csv"
+                Expected = Expected121()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="M/D/Y", _
+                    NumRows:=20, _
+                    ShowMissingsAs:=Empty)
+            Case 122
+                TestDescription = "GSM2230757 human1 umifm counts"
+                FileName = "GSM2230757_human1_umifm_counts.csv"
+                Expected = Empty
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty, _
+                    NumRowsExpected:=4, _
+                    NumColsExpected:=20128)
+            Case 123
+                TestDescription = "SacramentocrimeJanuary2006"
+                FileName = "SacramentocrimeJanuary2006.csv"
+                Expected = Expected123()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="M/D/Y", _
+                    SkipToRow:=7580, _
+                    ShowMissingsAs:=Empty)
+                    
         End Select
-        Debug.Print i, TestRes
         
         If Not IsEmpty(TestRes) Then
             If TestRes Then
@@ -803,14 +1085,10 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 NumFailed = NumFailed + 1
                 ReDim Preserve Failures(1 To NumFailed)
                 Failures(NumFailed) = WhatDiffers
-                
             End If
         End If
 
     Next i
-
-    Debug.Print "NUM PASSED = " & NumPassed
-    Debug.Print "NUM FAILED = " & NumFailed
 
     Exit Sub
 ErrHandler:
@@ -982,20 +1260,75 @@ Function Expected96_97_98()
     Expected96_97_98 = HStack( _
         Array(CDate("2021-Sep-01 16:23:13"), CDate("2022-Oct-09 04:16:13"), CDate("2022-Dec-27 13:56:15"), CDate("2022-May-07 08:56:31"), CDate("2024-Jan-14 05:29:48"), _
         CDate("2023-Jan-16 08:12:25"), CDate("2023-Dec-10 13:35:13"), CDate("2023-Jan-11 20:59:27"), CDate("2021-Oct-28 07:31:59"), CDate("2023-Jul-21 00:02:45"), CDate("2021-Dec-16 19:15:38")))
-
 End Function
 
+Function Expected108()
+                Expected108 = HStack( _
+                    Array("ID", 4473#, 3513#), _
+                    Array("INTERLOCK_NUMBER", Empty, "REDACTED"), _
+                    Array("INTERLOCK_DESCRIPTION", "This is a test interlock", "<p>REDACTED:<br><br>REDACTED</p><p><br></p>"), _
+                    Array("TYPE", Empty, Empty), _
+                    Array("CREATE_DATE", CDate("2012-Feb-09"), CDate("1998-Jul-22 16:37:01")), _
+                    Array("MODIFY_DATE", CDate("2018-Nov-02"), CDate("2019-Jun-20")), _
+                    Array("USERNAME", "REDACTED   ", "REDACTED       "), _
+                    Array("UNIT", "U         ", "A         "), _
+                    Array("AREA", "U         ", "RM        "), _
+                    Array("PURPOSE", "This is a test interlock", " REDACTED"), _
+                    Array("PID", Empty, Empty), _
+                    Array("LOCATION", Empty, Empty), _
+                    Array("FUNC_DATE", CDate("1900-Jan-01"), CDate("1900-Jan-01")), _
+                    Array("FUNC_BY", Empty, Empty), _
+                    Array("TECHNICAL_DESCRIPTION", "This is a test interlock", "<p>REDACTED<br><br>REDACTED<br>REDACTED</p>"), _
+                    Array("types", "O", "SC"))
+End Function
 
+Function Expected117()
+    Expected117 = HStack( _
+        Array("id", 1#, 2#, 3#, 4#, 5#, 6#, 7#, 8#, 9#, 10#, 11#, 12#, 13#, 14#, 15#, 16#, 17#, 18#, 19#), _
+        Array("firstname", "Lawrence", "Benjamin", "Wayne", "Sean", "Charles", "Linda", "Steve", "Jacqueline", "Tammy", "Nicholas", "Irene", "Gary", "David", "Jennifer", "Gary", "Theresa", "Carl", "Judy", "Jane"), _
+        Array("lastname", "Powell", "Chavez", "Burke", "Richards", "Long", "Rose", "Gardner", "Roberts", "Reynolds", "Ramos", "King", "Banks", "Knight", "Collins", "Vasquez", "Mason", "Williams", "Howard", "Harris"), _
+        Array("salary", 87216.81, 57043.38, 46134.09, 45046.21, 30555.6, 88894.06, 32414.46, 54839.54, 62300.64, 57661.69, 55565.61, 57620.06, 49729.65, 86834#, 47974.45, 67476.24, 71048.06, 53110.54, 52664.59), _
+        Array("hourlyrate", 26.47, 39.44, 33.8, 15.64, 17.67, 34.6, 36.39, 26.27, 37.67, 21.37, 13.88, 15.68, 10.39, 10.18, 24.52, 41.47, 29.67, 42.1, 16.48), _
+        Array("hiredate", 37355#, 40731#, 42419#, 36854#, 37261#, 39583#, 38797#, Empty, 36686#, 37519#, 38821#, Empty, 37489#, 39239#, 40336#, 36794#, 39764#, 42123#, 38319#), _
+        Array("lastclockin", CDate("2002-Jan-17 21:32:00"), CDate("2000-Sep-25 06:36:00"), CDate("2002-Sep-13 08:28:00"), CDate("2011-Jul-10 11:24:00"), CDate("2003-Feb-11 11:43:00"), CDate("2016-Jan-21 06:32:00"), CDate("2004-Jan-12 12:36:00"), Empty, CDate("2006-Dec-30 09:48:00"), CDate("2016-Apr-07 14:07:00"), CDate("2015-Mar-19 15:01:00"), Empty, CDate("2005-Jun-29 11:14:00"), CDate("2001-Sep-17 11:47:00"), CDate("2014-Aug-30 02:41:00"), CDate("2015-Nov-07 01:23:00"), CDate("2009-Sep-06 20:21:00"), CDate("2011-May-14 14:38:00"), CDate("2000-Oct-17 14:18:00")))
+End Function
+
+Function Expected121()
+    Expected121 = HStack( _
+        Array("Transaction_date", CDate("2009-Jan-02 06:17:00"), CDate("2009-Jan-02 04:53:00"), CDate("2009-Jan-02 13:08:00"), CDate("2009-Jan-03 14:44:00"), CDate("2009-Jan-04 12:56:00"), CDate("2009-Jan-04 13:19:00"), CDate("2009-Jan-04 20:11:00"), CDate("2009-Jan-02 20:09:00"), CDate("2009-Jan-04 13:17:00"), CDate("2009-Jan-04 14:11:00"), CDate("2009-Jan-05 02:42:00"), CDate("2009-Jan-05 05:39:00"), CDate("2009-Jan-02 09:16:00"), CDate("2009-Jan-05 10:08:00"), CDate("2009-Jan-02 14:18:00"), CDate("2009-Jan-04 01:05:00"), CDate("2009-Jan-05 11:37:00"), CDate("2009-Jan-06 05:02:00"), CDate("2009-Jan-06 07:45:00")), _
+        Array("Product", "Product1", "Product1", "Product1", "Product1", "Product2", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product1", "Product2"), _
+        Array("Price", 1200#, 1200#, 1200#, 1200#, 3600#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 1200#, 3600#), _
+        Array("Payment_Type", "Mastercard", "Visa", "Mastercard", "Visa", "Visa", "Visa", "Mastercard", "Mastercard", "Mastercard", "Visa", "Diners", "Amex", "Mastercard", "Visa", "Visa", "Diners", "Visa", "Diners", "Visa"), _
+        Array("Name", "carolina", "Betina", "Federica e Andrea", "Gouya", "Gerd W ", "LAURENCE", "Fleur", "adam", "Renee Elisabeth", "Aidan", "Stacy", "Heidi", "Sean ", "Georgia", "Richard", "Leanne", "Janet", "barbara", "Sabine"), _
+        Array("City", "Basildon", "Parkville                   ", "Astoria                     ", "Echuca", "Cahaba Heights              ", "Mickleton                   ", "Peoria                      ", "Martin                      ", "Tel Aviv", "Chatou", "New York                    ", "Eindhoven", "Shavano Park                ", "Eagle                       ", "Riverside                   ", "Julianstown", "Ottawa", "Hyderabad", "London"), _
+        Array("State", "England", "MO", "OR", "Victoria", "AL", "NJ", "IL", "TN", "Tel Aviv", "Ile-de-France", "NY", "Noord-Brabant", "TX", "ID", "NJ", "Meath", "Ontario", "Andhra Pradesh", "England"), _
+        Array("Country", "United Kingdom", "United States", "United States", "Australia", "United States", "United States", "United States", "United States", "Israel", "France", "United States", "Netherlands", "United States", "United States", "United States", "Ireland", "Canada", "India", "United Kingdom"), _
+        Array("Account_Created", CDate("2009-Jan-02 06:00:00"), CDate("2009-Jan-02 04:42:00"), CDate("2009-Jan-01 16:21:00"), CDate("2005-Sep-25 21:13:00"), CDate("2008-Nov-15 15:47:00"), CDate("2008-Sep-24 15:19:00"), CDate("2009-Jan-03 09:38:00"), CDate("2009-Jan-02 17:43:00"), CDate("2009-Jan-04 13:03:00"), CDate("2008-Jun-03 04:22:00"), CDate("2009-Jan-05 02:23:00"), CDate("2009-Jan-05 04:55:00"), CDate("2009-Jan-02 08:32:00"), CDate("2008-Nov-11 15:53:00"), CDate("2008-Dec-09 12:07:00"), CDate("2009-Jan-04"), CDate("2009-Jan-05 09:35:00"), CDate("2009-Jan-06 02:41:00"), CDate("2009-Jan-06 07:00:00")), _
+        Array("Last_Login", CDate("2009-Jan-02 06:08:00"), CDate("2009-Jan-02 07:49:00"), CDate("2009-Jan-03 12:32:00"), CDate("2009-Jan-03 14:22:00"), CDate("2009-Jan-04 12:45:00"), CDate("2009-Jan-04 13:04:00"), CDate("2009-Jan-04 19:45:00"), CDate("2009-Jan-04 20:01:00"), CDate("2009-Jan-04 22:10:00"), CDate("2009-Jan-05 01:17:00"), CDate("2009-Jan-05 04:59:00"), CDate("2009-Jan-05 08:15:00"), CDate("2009-Jan-05 09:05:00"), CDate("2009-Jan-05 10:05:00"), CDate("2009-Jan-05 11:01:00"), CDate("2009-Jan-05 13:36:00"), CDate("2009-Jan-05 19:24:00"), CDate("2009-Jan-06 07:52:00"), CDate("2009-Jan-06 09:17:00")), _
+        Array("Latitude", 51.5, 39.195, 46.18806, -36.1333333, 33.52056, 39.79, 40.69361, 36.34333, 32.0666667, 48.8833333, 40.71417, 51.45, 29.42389, 43.69556, 40.03222, 53.6772222, 45.4166667, 17.3833333, 51.52721), _
+        Array("Longitude", -1.1166667, -94.68194, -123.83, 144.75, -86.8025, -75.23806, -89.58889, -88.85028, 34.7666667, 2.15, -74.00639, 5.4666667, -98.49333, -116.35306, -74.95778, -6.3191667, -75.7, 78.4666667, 0.14559))
+End Function
+
+Function Expected123()
+    Expected123 = HStack( _
+        Array(CDate("2006-Jan-31 23:31:00"), CDate("2006-Jan-31 23:36:00"), CDate("2006-Jan-31 23:40:00"), CDate("2006-Jan-31 23:41:00"), CDate("2006-Jan-31 23:45:00"), CDate("2006-Jan-31 23:50:00")), _
+        Array("39TH ST / STOCKTON BLVD", "26TH ST / G ST", "4011 FREEPORT BLVD", "30TH ST / K ST", "5303 FRANKLIN BLVD", "COBBLE COVE LN / COBBLE SHORES DR"), _
+        Array(6#, 3#, 4#, 3#, 4#, 4#), _
+        Array("6B        ", "3B        ", "4A        ", "3C        ", "4B        ", "4C        "), _
+        Array(1005#, 728#, 957#, 841#, 969#, 1294#), _
+        Array("CASUALTY REPORT", "594(B)(2)(A) VANDALISM/ -$400", "459 PC  BURGLARY BUSINESS", "TRAFFIC-ACCIDENT INJURY", "3056 PAROLE VIO - I RPT", "TRAFFIC-ACCIDENT-NON INJURY"), _
+        Array(7000#, 2999#, 2203#, 5400#, 7000#, 5400#), _
+        Array(38.5566387, 38.57783198, 38.53759051, 38.57203045, 38.52718667, 38.47962803), _
+        Array(-121.4597445, -121.4704595, -121.4925914, -121.4670118, -121.4712477, -121.5286345))
+End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ArrayToVBALitteral
-' Author     : Philip Swannell
-' Date       : 19-Aug-2021
 ' Purpose    : Metaprogramming. Given an array of arbitrary data (strings, doubles, booleans, empties, errors) returns a
 '              snippet of VBA code that would generate that data and assign it to a variable AssignTo. The generated code
 '              assumes functions HStack and VStack are available.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function ArrayToVBALitteral(TheData As Variant, AssignTo As String, Optional LengthLimit As Long = 5000)
+Function ArrayToVBALitteral(TheData As Variant, Optional AssignTo As String, Optional LengthLimit As Long = 5000)
           Dim NR As Long, NC As Long, i As Long, j As Long
           Dim res As String
 
@@ -1006,39 +1339,43 @@ Function ArrayToVBALitteral(TheData As Variant, AssignTo As String, Optional Len
 
 5         Force2DArray TheData, NR, NC
 
-6         res = AssignTo & " = HStack( _" + vbLf
+6         If AssignTo <> "" Then
+7             res = AssignTo & " = "
+8         End If
 
-7         For j = 1 To NC
-8             If NR > 1 Then
-9                 res = res + "Array("
-10            End If
-11            For i = 1 To NR
-12                res = res + ElementToVBALitteral(TheData(i, j))
-                'Avoid attempting to build massive string in a manner which will be slow
-13                If Len(res) > LengthLimit Then Throw "Length limit (" + CStr(LengthLimit) + ") reached"
-14                If i < NR Then
-15                    res = res + ","
-16                End If
-17            Next i
-18            If NR > 1 Then
-19                res = res + ")"
-20            End If
-21            If j < NC Then
-22                res = res + ", _" + vbLf
+9         res = res + "HStack( _" + vbLf
+
+10        For j = 1 To NC
+11            If NR > 1 Then
+12                res = res + "Array("
+13            End If
+14            For i = 1 To NR
+15                res = res + ElementToVBALitteral(TheData(i, j))
+                  'Avoid attempting to build massive string in a manner which will be slow
+16                If Len(res) > LengthLimit Then Throw "Length limit (" + CStr(LengthLimit) + ") reached"
+17                If i < NR Then
+18                    res = res + ","
+19                End If
+20            Next i
+21            If NR > 1 Then
+22                res = res + ")"
 23            End If
-24        Next j
-25        res = res + ")"
+24            If j < NC Then
+25                res = res + ", _" + vbLf
+26            End If
+27        Next j
+28        res = res + ")"
 
-26        If Len(res) < 100 Then
-27            ArrayToVBALitteral = Replace(res, " _" & vbLf, "")
-28        Else
-29            ArrayToVBALitteral = Transpose(VBA.Split(res, vbLf))
-30        End If
+29        If Len(res) < 100 Then
+30            ArrayToVBALitteral = Replace(res, " _" & vbLf, "")
+31        Else
+32            ArrayToVBALitteral = Transpose(VBA.Split(res, vbLf))
+33        End If
 
 
-31        Exit Function
+34        Exit Function
 ErrHandler:
-32        ArrayToVBALitteral = "#ArrayToVBALitteral (line " & CStr(Erl) + "): " & Err.Description & "!"
+35        ArrayToVBALitteral = "#ArrayToVBALitteral (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 Function IsWideString(TheStr As String) As Boolean
@@ -1122,57 +1459,82 @@ ErrHandler:
 End Function
 
 Function GenerateTestCode(ConvertTypes As Variant, Delimiter As String, IgnoreRepeated As Boolean, DateFormat As String, _
-          Comment As String, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, Encoding As Variant, DecimalSeparator As String)
+    Comment As String, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, TrueStrings As String, FalseStrings As String, MissingStrings As String, Encoding As Variant, DecimalSeparator As String)
 
-          Dim res As String
-          Const IndentBy = 4
+    Dim res As String
+    Const IndentBy = 4
 
-1         On Error GoTo ErrHandler
-2         res = "TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers"
+    On Error GoTo ErrHandler
+    res = "TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers"
 
-3         If ConvertTypes <> False Then
-4             res = res + ", _" + vbLf + String(IndentBy, " ") + "ConvertTypes := " & ElementToVBALitteral(ConvertTypes)
-5         End If
+    If ConvertTypes <> False Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "ConvertTypes := " & ElementToVBALitteral(ConvertTypes)
+    End If
 
-6         If Delimiter <> "" Then
-7             res = res + ", _" + vbLf + String(IndentBy, " ") + "Delimiter := " & ElementToVBALitteral(Delimiter)
-8         End If
-9         If IgnoreRepeated = True Then
-10            res = res + ", _" + vbLf + String(IndentBy, " ") + "IgnoreRepeated := True"
-11        End If
-12        If DateFormat <> "" Then
-13                res = res + ", _" + vbLf + String(IndentBy, " ") + "DateFormat := " & ElementToVBALitteral(DateFormat)
-14        End If
-15        If Comment <> "" Then
-16            res = res + ", _" + vbLf + String(IndentBy, " ") + "Comment := " & ElementToVBALitteral(Comment)
-17        End If
-18        If SkipToRow <> 1 And SkipToRow <> 0 Then
-19            res = res + ", _" + vbLf + String(IndentBy, " ") + "SkipToRow := " & CStr(SkipToRow)
-20        End If
-21        If SkipToCol <> 1 And SkipToCol <> 0 Then
-22            res = res + ", _" + vbLf + String(IndentBy, " ") + "SkipToCol := " & CStr(SkipToCol)
-23        End If
-24        If NumRows <> 0 Then
-25            res = res + ", _" + vbLf + String(IndentBy, " ") + "NumRows := " & CStr(NumRows)
-26        End If
-27        If NumCols <> 0 Then
-28            res = res + ", _" + vbLf + String(IndentBy, " ") + "NumCols := " & CStr(NumCols)
-29        End If
-31            res = res + ", _" + vbLf + String(IndentBy, " ") + "ShowMissingsAs := Empty"
-33        If Encoding <> "" And Not IsEmpty(Encoding) Then
-34            res = res + ", _" + vbLf + String(IndentBy, " ") + "Encoding := " & ElementToVBALitteral(Encoding)
-35        End If
-36        If DecimalSeparator <> "." And DecimalSeparator <> "" Then
-37            res = res + ", _" + vbLf + String(IndentBy, " ") + "DecimalSeparator := " & ElementToVBALitteral(DecimalSeparator)
-38        End If
+    If Delimiter <> "" Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "Delimiter := " & ElementToVBALitteral(Delimiter)
+    End If
+    If IgnoreRepeated = True Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "IgnoreRepeated := True"
+    End If
+    If DateFormat <> "" Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "DateFormat := " & ElementToVBALitteral(DateFormat)
+    End If
+    If Comment <> "" Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "Comment := " & ElementToVBALitteral(Comment)
+    End If
+    If SkipToRow <> 1 And SkipToRow <> 0 Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "SkipToRow := " & CStr(SkipToRow)
+    End If
+    If SkipToCol <> 1 And SkipToCol <> 0 Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "SkipToCol := " & CStr(SkipToCol)
+    End If
+    If NumRows <> 0 Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "NumRows := " & CStr(NumRows)
+    End If
+    If NumCols <> 0 Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "NumCols := " & CStr(NumCols)
+    End If
+    If TrueStrings <> "" Then
+        If InStr(TrueStrings, ",") = 0 Then
+            res = res + ", _" + vbLf + String(IndentBy, " ") + "TrueStrings := " & ElementToVBALitteral(TrueStrings)
+        Else
+            res = res + ", _" + vbLf + String(IndentBy, " ") + "TrueStrings := " & ArrayToVBALitteral(VBA.Split(TrueStrings, ","))
+        End If
+    End If
+    If FalseStrings <> "" Then
+        If InStr(FalseStrings, ",") = 0 Then
+            res = res + ", _" + vbLf + String(IndentBy, " ") + "FalseStrings := " & ElementToVBALitteral(FalseStrings)
+        Else
+            res = res + ", _" + vbLf + String(IndentBy, " ") + "FalseStrings := " & ArrayToVBALitteral(VBA.Split(FalseStrings, ","))
+        End If
+    End If
+    If MissingStrings <> "" Then
+        If InStr(MissingStrings, ",") = 0 Then
+            res = res + ", _" + vbLf + String(IndentBy, " ") + "MissingStrings := " & ElementToVBALitteral(MissingStrings)
+        Else
+            res = res + ", _" + vbLf + String(IndentBy, " ") + "MissingStrings := " & ArrayToVBALitteral(VBA.Split(MissingStrings, ","))
+        End If
+    End If
+    
+    
+    
+    
+    res = res + ", _" + vbLf + String(IndentBy, " ") + "ShowMissingsAs := Empty"
+    If Encoding <> "" And Not IsEmpty(Encoding) Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "Encoding := " & ElementToVBALitteral(Encoding)
+    End If
+    If DecimalSeparator <> "." And DecimalSeparator <> "" Then
+        res = res + ", _" + vbLf + String(IndentBy, " ") + "DecimalSeparator := " & ElementToVBALitteral(DecimalSeparator)
+    End If
 
-39        res = res + ")"
+    res = res + ")"
 
-40        GenerateTestCode = Transpose(Split(res, vbLf))
+    GenerateTestCode = Transpose(Split(res, vbLf))
 
-41        Exit Function
+    Exit Function
 ErrHandler:
-42        GenerateTestCode = "#GenerateTestCode (line " & CStr(Erl) + "): " & Err.Description & "!"
+    GenerateTestCode = "#GenerateTestCode (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 '---------------------------------------------------------------------------------------

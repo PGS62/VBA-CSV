@@ -156,13 +156,13 @@ End Sub
 '             https://tools.ietf.org/html/rfc4180#section-2
 '---------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-    Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
-    Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
-    Optional ByVal NumCols As Long = 0, Optional TrueStrings As Variant, _
-    Optional FalseStrings As Variant, Optional MissingStrings As Variant, _
-    Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString)
+        Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
+        Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
+        Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
+        Optional ByVal NumCols As Long = 0, Optional TrueStrings As Variant, _
+        Optional FalseStrings As Variant, Optional MissingStrings As Variant, _
+        Optional ByVal ShowMissingsAs As Variant, _
+        Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString)
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
@@ -179,6 +179,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Const Err_Comment = "Comment must not contain double-quote, line feed or carriage return"
     Const Err_UTF8BOM = "Argument Encoding specifies that the file is UTF 8 encoded with Byte Option Mark, but the file has some other encoding"
     
+    Dim ISO8601 As Boolean
     Dim AnyConversion As Boolean
     Dim AnySentinels As Boolean
     Dim ColIndexes() As Long
@@ -192,7 +193,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Dim j As Long
     Dim k As Long
     Dim Lengths() As Long
-    Dim m As Long
+    Dim M As Long
     Dim MaxSentinelLength As Long
     Dim NeedToFill As Boolean
     Dim NotDelimited As Boolean
@@ -236,7 +237,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
         SourceType = st_File
     End If
 
-      'Parse and validate inputs...
+    'Parse and validate inputs...
     If SourceType <> st_String Then
         ParseEncoding FileName, Encoding, TriState, IsUTF8BOM
     End If
@@ -279,7 +280,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
         ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
     
     If ShowDatesAsDates Then
-        ParseDateFormat DateFormat, DateOrder, DateSeparator
+        ParseDateFormat DateFormat, DateOrder, DateSeparator, ISO8601
         SysDateOrder = Application.International(xlDateOrder)
         SysDateSeparator = Application.International(xlDateSeparator)
     End If
@@ -294,6 +295,15 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
           
     If SourceType = st_String Then
         CSVContents = FileName
+        
+        If NotDelimited Then
+            CSVRead = SplitCSVContents(CSVContents, SkipToRow, NumRows)
+            Exit Function
+        End If
+
+        
+        
+        
         Call ParseCSVContents(CSVContents, DQ, strDelimiter, Comment, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
             Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
     Else
@@ -378,7 +388,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
             ReturnArray(i, j) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
                 Lengths(k), TrimFields, DQ, QuoteCounts(k), RetainQuotes, ConvertQuoted, _
                 ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
-                ShowDatesAsDates, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
+                ShowDatesAsDates, ISO8601, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
                 AnySentinels, Sentinels, MaxSentinelLength, ShowMissingsAs)
             
             'File has variable number of fields per line...
@@ -392,9 +402,9 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
                         NeedToFill = False
                     End If
                     If NeedToFill Then
-                        For m = j + 1 To NumColsInReturn
-                            ReturnArray(i, m) = ShowMissingsAs
-                        Next m
+                        For M = j + 1 To NumColsInReturn
+                            ReturnArray(i, M) = ShowMissingsAs
+                        Next M
                     End If
                 End If
             End If
@@ -1013,48 +1023,53 @@ End Function
 '                 (0 = MDY, 1 = DMY, 2 = YMD)
 '  DateSeparator: ByRef argument is set to the DateSeparator, typically "-" or "/"
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String)
+Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, ByRef ISO8601)
 
-    Const Err_DateFormat = "DateFormat should be 'M-D-Y', 'D-M-Y' or 'Y-M-D'. A character other " + _
-        "than '-' is allowed as the separator. Omit to use the Windows default, which on this PC is "
+          Const Err_DateFormat = "DateFormat should be 'ISO', ''M-D-Y', 'D-M-Y' or 'Y-M-D'. A character other " + _
+              "than '-' is allowed as the separator. Omit to use the Windows default, which on this PC is "
 
-    On Error GoTo ErrHandler
-    
-    'Replace repeated D's with a single D, etc since sParseDateCore only needs _
-     to know the order in which the three parts of the date appear.
-    If Len(DateFormat) > 5 Then
-        DateFormat = UCase(DateFormat)
-        ReplaceRepeats DateFormat, "D"
-        ReplaceRepeats DateFormat, "M"
-        ReplaceRepeats DateFormat, "Y"
-    End If
+1         On Error GoTo ErrHandler
+          
+          'Replace repeated D's with a single D, etc since sParseDateCore only needs _
+           to know the order in which the three parts of the date appear.
+2         If Left(UCase(DateFormat), 3) = "ISO" Then
+3             ISO8601 = True
+4             Exit Sub
+5         End If
+           
+6         If Len(DateFormat) > 5 Then
+7             DateFormat = UCase(DateFormat)
+8             ReplaceRepeats DateFormat, "D"
+9             ReplaceRepeats DateFormat, "M"
+10            ReplaceRepeats DateFormat, "Y"
+11        End If
 
-    If Len(DateFormat) = 0 Then
-        'https://en.wikipedia.org/wiki/ISO_8601
-        DateOrder = 2 'Y-M-D
-        DateSeparator = "-"
-        
-    ElseIf Len(DateFormat) <> 5 Then
-        Throw Err_DateFormat + WindowsDefaultDateFormat
-    ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
-        Throw Err_DateFormat + WindowsDefaultDateFormat
-    Else
-        DateSeparator = Mid$(DateFormat, 2, 1)
-        Select Case UCase$(Left$(DateFormat, 1) + Mid$(DateFormat, 3, 1) + Right$(DateFormat, 1))
-            Case "MDY"
-                DateOrder = 0
-            Case "DMY"
-                DateOrder = 1
-            Case "YMD"
-                DateOrder = 2
-            Case Else
-                Throw Err_DateFormat + WindowsDefaultDateFormat()
-        End Select
-    End If
+12        If Len(DateFormat) = 0 Then
+              'https://en.wikipedia.org/wiki/ISO_8601
+13            DateOrder = 2 'Y-M-D
+14            DateSeparator = "-"
+              
+15        ElseIf Len(DateFormat) <> 5 Then
+16            Throw Err_DateFormat + WindowsDefaultDateFormat
+17        ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
+18            Throw Err_DateFormat + WindowsDefaultDateFormat
+19        Else
+20            DateSeparator = Mid$(DateFormat, 2, 1)
+21            Select Case UCase$(Left$(DateFormat, 1) + Mid$(DateFormat, 3, 1) + Right$(DateFormat, 1))
+                  Case "MDY"
+22                    DateOrder = 0
+23                Case "DMY"
+24                    DateOrder = 1
+25                Case "YMD"
+26                    DateOrder = 2
+27                Case Else
+28                    Throw Err_DateFormat + WindowsDefaultDateFormat()
+29            End Select
+30        End If
 
-    Exit Sub
+31        Exit Sub
 ErrHandler:
-    Throw "#ParseDateFormat: " & Err.Description & "!"
+32        Throw "#ParseDateFormat: " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1090,6 +1105,55 @@ Private Function WindowsDefaultDateFormat() As String
 ErrHandler:
     WindowsDefaultDateFormat = "Cannot determine!"
 End Function
+
+
+Function SplitCSVContents(CSVContents As String, StartRow As Long, NumRows As Long)
+    Dim Contents1D() As String
+    Dim Contents2D() As String
+    Dim i As Long
+    Dim LoopTo As Long
+    Dim LB As Long
+    Dim LastElement As String
+
+    On Error GoTo ErrHandler
+    If Len(CSVContents) = 1 Then
+        ReDim Contents1D(0 To 0)
+    Else
+        Contents1D = VBA.Split(CSVContents, vbLf)
+        LastElement = Contents1D(UBound(Contents1D))
+        If LastElement = "" Or LastElement = vbCr Then 'Because last line of CSV may or may not terminate with a line feed
+            ReDim Preserve Contents1D(LBound(Contents1D) To UBound(Contents1D) - 1)
+        End If
+    End If
+    LB = LBound(Contents1D)
+
+    Dim NumRowsInReturn As Long
+    If NumRows = 0 Then
+        NumRowsInReturn = (UBound(Contents1D) - LBound(Contents1D) + 1) - (StartRow - 1)
+        LoopTo = NumRowsInReturn
+    Else
+        NumRowsInReturn = NumRows
+        LoopTo = MinLngs(NumRowsInReturn, (UBound(Contents1D) - LBound(Contents1D) + 1) - (StartRow - 1))
+    End If
+
+    ReDim Contents2D(1 To NumRowsInReturn, 1 To 1)
+
+    For i = 1 To LoopTo
+        Contents2D(i, 1) = Contents1D(LB - 1 + i + StartRow - 1)
+    Next i
+
+    SplitCSVContents = Contents2D
+
+    Exit Function
+ErrHandler:
+    Stop
+    Resume
+    Throw "#SplitCSVContents (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+
+
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ShowTextFile
@@ -1631,11 +1695,19 @@ ErrHandler:
     Throw "#GetMoreFromStream: " & Err.Description & "!"
 End Sub
 
-Private Function MaxLngs(x As Long, y As Long) As Long
-    If x > y Then
+Private Function MaxLngs(x As Long, Y As Long) As Long
+    If x > Y Then
         MaxLngs = x
     Else
-        MaxLngs = y
+        MaxLngs = Y
+    End If
+End Function
+
+Private Function MinLngs(x As Long, Y As Long) As Long
+    If x > Y Then
+        MinLngs = Y
+    Else
+        MinLngs = x
     End If
 End Function
 
@@ -1678,7 +1750,7 @@ End Function
 Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, TrimFields As Boolean, _
     QuoteChar As String, QuoteCount As Long, RetainQuotes As Boolean, ConvertQuoted As Boolean, _
     ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, SysDecimalSeparator As String, _
-    ShowDatesAsDates As Boolean, DateOrder As Long, DateSeparator As String, SysDateOrder As Long, _
+    ShowDatesAsDates As Boolean, ISO8601 As Boolean, DateOrder As Long, DateSeparator As String, SysDateOrder As Long, _
     SysDateSeparator As String, AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
     ShowMissingsAs As Variant)
 
@@ -1709,6 +1781,12 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
                     Field = Replace(Field, QuoteChar + QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
                 End If
             End If
+            If ConvertQuoted Then
+                FieldLength = Len(Field)
+            Else
+                ConvertField = Field
+                Exit Function
+            End If
         End If
     End If
 
@@ -1716,7 +1794,6 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
         If FieldLength <= MaxSentinelLength Then
             If Sentinels.Exists(Field) Then
                 ConvertField = Sentinels(Field)
-                Converted = True
                 Exit Function
             End If
         End If
@@ -1741,7 +1818,14 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
     End If
 
     If ShowDatesAsDates Then
-        CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+        If ISO8601 Then
+            CastISO8601 Field, dtResult, Converted, SysDateOrder
+            If Not Converted Then
+                CastToTime Field, dtResult, Converted
+            End If
+        Else
+            CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+        End If
         If Converted Then
             ConvertField = dtResult
             Exit Function
@@ -1810,10 +1894,10 @@ Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSepa
     SysDateOrder As Long, SysDateSeparator As String, ByRef Converted As Boolean)
     
     Dim D As String
-    Dim m As String
+    Dim M As String
     Dim pos1 As Long
     Dim pos2 As Long
-    Dim y As String
+    Dim Y As String
     Dim TimePart As String
     
     On Error GoTo ErrHandler
@@ -1823,31 +1907,31 @@ Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSepa
     If pos2 = 0 Then GoTo CheckForTime
 
     If DateOrder = 0 Then 'M-D-Y
-        m = Left$(strIn, pos1 - 1)
+        M = Left$(strIn, pos1 - 1)
         D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-        y = Mid$(strIn, pos2 + 1)
-        SplitOutTime y, TimePart
+        Y = Mid$(strIn, pos2 + 1)
+        SplitOutTime Y, TimePart
     ElseIf DateOrder = 1 Then 'D-M-Y
         D = Left$(strIn, pos1 - 1)
-        m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-        y = Mid$(strIn, pos2 + 1)
-        SplitOutTime y, TimePart
+        M = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+        Y = Mid$(strIn, pos2 + 1)
+        SplitOutTime Y, TimePart
     ElseIf DateOrder = 2 Then 'Y-M-D
-        y = Left$(strIn, pos1 - 1)
-        m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+        Y = Left$(strIn, pos1 - 1)
+        M = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
         D = Mid$(strIn, pos2 + 1)
         SplitOutTime D, TimePart
     Else
         Throw "DateOrder must be 0, 1, or 2"
     End If
     If SysDateOrder = 0 Then
-        dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y + TimePart)
+        dtOut = CDate(M + SysDateSeparator + D + SysDateSeparator + Y + TimePart)
         Converted = True
     ElseIf SysDateOrder = 1 Then
-        dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y + TimePart)
+        dtOut = CDate(D + SysDateSeparator + M + SysDateSeparator + Y + TimePart)
         Converted = True
     ElseIf SysDateOrder = 2 Then
-        dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D + TimePart)
+        dtOut = CDate(Y + SysDateSeparator + M + SysDateSeparator + D + TimePart)
         Converted = True
     End If
     Exit Sub
@@ -1869,10 +1953,6 @@ End Sub
 ' Purpose    : A string to represent DateTime comes in four parts, the first three being Y, M, D (though not necessarily
 '             in that  order) with the (optional) fourth part being time. This method splits the third part that may
 '             include time into the third part and the time part.
-'Complexity:  Some files place a "T" character between the day part and time part, following ISO 8601's definition of
-'             "local time". But ISO 8601 encourages use of time zone specifiers. At present a date time with time zone
-'             present will not be parsed as a date at all. Perhaps we could allow "ISO8601" as a DateFormat argument and
-'             convert to UTC?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function SplitOutTime(ByRef ThirdPart As String, ByRef TimePart)
           Dim i As Long
@@ -1886,14 +1966,12 @@ Private Function SplitOutTime(ByRef ThirdPart As String, ByRef TimePart)
                   Case 48 To 57
 5                 Case Else
 6                     TimePart = Mid$(ThirdPart, i)
-7                     If Left$(TimePart, 1) = "T" Then
-8                         Mid$(TimePart, 1, 1) = " "
-9                     End If
 10                    ThirdPart = Left$(ThirdPart, i - 1)
 11                    Exit Function
 12            End Select
 13        Next i
 End Function
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : OStoEOL
@@ -1956,7 +2034,7 @@ End Function
 '---------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
-    Optional DateTimeFormat As String = "yyyy-mm-dd hh:mm:ss", _
+    Optional DateTimeFormat As String = "yyyy-mm-ddThh:mm:ss", _
     Optional Delimiter As String = ",", Optional Unicode As Boolean, _
     Optional ByVal EOL As String = "")
 
@@ -2185,7 +2263,7 @@ End Function
 '---------------------------------------------------------------------------------------
 Private Function NumDimensions(x As Variant) As Long
     Dim i As Long
-    Dim y As Long
+    Dim Y As Long
     If Not IsArray(x) Then
         NumDimensions = 0
         Exit Function
@@ -2193,7 +2271,7 @@ Private Function NumDimensions(x As Variant) As Long
         On Error GoTo ExitPoint
         i = 1
         Do While True
-            y = LBound(x, i)
+            Y = LBound(x, i)
             i = i + 1
         Loop
     End If
@@ -2228,7 +2306,7 @@ End Sub
 '              that field should be converted to the associated item value. Handles Booleans, Missings and Excel errors.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ByRef MaxLength As Long, ByRef AnySentinels As Boolean, ShowBooleansAsBooleans As Boolean, _
-    ShowErrorsAsErrors As Boolean, ByVal ShowMissingsAs As Variant, Optional TrueStrings As Variant, _
+    ShowErrorsAsErrors As Boolean, ByRef ShowMissingsAs As Variant, Optional TrueStrings As Variant, _
     Optional FalseStrings As Variant, Optional MissingStrings As Variant)
 
     Const Err_FalseStrings = "FalseStrings must be omitted or provided as a string or an array of strings that represent Boolean value False"
@@ -2294,7 +2372,7 @@ End Sub
 ' Procedure  : AddKeysToDict, Sub-routine of MakeSentinels
 ' Purpose    : Broadcast AddKeyToDict over an array of keys.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, Keys As Variant, item As Variant, FriendlyErrorString As String)
+Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As Variant, item As Variant, FriendlyErrorString As String)
     On Error GoTo ErrHandler
 
     Dim i As Long
@@ -2303,6 +2381,13 @@ Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, Keys As Varia
     If TypeName(Keys) = "Range" Then
         Keys = Keys.value
     End If
+    
+    If VarType(Keys) = vbString Then
+        If InStr(Keys, ",") > 0 Then
+            Keys = VBA.Split(Keys, ",")
+        End If
+    End If
+    
     Select Case NumDimensions(Keys)
         Case 0
             AddKeyToDict Sentinels, Keys, item, FriendlyErrorString
@@ -2335,7 +2420,8 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
     On Error GoTo ErrHandler
 
     If VarType(Key) <> vbString Then Throw FriendlyErrorString + " but '" + CStr(Key) + "' is of type " + TypeName(Key)
-    If Len(Key) = 0 Then Throw FriendlyErrorString + " but a zero-length string has been provided and that is not permitted"
+   ' If Len(Key) = 0 Then Throw FriendlyErrorString + " but a zero-length string has been provided and that is not permitted"
+    If Len(Key) = 0 Then Exit Sub
     
     If Not Sentinels.Exists(Key) Then
         Sentinels.Add Key, item
@@ -2359,3 +2445,63 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
 ErrHandler:
     Throw "#AddKeyToDict: " & Err.Description & "!"
 End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : TestSentinelSpeed
+' Purpose    : Test speed of accessing the sentinels dictionary, using similar approach to that employed in method
+'              ConvertField.
+'
+' Results:  On Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz   2.11 GHz, 16GB RAM
+'         A)  FieldContains = "This string is longer than the longest sentinel, which is 14"
+'             100,000,000 per second
+'         B)  FieldContains = "mini"   'Not a sentinel, but shorter than the longest sentinel
+'             20,000,000 per second
+'         C)  FieldContains = "True"    'A sentinel, one of the elements of TrueStrings
+'             9,000,000 per second
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub TestSentinelSpeed()
+    Dim Sentinels As New Scripting.Dictionary
+
+    Dim FieldContains As String
+    Dim t1 As Double, t2 As Double
+    Dim i As Long
+    Const N = 100000000
+    Dim res As Variant
+    Dim MaxLength As Long
+    Dim AnySentinels As Boolean
+
+    MakeSentinels Sentinels, MaxLength, AnySentinels, _
+        ShowBooleansAsBooleans:=True, _
+        ShowErrorsAsErrors:=True, _
+        ShowMissingsAs:=Empty, _
+        TrueStrings:=Array("True", "T"), _
+        FalseStrings:=Array("False", "F"), _
+        MissingStrings:=Array("NA", "-999")
+    
+    Dim Converted As Boolean
+    
+    'FieldContains = "This string is longer than the longest sentinel, which is 14"
+    'FieldContains = "mini"    'Not a sentinel, but shorter than the longest sentinel
+    FieldContains = "True"     'A sentinel, one of the elements of TrueStrings
+
+    t1 = sElapsedTime()
+    For i = 1 To N
+        If Len(FieldContains) <= MaxLength Then
+            If Sentinels.Exists(FieldContains) Then
+                res = Sentinels(FieldContains)
+                Converted = True
+            End If
+        End If
+    Next i
+    t2 = sElapsedTime()
+
+    Debug.Print Format(N / (t2 - t1), "###,###")
+
+    Exit Sub
+ErrHandler:
+    MsgBox "#TestSentinelSpeed: " & Err.Description & "!"
+End Sub
+
+
+
+

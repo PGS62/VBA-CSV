@@ -217,3 +217,272 @@ ErrHandler:
     Throw "#FileSize (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : sFill
+' Purpose    : Creates an array filled with the value x
+' -----------------------------------------------------------------------------------------------------------------------
+Function sFill(ByVal x As Variant, ByVal NumRows As Long, ByVal NumCols As Long)
+
+    On Error GoTo ErrHandler
+
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Variant
+
+    ReDim Result(1 To NumRows, 1 To NumCols)
+
+    For i = 1 To NumRows
+        For j = 1 To NumCols
+            Result(i, j) = x
+        Next j
+    Next i
+
+    sFill = Result
+
+    Exit Function
+ErrHandler:
+    sFill = "#sFill: " & Err.Description & "!"
+End Function
+
+'---------------------------------------------------------------------------------------------------------
+' Procedure : SplitString
+' Purpose   : Breaks up TheString into sub-strings with breaks at the positions at which the Delimiter
+'             character appears, and returns the sub-strings as a two-dimensional, 1-based, 1 column array.
+' Arguments
+' TheString : The string to be split.
+' Delimiter : The delimiter string, can be multiple characters. The search for the delimiter
+'             is case insensitive.
+'---------------------------------------------------------------------------------------------------------
+Function SplitString(TheString As String, Optional Delimiter As String = ",")
+
+          Dim i As Long
+          Dim LB As Long
+          Dim N As Long
+          Dim OneDArray
+          Dim res()
+          Dim UB As Long
+          
+1         On Error GoTo ErrHandler
+2         If Len(TheString) = 0 Then
+3             ReDim res(1 To 1, 1 To 1)
+4             res(1, 1) = ""
+5             SplitString = res
+6             Exit Function
+7         End If
+          
+8         OneDArray = VBA.Split(TheString, Delimiter, -1, vbTextCompare)
+9         LB = LBound(OneDArray): UB = UBound(OneDArray)
+10        N = UB - LB + 1
+11        ReDim res(1 To N, 1 To 1)
+12        For i = 1 To N
+13            res(i, 1) = OneDArray(i - 1)
+14        Next
+15        SplitString = res
+16        Exit Function
+ErrHandler:
+17        SplitString = "#SplitString (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+
+Function AllCombinations(Arg1, Arg2, Arg3, Arg4)
+          Dim res() As String
+          Dim Part1 As Variant
+          Dim Part2 As Variant
+          Dim Part3 As Variant
+          Dim Part4 As Variant
+          Dim k As Long
+
+1         Force2DArrayR Arg1
+2         Force2DArrayR Arg2
+3         Force2DArrayR Arg3
+4         Force2DArrayR Arg4
+
+5         ReDim res(1 To sNRows(Arg1) * sNRows(Arg2) * sNRows(Arg3) * sNRows(Arg4), 1 To 1)
+6         For Each Part1 In Arg1
+7             For Each Part2 In Arg2
+8                 For Each Part3 In Arg3
+9                     For Each Part4 In Arg4
+10                        k = k + 1
+11                        res(k, 1) = Part1 & Part2 & Part3 & Part4
+12                    Next
+13                Next
+14            Next
+15        Next
+16        AllCombinations = res
+
+End Function
+
+
+Function MakeGoodStringsBad(GoodStrings)
+
+          Dim Res1D() As String
+
+1         On Error GoTo ErrHandler
+2         Force2DArrayR GoodStrings
+          Dim ThisBadString
+
+          Dim i As Long, j As Long, k As Long
+
+3         ReDim Res1D(1 To 1)
+4         For i = 1 To sNRows(GoodStrings)
+5             For j = 1 To Len(GoodStrings(i, 1)) + 1
+6                 k = k + 1
+7                 If k > UBound(Res1D) Then
+8                     ReDim Preserve Res1D(1 To k)
+9                 End If
+10                Res1D(k) = InsertInString("x", GoodStrings(i, 1), j)
+11            Next j
+12        Next i
+
+13        MakeGoodStringsBad = Transpose(Res1D)
+
+14        Exit Function
+ErrHandler:
+15        MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+
+Private Function InsertInString(InsertThis As String, ByVal InToThis As String, AtPoint As Long)
+
+1         On Error GoTo ErrHandler
+2         If AtPoint + Len(InsertThis) > Len(InToThis) Then
+3             InToThis = InToThis + String(AtPoint + Len(InsertThis) - Len(InToThis), " ")
+4         End If
+
+5         Mid(InToThis, AtPoint, Len(InsertThis)) = InsertThis
+6         InsertInString = InToThis
+7         Exit Function
+ErrHandler:
+8         Throw "#InsertInString (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+'---------------------------------------------------------------------------------------------------------
+' Procedure : IsRegMatch
+' Purpose   : Implements Regular Expressions exposed by "Microsoft VBScript Regular Expressions 5.5".
+'             The function returns TRUE if StringToSearch matches RegularExpression, FALSE
+'             if it does not match, or an error string if RegularExpression contains a
+'             syntax error.
+' Arguments
+' RegularExpression: The regular expression. Must be a string. Example cat|dog to match on either the string
+'             cat or the string dog.
+' StringToSearch: The string to match. May be an array in which case the return from the function is an
+'             array of the same dimensions.
+' CaseSensitive: TRUE for case-sensitive matching, FALSE for case-insensitive matching. This argument is
+'             optional, defaulting to FALSE for case-insensitive matching.
+'
+' Notes     : Syntax cheat sheet:
+'             Character classes
+'             .                 any character except newline
+'             \w \d \s          word, digit, whitespace
+'             \W \D \S          not word, not digit, not whitespace
+'             [abc]             any of a, b, or c
+'             [^abc]            not a, b, or c
+'             [a-g]             character between a & g
+'
+'             Anchors
+'             ^abc$              start / end of the string
+'             \b                 word boundary
+'
+'             Escaped characters
+'             \. \* \\          escaped special characters
+'             \t \n \r          tab, linefeed, carriage return
+'
+'             Groups and Look-arounds
+'             (abc)             capture group
+'             \1                backreference to group #1
+'             (?:abc)           non-capturing group
+'             (?=abc)           positive lookahead
+'             (?!abc)           negative lookahead
+'
+'             Quantifiers and Alternation
+'             a* a+ a?          0 or more, 1 or more, 0 or 1
+'             a{5} a{2,}        exactly five, two or more
+'             a{1,3}            between one & three
+'             a+? a{2,}?        match as few as possible
+'             ab|cd             match ab or cd
+'
+'             Further reading:
+'             http://www.regular-expressions.info/
+'             https://en.wikipedia.org/wiki/Regular_expression
+'---------------------------------------------------------------------------------------------------------
+Function IsRegMatch(RegularExpression As String, ByVal StringToSearch As Variant, Optional CaseSensitive As Boolean = False)
+          Dim i As Long
+          Dim j As Long
+          Dim Result() As Variant
+          Dim rx As VBScript_RegExp_55.RegExp
+
+1         On Error GoTo ErrHandler
+
+2         If Not RegExSyntaxValid(RegularExpression) Then
+3             IsRegMatch = "#Invalid syntax for RegularExpression!"
+4             Exit Function
+5         End If
+6         Set rx = New RegExp
+7         With rx
+8             .IgnoreCase = Not CaseSensitive
+9             .Pattern = RegularExpression
+10            .Global = False        'Find first match only
+11        End With
+
+12        If VarType(StringToSearch) = vbString Then
+13            IsRegMatch = rx.Test(StringToSearch)
+
+14            GoTo EarlyExit
+15        ElseIf VarType(StringToSearch) < vbArray Then
+16            IsRegMatch = "#StringToSearch must be a string!"
+17            GoTo EarlyExit
+18        End If
+19        If TypeName(StringToSearch) = "Range" Then StringToSearch = StringToSearch.Value2
+
+20        Select Case NumDimensions(StringToSearch)
+              Case 2
+21                ReDim Result(LBound(StringToSearch, 1) To UBound(StringToSearch, 1), LBound(StringToSearch, 2) To UBound(StringToSearch, 2))
+22                For i = LBound(StringToSearch, 1) To UBound(StringToSearch, 1)
+23                    For j = LBound(StringToSearch, 2) To UBound(StringToSearch, 2)
+24                        If VarType(StringToSearch(i, j)) = vbString Then
+25                            Result(i, j) = rx.Test(StringToSearch(i, j))
+26                        Else
+27                            Result(i, j) = "#StringToSearch must be a string!"
+28                        End If
+29                    Next j
+30                Next i
+31            Case 1
+32                ReDim Result(LBound(StringToSearch, 1) To UBound(StringToSearch, 1))
+33                For i = LBound(StringToSearch, 1) To UBound(StringToSearch, 1)
+34                    If VarType(StringToSearch(i)) = vbString Then
+35                        Result(i) = rx.Test(StringToSearch(i))
+36                    Else
+37                        Result(i) = "#StringToSearch must be a string!"
+38                    End If
+39                Next i
+40            Case Else
+41                Throw "StringToSearch must be String or array with 1 or 2 dimensions"
+42        End Select
+
+43        IsRegMatch = Result
+EarlyExit:
+44        Set rx = Nothing
+
+45        Exit Function
+ErrHandler:
+46        IsRegMatch = "#IsRegMatch (line " & CStr(Erl) + "): " & Err.Description & "!"
+47        Set rx = Nothing
+End Function
+
+Private Function RegExSyntaxValid(RegularExpression As String) As Boolean
+          Dim res As Boolean
+          Dim rx As VBScript_RegExp_55.RegExp
+1         On Error GoTo ErrHandler
+2         Set rx = New RegExp
+3         With rx
+4             .IgnoreCase = False
+5             .Pattern = RegularExpression
+6             .Global = False        'Find first match only
+7         End With
+8         res = rx.Test("Foo")
+9         RegExSyntaxValid = True
+10        Exit Function
+ErrHandler:
+11        RegExSyntaxValid = False
+End Function
+
