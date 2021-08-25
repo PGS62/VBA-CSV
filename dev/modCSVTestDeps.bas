@@ -20,7 +20,7 @@ Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCo
 Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected As Variant, FileName As String, _
           ByRef WhatDiffers As String, Optional AbsTol As Double, Optional RelTol As Double, Optional ConvertTypes As Variant = False, _
           Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-          Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
+          Optional DateFormat As String, Optional Comment As String, Optional IgnoreEmptyLines As Boolean = True, Optional ByVal SkipToRow As Long = 1, _
           Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
           Optional ByVal NumCols As Long = 0, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
           Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant = "", _
@@ -34,7 +34,7 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
 2         WhatDiffers = ""
 3         TestDescription = "Case " + CStr(CaseNo) + " " + TestDescription
 
-4         Observed = CSVRead(FileName, ConvertTypes, Delimiter, IgnoreRepeated, DateFormat, Comment, SkipToRow, _
+4         Observed = CSVRead(FileName, ConvertTypes, Delimiter, IgnoreRepeated, DateFormat, Comment, IgnoreEmptyLines, SkipToRow, _
               SkipToCol, NumRows, NumCols, TrueStrings, FalseStrings, MissingStrings, ShowMissingsAs, Encoding, DecimalSeparator)
 
 5         If NumRowsExpected <> 0 Or NumColsExpected <> 0 Then
@@ -87,7 +87,6 @@ Failed:
 ErrHandler:
 43        Throw "#TestCSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
-
 
 Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, NumCols As Long, ExtraInfo As String, Unicode As Boolean, Ragged As Boolean)
     NameThatFile = (Folder & "\" & IIf(ExtraInfo = "", "", ExtraInfo & "_") & OS & "_" & Format(NumRows, "0000") & "_x_" & Format(NumCols, "000") & IIf(Unicode, "_Unicode", "_Ascii") & IIf(Ragged, "_Ragged", "") & ".csv")
@@ -178,7 +177,6 @@ Private Function FolderExists(ByVal FolderPath As String)
 ErrHandler:
     FolderExists = False
 End Function
-
 
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : sElapsedTime
@@ -520,15 +518,13 @@ ErrHandler:
 50        sIsApprox = False
 End Function
 
-
-
 '---------------------------------------------------------------------------------------
 ' Procedure : NonStringToString
 ' Purpose   : Convert non-string to string in a way that mimics how the non-string would
 '             be displayed in an Excel cell. Used by functions such as ConcatenateStrings
 '             and Examine (aka g)
 '---------------------------------------------------------------------------------------
-Function NonStringToString(x As Variant, Optional AddSingleQuotesToStings As Boolean = False)
+Private Function NonStringToString(x As Variant, Optional AddSingleQuotesToStings As Boolean = False)
     Dim res As String
     On Error GoTo ErrHandler
     If IsError(x) Then
@@ -807,9 +803,6 @@ Function IsNumber(x As Variant) As Boolean
 2                 IsNumber = True
 3         End Select
 End Function
-
-
-
 
 Function FileCopy(SourceFile As String, TargetFile As String)
           Dim F As Scripting.File

@@ -2,7 +2,6 @@ Attribute VB_Name = "modCSVXLUtils"
 Option Explicit
 'Functions that, inaddition to CSVRead and CSVWrite, are called from the worksheets of this workbook
 
-
 Function TempFolder()
     TempFolder = Environ("Temp")
 End Function
@@ -283,7 +282,6 @@ ErrHandler:
 17        SplitString = "#SplitString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-
 Function AllCombinations(Arg1, Arg2, Arg3, Arg4)
           Dim res() As String
           Dim Part1 As Variant
@@ -312,7 +310,6 @@ Function AllCombinations(Arg1, Arg2, Arg3, Arg4)
 
 End Function
 
-
 Function MakeGoodStringsBad(GoodStrings)
 
           Dim Res1D() As String
@@ -340,7 +337,6 @@ Function MakeGoodStringsBad(GoodStrings)
 ErrHandler:
 15        MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
-
 
 Private Function InsertInString(InsertThis As String, ByVal InToThis As String, AtPoint As Long)
 

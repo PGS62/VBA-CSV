@@ -30,26 +30,26 @@ End Enum
 Sub RegisterCSVRead()
     Const Description = "Returns the contents of a comma-separated file on disk as an array."
     Dim ArgumentDescriptions() As String
-    ReDim ArgumentDescriptions(1 To 16)
+    ReDim ArgumentDescriptions(1 To 17)
     ArgumentDescriptions(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV format."
     ArgumentDescriptions(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values; FALSE to leave as strings. Or string of letters N, D, B, E, T, Q, R. T = trim leading and trailing spaces. R = quoted strings retain quotes. Q = convert quoted fields."
     ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
     ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line or immediately after another delimiter or at the end of a line, should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
     ArgumentDescriptions(5) = "The format of dates in the file such as ""Y-M-D"", ""M-D-Y"" or ""Y/M/D"". If omitted, ""Y-M-D"" is assumed. Repeated D's (or M's or Y's) are equivalent to single instances, so that ""Y-M-D"" and ""YYYY-MMM-DD"" are equivalent."
     ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
-    ArgumentDescriptions(7) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first row."
-    ArgumentDescriptions(8) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
-    ArgumentDescriptions(9) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
-    ArgumentDescriptions(10) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
-    ArgumentDescriptions(11) = "Indicates how `True` values are represented in the file. May be a string, an array of strings or a range containing strings; by default ""TRUE"", ""True"" and ""true"" are recognised."
-    ArgumentDescriptions(12) = "Indicates how `False` values are represented in the file. May be a string, an array of strings or a range containing strings; by default ""FALSE"", ""False"" and ""false"" are recognised."
-    ArgumentDescriptions(13) = "Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default only an empty field (consecutive delimiters) is considered missing."
-    ArgumentDescriptions(14) = "Fields which are missing in the file (consecutive delimiters) or match one of the MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null string or #N/A! error value can be good alternatives."
-    ArgumentDescriptions(15) = "Allowed entries are ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"", and ""ANSI"", but for most files this argument can be omitted and CSVRead will detect the file's encoding."
-    ArgumentDescriptions(16) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
+    ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each column will be assigned ShowMissingsAs for that empty row)."
+    ArgumentDescriptions(8) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first row."
+    ArgumentDescriptions(9) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
+    ArgumentDescriptions(10) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
+    ArgumentDescriptions(11) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
+    ArgumentDescriptions(12) = "Indicates how `True` values are represented in the file. May be a string, an array of strings or a range containing strings; by default ""TRUE"", ""True"" and ""true"" are recognised."
+    ArgumentDescriptions(13) = "Indicates how `False` values are represented in the file. May be a string, an array of strings or a range containing strings; by default ""FALSE"", ""False"" and ""false"" are recognised."
+    ArgumentDescriptions(14) = "Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default only an empty field (consecutive delimiters) is considered missing."
+    ArgumentDescriptions(15) = "Fields which are missing in the file (consecutive delimiters) or match one of the MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null string or #N/A! error value can be good alternatives."
+    ArgumentDescriptions(16) = "Allowed entries are ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"", and ""ANSI"", but for most files this argument can be omitted and CSVRead will detect the file's encoding."
+    ArgumentDescriptions(17) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
     Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
 End Sub
-
 '---------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVWrite
 ' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
@@ -118,6 +118,8 @@ End Sub
 '             assumed. Repeated D's (or M's or Y's) are equivalent to single instances, so that "Y-M-D" and
 '             "YYYY-MMM-DD" are equivalent.
 ' Comment   : Rows that start with this string will be skipped while parsing.
+' IgnoreEmptyLines: Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each
+'             column will be assigned ShowMissingsAs for that empty row).
 ' SkipToRow : The row in the file at which reading starts. Optional and defaults to 1 to read from the first
 '             row.
 ' SkipToCol : The column in the file at which reading starts. Optional and defaults to 1 to read from the
@@ -157,11 +159,11 @@ End Sub
 '---------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
         Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-        Optional DateFormat As String, Optional Comment As String, Optional ByVal SkipToRow As Long = 1, _
-        Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
-        Optional ByVal NumCols As Long = 0, Optional TrueStrings As Variant, _
-        Optional FalseStrings As Variant, Optional MissingStrings As Variant, _
-        Optional ByVal ShowMissingsAs As Variant, _
+        Optional DateFormat As String, Optional Comment As String, Optional IgnoreEmptyLines As Boolean = True, _
+        Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
+        Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
+        Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
+        Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
         Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString)
 
     Const DQ = """"
@@ -300,11 +302,8 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
             CSVRead = SplitCSVContents(CSVContents, SkipToRow, NumRows)
             Exit Function
         End If
-
         
-        
-        
-        Call ParseCSVContents(CSVContents, DQ, strDelimiter, Comment, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
+        Call ParseCSVContents(CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
             Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
     Else
         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
@@ -337,10 +336,10 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
         If SkipToRow = 1 And NumRows = 0 Then
             CSVContents = STS.ReadAll
             STS.Close: Set STS = Nothing: Set SF = Nothing
-            Call ParseCSVContents(CSVContents, DQ, strDelimiter, Comment, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
+            Call ParseCSVContents(CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
                 Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
         Else
-            CSVContents = ParseCSVContents(STS, DQ, strDelimiter, Comment, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
+            CSVContents = ParseCSVContents(STS, DQ, strDelimiter, Comment, IgnoreEmptyLines, IgnoreRepeated, SkipToRow, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, _
                 Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts)
             STS.Close
         End If
@@ -727,7 +726,7 @@ End Sub
 '  ConvertTypes          : The argument to CSVRead
 '  ShowNumbersAsNumbers  : Should fields in the file that look like numbers be returned as Numbers? (Doubles)
 '  ShowDatesAsDates      : Should fields in the file that look like dates with the specified DateFormat be returned as Dates?
-'  ShowBooleansAsBooleans: Should fields in the file that are TRUE or FALSE (case insensitive) be returned as Booleans?
+'  ShowBooleansAsBooleans: Should fields in the file that match one of the TrueStrings or FalseStrings be returned as Booleans?
 '  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
 '  ConvertQuoted         : Should the four conversion rules above apply even to quoted fields?
 '  RetainQuotes          : Should quotes in quoted fields be retained?
@@ -1025,51 +1024,51 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, ByRef ISO8601)
 
-          Const Err_DateFormat = "DateFormat should be 'ISO', ''M-D-Y', 'D-M-Y' or 'Y-M-D'. A character other " + _
-              "than '-' is allowed as the separator. Omit to use the Windows default, which on this PC is "
+    Const Err_DateFormat = "DateFormat should be 'ISO', ''M-D-Y', 'D-M-Y' or 'Y-M-D'. A character other " + _
+        "than '-' is allowed as the separator. Omit to use the Windows default, which on this PC is "
 
-1         On Error GoTo ErrHandler
-          
-          'Replace repeated D's with a single D, etc since sParseDateCore only needs _
-           to know the order in which the three parts of the date appear.
-2         If Left(UCase(DateFormat), 3) = "ISO" Then
-3             ISO8601 = True
-4             Exit Sub
-5         End If
-           
-6         If Len(DateFormat) > 5 Then
-7             DateFormat = UCase(DateFormat)
-8             ReplaceRepeats DateFormat, "D"
-9             ReplaceRepeats DateFormat, "M"
-10            ReplaceRepeats DateFormat, "Y"
-11        End If
+    On Error GoTo ErrHandler
+    
+    'Replace repeated D's with a single D, etc since sParseDateCore only needs _
+     to know the order in which the three parts of the date appear.
+    If Left(UCase(DateFormat), 3) = "ISO" Then
+        ISO8601 = True
+        Exit Sub
+    End If
+     
+    If Len(DateFormat) > 5 Then
+        DateFormat = UCase(DateFormat)
+        ReplaceRepeats DateFormat, "D"
+        ReplaceRepeats DateFormat, "M"
+        ReplaceRepeats DateFormat, "Y"
+    End If
 
-12        If Len(DateFormat) = 0 Then
-              'https://en.wikipedia.org/wiki/ISO_8601
-13            DateOrder = 2 'Y-M-D
-14            DateSeparator = "-"
-              
-15        ElseIf Len(DateFormat) <> 5 Then
-16            Throw Err_DateFormat + WindowsDefaultDateFormat
-17        ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
-18            Throw Err_DateFormat + WindowsDefaultDateFormat
-19        Else
-20            DateSeparator = Mid$(DateFormat, 2, 1)
-21            Select Case UCase$(Left$(DateFormat, 1) + Mid$(DateFormat, 3, 1) + Right$(DateFormat, 1))
-                  Case "MDY"
-22                    DateOrder = 0
-23                Case "DMY"
-24                    DateOrder = 1
-25                Case "YMD"
-26                    DateOrder = 2
-27                Case Else
-28                    Throw Err_DateFormat + WindowsDefaultDateFormat()
-29            End Select
-30        End If
+    If Len(DateFormat) = 0 Then
+        'https://en.wikipedia.org/wiki/ISO_8601
+        DateOrder = 2 'Y-M-D
+        DateSeparator = "-"
+        
+    ElseIf Len(DateFormat) <> 5 Then
+        Throw Err_DateFormat + WindowsDefaultDateFormat
+    ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
+        Throw Err_DateFormat + WindowsDefaultDateFormat
+    Else
+        DateSeparator = Mid$(DateFormat, 2, 1)
+        Select Case UCase$(Left$(DateFormat, 1) + Mid$(DateFormat, 3, 1) + Right$(DateFormat, 1))
+            Case "MDY"
+                DateOrder = 0
+            Case "DMY"
+                DateOrder = 1
+            Case "YMD"
+                DateOrder = 2
+            Case Else
+                Throw Err_DateFormat + WindowsDefaultDateFormat()
+        End Select
+    End If
 
-31        Exit Sub
+    Exit Sub
 ErrHandler:
-32        Throw "#ParseDateFormat: " & Err.Description & "!"
+    Throw "#ParseDateFormat: " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1106,8 +1105,11 @@ ErrHandler:
     WindowsDefaultDateFormat = "Cannot determine!"
 End Function
 
-
-Function SplitCSVContents(CSVContents As String, StartRow As Long, NumRows As Long)
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : SplitCSVContents
+' Purpose    : Used when the CSVReads arg FileName is a CSVString and Delimiter is FALSE.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function SplitCSVContents(CSVContents As String, StartRow As Long, NumRows As Long)
     Dim Contents1D() As String
     Dim Contents2D() As String
     Dim i As Long
@@ -1119,9 +1121,11 @@ Function SplitCSVContents(CSVContents As String, StartRow As Long, NumRows As Lo
     If Len(CSVContents) = 1 Then
         ReDim Contents1D(0 To 0)
     Else
+        CSVContents = Replace(CSVContents, vbCrLf, vbLf)
+        CSVContents = Replace(CSVContents, vbCr, vbLf)
         Contents1D = VBA.Split(CSVContents, vbLf)
         LastElement = Contents1D(UBound(Contents1D))
-        If LastElement = "" Or LastElement = vbCr Then 'Because last line of CSV may or may not terminate with a line feed
+        If LastElement = "" Then 'Because last line of CSV may or may not terminate with a line feed
             ReDim Preserve Contents1D(LBound(Contents1D) To UBound(Contents1D) - 1)
         End If
     End If
@@ -1146,14 +1150,8 @@ Function SplitCSVContents(CSVContents As String, StartRow As Long, NumRows As Lo
 
     Exit Function
 ErrHandler:
-    Stop
-    Resume
     Throw "#SplitCSVContents (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
-
-
-
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ShowTextFile
@@ -1162,54 +1160,56 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ShowTextFile(T As TextStream, StartRow As Long, NumRows As Long)
 
-    Dim Contents1D() As String
-    Dim Contents2D() As String
-    Dim i As Long
-    Dim ReadAll As String
+          Dim Contents1D() As String
+          Dim Contents2D() As String
+          Dim i As Long
+          Dim ReadAll As String
 
-    On Error GoTo ErrHandler
+1         On Error GoTo ErrHandler
 
-    For i = 1 To StartRow - 1
-        T.SkipLine
-    Next
+2         For i = 1 To StartRow - 1
+3             T.SkipLine
+4         Next
 
-    If NumRows = 0 Then
-        ReadAll = T.ReadAll
-        T.Close
+5         If NumRows = 0 Then
+6             ReadAll = T.ReadAll
+7             T.Close
 
-        ReadAll = Replace(ReadAll, vbCrLf, vbLf)
-        ReadAll = Replace(ReadAll, vbCr, vbLf)
+8             If InStr(ReadAll, vbCr) > 0 Then
+9                 ReadAll = Replace(ReadAll, vbCrLf, vbLf)
+10                ReadAll = Replace(ReadAll, vbCr, vbLf)
+11            End If
 
-        'Text files may or may not be terminated by EOL characters...
-        If Right$(ReadAll, 1) = vbLf Then
-            ReadAll = Left$(ReadAll, Len(ReadAll) - 1)
-        End If
+              'Text files may or may not be terminated by EOL characters...
+12            If Right$(ReadAll, 1) = vbLf Then
+13                ReadAll = Left$(ReadAll, Len(ReadAll) - 1)
+14            End If
 
-        If Len(ReadAll) = 0 Then
-            ReDim Contents1D(0 To 0)
-        Else
-            Contents1D = VBA.Split(ReadAll, vbLf)
-        End If
-        ReDim Contents2D(1 To UBound(Contents1D) - LBound(Contents1D) + 1, 1 To 1)
-        For i = LBound(Contents1D) To UBound(Contents1D)
-            Contents2D(i + 1, 1) = Contents1D(i)
-        Next i
-    Else
-        ReDim Contents2D(1 To NumRows, 1 To 1)
+15            If Len(ReadAll) = 0 Then
+16                ReDim Contents1D(0 To 0)
+17            Else
+18                Contents1D = VBA.Split(ReadAll, vbLf)
+19            End If
+20            ReDim Contents2D(1 To UBound(Contents1D) - LBound(Contents1D) + 1, 1 To 1)
+21            For i = LBound(Contents1D) To UBound(Contents1D)
+22                Contents2D(i + 1, 1) = Contents1D(i)
+23            Next i
+24        Else
+25            ReDim Contents2D(1 To NumRows, 1 To 1)
 
-        For i = 1 To NumRows 'BUG, won't work for Mac files. TODO Fix this?
-            If T.AtEndOfStream Then Exit For
-            Contents2D(i, 1) = T.ReadLine
-        Next i
+26            For i = 1 To NumRows 'BUG, won't work for Mac files. TODO Fix this?
+27                If T.AtEndOfStream Then Exit For
+28                Contents2D(i, 1) = T.ReadLine
+29            Next i
 
-        T.Close
-    End If
+30            T.Close
+31        End If
 
-    ShowTextFile = Contents2D
+32        ShowTextFile = Contents2D
 
-    Exit Function
+33        Exit Function
 ErrHandler:
-    Throw "#ShowTextFile: " & Err.Description & "!"
+34        Throw "#ShowTextFile: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1222,7 +1222,7 @@ End Function
 '                    otherwise be significant to parsing, such as delimiters or new line characters.
 '  Delimiter       : The string that separates fields within each line. Typically a single character, but needn't be.
 '  SkipToRow       : Rows in the file prior to SkipToRow are ignored.
-'  Comment         : Lines in the file that start with these characters will be ignored, handled by method SkipComment.
+'  Comment         : Lines in the file that start with these characters will be ignored, handled by method SkipLines.
 '  IgnoreRepeated  : If true then parsing ignores delimiters at the start of lines, consecutive delimiters and delimiters
 '                    at the end of lines.
 '  SkipToRow       : The first line of the file to appear in the return from CSVRead. However, we need to parse earlier
@@ -1243,15 +1243,16 @@ End Function
 '  QuoteCounts     : Set to an array of size at least NumFields. Element k gives the number of QuoteChars that appear in
 '                    the kth field.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, Delimiter As String, Comment As String, IgnoreRepeated As Boolean, SkipToRow As Long, _
-    NumRows As Long, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, ByRef Starts() As Long, _
+Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, Delimiter As String, Comment As String, _
+    IgnoreEmptyLines As Boolean, IgnoreRepeated As Boolean, SkipToRow As Long, NumRows As Long, ByRef NumRowsFound As Long, _
+    ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, ByRef Starts() As Long, _
     ByRef Lengths() As Long, RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long) As String
 
     Const Err_ContentsOrStream = "ContentsOrStream must either be a string or a TextStream"
     Const Err_Delimiter = "Delimiter must not be the null string"
     Dim Buffer As String
     Dim BufferUpdatedTo As Long
-    Dim CheckForComments As Boolean
+    Dim DoSkipping As Boolean
     Dim ColNum As Long
     Dim EvenQuotes As Boolean
     Dim HaveReachedSkipToRow As Boolean
@@ -1295,8 +1296,8 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
     End If
        
     LComment = Len(Comment)
-    If LComment > 0 Then
-        CheckForComments = True
+    If LComment > 0 Or IgnoreEmptyLines Then
+        DoSkipping = True
     End If
        
     If Streaming Then
@@ -1327,8 +1328,8 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
     
     i = 0: j = 1
     
-    If CheckForComments Then
-        SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
+    If DoSkipping Then
+        SkipLines Streaming, Comment, LComment, IgnoreEmptyLines, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
     End If
     
     If IgnoreRepeated Then
@@ -1394,8 +1395,8 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
                         End If
                     End If
                     
-                    If CheckForComments Then
-                        SkipComment Streaming, Comment, LComment, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
+                    If DoSkipping Then
+                        SkipLines Streaming, Comment, LComment, IgnoreEmptyLines, T, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
                     End If
                     
                     If IgnoreRepeated Then
@@ -1485,7 +1486,16 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
     If SkipToRow > NumRowsInFile Then
         If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or _
                              a negative number of rows. So throw an error.
-            Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of rows in the file (" + CStr(NumRowsInFile) + ")"
+            Dim RowDescription As String
+            If IgnoreEmptyLines And Len(Comment) > 0 Then
+                RowDescription = "not commented, not empty "
+            ElseIf IgnoreEmptyLines Then
+                RowDescription = "not empty "
+            ElseIf Len(Comment) > 0 Then
+                RowDescription = "not commented "
+            End If
+                             
+            Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of " + RowDescription + "rows in the file (" + CStr(NumRowsInFile) + ")"
         Else
             'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
             NumFields = 0
@@ -1501,23 +1511,41 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : SkipComment
-' Purpose    : Sub-routine of ParseCSVContents. Skip a commented row by incrementing i to the position of the line feed
+' Procedure  : SkipLines
+' Purpose    : Sub-routine of ParseCSVContents. Skip a commented or empty row by incrementing i to the position of the line feed
 '              just before the next not-commented line.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub SkipComment(Streaming As Boolean, Comment As String, LComment As Long, T As Scripting.TextStream, _
+Private Sub SkipLines(Streaming As Boolean, Comment As String, LComment As Long, IgnoreEmptyLines As Boolean, T As Scripting.TextStream, _
     Delimiter As String, ByRef Buffer As String, ByRef i As Long, QuoteChar As String, ByVal PosLF As Long, _
     ByVal PosCR As Long, ByRef BufferUpdatedTo As Long)
+    
+    Dim LookAheadBy As Long
+    Dim SkipThisLine As Boolean
     Do
         If Streaming Then
-            If i + LComment > BufferUpdatedTo Then
+            LookAheadBy = MaxLngs(LComment, 2)
+        
+            If i + LookAheadBy > BufferUpdatedTo Then
                 If Not T.AtEndOfStream Then
                     Call GetMoreFromStream(T, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
                 End If
             End If
         End If
 
-        If Mid$(Buffer, i + 1, LComment) = Comment Then
+        SkipThisLine = False
+        If LComment > 0 Then
+            If Mid$(Buffer, i + 1, LComment) = Comment Then
+                SkipThisLine = True
+            End If
+        End If
+        If IgnoreEmptyLines Then
+            Select Case Mid$(Buffer, i + 1, 1)
+                Case vbLf, vbCr
+                    SkipThisLine = True
+            End Select
+        End If
+
+        If SkipThisLine Then
             If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
             If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
             If PosLF < PosCR Then
@@ -1853,7 +1881,6 @@ ErrHandler:
     'Do nothing - strIn was not a string representing a number.
 End Sub
 
-
 Sub testCastToDate()
     Dim strIn As String
     Dim dtOut As Date
@@ -1955,23 +1982,22 @@ End Sub
 '             include time into the third part and the time part.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function SplitOutTime(ByRef ThirdPart As String, ByRef TimePart)
-          Dim i As Long
-          Dim LoopTo As Long
-          
-1         LoopTo = Len(ThirdPart)
-2         If LoopTo > 5 Then LoopTo = 5
+    Dim i As Long
+    Dim LoopTo As Long
+    
+    LoopTo = Len(ThirdPart)
+    If LoopTo > 5 Then LoopTo = 5
 
-3         For i = 1 To LoopTo
-4             Select Case AscW(Mid$(ThirdPart, i, 1))
-                  Case 48 To 57
-5                 Case Else
-6                     TimePart = Mid$(ThirdPart, i)
-10                    ThirdPart = Left$(ThirdPart, i - 1)
-11                    Exit Function
-12            End Select
-13        Next i
+    For i = 1 To LoopTo
+        Select Case AscW(Mid$(ThirdPart, i, 1))
+            Case 48 To 57
+            Case Else
+                TimePart = Mid$(ThirdPart, i)
+                ThirdPart = Left$(ThirdPart, i - 1)
+                Exit Function
+        End Select
+    Next i
 End Function
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : OStoEOL
@@ -2452,23 +2478,24 @@ End Sub
 '              ConvertField.
 '
 ' Results:  On Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz   2.11 GHz, 16GB RAM
-'         A)  FieldContains = "This string is longer than the longest sentinel, which is 14"
-'             100,000,000 per second
-'         B)  FieldContains = "mini"   'Not a sentinel, but shorter than the longest sentinel
-'             20,000,000 per second
-'         C)  FieldContains = "True"    'A sentinel, one of the elements of TrueStrings
-'             9,000,000 per second
+'
+'Running TestSentinelSpeed 2021-08-25T15:01:33
+'Conversions per second = 90,346,968       Field = "This string is longer than the longest sentinel, which is 14"
+'Conversions per second = 20,976,150       Field = "mini" (Not a sentinel, but shorter than the longest sentinel)
+'Conversions per second = 9,295,050        Field = "True" (A sentinel, one of the elements of TrueStrings)
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub TestSentinelSpeed()
     Dim Sentinels As New Scripting.Dictionary
 
-    Dim FieldContains As String
+    Dim Field As String
     Dim t1 As Double, t2 As Double
     Dim i As Long
-    Const N = 100000000
+    Dim j As Long
+    Const N = 10000000
     Dim res As Variant
     Dim MaxLength As Long
     Dim AnySentinels As Boolean
+    Dim Comment As String
 
     MakeSentinels Sentinels, MaxLength, AnySentinels, _
         ShowBooleansAsBooleans:=True, _
@@ -2480,28 +2507,38 @@ Private Sub TestSentinelSpeed()
     
     Dim Converted As Boolean
     
-    'FieldContains = "This string is longer than the longest sentinel, which is 14"
-    'FieldContains = "mini"    'Not a sentinel, but shorter than the longest sentinel
-    FieldContains = "True"     'A sentinel, one of the elements of TrueStrings
+    Debug.Print "Running TestSentinelSpeed " & Format(Now(), "yyyy-mm-ddThh:mm:ss")
+    
+    For j = 1 To 3
+    
+        Select Case j
+            Case 1
+                Field = "This string is longer than the longest sentinel, which is 14"
+            Case 2
+                Field = "mini"
+                Comment = "Not a sentinel, but shorter than the longest sentinel"
+            Case 3
+                Field = "True"
+                Comment = "A sentinel, one of the elements of TrueStrings"
+        End Select
 
-    t1 = sElapsedTime()
-    For i = 1 To N
-        If Len(FieldContains) <= MaxLength Then
-            If Sentinels.Exists(FieldContains) Then
-                res = Sentinels(FieldContains)
-                Converted = True
+        t1 = sElapsedTime()
+        For i = 1 To N
+            If Len(Field) <= MaxLength Then
+                If Sentinels.Exists(Field) Then
+                    res = Sentinels(Field)
+                    Converted = True
+                End If
             End If
-        End If
-    Next i
-    t2 = sElapsedTime()
+        Next i
+        t2 = sElapsedTime()
 
-    Debug.Print Format(N / (t2 - t1), "###,###")
+        Debug.Print "Conversions per second = " & Format(N / (t2 - t1), "###,###"), _
+            "Field = """ & Field & """" & IIf(Comment = "", "", " (" & Comment & ")")
+
+    Next j
 
     Exit Sub
 ErrHandler:
     MsgBox "#TestSentinelSpeed: " & Err.Description & "!"
 End Sub
-
-
-
-

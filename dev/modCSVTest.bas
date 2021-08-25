@@ -68,7 +68,7 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 TestDescription = "test empty file newlines"
                 FileName = "test_empty_file_newlines.csv"
                 Expected = HStack(Array(Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty, IgnoreEmptyLines:=False)
             Case 3
                 TestDescription = "test single column"
                 FileName = "test_single_column.csv"
@@ -196,7 +196,8 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
                     ConvertTypes:=True, _
                     SkipToRow:=4, _
-                    ShowMissingsAs:=Empty)
+                    ShowMissingsAs:=Empty, _
+                    IgnoreEmptyLines:=False)
             Case 22
                 TestDescription = "test missing last field"
                 FileName = "test_missing_last_field.csv"
@@ -298,10 +299,13 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                 TestDescription = "test 2 footer rows"
                 FileName = "test_2_footer_rows.csv"
                 Expected = HStack( _
-                    Array(Empty, Empty, Empty, "col1", 1#, 4#, 7#, 10#, 13#), _
-                    Array(Empty, Empty, Empty, "col2", 2#, 5#, 8#, 11#, 14#), _
-                    Array(Empty, Empty, Empty, "col3", 3#, 6#, 9#, 12#, 15#))
-                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+                    Array("col1", 1#, 4#, 7#, 10#, 13#), _
+                    Array("col2", 2#, 5#, 8#, 11#, 14#), _
+                    Array("col3", 3#, 6#, 9#, 12#, 15#))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    ShowMissingsAs:=Empty, _
+                    IgnoreEmptyLines:=True)
             Case 38
                 TestDescription = "test utf8 with BOM"
                 FileName = "test_utf8_with_BOM.csv"
@@ -1075,7 +1079,36 @@ Sub RunTests(ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() 
                     DateFormat:="M/D/Y", _
                     SkipToRow:=7580, _
                     ShowMissingsAs:=Empty)
-                    
+            Case 125
+                TestDescription = "test padding"
+                FileName = "test_padding.csv"
+                Expected = HStack( _
+                    Array("col1", 1#, 4#, 7#, Empty), _
+                    Array("col2", 2#, 5#, 8#, Empty), _
+                    Array("col3", 3#, 6#, 9#, Empty), _
+                    Array(Empty, Empty, Empty, Empty, Empty))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    NumRows:=5, _
+                    NumCols:=4, _
+                    ShowMissingsAs:=Empty)
+            Case 126
+                TestDescription = "test not delimited"
+                FileName = "test_not_delimited.csv"
+                Expected = HStack(Array("col1,col2,col3", "1,2,3", "4,5,6", "7,8,9"))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, WhatDiffers, _
+                    Delimiter:="False", _
+                    ShowMissingsAs:=Empty)
+            Case 127
+                TestDescription = "test string first argument"
+                FileName = "col1,col2,col3" & vbLf & "1,2,3" & vbLf & "4,5,6" & vbLf & "7,8,9"
+                Expected = HStack( _
+                    Array("col1", "1", "4", "7"), _
+                    Array("col2", "2", "5", "8"), _
+                    Array("col3", "3", "6", "9"))
+                TestRes = TestCSVRead(i, TestDescription, Expected, FileName, WhatDiffers, _
+                    ShowMissingsAs:=Empty)
+        
         End Select
         
         If Not IsEmpty(TestRes) Then
@@ -1255,7 +1288,6 @@ Function Expected95()
         Array("16S_batch Mapping", "16S_batch001"), Array("Mother/Child Dyads", Empty))
 End Function
 
-
 Function Expected96_97_98()
     Expected96_97_98 = HStack( _
         Array(CDate("2021-Sep-01 16:23:13"), CDate("2022-Oct-09 04:16:13"), CDate("2022-Dec-27 13:56:15"), CDate("2022-May-07 08:56:31"), CDate("2024-Jan-14 05:29:48"), _
@@ -1371,7 +1403,6 @@ Function ArrayToVBALitteral(TheData As Variant, Optional AssignTo As String, Opt
 31        Else
 32            ArrayToVBALitteral = Transpose(VBA.Split(res, vbLf))
 33        End If
-
 
 34        Exit Function
 ErrHandler:
@@ -1516,9 +1547,6 @@ Function GenerateTestCode(ConvertTypes As Variant, Delimiter As String, IgnoreRe
             res = res + ", _" + vbLf + String(IndentBy, " ") + "MissingStrings := " & ArrayToVBALitteral(VBA.Split(MissingStrings, ","))
         End If
     End If
-    
-    
-    
     
     res = res + ", _" + vbLf + String(IndentBy, " ") + "ShowMissingsAs := Empty"
     If Encoding <> "" And Not IsEmpty(Encoding) Then

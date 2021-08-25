@@ -209,7 +209,7 @@ Sub CastISO8601(ByVal strIn As String, dtOut As Date, ByRef Converted As Boolean
         Set rx = New RegExp
         With rx
             .IgnoreCase = False
-            .Pattern = "^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?((Z|((\+|\-)[0-9][0-9]:[0-9][0-9])))?)?$"
+            .Pattern = "^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?((Z|((\+|\-)[0-2][0-9]:[0-5][0-9])))?)?$"
             .Global = False        'Find first match only
         End With
         rxExists = True
@@ -350,3 +350,44 @@ ErrHandler:
     'Was not recognised as ISO8601 date
 End Sub
 
+'See "gogeek"'s post at https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : GetLocalOffsetToUTC
+' Author     : Philip Swannell
+' Date       : 25-Aug-2021
+' Purpose    :
+' Parameters :
+' -----------------------------------------------------------------------------------------------------------------------
+Function GetLocalOffsetToUTC()
+    Dim dt As Object, UTC As Date
+    Dim TimeNow As Date
+    On Error GoTo ErrHandler
+        TimeNow = Now()
+
+    Set dt = CreateObject("WbemScripting.SWbemDateTime")
+    dt.SetVarDate TimeNow
+    UTC = dt.GetVarDate(False)
+    GetLocalOffsetToUTC = (TimeNow - UTC)
+
+
+    Exit Function
+ErrHandler:
+    Throw "#GetLocalOffsetToUTC (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+Function ISO8601FormatString()
+    Dim TimeZone
+    Dim RightChars
+
+    TimeZone = GetLocalOffsetToUTC()
+
+    If TimeZone = 0 Then
+        RightChars = "Z"
+    ElseIf TimeZone > 0 Then
+        RightChars = "+" & Format(TimeZone, "hh:mm")
+    Else
+        RightChars = "-" & Format(Abs(TimeZone), "hh:mm")
+    End If
+    ISO8601FormatString = "yyyy-mm-ddT:hh:mm:ss.000" & RightChars
+
+End Function
