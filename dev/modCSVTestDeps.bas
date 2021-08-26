@@ -1,6 +1,14 @@
 Attribute VB_Name = "modCSVTestDeps"
+
+' VBA-CSV
+
+' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
+' License MIT (https://opensource.org/licenses/MIT)
+' Document: https://github.com/PGS62/VBA-CSV#readme
+
 'This module contains "test dependencies" of CSVReadWrite, i.e. dependencies of the code used to test ModCSVReadWrite, _
 but not dependencies of ModCSVReadWrite itself which is (should be) self-contained
+
 Option Explicit
 Option Private Module
 
@@ -17,7 +25,7 @@ Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCo
 ' Purpose    : Kernel of the method RunTests, uses sArryasIdentical to check that data read by function CSVRead is
 '              identical to Expected. If not sets WhatDiffers to a description of what went wrong.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected As Variant, FileName As String, _
+Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected As Variant, FileName As String, ByRef Observed, _
           ByRef WhatDiffers As String, Optional AbsTol As Double, Optional RelTol As Double, Optional ConvertTypes As Variant = False, _
           Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
           Optional DateFormat As String, Optional Comment As String, Optional IgnoreEmptyLines As Boolean = True, Optional ByVal SkipToRow As Long = 1, _
@@ -26,8 +34,6 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
           Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant = "", _
           Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
           Optional NumRowsExpected As Long, Optional NumColsExpected As Long) As Boolean
-
-          Dim Observed As Variant
 
 1         On Error GoTo ErrHandler
 
@@ -453,8 +459,6 @@ End Function
 '---------------------------------------------------------------------------------------------------------
 Function sIsApprox(ByVal x, ByVal Y, Optional CaseSensitive As Boolean = False, Optional AbsTol As Double, Optional RelTol As Double)
 
-          Const Epsilon = 2E-16
-          
           Dim CompareTo As Double
           Dim VTA As Long
           Dim VTB As Long

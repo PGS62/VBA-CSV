@@ -1,6 +1,14 @@
 Attribute VB_Name = "modCSVXLUtils"
+
+' VBA-CSV
+
+' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
+' License MIT (https://opensource.org/licenses/MIT)
+' Document: https://github.com/PGS62/VBA-CSV#readme
+
 Option Explicit
-'Functions that, inaddition to CSVRead and CSVWrite, are called from the worksheets of this workbook
+'Functions that, in addition to CSVRead and CSVWrite, are called from the worksheets of this workbook _
+see also mod
 
 Function TempFolder()
     TempFolder = Environ("Temp")
@@ -95,17 +103,23 @@ ErrHandler:
 16        FileFromPath = "#" & Err.Description & "!"
 End Function
 
-Function RawFileContents(FileName As String)
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FileReadAll
+' Author     : Philip Swannell
+' Date       : 26-Aug-2021
+' Purpose    : Returns the contents of a file as a string
+' -----------------------------------------------------------------------------------------------------------------------
+Function FileReadAll(FileName As String)
     Dim FSO As New FileSystemObject, F As Scripting.File, T As Scripting.TextStream
     On Error GoTo ErrHandler
     Set F = FSO.GetFile(FileName)
     Set T = F.OpenAsTextStream()
-    RawFileContents = T.ReadAll
+    FileReadAll = T.ReadAll
     T.Close
 
     Exit Function
 ErrHandler:
-    Throw "#RawFileContents (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#FileReadAll (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 '---------------------------------------------------------------------------------------------------------
@@ -282,7 +296,15 @@ ErrHandler:
 17        SplitString = "#SplitString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function AllCombinations(Arg1, Arg2, Arg3, Arg4)
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : AllCombinations
+' Author     : Philip Swannell
+' Date       : 26-Aug-2021
+' Purpose    : Iterate over all combinations of the elements of the (up to) 4 input arrays, producing an output vector
+'              of those elements concatenated with given delimiter.
+' -----------------------------------------------------------------------------------------------------------------------
+Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
+          Optional Arg4, Optional Delimiter As String)
           Dim res() As String
           Dim Part1 As Variant
           Dim Part2 As Variant
@@ -290,44 +312,67 @@ Function AllCombinations(Arg1, Arg2, Arg3, Arg4)
           Dim Part4 As Variant
           Dim k As Long
 
-1         Force2DArrayR Arg1
-2         Force2DArrayR Arg2
-3         Force2DArrayR Arg3
-4         Force2DArrayR Arg4
+1         On Error GoTo ErrHandler
+2         If IsMissing(Arg2) Then Arg2 = ""
+3         If IsMissing(Arg3) Then Arg3 = ""
+4         If IsMissing(Arg4) Then Arg4 = ""
 
-5         ReDim res(1 To sNRows(Arg1) * sNRows(Arg2) * sNRows(Arg3) * sNRows(Arg4), 1 To 1)
-6         For Each Part1 In Arg1
-7             For Each Part2 In Arg2
-8                 For Each Part3 In Arg3
-9                     For Each Part4 In Arg4
-10                        k = k + 1
-11                        res(k, 1) = Part1 & Part2 & Part3 & Part4
-12                    Next
-13                Next
-14            Next
-15        Next
-16        AllCombinations = res
+5         Force2DArrayR Arg1
+6         Force2DArrayR Arg2
+7         Force2DArrayR Arg3
+8         Force2DArrayR Arg4
 
+9         ReDim res(1 To sNRows(Arg1) * sNCols(Arg1) * sNRows(Arg2) * sNCols(Arg2) * sNRows(Arg3) * sNCols(Arg4) * sNRows(Arg4) * sNCols(Arg4), 1 To 1)
+10        For Each Part1 In Arg1
+11            Part1 = CStr(Part1)
+12            For Each Part2 In Arg2
+13                Part2 = CStr(Part2)
+14                For Each Part3 In Arg3
+15                    Part3 = CStr(Part3)
+16                    For Each Part4 In Arg4
+17                        Part4 = CStr(Part4)
+18                        k = k + 1
+19                        res(k, 1) = Part1 & IIf(Len(Part2) > 0, Delimiter, "") & Part2 & _
+                              IIf(Len(Part3) > 0, Delimiter, "") & Part3 & _
+                              IIf(Len(Part4) > 0, Delimiter, "") & Part4
+20                    Next
+21                Next
+22            Next
+23        Next
+24        AllCombinations = res
+
+25        Exit Function
+ErrHandler:
+26        AllCombinations = "#AllCombinations (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function MakeGoodStringsBad(GoodStrings)
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : MakeGoodStringsBad
+' Purpose    : For a vector of input strings, returns a longer vector of those strings "made bad" by injecting the
+'              character "x" at all possible positions.
+'              Helpful for testing, say, parsing of nearly-but-not-quite-valid ISO8601 strings.
+' Parameters :
+'  GoodStrings: Array (1 col) of strings.
+' -----------------------------------------------------------------------------------------------------------------------
+Function MakeGoodStringsBad(GoodStrings, Optional InsertThis As String = "x")
 
           Dim Res1D() As String
 
 1         On Error GoTo ErrHandler
 2         Force2DArrayR GoodStrings
-          Dim ThisBadString
 
-          Dim i As Long, j As Long, k As Long
+          Dim i As Long
+          Dim j As Long
+          Dim k As Long
 
 3         ReDim Res1D(1 To 1)
 4         For i = 1 To sNRows(GoodStrings)
-5             For j = 1 To Len(GoodStrings(i, 1)) + 1
+5             For j = 0 To Len(GoodStrings(i, 1)) + 1
 6                 k = k + 1
 7                 If k > UBound(Res1D) Then
 8                     ReDim Preserve Res1D(1 To k)
 9                 End If
-10                Res1D(k) = InsertInString("x", GoodStrings(i, 1), j)
+10                Res1D(k) = InsertInString(InsertThis, GoodStrings(i, 1), j)
 11            Next j
 12        Next i
 
@@ -338,18 +383,26 @@ ErrHandler:
 15        MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Private Function InsertInString(InsertThis As String, ByVal InToThis As String, AtPoint As Long)
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : InsertInString
+' Purpose    : Sub of MakeGoodStringsBad
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function InsertInString(InsertThis As String, ByVal InToThis As String, ByVal AtPoint As Long)
 
 1         On Error GoTo ErrHandler
+
 2         If AtPoint + Len(InsertThis) > Len(InToThis) Then
 3             InToThis = InToThis + String(AtPoint + Len(InsertThis) - Len(InToThis), " ")
-4         End If
+4         ElseIf AtPoint <= 0 Then
+5             InToThis = String(1 - AtPoint, " ") + InToThis
+              AtPoint = 1
+6         End If
 
-5         Mid(InToThis, AtPoint, Len(InsertThis)) = InsertThis
-6         InsertInString = InToThis
-7         Exit Function
+7         Mid(InToThis, AtPoint, Len(InsertThis)) = InsertThis
+8         InsertInString = InToThis
+9         Exit Function
 ErrHandler:
-8         Throw "#InsertInString (line " & CStr(Erl) + "): " & Err.Description & "!"
+10        Throw "#InsertInString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 '---------------------------------------------------------------------------------------------------------
@@ -465,6 +518,10 @@ ErrHandler:
 47        Set rx = Nothing
 End Function
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : RegExSyntaxValid
+' Purpose    : Tests syntax of a regular expression.
+' -----------------------------------------------------------------------------------------------------------------------
 Private Function RegExSyntaxValid(RegularExpression As String) As Boolean
           Dim res As Boolean
           Dim rx As VBScript_RegExp_55.RegExp

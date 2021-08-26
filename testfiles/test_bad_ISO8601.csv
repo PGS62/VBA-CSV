@@ -8,6 +8,16 @@ Minute out of range,2021-06-29T17:61:23.492-12:00
 Seconds out of range,2021-06-29T17:58:60.492-12:00
 Time zone hours out of range,2021-06-29T17:58:23.492-24:00
 Time zone minutes out of range,2021-06-29T17:58:23.492-12:60
+Month out-of-range,2021-00-29
+Month out-of-range,2021-13-29
+Day out of range,2021-06-00
+Day out of range,2021-06-31
+Hour out of range,2021-06-29T25:15:20
+Month out-of-range,2021-30-29
+Day out of range,2021-06-40
+Hour out of range,2021-06-29T30:15:20
+Minute out of range,2021-06-29T20:60:20
+Seconds out of range,2021-06-29T:20:59:60
 Bad character at position 1,x021-06-29T17:58:23.492-12:00
 Bad character at position 2,2x21-06-29T17:58:23.492-12:00
 Bad character at position 3,20x1-06-29T17:58:23.492-12:00

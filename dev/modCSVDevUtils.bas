@@ -1,9 +1,17 @@
 Attribute VB_Name = "modCSVDevUtils"
+
+' VBA-CSV
+
+' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
+' License MIT (https://opensource.org/licenses/MIT)
+' Document: https://github.com/PGS62/VBA-CSV#readme
+
 Option Explicit
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : SaveWorkbookAndExportModules
-' Purpose    : Export the modules of this workbook to the src folder, also save the workbook in its current location, and save a backup of the workbook to my OneDrive folder.
+' Purpose    : Export the modules of this workbook to the src folder, also save the workbook in its current location,
+'              and save a backup of the workbook to my OneDrive folder.
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub SaveWorkbookAndExportModules()
 
@@ -102,6 +110,10 @@ ErrHandler:
 62        MsgBox "#SaveWorkbookAndExportModules (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : PrepareForRelease
+' Purpose    : Tidy up the worksheets of this workbook.
+' -----------------------------------------------------------------------------------------------------------------------
 Sub PrepareForRelease()
 
     Dim i As Long

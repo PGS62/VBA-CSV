@@ -32,10 +32,10 @@ Sub RegisterCSVRead()
     Dim ArgumentDescriptions() As String
     ReDim ArgumentDescriptions(1 To 17)
     ArgumentDescriptions(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV format."
-    ArgumentDescriptions(2) = "TRUE to convert Numbers, Dates, Booleans and Errors into their typed values; FALSE to leave as strings. Or string of letters N, D, B, E, T, Q, R. T = trim leading and trailing spaces. R = quoted strings retain quotes. Q = convert quoted fields."
+    ArgumentDescriptions(2) = "Type conversion: Boolean or string, subset of letters NDBETQ. N = convert Numbers, D = convert Dates, B = Convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = quoted fields also converted. TRUE = NDB, FALSE = no conversion."
     ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
     ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line or immediately after another delimiter or at the end of a line, should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
-    ArgumentDescriptions(5) = "The format of dates in the file such as ""Y-M-D"", ""M-D-Y"" or ""Y/M/D"". If omitted, ""Y-M-D"" is assumed. Repeated D's (or M's or Y's) are equivalent to single instances, so that ""Y-M-D"" and ""YYYY-MMM-DD"" are equivalent."
+    ArgumentDescriptions(5) = "The format of dates in the file such as ""Y-M-D"", ""M-D-Y"" or ""Y/M/D"". Also supports ""ISO"" for ISO8601 (e.g. 2021-08-26T09:11:30) or ""ISOZ"" (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
     ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
     ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each column will be assigned ShowMissingsAs for that empty row)."
     ArgumentDescriptions(8) = "The row in the file at which reading starts. Optional and defaults to 1 to read from the first row."
@@ -50,6 +50,7 @@ Sub RegisterCSVRead()
     ArgumentDescriptions(17) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
     Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
 End Sub
+
 '---------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVWrite
 ' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
@@ -63,7 +64,7 @@ Sub RegisterCSVWrite()
     ArgumentDescriptions(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the function returns a string of Data converted to CSV format."
     ArgumentDescriptions(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. Double quotes are always escaped by another double quote."
     ArgumentDescriptions(4) = "A format string that determine how dates, including cells formatted as dates, appear in the file. If omitted, defaults to ""yyyy-mm-dd""."
-    ArgumentDescriptions(5) = "A format string that determines how dates with non-zero time part appear in the file. If omitted defaults to ""yyyy-mm-dd hh:mm:ss"".The companion function CSVRead is not capable of converting fields written in DateTime format back from strings into Dates."
+    ArgumentDescriptions(5) = "Format for datetimes. Defaults to ""ISO"" which abbreviates ""yyyy-mm-ddThh:mm:ss"". Use ""ISOZ"" for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data."
     ArgumentDescriptions(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one character."
     ArgumentDescriptions(7) = "If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains strings with characters whose code points exceed 255."
     ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter ""Windows"" (the default), ""Unix"" or ""Mac"". Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings ""CRLF"", ""LF"" or ""CR""."
@@ -74,34 +75,30 @@ End Sub
 ' Procedure : CSVRead
 ' Purpose   : Returns the contents of a comma-separated file on disk as an array.
 ' Arguments
-' FileName  : Either: * The name of a file, with path.
-'             * A URL of a file.
-'             * A string in CSV format.
+' FileName  : The full name of the file, including the path, or else a URL of a file, or else a string in
+'             CSV format.
 ' ConvertTypes: ConvertTypes provides control over whether fields in the file are converted to typed values
 '             in the return or remain as strings, and also sets the treatment of "quoted fields" and space
 '             characters.
 '
 '             ConvertTypes may take values FALSE (the default), TRUE, or a string of zero or more letters
-'             from "NDBETQR".
+'             from "NDBETQ".
 '
 '             If ConvertTypes is:
 '             * FALSE then no conversion takes place other than quoted fields being unquoted.
-'             * TRUE then unquoted numbers, dates, Booleans and errors are converted, equivalent to "NDBE".
+'             * TRUE then unquoted numbers, dates and Booleans and errors are converted, equivalent to
+'             "NDB".
 '
 '             If ConvertTypes is a string including:
 '             1) "N" then fields that represent numbers are converted to numbers (Doubles).
 '             2) "D" then fields that represent dates (respecting DateFormat) are converted to Dates.
-'             3) "B" then fields that read true or false are converted to Booleans. The match is not case
-'             sensitive so TRUE, FALSE, True and False are also converted.
+'             3) "B" then fields that read match one of the TrueStrings are converted to Booleans.
 '             4) "E" then fields that match Excel"s representation of error values are converted to error
 '             values. There are fourteen such strings, including #N/A, #NAME?, #VALUE! and #DIV/0!.
 '             5) "T" then leading and trailing spaces are trimmed from fields. In the case of quoted
 '             fields, this will not remove spaces between the quotes.
 '             6) "Q" then conversion happens for both quoted and unquoted fields; otherwise only unquoted
 '             fields are converted.
-'             7) "R" then quoted fields retain their quotes, otherwise they are "unquoted" i.e. have their
-'             leading and trailing characters removed and consecutive pairs of double-quotes replaced by a
-'             single double quote.
 ' Delimiter : By default, CSVRead will try to detect a file's delimiter as the first instance of comma, tab,
 '             semi-colon, colon or pipe found outside quoted regions in the first 10,000 characters of the
 '             file. If it can't auto-detect the delimiter, it will assume comma. If your file includes a
@@ -114,9 +111,13 @@ End Sub
 ' IgnoreRepeated: Whether delimiters which appear at the start of a line or immediately after another
 '             delimiter or at the end of a line, should be ignored while parsing; useful-for fixed-width
 '             files with delimiter padding between fields.
-' DateFormat: The format of dates in the file such as "Y-M-D", "M-D-Y" or "Y/M/D". If omitted, "Y-M-D" is
-'             assumed. Repeated D's (or M's or Y's) are equivalent to single instances, so that "Y-M-D" and
-'             "YYYY-MMM-DD" are equivalent.
+' DateFormat: The format of dates in the file such as "Y-M-D", "M-D-Y" or "Y/M/D". Alternatively, if dates
+'             in the file comply with ISO8601 use:
+'             * "ISO" if dates are given "2021-08-26" and dates-with-time are given without time zone e.g.
+'             "2021-08-26T08:59:15"
+'             * "ISOZ" if dates are given "2021-08-26" and dates-with-time are given with time zone, e.g.
+'             "2021-08-26T08:59:15Z" or "2021-08-26T13:59:15+05:00". In this case, dates-with-time in the
+'             file are returned in UTC time.
 ' Comment   : Rows that start with this string will be skipped while parsing.
 ' IgnoreEmptyLines: Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each
 '             column will be assigned ShowMissingsAs for that empty row).
@@ -181,7 +182,8 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Const Err_Comment = "Comment must not contain double-quote, line feed or carriage return"
     Const Err_UTF8BOM = "Argument Encoding specifies that the file is UTF 8 encoded with Byte Option Mark, but the file has some other encoding"
     
-    Dim ISO8601 As Boolean
+    Dim AcceptWithoutTimeZone As Boolean
+    Dim AcceptWithTimeZone As Boolean
     Dim AnyConversion As Boolean
     Dim AnySentinels As Boolean
     Dim ColIndexes() As Long
@@ -191,6 +193,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Dim DateSeparator As String
     Dim FirstThreeChars As String
     Dim i As Long
+    Dim ISO8601 As Boolean
     Dim IsUTF8BOM As Boolean
     Dim j As Long
     Dim k As Long
@@ -206,7 +209,6 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Dim NumRowsInReturn As Long
     Dim QuoteCounts() As Long
     Dim Ragged As Boolean
-    Dim RetainQuotes As Boolean
     Dim ReturnArray() As Variant
     Dim RowIndexes() As Long
     Dim Sentinels As New Scripting.Dictionary
@@ -276,13 +278,13 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 
     ParseConvertTypes ConvertTypes, ShowNumbersAsNumbers, _
         ShowDatesAsDates, ShowBooleansAsBooleans, ShowErrorsAsErrors, _
-        ConvertQuoted, RetainQuotes, TrimFields
+        ConvertQuoted, TrimFields
 
     MakeSentinels Sentinels, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
         ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
     
     If ShowDatesAsDates Then
-        ParseDateFormat DateFormat, DateOrder, DateSeparator, ISO8601
+        ParseDateFormat DateFormat, DateOrder, DateSeparator, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone
         SysDateOrder = Application.International(xlDateOrder)
         SysDateSeparator = Application.International(xlDateSeparator)
     End If
@@ -385,9 +387,9 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
         If j >= 1 And j <= NumColsInReturn Then
         
             ReturnArray(i, j) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
-                Lengths(k), TrimFields, DQ, QuoteCounts(k), RetainQuotes, ConvertQuoted, _
+                Lengths(k), TrimFields, DQ, QuoteCounts(k), ConvertQuoted, _
                 ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
-                ShowDatesAsDates, ISO8601, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
+                ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, _
                 AnySentinels, Sentinels, MaxSentinelLength, ShowMissingsAs)
             
             'File has variable number of fields per line...
@@ -721,7 +723,7 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseConvertTypes
-' Purpose    : Parse the input ConvertTypes to set seven Boolean flags which are passed by reference
+' Purpose    : Parse the input ConvertTypes to set seven Boolean flags which are passed by reference.
 ' Parameters :
 '  ConvertTypes          : The argument to CSVRead
 '  ShowNumbersAsNumbers  : Should fields in the file that look like numbers be returned as Numbers? (Doubles)
@@ -729,18 +731,19 @@ End Sub
 '  ShowBooleansAsBooleans: Should fields in the file that match one of the TrueStrings or FalseStrings be returned as Booleans?
 '  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
 '  ConvertQuoted         : Should the four conversion rules above apply even to quoted fields?
-'  RetainQuotes          : Should quotes in quoted fields be retained?
 '  TrimFields            : Should leading and trailing spaces be trimmed from fields?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
     ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
-    ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef RetainQuotes As Boolean, ByRef TrimFields As Boolean)
+    ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean)
 
-    Const Err_ConvertTypes = "ConvertTypes must be Boolean or string with allowed letters NDBETQR. " & _
-        "'N' show numbers as numbers, 'D' show dates as dates, 'B' show Booleans " & _
-        "as Booleans, 'E' show Excel errors as errors, 'T' to trim leading and trailing spaces from fields, 'Q' rules NDBE apply even to quoted fields, 'R' quoted fields retain their quotes, TRUE = NDBE (convert unquoted numbers, dates, Booleans and errors), FALSE = no conversion"
-    Const Err_Quoted = "ConvertTypes cannot contain both 'Q' and 'R' since 'Q' indicates that type conversion should apply to quoted fields, but 'R' indicates that quoted fields should retain their quotes."
-    Const Err_Quoted2 = "ConvertTypes is incorrect, 'Q' indicates that conversion should apply even to quoted fields, but none of 'N', 'D', 'B' or 'E' are present to indicate which type conversion to apply"
+    Const Err_ConvertTypes = "ConvertTypes must be Boolean or string with allowed letters NDBETQ. " & _
+        """N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans " & _
+        "as Booleans, ""E"" show Excel errors as errors, ""T"" to trim leading and trailing " & _
+        "spaces from fields, ""Q"" rules NDBE apply even to quoted fields, TRUE = ""NDB"" " & _
+        "(convert unquoted numbers, dates and Booleans), FALSE = no conversion"
+    Const Err_Quoted = "ConvertTypes is incorrect, ""Q"" indicates that conversion should apply even to " & _
+        "quoted fields, but none of ""N"", ""D"", ""B"" or ""E"" are present to indicate which type conversion to apply"
     Dim i As Long
 
     On Error GoTo ErrHandler
@@ -756,15 +759,13 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
             ShowNumbersAsNumbers = True
             ShowDatesAsDates = True
             ShowBooleansAsBooleans = True
-            ShowErrorsAsErrors = True
-            RetainQuotes = False
+            ShowErrorsAsErrors = False
             ConvertQuoted = False
         Else
             ShowNumbersAsNumbers = False
             ShowDatesAsDates = False
             ShowBooleansAsBooleans = False
             ShowErrorsAsErrors = False
-            RetainQuotes = False
             ConvertQuoted = False
         End If
     ElseIf VarType(ConvertTypes) = vbString Then
@@ -772,7 +773,6 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
         ShowDatesAsDates = False
         ShowBooleansAsBooleans = False
         ShowErrorsAsErrors = False
-        RetainQuotes = False
         ConvertQuoted = False
         For i = 1 To Len(ConvertTypes)
             Select Case UCase(Mid$(ConvertTypes, i, 1))
@@ -786,8 +786,6 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
                     ShowErrorsAsErrors = True
                 Case "Q"
                     ConvertQuoted = True
-                Case "R"
-                    RetainQuotes = True
                 Case "T"
                     TrimFields = True
                 Case Else
@@ -799,11 +797,9 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
         Throw Err_ConvertTypes
     End If
     
-    If RetainQuotes And ConvertQuoted Then
-        Throw Err_Quoted
-    ElseIf ConvertQuoted And Not (ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+    If ConvertQuoted And Not (ShowNumbersAsNumbers Or ShowDatesAsDates Or _
         ShowBooleansAsBooleans Or ShowErrorsAsErrors) Then
-        Throw Err_Quoted2
+        Throw Err_Quoted
     End If
 
     Exit Sub
@@ -988,7 +984,6 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
                     End If
             End Select
         Next i
-
     Else
         Throw Err_SourceType
     End If
@@ -1022,38 +1017,47 @@ End Function
 '                 (0 = MDY, 1 = DMY, 2 = YMD)
 '  DateSeparator: ByRef argument is set to the DateSeparator, typically "-" or "/"
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, ByRef ISO8601)
+Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, _
+    ByRef ISO8601, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
 
-    Const Err_DateFormat = "DateFormat should be 'ISO', ''M-D-Y', 'D-M-Y' or 'Y-M-D'. A character other " + _
-        "than '-' is allowed as the separator. Omit to use the Windows default, which on this PC is "
+    Dim Err_DateFormat As String
 
     On Error GoTo ErrHandler
     
-    'Replace repeated D's with a single D, etc since sParseDateCore only needs _
-     to know the order in which the three parts of the date appear.
-    If Left(UCase(DateFormat), 3) = "ISO" Then
+    If UCase(DateFormat) = "ISO" Then
         ISO8601 = True
+        AcceptWithoutTimeZone = True
+        AcceptWithTimeZone = False
+        Exit Sub
+    ElseIf UCase(DateFormat) = "ISOZ" Then
+        ISO8601 = True
+        AcceptWithoutTimeZone = False
+        AcceptWithTimeZone = True
         Exit Sub
     End If
+    
+    Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " + _
+        "'M/D/Y', 'D/M/Y' or 'Y/M/D'" & ". Omit to use the default date format on this PC which is """ + WindowsDateFormat() + """"
      
+    'Replace repeated D's with a single D, etc since CastToDate only needs _
+     to know the order in which the three parts of the date appear.
     If Len(DateFormat) > 5 Then
         DateFormat = UCase(DateFormat)
         ReplaceRepeats DateFormat, "D"
         ReplaceRepeats DateFormat, "M"
         ReplaceRepeats DateFormat, "Y"
     End If
-
+       
     If Len(DateFormat) = 0 Then
-        'https://en.wikipedia.org/wiki/ISO_8601
-        DateOrder = 2 'Y-M-D
-        DateSeparator = "-"
-        
+        DateOrder = Application.International(xlDateOrder)
+        DateSeparator = Application.International(xlDateSeparator)
     ElseIf Len(DateFormat) <> 5 Then
-        Throw Err_DateFormat + WindowsDefaultDateFormat
+        Throw Err_DateFormat
     ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
-        Throw Err_DateFormat + WindowsDefaultDateFormat
+        Throw Err_DateFormat
     Else
         DateSeparator = Mid$(DateFormat, 2, 1)
+        If DateSeparator <> "/" And DateSeparator <> "-" Then Throw Err_DateFormat
         Select Case UCase$(Left$(DateFormat, 1) + Mid$(DateFormat, 3, 1) + Right$(DateFormat, 1))
             Case "MDY"
                 DateOrder = 0
@@ -1062,7 +1066,7 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
             Case "YMD"
                 DateOrder = 2
             Case Else
-                Throw Err_DateFormat + WindowsDefaultDateFormat()
+                Throw Err_DateFormat
         End Select
     End If
 
@@ -1084,25 +1088,25 @@ Private Sub ReplaceRepeats(ByRef TheString As String, TheChar As String)
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : WindowsDefaultDateFormat
+' Procedure  : WindowsDateFormat
 ' Purpose    : Returns a description of the system date format, used only for error string generation.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function WindowsDefaultDateFormat() As String
+Private Function WindowsDateFormat() As String
     Dim DS As String
     On Error GoTo ErrHandler
     DS = Application.International(xlDateSeparator)
     Select Case Application.International(xlDateOrder)
         Case 0
-            WindowsDefaultDateFormat = "M" + DS + "D" + DS + "Y"
+            WindowsDateFormat = "M" + DS + "D" + DS + "Y"
         Case 1
-            WindowsDefaultDateFormat = "D" + DS + "M" + DS + "Y"
+            WindowsDateFormat = "D" + DS + "M" + DS + "Y"
         Case 2
-            WindowsDefaultDateFormat = "Y" + DS + "M" + DS + "D"
+            WindowsDateFormat = "Y" + DS + "M" + DS + "D"
     End Select
 
     Exit Function
 ErrHandler:
-    WindowsDefaultDateFormat = "Cannot determine!"
+    WindowsDateFormat = "Cannot determine!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1744,42 +1748,50 @@ End Function
 ' Purpose    : Convert a field in the file into an element of the returned array.
 ' Parameters :
 'General
-'  Field               : Field, i.e. characters from the file between successive delimiters.
-'  AnyConversion       : Is any type conversion to take place? i.e. processing other than trimming whitespace and unquoting.
-'  FieldLength         : The length of Field.
+'  Field                : Field, i.e. characters from the file between successive delimiters.
+'  AnyConversion        : Is any type conversion to take place? i.e. processing other than trimming whitespace and
+'                         unquoting.
+'  FieldLength          : The length of Field.
 'Whitespace and Quotes
-'  TrimFields          : Should leading and trailing spaces be trimmed from fields? For quoted fields, this will not
-'                        remove spaces between the quotes.
-'  QuoteChar           : The quote character, typically ". No support for different OpenQuoteChar, CloseQuoteChar and
-'                        EscapeChar.
-'  QuoteCount          : How many quote characters does Field contain?
-'  RetainQuotes        : Should quoted fields keep their quote characters? Mainly usefule for debugging.
-'  ConvertQuoted       : Should quoted fields (after quote removal) be converted according to args ShowNumbersAsNumbers
-'                        ShowDatesAsDates, and the contents of Sentinels.
+'  TrimFields           : Should leading and trailing spaces be trimmed from fields? For quoted fields, this will not
+'                         remove spaces between the quotes.
+'  QuoteChar            : The quote character, typically ". No support for different opening and closing quote characters
+'                         or different escape character.
+'  QuoteCount           : How many quote characters does Field contain?
+'  ConvertQuoted        : Should quoted fields (after quote removal) be converted according to args ShowNumbersAsNumbers
+'                         ShowDatesAsDates, and the contents of Sentinels.
 'Numbers
-'  ShowNumbersAsNumbers: If Field is a string representation of a number should the function return that number?
-'  SepStandard         : Is the decimal separator the same as the system defaults? If True then the next two are ignored.
-'  DecimalSeparator    : The decimal separator used in the input string.
-'  SysDecimalSeparator : The default decimal separator on the system.
+'  ShowNumbersAsNumbers : If Field is a string representation of a number should the function return that number?
+'  SepStandard          : Is the decimal separator the same as the system defaults? If True then the next two arguments
+'                         are ignored.
+'  DecimalSeparator     : The decimal separator used in the input string.
+'  SysDecimalSeparator  : The default decimal separator on the system.
 'Dates
-'  DateOrder           : If Field is a string representation what order of parts must it respect?
-'                        0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
-'  DateSeparator       : The date separator used by inStr, typically "-" or "/".
-'  SysDateOrder        : The Windows system date order. 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
-'  SysDateSeparator    : The Windows system date separator.
+'  ShowDatesAsDates     : If Field is a string representation of a date should the function return that date?
+'  ISO8601              : If field is a date, does it respect (a subset of) ISO8601?
+'  AcceptWithoutTimeZone: In the case of ISO8601 dates, should conversion be dates-with-time that have no time zone
+'                         information?
+'  AcceptWithTimeZone   : In the case of ISO8601 dates, should conversion be dates-with-time that have time zone
+'                         information?
+'  DateOrder            : If Field is a string representation what order of parts must it respect (not relevant if
+'                         ISO8601 is True) 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
+'  DateSeparator        : The date separator, must be one of "-" or "/".
+'  SysDateOrder         : The Windows system date order. 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
+'  SysDateSeparator     : The Windows system date separator.
 'Booleans, Errors, Missings
-'  AnySentinels        : Does the sentinel dictionary have any elements?
-'  Sentinels           : A dictionary of Sentinels. If Sentinels.Exists(Field) Then ConvertField = Sentinels(Field)
-'  MaxSentinelLength   : The maximum length of the keys of Sentinels.
-'  ShowMissingsAs      : The value to which missing fields (consecutive delimiters) are converted. If CSVRead has a
-'                        MissingStrings argument then values matching those strings are also converted to ShowMissingsAs,
-'                        thanks to method MakeSentinels.
+'  AnySentinels         : Does the sentinel dictionary have any elements?
+'  Sentinels            : A dictionary of Sentinels. If Sentinels.Exists(Field) Then ConvertField = Sentinels(Field)
+'  MaxSentinelLength    : The maximum length of the keys of Sentinels.
+'  ShowMissingsAs       : The value to which missing fields (consecutive delimiters) are converted. If CSVRead has a
+'                         MissingStrings argument then values matching those strings are also converted to ShowMissingsAs,
+'                         thanks to method MakeSentinels.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, TrimFields As Boolean, _
-    QuoteChar As String, QuoteCount As Long, RetainQuotes As Boolean, ConvertQuoted As Boolean, _
+    QuoteChar As String, QuoteCount As Long, ConvertQuoted As Boolean, _
     ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, SysDecimalSeparator As String, _
-    ShowDatesAsDates As Boolean, ISO8601 As Boolean, DateOrder As Long, DateSeparator As String, SysDateOrder As Long, _
-    SysDateSeparator As String, AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
+    ShowDatesAsDates As Boolean, ISO8601 As Boolean, AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, _
+    DateOrder As Long, DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+    AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
     ShowMissingsAs As Variant)
 
     Dim Converted As Boolean
@@ -1803,11 +1815,9 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
     ElseIf Left$(Field, 1) = QuoteChar Then 'NOTE definition of quoted is both first and last characters must be quote characters
         If Right$(QuoteChar, 1) = QuoteChar Then
             isQuoted = True
-            If Not RetainQuotes Then
-                Field = Mid$(Field, 2, FieldLength - 2)
-                If QuoteCount > 2 Then
-                    Field = Replace(Field, QuoteChar + QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
-                End If
+            Field = Mid$(Field, 2, FieldLength - 2)
+            If QuoteCount > 2 Then
+                Field = Replace(Field, QuoteChar + QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
             End If
             If ConvertQuoted Then
                 FieldLength = Len(Field)
@@ -1847,7 +1857,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
 
     If ShowDatesAsDates Then
         If ISO8601 Then
-            CastISO8601 Field, dtResult, Converted, SysDateOrder
+            CastISO8601 Field, dtResult, Converted, AcceptWithoutTimeZone, AcceptWithTimeZone
             If Not Converted Then
                 CastToTime Field, dtResult, Converted
             End If
@@ -1881,7 +1891,13 @@ ErrHandler:
     'Do nothing - strIn was not a string representing a number.
 End Sub
 
-Sub testCastToDate()
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : TestCastToDate
+' Author     : Philip Swannell
+' Date       : 26-Aug-2021
+' Purpose    : Quick test of method CastToDate, See also RunTests() for more comprehensive testing
+' -----------------------------------------------------------------------------------------------------------------------
+Sub TestCastToDate()
     Dim strIn As String
     Dim dtOut As Date
     Dim DateOrder As Long
@@ -1889,18 +1905,26 @@ Sub testCastToDate()
     Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     Dim Converted As Boolean
+    Dim i As Long
 
-    strIn = "20-08-2021 12:00:00": DateOrder = 1
-    strIn = "08-20-2021 12:00:00": DateOrder = 0
-    strIn = "2021-08-20 12:00:00": DateOrder = 2
+    For i = 1 To 3
+        Select Case i
+            Case 1
+                strIn = "20-08-2021 12:00:00": DateOrder = 1
+            Case 2
+                strIn = "08-20-2021 12:00:00": DateOrder = 0
+            Case 3
+                strIn = "2021-08-20 12:00:00": DateOrder = 2
+        End Select
     
-    DateSeparator = "-"
-    SysDateOrder = Application.International(xlDateOrder)
-    SysDateSeparator = Application.International(xlDateSeparator)
+        DateSeparator = "-"
+        SysDateOrder = Application.International(xlDateOrder)
+        SysDateSeparator = Application.International(xlDateSeparator)
 
-    CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+        CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
 
-    Debug.Print dtOut
+        Debug.Print "StrIn = """ & strIn & """", "DateOrder = " & DateOrder, "dtOut = " & Format(dtOut, "yyyy-mmm-dd hh:mm:ss")
+    Next
 
 End Sub
 
@@ -1908,6 +1932,7 @@ End Sub
 ' Procedure  : CastToDate, sub-routine of ConvertField
 ' Purpose    : In-place conversion of a string that looks like a date into a Long or Date. No error if string cannot be
 '              converted to date. Converts Dates, DateTimes and Times. Times in very simple format hh:mm:ss
+'              Does not handle ISO8601 - see alternative function CastISO8601
 ' Parameters :
 '  strIn           : String
 '  dtOut           : Result of cast
@@ -2031,8 +2056,8 @@ End Function
 '             name is overwritten. If successful, the function returns FileName, otherwise an "error
 '             string" (starts with #, ends with !) describing what went wrong.
 ' Arguments
-' Data      : An array of data. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or
-'             null values.
+' Data      : An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty,
+'             Excel errors or null values.
 ' FileName  : The full name of the file, including the path. Alternatively, if FileName is omitted, then the
 '             function returns a string of Data converted to CSV format.
 ' QuoteAllStrings: If TRUE (the default) then elements of Data that are strings are quoted before being
@@ -2041,9 +2066,9 @@ End Function
 '             return or double quote. In all cases, double quotes are escaped by another double quote.
 ' DateFormat: A format string that determine how dates, including cells formatted as dates, appear in the
 '             file. If omitted, defaults to "yyyy-mm-dd".
-' DateTimeFormat: A format string that determines how dates with non-zero time part appear in the file. If
-'             omitted defaults to "yyyy-mm-dd hh:mm:ss".The companion function CSVRead is not capable of
-'             converting fields written in DateTime format back from strings into Dates.
+' DateTimeFormat: Format for datetimes. Defaults to "ISO" which abbreviates "yyyy-mm-ddThh:mm:ss". Use
+'             "ISOZ" for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight
+'             saving may be inconsistent across the datetimes in data.
 ' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
 '             character.
 ' Unicode   : If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will
@@ -2055,17 +2080,18 @@ End Function
 '
 ' Notes     : See also companion function CSVRead.
 '
-'             For definition of the CSV format see
+'             For discussion of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
 '---------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
-    Optional DateTimeFormat As String = "yyyy-mm-ddThh:mm:ss", _
+    Optional ByVal DateTimeFormat As String = "ISO", _
     Optional Delimiter As String = ",", Optional Unicode As Boolean, _
     Optional ByVal EOL As String = "")
 
     Const DQ = """"
-    Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a double quote, line feed or carriage return"
+    Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a " & _
+        "double  quote, line feed or carriage return"
     Const Err_Dimensions = "Data must be a range or a 2-dimensional array"
     
     Dim EOLIsWindows As Boolean
@@ -2095,6 +2121,13 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     If Len(Delimiter) = 0 Or Left$(Delimiter, 1) = DQ Or Left$(Delimiter, 1) = vbLf Or Left$(Delimiter, 1) = vbCr Then
         Throw Err_Delimiter
     End If
+    
+    Select Case UCase(DateTimeFormat)
+        Case "ISO"
+            DateTimeFormat = "yyyy-mm-ddThh:mm:ss"
+        Case "ISOZ"
+            DateTimeFormat = ISOZFormatString()
+    End Select
 
     If TypeName(Data) = "Range" Then
         'Preserve elements of type Date by using .Value, not .Value2
@@ -2102,7 +2135,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     End If
     
     If NumDimensions(Data) <> 2 Then Throw Err_Dimensions
-        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
+    ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
     
     If WriteToFile Then
         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
@@ -2542,3 +2575,376 @@ Private Sub TestSentinelSpeed()
 ErrHandler:
     MsgBox "#TestSentinelSpeed: " & Err.Description & "!"
 End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : SpeedTestISO8601
+' Purpose    : Testing speed of CastISO8601
+
+'Example output: (Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz   2.11 GHz, 16GB RAM)
+
+'Running SpeedTestISO8601 2021-08-24T18:59:30
+'Calls per second = 2,650,189              strIn = "Foo" Check = 1900-01-00T00:00:00.000
+'Calls per second = 2,660,280              strIn = "Foo" Check = 1900-01-00T00:00:00.000
+'Calls per second = 2,681,348              strIn = "Foo" Check = 1900-01-00T00:00:00.000
+'Calls per second = 2,229,503              strIn = "xxxxxxxxxxxx"      Check = 1900-01-00T00:00:00.000
+'Calls per second = 2,144,496              strIn = "xxxxxxxxxxxx"      Check = 1900-01-00T00:00:00.000
+'Calls per second = 2,135,019              strIn = "xxxxxxxxxxxx"      Check = 1900-01-00T00:00:00.000
+'Calls per second = 1,581,522              strIn = "xxxx-xxxxxxx"      Check = 1900-01-00T00:00:00.000
+'Calls per second = 1,574,575              strIn = "xxxx-xxxxxxx"      Check = 1900-01-00T00:00:00.000
+'Calls per second = 1,594,879              strIn = "xxxx-xxxxxxx"      Check = 1900-01-00T00:00:00.000
+'Calls per second = 632,374  strIn = "2021-08-24T15:18:01.123+05:0x"   Check = 1900-01-00T00:00:00.000
+'Calls per second = 633,033  strIn = "2021-08-24T15:18:01.123+05:0x"   Check = 1900-01-00T00:00:00.000
+'Calls per second = 643,524  strIn = "2021-08-24T15:18:01.123+05:0x"   Check = 1900-01-00T00:00:00.000
+'Calls per second = 469,506  strIn = "2021-08-23"        Check = 2021-08-23T00:00:00.000
+'Calls per second = 471,985  strIn = "2021-08-23"        Check = 2021-08-23T00:00:00.000
+'Calls per second = 465,819  strIn = "2021-08-23"        Check = 2021-08-23T00:00:00.000
+'Calls per second = 368,133  strIn = "2021-08-24T15:18:01"             Check = 2021-08-24T15:18:01.000
+'Calls per second = 367,303  strIn = "2021-08-24T15:18:01"             Check = 2021-08-24T15:18:01.000
+'Calls per second = 350,648  strIn = "2021-08-24T15:18:01"             Check = 2021-08-24T15:18:01.000
+'Calls per second = 230,480  strIn = "2021-08-23T08:47:21.123"         Check = 2021-08-23T08:47:21.000
+'Calls per second = 225,836  strIn = "2021-08-23T08:47:21.123"         Check = 2021-08-23T08:47:21.000
+'Calls per second = 246,625  strIn = "2021-08-23T08:47:21.123"         Check = 2021-08-23T08:47:21.000
+'Calls per second = 235,492  strIn = "2021-08-24T15:18:01+05:00"       Check = 2021-08-24T10:18:01.000
+'Calls per second = 230,097  strIn = "2021-08-24T15:18:01+05:00"       Check = 2021-08-24T10:18:01.000
+'Calls per second = 231,845  strIn = "2021-08-24T15:18:01+05:00"       Check = 2021-08-24T10:18:01.000
+'Calls per second = 215,734  strIn = "2021-08-24T15:18:01.123+05:00"   Check = 2021-08-24T10:18:01.000
+'Calls per second = 208,329  strIn = "2021-08-24T15:18:01.123+05:00"   Check = 2021-08-24T10:18:01.000
+'Calls per second = 211,625  strIn = "2021-08-24T15:18:01.123+05:00"   Check = 2021-08-24T10:18:01.000
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub SpeedTestISO8601()
+
+    Const N = 1000000
+    Dim Converted As Boolean
+    Dim dtOut As Date
+    Dim i As Long
+    Dim j As Long
+    Dim k As Long
+    Dim strIn As String
+    Dim SysDateOrder As Long
+    Dim t1 As Double
+    Dim t2 As Double
+    Dim res
+
+    SysDateOrder = Application.International(xlDateOrder)
+
+    Debug.Print "Running SpeedTestISO8601 " + Format(Now(), "yyyy-mm-ddThh:mm:ss")
+    For k = 1 To 9
+        For j = 1 To 3
+            dtOut = 0
+            Select Case k
+                Case 1
+                    strIn = "Foo" ' less than 10 in length
+                Case 2
+                    strIn = "xxxxxxxxxxxx" '5th character not "-"
+                Case 3
+                    strIn = "xxxx-xxxxxxx" 'rejected by RegEx
+                Case 4
+                    strIn = "2021-08-24T15:18:01.123+05:0x" ' rejected by regex
+                Case 5
+                    strIn = "2021-08-23"
+                Case 6
+                    strIn = "2021-08-24T15:18:01"
+                Case 7
+                    strIn = "2021-08-23T08:47:21.123"
+                Case 8
+                    strIn = "2021-08-24T15:18:01+05:00"
+                Case 9
+                    strIn = "2021-08-24T15:18:01.123+05:00"
+            End Select
+
+            t1 = sElapsedTime()
+            For i = 1 To N
+                Call CastISO8601(strIn, dtOut, Converted, True, True)
+            Next i
+            t2 = sElapsedTime
+            Debug.Print "Calls per second = " & Format(N / (t2 - t1), "###,###"), "strIn = """ & strIn & """", "Check = " & Application.WorksheetFunction.text(dtOut, "yyyy-mm-ddThh:mm:ss.000")
+            DoEvents 'kick Immediate window to life
+        Next j
+    Next k
+
+End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ParseISO8601
+' Purpose    : Test harness for calling from spreadsheets
+' Parameters :
+'  strIn:
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function ParseISO8601(strIn As String)
+          Dim dtOut As Date
+          Dim Converted As Boolean
+
+1         On Error GoTo ErrHandler
+2         CastISO8601 strIn, dtOut, Converted, True, True
+
+3         If Converted Then
+4             ParseISO8601 = dtOut
+5         Else
+6             ParseISO8601 = "#Not recognised as ISO8601 date!"
+7         End If
+8         Exit Function
+ErrHandler:
+9         ParseISO8601 = "#ParseISO8601 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : CastToTime
+' Purpose    : Cast strings that represent a time to a date, no handling of TimeZone.
+'Example inputs:
+'                13:30
+'                13:30:10
+'                13:30:10.123
+' -----------------------------------------------------------------------------------------------------------------------
+Sub CastToTime(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
+
+    Static rx As VBScript_RegExp_55.RegExp
+
+    Dim L As Long
+
+    On Error GoTo ErrHandler
+    If rx Is Nothing Then
+        Set rx = New RegExp
+        With rx
+            .IgnoreCase = False
+            .Pattern = "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9](\.[0-9]+)?)?$"
+            .Global = False        'Find first match only
+        End With
+    End If
+
+    L = Len(strIn)
+
+    If L < 5 Then Exit Sub
+    If Not rx.Test(strIn) Then Exit Sub
+    If L <= 8 Then
+        dtOut = CDate(strIn)
+        Converted = True
+    Else
+        dtOut = CDate(Left(strIn, 8)) + CDbl(Mid(strIn, 9)) / 86400
+        Converted = True
+    End If
+    Exit Sub
+ErrHandler:
+    'Do nothing, was not a valid time (e.g. h,m or s out of range)
+End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : CastISO8601
+' Purpose    : Convert ISO8601 formatted datestrings to UTC date. Handles the following formats. https://xkcd.com/1179/
+
+'Always accepts dates without time
+'Format                        Example
+'yyyy-mm-dd                    2021-08-23
+
+'If AcceptWithoutTimeZone is True:
+'yyyy-mm-ddThh:mm:ss           2021-08-23T08:47:21
+'yyyy-mm-ddThh:mm:ss.000       2021-08-23T08:47:20.920
+
+'If AcceptWithTimeZone is True:
+'yyyy-mm-ddThh:mm:ssZ          2021-08-23T08:47:21Z
+'yyyy-mm-ddThh:mm:ss.000Z      2021-08-23T08:47:20.920Z
+'yyyy-mm-ddThh:mm:ss+hh:mm     2021-08-23T08:47:21+05:00
+'yyyy-mm-ddThh:mm:ss.000+hh:mm 2021-08-23T08:47:20.920+05:00
+
+' Parameters :
+'  StrIn                : The string to be converted
+'  DtOut                : The date that the string converts to.
+'  Converted            : Did the function convert (true) or reject as not a correctly formatted date (false)
+'  AcceptWithoutTimeZone: Should the function accept datetime without time zone given?
+'  AcceptWithTimeZone   : Should the function accept datetime with time zone given?
+
+'       IMPORTANT:       WHEN TIMEZONE IS GIVEN THE FUNCTION RETURNS THE TIME IN UTC
+
+' -----------------------------------------------------------------------------------------------------------------------
+Sub CastISO8601(ByVal strIn As String, dtOut As Date, ByRef Converted As Boolean, _
+    AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
+
+    Dim HaveMilliPart As Boolean
+    Dim L As Long
+    Dim LocalTime As Double
+    Dim MilliPart As Double
+    Dim MinusPos As Long
+    Dim PlusPos As Long
+    Dim Sign
+    Dim ZAtEnd As Boolean
+    
+    Static rxNoNo As VBScript_RegExp_55.RegExp
+    Static RxYesNo As VBScript_RegExp_55.RegExp
+    Static RxNoYes As VBScript_RegExp_55.RegExp
+    Static rxYesYes As VBScript_RegExp_55.RegExp
+    Static rxExists As Boolean
+
+    On Error GoTo ErrHandler
+     
+    If Not rxExists Then
+        Set rxNoNo = New RegExp
+        'Reject datetime
+        With rxNoNo
+            .IgnoreCase = False
+            .Pattern = "^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9]$"
+            .Global = False
+        End With
+        
+        'Accept datetime without time zone, reject datetime with timezone
+        Set RxYesNo = New RegExp
+        With RxYesNo
+            .IgnoreCase = False
+            .Pattern = "^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?)?$"
+            .Global = False
+        End With
+        
+        'Reject datetime without time zone, accept datetime with timezone
+        Set RxNoYes = New RegExp
+        With RxNoYes
+            .IgnoreCase = False
+            .Pattern = "^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?(Z|((\+|\-)[0-2][0-9]:[0-5][0-9])))?$"
+            .Global = False
+        End With
+        
+        'Accept datetime, both with and without timezone
+        Set rxYesYes = New RegExp
+        With rxYesYes
+            .IgnoreCase = False
+            .Pattern = "^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?((Z|((\+|\-)[0-2][0-9]:[0-5][0-9])))?)?$"
+            .Global = False
+        End With
+        rxExists = True
+    End If
+
+    Converted = False
+
+    L = Len(strIn)
+
+    If L < 10 Then Exit Sub
+    If Mid(strIn, 5, 1) <> "-" Then Exit Sub
+    
+    If AcceptWithoutTimeZone Then
+        If AcceptWithTimeZone Then
+            If Not rxYesYes.Test(strIn) Then Exit Sub
+        Else
+            If Not RxYesNo.Test(strIn) Then Exit Sub
+        End If
+    Else
+        If AcceptWithTimeZone Then
+            If Not RxNoYes.Test(strIn) Then Exit Sub
+        Else
+            If Not rxNoNo.Test(strIn) Then Exit Sub
+        End If
+    End If
+
+    If L = 10 Then
+        'This works irrespective of Windows regional settings
+        dtOut = CDate(strIn)
+        Converted = True
+        Exit Sub
+    End If
+    
+    'Replace the "T" separator
+    Mid(strIn, 11, 1) = " "
+    
+    If L = 19 Then
+        dtOut = CDate(strIn)
+        Converted = True
+        Exit Sub
+    End If
+
+    If Right(strIn, 1) = "Z" Then
+        Sign = 0
+        ZAtEnd = True
+    Else
+        PlusPos = InStr(20, strIn, "+")
+        If PlusPos > 0 Then
+            Sign = 1
+        Else
+            MinusPos = InStr(20, strIn, "-")
+            If MinusPos > 0 Then
+                Sign = -1
+            End If
+        End If
+    End If
+
+    If Mid(strIn, 20, 1) = "." Then 'Have fraction of a second
+        Select Case Sign
+            Case 0
+                'Example: "2021-08-23T08:47:20.920Z"
+                MilliPart = CDbl(Mid(strIn, 20, IIf(ZAtEnd, L - 20, L - 19)))
+            Case 1
+                'Example: "2021-08-23T08:47:20.920+05:00"
+                MilliPart = CDbl(Mid(strIn, 20, PlusPos - 20))
+            Case -1
+                'Example: "2021-08-23T08:47:20.920-05:00"
+                MilliPart = CDbl(Mid(strIn, 20, MinusPos - 20))
+        End Select
+    End If
+    
+    LocalTime = CDate(Left(strIn, 19)) + MilliPart / 86400
+
+    Dim Adjust As Date
+    Select Case Sign
+        Case 0
+            dtOut = LocalTime
+            Converted = True
+            Exit Sub
+        Case 1
+            If L <> PlusPos + 5 Then Exit Sub
+            Adjust = CDate(Right(strIn, 5))
+            dtOut = LocalTime - Adjust
+            Converted = True
+        Case -1
+            If L <> MinusPos + 5 Then Exit Sub
+            Adjust = CDate(Right(strIn, 5))
+            dtOut = LocalTime + Adjust
+            Converted = True
+    End Select
+
+    Exit Sub
+ErrHandler:
+    'Was not recognised as ISO8601 date
+End Sub
+
+'See "gogeek"'s post at https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : GetLocalOffsetToUTC
+' Purpose    : Get the PC's offset to UTC.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function GetLocalOffsetToUTC()
+    Dim dt As Object, UTC As Date
+    Dim TimeNow As Date
+    On Error GoTo ErrHandler
+    TimeNow = Now()
+
+    Set dt = CreateObject("WbemScripting.SWbemDateTime")
+    dt.SetVarDate TimeNow
+    UTC = dt.GetVarDate(False)
+    GetLocalOffsetToUTC = (TimeNow - UTC)
+
+    Exit Function
+ErrHandler:
+    Throw "#GetLocalOffsetToUTC (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ISOZFormatString
+' Purpose    : Returns the format string required to save datetimes with timezone under the assumton that the offset to
+'              UTC is the same as the curent offset on this PC - use with care, Daylight saving may mean that that's not
+'              a correct assumption for all the dates in a set of data...
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function ISOZFormatString()
+    Dim TimeZone
+    Dim RightChars
+
+    On Error GoTo ErrHandler
+        TimeZone = GetLocalOffsetToUTC()
+
+    If TimeZone = 0 Then
+        RightChars = "Z"
+    ElseIf TimeZone > 0 Then
+        RightChars = "+" & Format(TimeZone, "hh:mm")
+    Else
+        RightChars = "-" & Format(Abs(TimeZone), "hh:mm")
+    End If
+    ISOZFormatString = "yyyy-mm-ddT:hh:mm:ss" & RightChars
+
+    Exit Function
+ErrHandler:
+    Throw "#ISOZFormatString (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function

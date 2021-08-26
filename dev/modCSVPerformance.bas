@@ -1,4 +1,11 @@
 Attribute VB_Name = "modCSVPerformance"
+
+' VBA-CSV
+
+' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
+' License MIT (https://opensource.org/licenses/MIT)
+' Document: https://github.com/PGS62/VBA-CSV#readme
+
 Option Explicit
 
 'Code of the "Performance" worksheet
