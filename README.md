@@ -93,6 +93,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [lastest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. Code coverage of the tests is 100%.
 
 # About
-Author: Philip Swannell
+Author: Philip Swannell  
 Licence: MIT
 
