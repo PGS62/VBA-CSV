@@ -6,7 +6,7 @@ CSV reading and writing for VBA and Excel spreadsheets, via two functions `CSVRe
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
 3. Add a reference to "Microsoft Scripting Runtime" (In VBA Editor Tools > References).
 4. Add a reference to "Microsoft VBScript Regular Expressions 5.5"
-5. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event. Example:
+5. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module. Example:
 ```vba
 Private Sub Workbook_Open()
     RegisterCSVWrite
@@ -14,7 +14,7 @@ Private Sub Workbook_Open()
 End Sub
 ```
 # Acknowledgements
-I re-wrote the parsing code of `CSVRead` after examining "sdkn104"'s code available [here](https://github.com/sdkn104/VBA-CSV); my approach is now similar to the one employed there.
+I re-worked the parsing code of `CSVRead` after examining "sdkn104"'s code available [here](https://github.com/sdkn104/VBA-CSV); my approach is now similar to the one employed there, and the performance is similar too.
 
 The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance here. For testing `CSVRead`, I also make use of the suite of test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
@@ -97,6 +97,13 @@ An alternative approach is to change the constant `m_ErrorStyle` (at the top of 
 
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [lastest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
+
+# Alternatives
+Other CSV parsers are available for VBA:  
+https://github.com/ws-garcia/VBA-CSV-interface  
+https://github.com/sdkn104/VBA-CSV
+
+
 
 # About
 Author: Philip Swannell  
