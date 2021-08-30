@@ -18,6 +18,10 @@ I re-wrote the parsing code of `CSVRead` after examining "sdkn104"'s code availa
 
 The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance here. For testing `CSVRead`, I also make use of the suite of test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
+# Examples
+
+
+
 
 # Documentation
 #### _CSVRead_
@@ -77,4 +81,12 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
 |`Unicode`|If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but `Data` contains strings with characters whose code points exceed 255.|
 |`EOL`|Controls the line endings of the file written. Enter "Windows" (the default), "Unix" or "Mac". Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings "CRLF", "LF" or "CR". The last line of the file is written with a line ending.|
+
+
+
+# Performance
+
+
+# Testing
+`CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [lastest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. Code coverage of the tests is 100%.
 
