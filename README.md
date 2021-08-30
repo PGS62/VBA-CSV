@@ -2,7 +2,7 @@
 CSV reading and writing for VBA and Excel spreadsheets, via two functions `CSVRead` and `CSVWrite`.
 
 # Installation
-1. Download the latest release.
+1. Download the [latest release](https://github.com/PGS62/VBA-CSV/releases).
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
 3. Add a reference to "Microsoft Scripting Runtime" (In VBA Editor Tools > References).
 4. Add a reference to "Microsoft VBScript Regular Expressions 5.5"
