@@ -1,4 +1,7 @@
 "Version","Date","Time","Author","Comment"
+54,30-Aug-2021,07:54:31,"Philip Swannell","Reworked performance testing to include comparison with Julia."
+53,28-Aug-2021,15:49:14,"Philip Swannell","More tests and fixes to column-by-column formatting."
+52,27-Aug-2021,20:29:09,"Philip Swannell","Implemented Column-by-column type conversion"
 51,26-Aug-2021,19:21:16,"Philip Swannell","Changes to sheet Demo."
 50,26-Aug-2021,19:14:13,"Philip Swannell","More refactoring."
 49,26-Aug-2021,18:29:39,"Philip Swannell","Refactoring"

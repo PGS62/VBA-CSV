@@ -36,10 +36,20 @@ Public Sub RoundTripTest()
     Dim OS As Variant
     Dim Unicode As Variant
     Dim WhatDiffers As String
+    Dim NumPassed As Long
+    Dim NumFailed As Long
+    Dim Prompt As String
+    Const Title = "VBA-CSV Round Trip Tests"
     
     On Error GoTo ErrHandler
     
     Folder = Environ("Temp") & "\VBA-CSV\RoundTripTests"
+
+    Prompt = "Run Round Trip Tests?" + vbLf + vbLf + _
+        "Note this will generate 1,620 files in folder" + vbLf + _
+        Environ("Temp") & "\VBA-CSV\RoundTripTests"
+
+    If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
 
     ThrowIfError CreatePath(Folder)
 
@@ -50,15 +60,15 @@ Public Sub RoundTripTest()
             For Each Delimiter In Array(",", "::::")
                 For Each NRows In Array(1, 2, 20)
                     For Each NCols In Array(1, 2, 10)
-              
+        
                         'For Variants we need to vary AllowLineFeed and DateFormat
                         For Each AllowLineFeed In Array(True, False)
                             For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
                                 Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode), EOL)
                                 NumTests = NumTests + 1
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
-                                RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
-                                    
+                                RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
+                              
                             Next DateFormat
                         Next AllowLineFeed
 
@@ -67,8 +77,8 @@ Public Sub RoundTripTest()
                             Data = RandomDates(CLng(NRows), CLng(NCols))
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDates"
-                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
-                                
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
+                          
                         Next DateFormat
 
                         'For Strings, we need to vary AllowLineFeed
@@ -76,7 +86,7 @@ Public Sub RoundTripTest()
                             Data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed), EOL)
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & IIf(AllowLineFeed, "RandomStringsWithLineFeeds", "RandomStrings")
-                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
                         Next AllowLineFeed
 
                         For k = 1 To 4
@@ -94,17 +104,24 @@ Public Sub RoundTripTest()
                                 Data = RandomLongs(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomLongs"
                             End If
-                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), _
+                                CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
+                            
                         Next k
-                        'Print a heartbeat...
-                        If NumTests Mod 10 = 0 Then Debug.Print NumTests
                         DoEvents 'Kick Immediate window back to life?
                     Next NCols
                 Next NRows
             Next Delimiter
         Next Unicode
     Next OS
-    Debug.Print "Finished"
+    Debug.Print "Finished. NumPassed = " + Format(NumPassed, "###,##0") & " NumFailed = " & Format(NumFailed, "###,##0")
+    If NumFailed = 0 Then
+        Prompt = "Finished, all " + Format(NumPassed, "###,##0") + " tests passed"
+        MsgBox Prompt, vbOKOnly + vbInformation, Title
+    Else
+        Prompt = "Finished, " + Format(NumPassed, "###,##0") + " tests passed, and " & Format(NumFailed, "###,##0") + " tests failed. See VBA immediate window for details."
+        MsgBox Prompt, vbOKOnly + vbCritical, Title
+    End If
 
     Exit Sub
 ErrHandler:
@@ -119,59 +136,71 @@ End Sub
 '              Empty and null string. Also method RandomDoubles only generates doubles that have exact representation as
 '              strings (avoid errors of order 10E-15).
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function RoundTripTestCore(Folder As String, OS As String, ByVal Data As Variant, DateFormat As String, Unicode As Boolean, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String)
+Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Variant, DateFormat As String, _
+    Unicode As Boolean, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String, _
+    ByRef NumPassed As Long, ByRef NumFailed As Long)
 
-          Dim DataReadBack
+    Dim DataReadBack
 
-1         On Error GoTo ErrHandler
-          Dim FileName As String
-          Dim NR As Long
-          Dim NC As Long
-          Const ConvertTypes = "NDBE" 'must use this for round-tripping to work.
-2         WhatDiffers = ""
+    On Error GoTo ErrHandler
+    Dim FileName As String
+    Dim NR As Long
+    Dim NC As Long
+    Dim NumDone As Long
+    Const ConvertTypes = "NDBE" 'must use this for round-tripping to work.
+    
+    WhatDiffers = ""
 
-3         NR = sNRows(Data)
-4         NC = sNCols(Data)
+    NR = sNRows(Data)
+    NC = sNCols(Data)
 
-5         FileName = NameThatFile(Folder, OS, NR, NC, ExtraInfo, CBool(Unicode), False)
+    FileName = NameThatFile(Folder, OS, NR, NC, ExtraInfo, CBool(Unicode), False)
 
-6         ThrowIfError CSVWrite(Data, FileName, True, DateFormat, , Delimiter, Unicode, EOL)
+    ThrowIfError CSVWrite(Data, FileName, True, DateFormat, , Delimiter, Unicode, EOL)
 
-          'The Call to CSVRead has to infer both Encoding and EOL
-7         DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
+    'The Call to CSVRead has to infer both Encoding and EOL
+    DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
+    
+    If sArraysIdentical(Data, DataReadBack, True, False, WhatDiffers) Then
+        NumPassed = NumPassed + 1
+    Else
+        Debug.Print String(100, "=")
+        Debug.Print "Round trip failed for: '" & FileName & "'"
+        Debug.Print WhatDiffers
+        NumFailed = NumFailed + 1
+    End If
 
-8         If Not sArraysIdentical(Data, DataReadBack, True, False, WhatDiffers) Then
-9             Debug.Print FileName
-10            Debug.Print WhatDiffers
-11        End If
+NumDone = NumPassed + NumFailed
+If NumDone Mod 50 = 0 Then Debug.Print Format(NumDone, "###,##0")
 
-12        Exit Function
+
+    Exit Sub
 ErrHandler:
-13        Throw "#RoundTripTestCore: " & Err.Description & "!"
-End Function
+    Throw "#RoundTripTestCore: " & Err.Description & "!"
+End Sub
 
 Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
 
     Const maxlen = 20
     Dim i As Long
     Dim length As Long
-    Dim res As String
+    Dim Res As String
     
     On Error GoTo ErrHandler
     
     length = CLng(1 + Rnd() * maxlen)
-    res = String(length, " ")
+    Res = String(length, " ")
 
     For i = 1 To length
         If Unicode Then
-            Mid(res, i, 1) = ChrW(33 + Rnd() * 370)
+            Mid(Res, i, 1) = ChrW(33 + Rnd() * 370)
         Else
-            Mid(res, i, 1) = Chr(34 + Rnd() * 88)
+            Mid(Res, i, 1) = Chr(34 + Rnd() * 88)
         End If
 
         If Not AllowLineFeed Then
-            If Mid(res, i, 1) = vbLf Or Mid(res, i, 1) = vbCr Then
-                Mid(res, i, 1) = " "
+            If Mid(Res, i, 1) = vbLf Or Mid(Res, i, 1) = vbCr Then
+                Mid(Res, i, 1) = " "
             End If
         End If
     Next
@@ -179,12 +208,12 @@ Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL 
     If AllowLineFeed Then
         If length > 5 Then
             If Rnd() < 0.2 Then
-                Mid(res, length / 2, Len(EOL)) = EOL
+                Mid(Res, length / 2, Len(EOL)) = EOL
             End If
         End If
     End If
     
-    RandomString = res
+    RandomString = Res
 
     Exit Function
 ErrHandler:
@@ -325,10 +354,10 @@ ErrHandler:
 End Function
 
 Private Function RandomErrorValue()
-    Dim N As Long
+    Dim n As Long
     On Error GoTo ErrHandler
-    N = CLng(0.5 + Rnd() * 14)
-    RandomErrorValue = CVErr(Choose(N, xlErrBlocked, xlErrCalc, xlErrConnect, xlErrDiv0, xlErrField, xlErrGettingData, _
+    n = CLng(0.5 + Rnd() * 14)
+    RandomErrorValue = CVErr(Choose(n, xlErrBlocked, xlErrCalc, xlErrConnect, xlErrDiv0, xlErrField, xlErrGettingData, _
         xlErrNA, xlErrName, xlErrNull, xlErrNum, xlErrRef, xlErrSpill, xlErrUnknown, xlErrValue))
     Exit Function
 ErrHandler:
@@ -357,13 +386,13 @@ End Function
 
 Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
 
-    Dim N As Long
+    Dim n As Long
     Const NUMTYPES = 11
 
     On Error GoTo ErrHandler
-    N = CLng(0.5 + NUMTYPES * Rnd())
+    n = CLng(0.5 + NUMTYPES * Rnd())
 
-    Select Case N
+    Select Case n
         Case 1
             RandomVariant = RandomBoolean()
         Case 2
@@ -422,25 +451,25 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
     Const DateFormat = "yyyy-mmm-dd"
     Dim i As Long
     Dim j As Long
-    Dim res() As Variant
+    Dim Res() As Variant
 
     On Error GoTo ErrHandler
 
     EOL = OStoEOL(EOL, "EOL")
-    ReDim res(1 To NRows, 1 To NCols)
+    ReDim Res(1 To NRows, 1 To NCols)
 
     For i = 1 To NRows
         For j = 1 To NCols
-            res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Unicode, EOL)
+            Res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Unicode, EOL)
         Next j
     Next i
     If AllowLineFeed Then
         i = 0.5 + Rnd() * NRows
         j = 0.5 + Rnd() * NCols
-        res(i, j) = "Here's a carriage return (ascii 13):" & vbCr & "and here's a line feed (ascii 10):" & vbLf & "and here's both together:" & vbCrLf
+        Res(i, j) = "Here's a carriage return (ascii 13):" & vbCr & "and here's a line feed (ascii 10):" & vbLf & "and here's both together:" & vbCrLf
     End If
 
-    RandomVariants = res
+    RandomVariants = Res
 
     Exit Function
 ErrHandler:

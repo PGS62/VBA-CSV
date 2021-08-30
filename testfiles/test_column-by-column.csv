@@ -1,0 +1,19 @@
+"Type","Col A","Col B","Col C","Col D","Col E","Col F","Col G"
+"Number",44424,44424,44424,44424,44424,44424,44424
+"Date",2021-08-24T12:49:13,2021-08-24T12:49:13,2021-08-24T12:49:13,2021-08-24T12:49:13,2021-08-24T12:49:13,2021-08-24T12:49:13,2021-08-24T12:49:13
+"Boolean",True,True,True,True,True,True,True
+"Error",#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!
+"String","1","1","1","1","1","1","1"
+"String","2021-08-24T12:49:13","2021-08-24T12:49:13","2021-08-24T12:49:13","2021-08-24T12:49:13","2021-08-24T12:49:13","2021-08-24T12:49:13","2021-08-24T12:49:13"
+"String","TRUE","TRUE","TRUE","TRUE","TRUE","TRUE","TRUE"
+"String","#DIV/0!","#DIV/0!","#DIV/0!","#DIV/0!","#DIV/0!","#DIV/0!","#DIV/0!"
+"String","abc","abc","abc","abc","abc","abc","abc"
+"String","abc""def","abc""def","abc""def","abc""def","abc""def","abc""def","abc""def"
+"String","Line
+Feed","Line
+Feed","Line
+Feed","Line
+Feed","Line
+Feed","Line
+Feed","Line
+Feed"

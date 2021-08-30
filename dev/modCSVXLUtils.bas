@@ -80,33 +80,31 @@ End Function
 ' Purpose    : Split file-with-path to file name (if ReturnFileName is True) or path otherwise.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function FileFromPath(FullFileName As Variant, Optional ReturnFileName As Boolean = True) As Variant
-1         On Error GoTo ErrHandler
-          Dim SlashPos As Long
-          Dim SlashPos2 As Long
-2         If VarType(FullFileName) = vbString Then
-3             SlashPos = InStrRev(FullFileName, "\")
-4             SlashPos2 = InStrRev(FullFileName, "/")
-5             If SlashPos2 > SlashPos Then SlashPos = SlashPos2
-6             If SlashPos = 0 Then Throw "Neither '\' nor '/' found"
+    On Error GoTo ErrHandler
+    Dim SlashPos As Long
+    Dim SlashPos2 As Long
+    If VarType(FullFileName) = vbString Then
+        SlashPos = InStrRev(FullFileName, "\")
+        SlashPos2 = InStrRev(FullFileName, "/")
+        If SlashPos2 > SlashPos Then SlashPos = SlashPos2
+        If SlashPos = 0 Then Throw "Neither '\' nor '/' found"
 
-7             If ReturnFileName Then
-8                 FileFromPath = Mid$(FullFileName, SlashPos + 1)
-9             Else
-10                FileFromPath = Left$(FullFileName, SlashPos - 1)
-11            End If
-12        Else
-13            Throw "FullFileName must be a string"
-14        End If
+        If ReturnFileName Then
+            FileFromPath = Mid$(FullFileName, SlashPos + 1)
+        Else
+            FileFromPath = Left$(FullFileName, SlashPos - 1)
+        End If
+    Else
+        Throw "FullFileName must be a string"
+    End If
 
-15        Exit Function
+    Exit Function
 ErrHandler:
-16        FileFromPath = "#" & Err.Description & "!"
+    FileFromPath = "#" & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : FileReadAll
-' Author     : Philip Swannell
-' Date       : 26-Aug-2021
 ' Purpose    : Returns the contents of a file as a string
 ' -----------------------------------------------------------------------------------------------------------------------
 Function FileReadAll(FileName As String)
@@ -133,7 +131,7 @@ End Function
 Function VStack(ParamArray Arrays())
     Dim AllC As Long
     Dim AllR As Long
-    Dim C As Long
+    Dim c As Long
     Dim i As Long
     Dim j As Long
     Dim k As Long
@@ -151,20 +149,20 @@ Function VStack(ParamArray Arrays())
         For i = LBound(Arrays) To UBound(Arrays)
             If TypeName(Arrays(i)) = "Range" Then Arrays(i) = Arrays(i).value
             If IsMissing(Arrays(i)) Then
-                R = 0: C = 0
+                R = 0: c = 0
             Else
                 Select Case NumDimensions(Arrays(i))
                     Case 0
-                        R = 1: C = 1
+                        R = 1: c = 1
                     Case 1
                         R = 1
-                        C = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
+                        c = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
                     Case 2
                         R = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
-                        C = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
+                        c = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
                 End Select
             End If
-            If C > AllC Then AllC = C
+            If c > AllC Then AllC = c
             AllR = AllR + R
         Next i
 
@@ -180,28 +178,28 @@ Function VStack(ParamArray Arrays())
             If Not IsMissing(Arrays(i)) Then
                 Select Case NumDimensions(Arrays(i))
                     Case 0
-                        R = 1: C = 1
+                        R = 1: c = 1
                         ReturnArray(R0, 1) = Arrays(i)
                     Case 1
                         R = 1
-                        C = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
-                        For j = 1 To C
+                        c = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
+                        For j = 1 To c
                             ReturnArray(R0, j) = Arrays(i)(j + LBound(Arrays(i)) - 1)
                         Next j
                     Case 2
                         R = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
-                        C = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
+                        c = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
 
                         For j = 1 To R
-                            For k = 1 To C
+                            For k = 1 To c
                                 ReturnArray(R0 + j - 1, k) = Arrays(i)(j + LBound(Arrays(i), 1) - 1, k + LBound(Arrays(i), 2) - 1)
                             Next k
                         Next j
 
                 End Select
-                If C < AllC Then
+                If c < AllC Then
                     For j = 1 To R
-                        For k = C + 1 To AllC
+                        For k = c + 1 To AllC
                             ReturnArray(R0 + j - 1, k) = NA
                         Next k
                     Next j
@@ -268,82 +266,80 @@ End Function
 '---------------------------------------------------------------------------------------------------------
 Function SplitString(TheString As String, Optional Delimiter As String = ",")
 
-          Dim i As Long
-          Dim LB As Long
-          Dim N As Long
-          Dim OneDArray
-          Dim res()
-          Dim UB As Long
-          
-1         On Error GoTo ErrHandler
-2         If Len(TheString) = 0 Then
-3             ReDim res(1 To 1, 1 To 1)
-4             res(1, 1) = ""
-5             SplitString = res
-6             Exit Function
-7         End If
-          
-8         OneDArray = VBA.Split(TheString, Delimiter, -1, vbTextCompare)
-9         LB = LBound(OneDArray): UB = UBound(OneDArray)
-10        N = UB - LB + 1
-11        ReDim res(1 To N, 1 To 1)
-12        For i = 1 To N
-13            res(i, 1) = OneDArray(i - 1)
-14        Next
-15        SplitString = res
-16        Exit Function
+    Dim i As Long
+    Dim LB As Long
+    Dim n As Long
+    Dim OneDArray
+    Dim Res()
+    Dim UB As Long
+    
+    On Error GoTo ErrHandler
+    If Len(TheString) = 0 Then
+        ReDim Res(1 To 1, 1 To 1)
+        Res(1, 1) = ""
+        SplitString = Res
+        Exit Function
+    End If
+    
+    OneDArray = VBA.Split(TheString, Delimiter, -1, vbTextCompare)
+    LB = LBound(OneDArray): UB = UBound(OneDArray)
+    n = UB - LB + 1
+    ReDim Res(1 To n, 1 To 1)
+    For i = 1 To n
+        Res(i, 1) = OneDArray(i - 1)
+    Next
+    SplitString = Res
+    Exit Function
 ErrHandler:
-17        SplitString = "#SplitString (line " & CStr(Erl) + "): " & Err.Description & "!"
+    SplitString = "#SplitString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : AllCombinations
-' Author     : Philip Swannell
-' Date       : 26-Aug-2021
 ' Purpose    : Iterate over all combinations of the elements of the (up to) 4 input arrays, producing an output vector
 '              of those elements concatenated with given delimiter.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
           Optional Arg4, Optional Delimiter As String)
-          Dim res() As String
-          Dim Part1 As Variant
-          Dim Part2 As Variant
-          Dim Part3 As Variant
-          Dim Part4 As Variant
-          Dim k As Long
+    Dim Res() As String
+    Dim Part1 As Variant
+    Dim Part2 As Variant
+    Dim Part3 As Variant
+    Dim Part4 As Variant
+    Dim k As Long
 
-1         On Error GoTo ErrHandler
-2         If IsMissing(Arg2) Then Arg2 = ""
-3         If IsMissing(Arg3) Then Arg3 = ""
-4         If IsMissing(Arg4) Then Arg4 = ""
+    On Error GoTo ErrHandler
+    If IsMissing(Arg2) Then Arg2 = ""
+    If IsMissing(Arg3) Then Arg3 = ""
+    If IsMissing(Arg4) Then Arg4 = ""
 
-5         Force2DArrayR Arg1
-6         Force2DArrayR Arg2
-7         Force2DArrayR Arg3
-8         Force2DArrayR Arg4
+    Force2DArrayR Arg1
+    Force2DArrayR Arg2
+    Force2DArrayR Arg3
+    Force2DArrayR Arg4
 
-9         ReDim res(1 To sNRows(Arg1) * sNCols(Arg1) * sNRows(Arg2) * sNCols(Arg2) * sNRows(Arg3) * sNCols(Arg4) * sNRows(Arg4) * sNCols(Arg4), 1 To 1)
-10        For Each Part1 In Arg1
-11            Part1 = CStr(Part1)
-12            For Each Part2 In Arg2
-13                Part2 = CStr(Part2)
-14                For Each Part3 In Arg3
-15                    Part3 = CStr(Part3)
-16                    For Each Part4 In Arg4
-17                        Part4 = CStr(Part4)
-18                        k = k + 1
-19                        res(k, 1) = Part1 & IIf(Len(Part2) > 0, Delimiter, "") & Part2 & _
-                              IIf(Len(Part3) > 0, Delimiter, "") & Part3 & _
-                              IIf(Len(Part4) > 0, Delimiter, "") & Part4
-20                    Next
-21                Next
-22            Next
-23        Next
-24        AllCombinations = res
+    ReDim Res(1 To sNRows(Arg1) * sNCols(Arg1) * sNRows(Arg2) * sNCols(Arg2) * sNRows(Arg3) * sNCols(Arg4) * sNRows(Arg4) * sNCols(Arg4), 1 To 1)
+    For Each Part1 In Arg1
+        Part1 = CStr(Part1)
+        For Each Part2 In Arg2
+            Part2 = CStr(Part2)
+            For Each Part3 In Arg3
+                Part3 = CStr(Part3)
+                For Each Part4 In Arg4
+                    Part4 = CStr(Part4)
+                    k = k + 1
+                    Res(k, 1) = Part1 & IIf(Len(Part2) > 0, Delimiter, "") & Part2 & _
+                        IIf(Len(Part3) > 0, Delimiter, "") & Part3 & _
+                        IIf(Len(Part4) > 0, Delimiter, "") & Part4
+                Next
+            Next
+        Next
+    Next
+    AllCombinations = Res
 
-25        Exit Function
+    Exit Function
 ErrHandler:
-26        AllCombinations = "#AllCombinations (line " & CStr(Erl) + "): " & Err.Description & "!"
+    AllCombinations = "#AllCombinations (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -356,31 +352,31 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Function MakeGoodStringsBad(GoodStrings, Optional InsertThis As String = "x")
 
-          Dim Res1D() As String
+    Dim Res1D() As String
 
-1         On Error GoTo ErrHandler
-2         Force2DArrayR GoodStrings
+    On Error GoTo ErrHandler
+    Force2DArrayR GoodStrings
 
-          Dim i As Long
-          Dim j As Long
-          Dim k As Long
+    Dim i As Long
+    Dim j As Long
+    Dim k As Long
 
-3         ReDim Res1D(1 To 1)
-4         For i = 1 To sNRows(GoodStrings)
-5             For j = 0 To Len(GoodStrings(i, 1)) + 1
-6                 k = k + 1
-7                 If k > UBound(Res1D) Then
-8                     ReDim Preserve Res1D(1 To k)
-9                 End If
-10                Res1D(k) = InsertInString(InsertThis, GoodStrings(i, 1), j)
-11            Next j
-12        Next i
+    ReDim Res1D(1 To 1)
+    For i = 1 To sNRows(GoodStrings)
+        For j = 0 To Len(GoodStrings(i, 1)) + 1
+            k = k + 1
+            If k > UBound(Res1D) Then
+                ReDim Preserve Res1D(1 To k)
+            End If
+            Res1D(k) = InsertInString(InsertThis, GoodStrings(i, 1), j)
+        Next j
+    Next i
 
-13        MakeGoodStringsBad = Transpose(Res1D)
+    MakeGoodStringsBad = Transpose(Res1D)
 
-14        Exit Function
+    Exit Function
 ErrHandler:
-15        MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -389,20 +385,20 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InsertInString(InsertThis As String, ByVal InToThis As String, ByVal AtPoint As Long)
 
-1         On Error GoTo ErrHandler
+    On Error GoTo ErrHandler
 
-2         If AtPoint + Len(InsertThis) > Len(InToThis) Then
-3             InToThis = InToThis + String(AtPoint + Len(InsertThis) - Len(InToThis), " ")
-4         ElseIf AtPoint <= 0 Then
-5             InToThis = String(1 - AtPoint, " ") + InToThis
-              AtPoint = 1
-6         End If
+    If AtPoint + Len(InsertThis) > Len(InToThis) Then
+        InToThis = InToThis + String(AtPoint + Len(InsertThis) - Len(InToThis), " ")
+    ElseIf AtPoint <= 0 Then
+        InToThis = String(1 - AtPoint, " ") + InToThis
+        AtPoint = 1
+    End If
 
-7         Mid(InToThis, AtPoint, Len(InsertThis)) = InsertThis
-8         InsertInString = InToThis
-9         Exit Function
+    Mid(InToThis, AtPoint, Len(InsertThis)) = InsertThis
+    InsertInString = InToThis
+    Exit Function
 ErrHandler:
-10        Throw "#InsertInString (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#InsertInString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 '---------------------------------------------------------------------------------------------------------
@@ -455,67 +451,67 @@ End Function
 '             https://en.wikipedia.org/wiki/Regular_expression
 '---------------------------------------------------------------------------------------------------------
 Function IsRegMatch(RegularExpression As String, ByVal StringToSearch As Variant, Optional CaseSensitive As Boolean = False)
-          Dim i As Long
-          Dim j As Long
-          Dim Result() As Variant
-          Dim rx As VBScript_RegExp_55.RegExp
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Variant
+    Dim rx As VBScript_RegExp_55.RegExp
 
-1         On Error GoTo ErrHandler
+    On Error GoTo ErrHandler
 
-2         If Not RegExSyntaxValid(RegularExpression) Then
-3             IsRegMatch = "#Invalid syntax for RegularExpression!"
-4             Exit Function
-5         End If
-6         Set rx = New RegExp
-7         With rx
-8             .IgnoreCase = Not CaseSensitive
-9             .Pattern = RegularExpression
-10            .Global = False        'Find first match only
-11        End With
+    If Not RegExSyntaxValid(RegularExpression) Then
+        IsRegMatch = "#Invalid syntax for RegularExpression!"
+        Exit Function
+    End If
+    Set rx = New RegExp
+    With rx
+        .IgnoreCase = Not CaseSensitive
+        .Pattern = RegularExpression
+        .Global = False        'Find first match only
+    End With
 
-12        If VarType(StringToSearch) = vbString Then
-13            IsRegMatch = rx.Test(StringToSearch)
+    If VarType(StringToSearch) = vbString Then
+        IsRegMatch = rx.Test(StringToSearch)
 
-14            GoTo EarlyExit
-15        ElseIf VarType(StringToSearch) < vbArray Then
-16            IsRegMatch = "#StringToSearch must be a string!"
-17            GoTo EarlyExit
-18        End If
-19        If TypeName(StringToSearch) = "Range" Then StringToSearch = StringToSearch.Value2
+        GoTo EarlyExit
+    ElseIf VarType(StringToSearch) < vbArray Then
+        IsRegMatch = "#StringToSearch must be a string!"
+        GoTo EarlyExit
+    End If
+    If TypeName(StringToSearch) = "Range" Then StringToSearch = StringToSearch.Value2
 
-20        Select Case NumDimensions(StringToSearch)
-              Case 2
-21                ReDim Result(LBound(StringToSearch, 1) To UBound(StringToSearch, 1), LBound(StringToSearch, 2) To UBound(StringToSearch, 2))
-22                For i = LBound(StringToSearch, 1) To UBound(StringToSearch, 1)
-23                    For j = LBound(StringToSearch, 2) To UBound(StringToSearch, 2)
-24                        If VarType(StringToSearch(i, j)) = vbString Then
-25                            Result(i, j) = rx.Test(StringToSearch(i, j))
-26                        Else
-27                            Result(i, j) = "#StringToSearch must be a string!"
-28                        End If
-29                    Next j
-30                Next i
-31            Case 1
-32                ReDim Result(LBound(StringToSearch, 1) To UBound(StringToSearch, 1))
-33                For i = LBound(StringToSearch, 1) To UBound(StringToSearch, 1)
-34                    If VarType(StringToSearch(i)) = vbString Then
-35                        Result(i) = rx.Test(StringToSearch(i))
-36                    Else
-37                        Result(i) = "#StringToSearch must be a string!"
-38                    End If
-39                Next i
-40            Case Else
-41                Throw "StringToSearch must be String or array with 1 or 2 dimensions"
-42        End Select
+    Select Case NumDimensions(StringToSearch)
+        Case 2
+            ReDim Result(LBound(StringToSearch, 1) To UBound(StringToSearch, 1), LBound(StringToSearch, 2) To UBound(StringToSearch, 2))
+            For i = LBound(StringToSearch, 1) To UBound(StringToSearch, 1)
+                For j = LBound(StringToSearch, 2) To UBound(StringToSearch, 2)
+                    If VarType(StringToSearch(i, j)) = vbString Then
+                        Result(i, j) = rx.Test(StringToSearch(i, j))
+                    Else
+                        Result(i, j) = "#StringToSearch must be a string!"
+                    End If
+                Next j
+            Next i
+        Case 1
+            ReDim Result(LBound(StringToSearch, 1) To UBound(StringToSearch, 1))
+            For i = LBound(StringToSearch, 1) To UBound(StringToSearch, 1)
+                If VarType(StringToSearch(i)) = vbString Then
+                    Result(i) = rx.Test(StringToSearch(i))
+                Else
+                    Result(i) = "#StringToSearch must be a string!"
+                End If
+            Next i
+        Case Else
+            Throw "StringToSearch must be String or array with 1 or 2 dimensions"
+    End Select
 
-43        IsRegMatch = Result
+    IsRegMatch = Result
 EarlyExit:
-44        Set rx = Nothing
+    Set rx = Nothing
 
-45        Exit Function
+    Exit Function
 ErrHandler:
-46        IsRegMatch = "#IsRegMatch (line " & CStr(Erl) + "): " & Err.Description & "!"
-47        Set rx = Nothing
+    IsRegMatch = "#IsRegMatch (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Set rx = Nothing
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -523,19 +519,110 @@ End Function
 ' Purpose    : Tests syntax of a regular expression.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function RegExSyntaxValid(RegularExpression As String) As Boolean
-          Dim res As Boolean
-          Dim rx As VBScript_RegExp_55.RegExp
-1         On Error GoTo ErrHandler
-2         Set rx = New RegExp
-3         With rx
-4             .IgnoreCase = False
-5             .Pattern = RegularExpression
-6             .Global = False        'Find first match only
-7         End With
-8         res = rx.Test("Foo")
-9         RegExSyntaxValid = True
-10        Exit Function
+    Dim Res As Boolean
+    Dim rx As VBScript_RegExp_55.RegExp
+    On Error GoTo ErrHandler
+    Set rx = New RegExp
+    With rx
+        .IgnoreCase = False
+        .Pattern = RegularExpression
+        .Global = False        'Find first match only
+    End With
+    Res = rx.Test("Foo")
+    RegExSyntaxValid = True
+    Exit Function
 ErrHandler:
-11        RegExSyntaxValid = False
+    RegExSyntaxValid = False
 End Function
 
+'---------------------------------------------------------------------------------------------------------
+' Procedure : RegExReplace
+' Purpose   : Uses regular expressions to make replacement in a set of input strings.
+'
+'             The function replaces every instance of the regular expression match with the
+'             replacement.
+' Arguments
+' InputString: Input string to be transformed. Can be an array. Non-string elements will be left
+'             unchanged.
+' RegularExpression: A standard regular expression string.
+' Replacement: A replacement template for each match of the regular expression in the input string.
+' CaseSensitive: Whether matching should be case-sensitive (TRUE) or not (FALSE).
+'
+' Notes     : Details of regular expressions are given under sIsRegMatch. The replacement string can be
+'             an explicit string, and it can also contain special escape sequences that are
+'             replaced by the characters they represent. The options available are:
+'
+'             Characters Replacement
+'             $n        n-th backreference. That is, a copy of the n-th matched group
+'             specified with parentheses in the regular expression. n must be an integer
+'             value designating a valid backreference, greater than zero, and of two digits
+'             at most.
+'             $&       A copy of the entire match
+'             $`        The prefix, that is, the part of the target sequence that precedes
+'             the match.
+'             $´        The suffix, that is, the part of the target sequence that follows
+'             the match.
+'             $$        A single $ character.
+'---------------------------------------------------------------------------------------------------------
+Function RegExReplace(InputString As Variant, RegularExpression As String, Replacement As String, Optional CaseSensitive As Boolean)
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As String
+    Dim rx As VBScript_RegExp_55.RegExp
+    On Error GoTo ErrHandler
+
+    If Not RegExSyntaxValid(RegularExpression) Then
+        RegExReplace = "#Invalid syntax for RegularExpression!"
+        Exit Function
+    End If
+
+    Set rx = New RegExp
+
+    With rx
+        .IgnoreCase = Not (CaseSensitive)
+        .Pattern = RegularExpression
+        .Global = True
+    End With
+
+    If VarType(InputString) = vbString Then
+        RegExReplace = rx.Replace(InputString, Replacement)
+        GoTo Cleanup
+    ElseIf VarType(InputString) < vbArray Then
+        RegExReplace = InputString
+        GoTo Cleanup
+    End If
+    If TypeName(InputString) = "Range" Then InputString = InputString.Value2
+
+    Select Case NumDimensions(InputString)
+        Case 2
+            ReDim Result(LBound(InputString, 1) To UBound(InputString, 1), LBound(InputString, 2) To UBound(InputString, 2))
+            For i = LBound(InputString, 1) To UBound(InputString, 1)
+                For j = LBound(InputString, 2) To UBound(InputString, 2)
+                    If VarType(InputString(i, j)) = vbString Then
+                        Result(i, j) = rx.Replace(InputString(i, j), Replacement)
+                    Else
+                        Result(i, j) = InputString(i, j)
+                    End If
+                Next j
+            Next i
+        Case 1
+            ReDim Result(LBound(InputString, 1) To UBound(InputString, 1))
+            For i = LBound(InputString, 1) To UBound(InputString, 1)
+                If VarType(InputString(i)) = vbString Then
+                    Result(i) = rx.Replace(InputString(i), Replacement)
+                Else
+                    Result(i) = InputString(i)
+                End If
+            Next i
+        Case Else
+            Throw "InputString must be a String or an array with 1 or 2 dimensions"
+    End Select
+    RegExReplace = Result
+
+Cleanup:
+    Set rx = Nothing
+    Exit Function
+ErrHandler:
+    RegExReplace = "#RegExReplace (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Set rx = Nothing
+End Function

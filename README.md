@@ -24,15 +24,15 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 Returns the contents of a comma-separated file on disk as an array.
 ```vba
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-        Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-        Optional DateFormat As String, Optional Comment As String, _
-        Optional IgnoreEmptyLines As Boolean = True, Optional ByVal HeaderRowNum As Long, _
-        Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
-        Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
-        Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
-        Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-        Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
-        Optional ByRef HeaderRow)
+          Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
+          Optional DateFormat As String, Optional Comment As String, _
+          Optional IgnoreEmptyLines As Boolean = True, Optional ByVal HeaderRowNum As Long = 0, _
+          Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
+          Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
+          Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
+          Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+          Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
+          Optional ByRef HeaderRow)
 ```
 
 |Argument|Description|
@@ -44,8 +44,8 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`DateFormat`|The format of dates in the file such as "Y-M-D", "M-D-Y" or "Y/M/D". Also supports "ISO" for ISO8601 (e.g. 2021-08-26T09:11:30) or "ISOZ" (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time.|
 |`Comment`|Rows that start with this string will be skipped while parsing.|
 |`IgnoreEmptyLines`|Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each column will be assigned `ShowMissingsAs` for that empty row).|
-|`HeaderRowNum`|The row in the file containing headers. This argument is most useful when calling from VBA, with `SkipToRow` set to one more than `HeaderRowNum`. In that case the function returns the "data rows", and the header rows are returned via the by-reference argument `HeaderRow`.|
-|`SkipToRow`|The first row in the file that's included in the return. Must be at least `HeaderRowNum`, to which it defaults if omitted, but when calling from VBA (rather than an Excel formula) it's often convenient to pass `SkipToRow` as `HeaderRow`+1, so that the function returns the "data rows" and sets the by-reference argument `HeaderRow` equal to the contents of the header row.|
+|`HeaderRowNum`|The row in the file containing headers. This argument is most useful when calling from VBA, with `SkipToRow` set to one more than `HeaderRowNum`. In that case the function returns the "data rows", and the header rows are returned via the by-reference argument `HeaderRow`. Optional and defaults to 0.|
+|`SkipToRow`|The first row in the file that's included in the return. Optional and defaults to one more than `HeaderRowNum`.|
 |`SkipToCol`|The column in the file at which reading starts. Optional and defaults to 1 to read from the first column.|
 |`NumRows`|The number of rows to read from the file. If omitted (or zero), all rows from `SkipToRow` to the end of the file are read.|
 |`NumCols`|The number of columns to read from the file. If omitted (or zero), all columns from `SkipToCol` are read.|
