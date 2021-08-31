@@ -14,7 +14,7 @@ Option Explicit
 ' Purpose    : Metaprogramming - generate the VBA code for a given test, used on worksheet Test to genenerate a single
 '              case statement for method RunTests.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, ConvertTypes As Variant, Delimiter As String, IgnoreRepeated As Boolean, DateFormat As String, _
+Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, ConvertTypes As Variant, Delimiter As Variant, IgnoreRepeated As Boolean, DateFormat As String, _
     Comment As String, IgnoreEmptyLines As Boolean, HeaderRowNum As Long, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, TrueStrings As String, _
     FalseStrings As String, MissingStrings As String, Encoding As Variant, DecimalSeparator As String, ExpectedHeaderRow As Variant)
 

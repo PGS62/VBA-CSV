@@ -8,50 +8,8 @@ Attribute VB_Name = "modCSVTest"
 Option Explicit
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : RunTestsFromButton
-' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
-' -----------------------------------------------------------------------------------------------------------------------
-Sub RunTestsFromButton()
-    Dim NumPassed As Long
-    Dim NumFailed As Long
-    Dim NumSkipped As Long
-    Dim Failures() As String
-    Dim ProtectContents As Boolean
-    Dim IncludeLargeFiles As Boolean
-
-    Dim DataToPaste
-    Dim RangeToPasteTo As Range
-
-    On Error GoTo ErrHandler
-
-    IncludeLargeFiles = shTest.Range("IncludeLargeFiles").value
-
-    RunTests IncludeLargeFiles, NumPassed, NumFailed, NumSkipped, Failures
-
-    With shTest
-        ProtectContents = .ProtectContents
-        .Unprotect
-        .Range("NumPassed").value = NumPassed
-        .Range("NumFailed").value = NumFailed
-        .Range("NumSkipped").value = NumSkipped
-        .Range("Test_Failures").ClearContents
-        If NumFailed > 0 Then
-            DataToPaste = Transpose(Failures)
-            Set RangeToPasteTo = .Range("Test_Failures").Resize(NumFailed)
-            RangeToPasteTo.value = DataToPaste
-            shTest.Names.Add "Test_Failures", RangeToPasteTo
-        End If
-        .Protect Contents:=ProtectContents
-    End With
-
-    Exit Sub
-ErrHandler:
-    MsgBox "#RunTestsFromButton (line " & CStr(Erl) + "): " & Err.Description & "!", vbCritical
-End Sub
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RunTests
-' Purpose    : Multiple calls to TestCSVRead against many different data files, of which the majority are from
+' Purpose    : Multiple calls to TestCSVRead against many different data files, of which many are from
 '              https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef NumSkipped As Long, ByRef Failures() As String)
@@ -62,12 +20,11 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Dim i As Long
     Dim k As Long
     Dim m As Long
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Variant
     Dim WhatDiffers As String
-    Dim Observed As Variant
 
-    On Error GoTo ErrHandler
     On Error GoTo ErrHandler
     Folder = ThisWorkbook.path
     Folder = Left(Folder, InStrRev(Folder, "\")) + "testfiles\"
@@ -406,7 +363,6 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
                 TestDescription = "stocks"
                 FileName = "stocks.csv"
                 Expected = Expected057()
-                
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
                     ConvertTypes:="T", _
                     ShowMissingsAs:=Empty)
@@ -609,7 +565,6 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
                 TestDescription = "test strange delimiter"
                 FileName = "test_strange_delimiter.csv"
                 Expected = Expected088()
-                
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
                     ConvertTypes:=True, _
                     Delimiter:="{""}", _
@@ -729,7 +684,6 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
                         Expected(k, 1) = CDate(Expected(k, 1))
                     End If
                 Next k
-
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
                     ConvertTypes:=True, _
                     Delimiter:=",", _
@@ -749,7 +703,6 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
                         Expected(k, 1) = CDate(Expected(k, 1))
                     End If
                 Next k
-
                 TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
                     ConvertTypes:=True, _
                     Delimiter:=",", _
@@ -1266,7 +1219,244 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
                     ShowMissingsAs:=Empty, _
                     HeaderRowNum:=1#, _
                     ExpectedHeaderRow:=HStack("Type", "Col A", "Col B", "Col C", "Col D", "Col E", "Col F", "Col G"))
-        
+            Case 156
+                TestDescription = "test not delimited.txt"
+                FileName = "test_not_delimited.txt"
+                Expected = Expected156()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    Delimiter:=False, _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 157
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    Delimiter:=99#, _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 158
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: SkipToCol (4) exceeds the number of columns in the file (3)!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    IgnoreEmptyLines:=False, _
+                    SkipToCol:=4, _
+                    ShowMissingsAs:=Empty)
+            Case 159
+                TestDescription = "test too few headers"
+                FileName = "test_too_few_headers.csv"
+                Expected = Expected159()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty, _
+                    HeaderRowNum:=1#, _
+                    ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "", "", "", "", ""))
+            Case 160
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: #ParseCTString: ConvertTypes must be Boolean or string with allowed letters NDBETQ. ""N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans as Booleans, ""E"" show Excel errors as errors, ""T"" to trim leading and trailing spaces from fields, ""Q"" rules NDBE apply even to quoted fields, TRUE = ""NDB"" (convert unquoted numbers, dates and Booleans), FALSE = no conversion Found unrecognised character 'X'!!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:="XYZ", _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 161
+                TestDescription = "test quoted headers"
+                FileName = "test_quoted_headers.csv"
+                Expected = Expected161()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty, _
+                    HeaderRowNum:=1#, _
+                    ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8", "Col9", "Col10"))
+            Case 162
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y' or 'Y/M/D'. Omit to use the default date format on this PC which is ""M/D/Y""!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="BAD", _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 163
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y' or 'Y/M/D'. Omit to use the default date format on this PC which is ""M/D/Y""!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="Y-M/D", _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 164
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: #OneDArrayToTwoDArray: If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements!!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=Array(1.5, "N"), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 165
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is 1.5!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack(Array(1.5, 2#), Array("N", "N")), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 166
+                TestDescription = "test not delimited.txt"
+                FileName = "test_not_delimited.txt"
+                Expected = HStack(Array("Use:", "]add CSV#main", "=#"))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    Delimiter:=False, _
+                    IgnoreEmptyLines:=False, _
+                    SkipToRow:=3, _
+                    NumRows:=3, _
+                    ShowMissingsAs:=Empty)
+            Case 167
+                TestDescription = "test dateformat"
+                FileName = "test_dateformat.csv"
+                Expected = Expected167()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    DateFormat:="YYYY-MM-DD", _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 168
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = HStack(Array("Col1", "1", "4", "7"), Array("Col2", 2#, 5#, 8#), Array("Col3", "3", "6", "9"))
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack(Array(1#, False), Array(2#, True), Array(3#, False)), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 169
+                TestDescription = "test bad inputs"
+                FileName = "test_bad_inputs.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes is contradictory. Column 2 is specified to be converted using two different conversion rules: B and N!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack(Array(1#, "NB"), Array(1#, "BN"), Array(2#, "N"), Array(2#, "B")), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 170
+                TestDescription = "download airline safety"
+                FileName = "https://raw.githubusercontent.com/fivethirtyeight/data/master/airline-safety/airline-safety.csv"
+                Expected = Expected170()
+                TestRes = TestCSVRead(i, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty, _
+                    HeaderRowNum:=1#, _
+                    ExpectedHeaderRow:=HStack( _
+                    "airline", _
+                    "avail_seat_km_per_week", _
+                    "incidents_85_99", _
+                    "fatal_accidents_85_99", _
+                    "fatalities_85_99", _
+                    "incidents_00_14", _
+                    "fatal_accidents_00_14", _
+                    "fatalities_00_14"))
+            Case 171
+                TestDescription = "test column-by-column"
+                FileName = "test_column-by-column.csv"
+                Expected = Expected171()
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack( _
+                    Array(0#, False), _
+                    Array(2#, "N"), _
+                    Array(3#, "B"), _
+                    Array(4#, "D"), _
+                    Array(5#, "E"), _
+                    Array(6#, "NQ"), _
+                    Array(7#, "BQ"), _
+                    Array(8#, "EQ")), _
+                    DateFormat:="ISO", _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 172
+                TestDescription = "test column-by-column"
+                FileName = "test_column-by-column.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is -2!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack( _
+                    Array(-2#, False), _
+                    Array(2#, "N"), _
+                    Array(3#, "B"), _
+                    Array(4#, "D"), _
+                    Array(5#, "E"), _
+                    Array(6#, "NQ"), _
+                    Array(7#, "BQ"), _
+                    Array(8#, "EQ")), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 173
+                TestDescription = "test column-by-column"
+                FileName = "test_column-by-column.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,2) is string ""XX""!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack(Array(0#, False), Array(2#, "XX"), Array(3#, "B"), Array(4#, "D")), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 174
+                TestDescription = "test column-by-column"
+                FileName = "test_column-by-column.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,1) is of type Error!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack(Array(3#, CVErr(2007)), Array(4#, "D"), Array(5#, "E")), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+            Case 175
+                TestDescription = "test column-by-column"
+                FileName = "test_column-by-column.csv"
+                Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes specifies columns by their header (instead of by number), but HeaderRowNum has not been specified!!"
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=HStack(Array("Col A", "N"), Array("Col B", "N"), Array("Col C", "N")), _
+                    IgnoreEmptyLines:=False, _
+                    ShowMissingsAs:=Empty)
+                    
+            Case 176
+                TestDescription = "test various time formats"
+                FileName = "test_various_time_formats.csv"
+                Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
+                For k = 1 To sNRows(Expected)
+                    If VarType(Expected(k, 1)) = vbDouble Then
+                        Expected(k, 1) = CDate(Expected(k, 1))
+                    End If
+                Next k
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    DateFormat:="Y-M-D", _
+                    IgnoreEmptyLines:=False, _
+                    SkipToRow:=2, _
+                    SkipToCol:=1, _
+                    NumCols:=1, _
+                    AbsTol:=0.000000000000001, _
+                    ShowMissingsAs:=Empty)
+            Case 177
+                TestDescription = "test y-m-d dates with fractional seconds"
+                FileName = "test_y-m-d_dates_with_fractional_seconds.csv"
+                Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
+                For k = 1 To sNRows(Expected)
+                    If VarType(Expected(k, 1)) = vbDouble Then
+                        Expected(k, 1) = CDate(Expected(k, 1))
+                    End If
+                Next k
+                TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+                    ConvertTypes:="D", _
+                    DateFormat:="Y-M-D", _
+                    IgnoreEmptyLines:=False, _
+                    SkipToRow:=2, _
+                    SkipToCol:=1, _
+                    NumCols:=1, _
+                    AbsTol:=0.0000000001, _
+                    ShowMissingsAs:=Empty)
+                    
+                    
+                    
+                    
         End Select
         
         If Not IsEmpty(TestRes) Then
@@ -1278,12 +1468,75 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
                 Failures(NumFailed) = WhatDiffers
             End If
         End If
-
     Next i
 
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+
+Sub PasteFailures(NumFailures As Long, Optional Failures)
+    On Error GoTo ErrHandler
+        With shTestResults
+        .Unprotect
+        .UsedRange.EntireColumn.Delete
+        With .Cells(1, 1)
+            .value = "Test Results"
+            .Font.Size = 22
+        End With
+        If NumFailures > 0 Then
+            With .Cells(3, 1).Resize(NumFailures)
+                .value = Transpose(Failures)
+            End With
+            Else
+            .Cells(3, 1).value = "All tests passed."
+        End If
+    .Protect , , True
+    End With
+
+
+
+    Exit Sub
+ErrHandler:
+    Throw "#PasteFailures (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : RunTestsFromButton
+' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
+' -----------------------------------------------------------------------------------------------------------------------
+Sub RunTestsFromButton()
+    Dim NumPassed As Long
+    Dim NumFailed As Long
+    Dim NumSkipped As Long
+    Dim Failures() As String
+    Dim ProtectContents As Boolean
+    Dim IncludeLargeFiles As Boolean
+
+    Dim DataToPaste
+    Dim RangeToPasteTo As Range
+
+    On Error GoTo ErrHandler
+
+    IncludeLargeFiles = shTest.Range("IncludeLargeFiles").value
+
+    RunTests IncludeLargeFiles, NumPassed, NumFailed, NumSkipped, Failures
+
+    With shTest
+        ProtectContents = .ProtectContents
+        .Unprotect
+        .Range("NumPassed").value = NumPassed
+        .Range("NumFailed").value = NumFailed
+        .Range("NumSkipped").value = NumSkipped
+        PasteFailures NumFailed, Failures
+        .Protect Contents:=ProtectContents
+    End With
+
+    Exit Sub
+ErrHandler:
+    MsgBox "#RunTestsFromButton (line " & CStr(Erl) + "): " & Err.Description & "!", vbCritical
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -1302,6 +1555,21 @@ Private Function FolderExists(ByVal FolderPath As String)
 ErrHandler:
     FolderExists = False
 End Function
+
+Function FileExists(ByVal FilePath As String)
+    Dim F As Scripting.File
+    Dim FSO As Scripting.FileSystemObject
+    On Error GoTo ErrHandler
+    Set FSO = New FileSystemObject
+    Set F = FSO.GetFile(FilePath)
+    FileExists = True
+    Exit Function
+ErrHandler:
+    FileExists = False
+End Function
+
+
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedures  : Expected005 etc.
@@ -1955,7 +2223,7 @@ Function Expected133()
 End Function
 
 Function Expected134()
-Expected134 = HStack(Array("1", "4", "7"), Array("2", "5", "8"), Array("3", "6", "9"))
+    Expected134 = HStack(Array("1", "4", "7"), Array("2", "5", "8"), Array("3", "6", "9"))
 End Function
 
 Function Expected155()
@@ -1969,3 +2237,75 @@ Function Expected155()
         Array("Col F", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", CDate("2021-Aug-24 12:49:13"), "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbLf + "Feed"), _
         Array("Col G", "44424", "2021-08-24T12:49:13", True, CVErr(2007), "1", "2021-08-24T12:49:13", True, CVErr(2007), "abc", "abc""def", "Line" + vbLf + "Feed"))
 End Function
+
+Function Expected156()
+    Expected156 = VStack( _
+        VStack("using CSV#= as of 29 Aug 2021 one needs the main version of CSV, latest released version", "0.8.5 fails to load some of the files. See https://github.com/JuliaData/CSV.jl/issues/879", "Use:", "]add CSV#main", "=#", "using DataFrames", "", "function benchmark()", "    benchmark_csvs_in_folder(""C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance"", ", "    ""C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance/JuliaResults.txt"")"), _
+        VStack("end", "", """""""", "   benchmark_csvs_in_folder(foldername::String, outputfile::String)", "Benchmark all .csv files in `foldername`, writing results to `outputfile`.", """""""", "function benchmark_csvs_in_folder(foldername::String, outputfile::String)", "    files = readdir(foldername, join=true)", "    files = filter(x -> x[end - 3:end] == "".csv"", files)# only .csv files", ""), _
+        VStack("    n = length(files)", "    times = fill(0.0, n)", "    numcalls = fill(0, n)", "    statuses = fill(""OK"", n)", "", "    foo = benchmarkonefile(files[1], 1)# for compilation ""warmup""", "    for (f, i) in zip(files, 1:n)", "        println(i, f)", "        try", "            times[i], numcalls[i] = benchmarkonefile(f, 5)"), _
+        VStack("        catch e", "            statuses[i] = ""$e""", "        end", "    end", "    times", "", "    result = DataFrame(filename=replace.(files, ""/"" => ""\\""), time=times, ", "                        status=statuses, numcalls=numcalls)", "    CSV.write(outputfile, result)", "end"), _
+        VStack("", """""""", "    benchmarkonefile(filename::String, timeout::Int)", "Average time (over sufficient trials to take `timeout` seconds) to load file `filename` to", "a DataFrame, using CSV.File.", """""""", "function benchmarkonefile(filename::String, timeout::Int)", "    i = 0", "    time2 = time() # needed to give time2 scope outside the loop.", "    time1 = time()"), _
+        VStack("    while true", "        i = i + 1", "        res = CSV.File(filename, header=false, type=String) |> DataFrame", "        time2 = time()", "        time2 - time1 < timeout || break", "    end", "    (time2 - time1) / i, i", "end"))
+End Function
+
+Function Expected159()
+    Expected159 = HStack( _
+        Array("Col1", 1#, 11#, 21#, 31#, 41#, 51#, 61#, 71#, 81#, 91#), _
+        Array("Col2", 2#, 12#, 22#, 32#, 42#, 52#, 62#, 72#, 82#, 92#), _
+        Array("Col3", 3#, 13#, 23#, 33#, 43#, 53#, 63#, 73#, 83#, 93#), _
+        Array("Col4", 4#, 14#, 24#, 34#, 44#, 54#, 64#, 74#, 84#, 94#), _
+        Array("Col5", 5#, 15#, 25#, 35#, 45#, 55#, 65#, 75#, 85#, 95#), _
+        Array(Empty, 6#, 16#, 26#, 36#, 46#, 56#, 66#, 76#, 86#, 96#), _
+        Array(Empty, 7#, 17#, 27#, 37#, 47#, 57#, 67#, 77#, 87#, 97#), _
+        Array(Empty, 8#, 18#, 28#, 38#, 48#, 58#, 68#, 78#, 88#, 98#), _
+        Array(Empty, 9#, 19#, 29#, 39#, 49#, 59#, 69#, 79#, 89#, 99#), _
+        Array(Empty, 10#, 20#, 30#, 40#, 50#, 60#, 70#, 80#, 90#, 100#))
+End Function
+
+Function Expected161()
+    Expected161 = HStack( _
+        Array("Col1", 1#, 11#, 21#, 31#, 41#, 51#, 61#, 71#, 81#, 91#), _
+        Array("Col2", 2#, 12#, 22#, 32#, 42#, 52#, 62#, 72#, 82#, 92#), _
+        Array("Col3", 3#, 13#, 23#, 33#, 43#, 53#, 63#, 73#, 83#, 93#), _
+        Array("Col4", 4#, 14#, 24#, 34#, 44#, 54#, 64#, 74#, 84#, 94#), _
+        Array("Col5", 5#, 15#, 25#, 35#, 45#, 55#, 65#, 75#, 85#, 95#), _
+        Array("Col6", 6#, 16#, 26#, 36#, 46#, 56#, 66#, 76#, 86#, 96#), _
+        Array("Col7", 7#, 17#, 27#, 37#, 47#, 57#, 67#, 77#, 87#, 97#), _
+        Array("Col8", 8#, 18#, 28#, 38#, 48#, 58#, 68#, 78#, 88#, 98#), _
+        Array("Col9", 9#, 19#, 29#, 39#, 49#, 59#, 69#, 79#, 89#, 99#), _
+        Array("Col10", 10#, 20#, 30#, 40#, 50#, 60#, 70#, 80#, 90#, 100#))
+End Function
+
+Function Expected167()
+    Expected167 = HStack( _
+        Array("Date1", CDate("2021-Aug-30"), CDate("2021-Aug-31")), _
+        Array("Date2", CDate("2021-Aug-31"), CDate("2021-Sep-01")))
+End Function
+
+Function Expected170()
+    Expected170 = HStack( _
+        Array("airline", "Aer Lingus", "Aeroflot*", "Aerolineas Argentinas", "Aeromexico*", "Air Canada", "Air France", "Air India*", "Air New Zealand*", "Alaska Airlines*", "Alitalia", "All Nippon Airways", "American*", "Austrian Airlines", "Avianca", "British Airways*", "Cathay Pacific*", "China Airlines", "Condor", "COPA", "Delta / Northwest*", "Egyptair", "El Al", "Ethiopian Airlines", "Finnair", "Garuda Indonesia", "Gulf Air", "Hawaiian Airlines", "Iberia", "Japan Airlines", "Kenya Airways", "KLM*", "Korean Air", "LAN Airlines", "Lufthansa*", "Malaysia Airlines", "Pakistan International", "Philippine Airlines", "Qantas*", "Royal Air Maroc", "SAS*", "Saudi Arabian", "Singapore Airlines", "South African", "Southwest Airlines", "Sri Lankan / AirLanka", "SWISS*", "TACA", "TAM", "TAP - Air Portugal", "Thai Airways", "Turkish Airlines", "United / Continental*", "US Airways / America West*", "Vietnam Airlines", "Virgin Atlantic", "Xiamen Airlines"), _
+        Array("avail_seat_km_per_week", 320906734#, 1197672318#, 385803648#, 596871813#, 1865253802#, 3004002661#, 869253552#, 710174817#, 965346773#, 698012498#, 1841234177#, 5228357340#, 358239823#, 396922563#, 3179760952#, 2582459303#, 813216487#, 417982610#, 550491507#, 6525658894#, 557699891#, 335448023#, 488560643#, 506464950#, 613356665#, 301379762#, 493877795#, 1173203126#, 1574217531#, 277414794#, 1874561773#, 1734522605#, 1001965891#, 3426529504#, 1039171244#, 348563137#, 413007158#, 1917428984#, 295705339#, 682971852#, 859673901#, 2376857805#, 651502442#, 3276525770#, 325582976#, 792601299#, 259373346#, 1509195646#, 619130754#, 1702802250#, 1946098294#, 7139291291#, 2455687887#, 625084918#, 1005248585#, 430462962#), _
+        Array("incidents_85_99", 2#, 76#, 6#, 3#, 2#, 14#, 2#, 3#, 5#, 7#, 3#, 21#, 1#, 5#, 4#, 0#, 12#, 2#, 3#, 24#, 8#, 1#, 25#, 1#, 10#, 1#, 0#, 4#, 3#, 2#, 7#, 12#, 3#, 6#, 3#, 8#, 7#, 1#, 5#, 5#, 7#, 2#, 2#, 1#, 2#, 2#, 3#, 8#, 0#, 8#, 8#, 19#, 16#, 7#, 1#, 9#), _
+        Array("fatal_accidents_85_99", 0#, 14#, 0#, 1#, 0#, 4#, 1#, 0#, 0#, 2#, 1#, 5#, 0#, 3#, 0#, 0#, 6#, 1#, 1#, 12#, 3#, 1#, 5#, 0#, 3#, 0#, 0#, 1#, 1#, 0#, 1#, 5#, 2#, 1#, 1#, 3#, 4#, 0#, 3#, 0#, 2#, 2#, 1#, 0#, 1#, 1#, 1#, 3#, 0#, 4#, 3#, 8#, 7#, 3#, 0#, 1#), _
+        Array("fatalities_85_99", 0#, 128#, 0#, 64#, 0#, 79#, 329#, 0#, 0#, 50#, 1#, 101#, 0#, 323#, 0#, 0#, 535#, 16#, 47#, 407#, 282#, 4#, 167#, 0#, 260#, 0#, 0#, 148#, 520#, 0#, 3#, 425#, 21#, 2#, 34#, 234#, 74#, 0#, 51#, 0#, 313#, 6#, 159#, 0#, 14#, 229#, 3#, 98#, 0#, 308#, 64#, 319#, 224#, 171#, 0#, 82#), _
+        Array("incidents_00_14", 0#, 6#, 1#, 5#, 2#, 6#, 4#, 5#, 5#, 4#, 7#, 17#, 1#, 0#, 6#, 2#, 2#, 0#, 0#, 24#, 4#, 1#, 5#, 0#, 4#, 3#, 1#, 5#, 0#, 2#, 1#, 1#, 0#, 3#, 3#, 10#, 2#, 5#, 3#, 6#, 11#, 2#, 1#, 8#, 4#, 3#, 1#, 7#, 0#, 2#, 8#, 14#, 11#, 1#, 0#, 2#), _
+        Array("fatal_accidents_00_14", 0#, 1#, 0#, 0#, 0#, 2#, 1#, 1#, 1#, 0#, 0#, 3#, 0#, 0#, 0#, 0#, 1#, 0#, 0#, 2#, 1#, 0#, 2#, 0#, 2#, 1#, 0#, 0#, 0#, 2#, 0#, 0#, 0#, 0#, 2#, 2#, 1#, 0#, 0#, 1#, 0#, 1#, 0#, 0#, 0#, 0#, 1#, 2#, 0#, 1#, 2#, 2#, 2#, 0#, 0#, 0#), _
+        Array("fatalities_00_14", 0#, 88#, 0#, 0#, 0#, 337#, 158#, 7#, 88#, 0#, 0#, 416#, 0#, 0#, 0#, 0#, 225#, 0#, 0#, 51#, 14#, 0#, 92#, 0#, 22#, 143#, 0#, 0#, 0#, 283#, 0#, 0#, 0#, 0#, 537#, 46#, 1#, 0#, 0#, 110#, 0#, 83#, 0#, 0#, 0#, 0#, 3#, 188#, 0#, 1#, 84#, 109#, 23#, 0#, 0#, 0#))
+End Function
+
+Function Expected171()
+    Expected171 = HStack( _
+        Array("Type", "Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String", "String"), _
+        Array("Col A", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbLf + "Feed"), _
+        Array("Col B", "44424", "2021-08-24T12:49:13", True, "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbLf + "Feed"), _
+        Array("Col C", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbLf + "Feed"), _
+        Array("Col D", "44424", "2021-08-24T12:49:13", "True", CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbLf + "Feed"), _
+        Array("Col E", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", 1#, "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbLf + "Feed"), _
+        Array("Col F", "44424", "2021-08-24T12:49:13", True, "#DIV/0!", "1", "2021-08-24T12:49:13", True, "#DIV/0!", "abc", "abc""def", "Line" + vbLf + "Feed"), _
+        Array("Col G", "44424", "2021-08-24T12:49:13", "True", CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", CVErr(2007), "abc", "abc""def", "Line" + vbLf + "Feed"))
+End Function
+
+
+
+

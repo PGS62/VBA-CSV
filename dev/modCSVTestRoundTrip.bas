@@ -428,7 +428,7 @@ End Function
 'Copy of identical function in modCVS so that copy there can be Private
 Private Function OStoEOL(OS As String, ArgName As String) As String
 
-    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associented end of line characters."
+    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
 
     Select Case LCase(OS)
         Case "windows", vbCrLf

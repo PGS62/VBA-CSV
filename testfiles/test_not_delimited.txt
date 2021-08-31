@@ -6,21 +6,16 @@ Use:
 using DataFrames
 
 function benchmark()
-    #= folder points to where the VBA method RunSpeedTests writes performance test files.
-    See workbooks/VBA-CSV.xlsm, module modCSVPerformance =# 
-
-    folder = joinpath(ENV["TEMP"],"VBA-CSV/Performance")
-    outputfile = normpath(joinpath(@__DIR__,"..","julia/juliaparsetimes.csv"))
- outputfile = outputfile * "2"
-    benchmark_csvs_in_folder(folder,outputfile)
+    benchmark_csvs_in_folder("C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance", 
+    "C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance/JuliaResults.txt")
 end
 
 """
-   benchmark_csvs_in_folder(folder::String, outputfile::String)
-Benchmark all .csv files in `folder`, writing results to `outputfile`.
+   benchmark_csvs_in_folder(foldername::String, outputfile::String)
+Benchmark all .csv files in `foldername`, writing results to `outputfile`.
 """
-function benchmark_csvs_in_folder(folder::String, outputfile::String)
-    files = readdir(folder, join=true)
+function benchmark_csvs_in_folder(foldername::String, outputfile::String)
+    files = readdir(foldername, join=true)
     files = filter(x -> x[end - 3:end] == ".csv", files)# only .csv files
 
     n = length(files)
@@ -50,7 +45,8 @@ Average time (over sufficient trials to take `timeout` seconds) to load file `fi
 a DataFrame, using CSV.File.
 """
 function benchmarkonefile(filename::String, timeout::Int)
-    i = 0 ; time2 = time() # needed to give variables scope outside the loop.
+    i = 0
+    time2 = time() # needed to give time2 scope outside the loop.
     time1 = time()
     while true
         i = i + 1

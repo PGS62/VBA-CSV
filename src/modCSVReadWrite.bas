@@ -1,5 +1,4 @@
 Attribute VB_Name = "modCSVReadWrite"
-
 ' VBA-CSV
 
 ' Copyright (C) 2021 - Philip Swannell
@@ -17,76 +16,18 @@ Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownlo
 Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
 #End If
 
+Private Enum enmErrorStyle
+    es_ReturnString = 0
+    es_RaiseError = 1
+End Enum
+
+Private Const m_ErrorStyle = es_ReturnString
+
 Private Enum enmSourceType
     st_File = 0
     st_URL = 1
     st_String = 2
 End Enum
-
-'---------------------------------------------------------------------------------------------------------
-' Procedure  : RegisterCSVRead
-' Purpose    : Register the function CSVRead with the Excel function wizard. Suggest this function is called from a
-'              WorkBook_Open event.
-'---------------------------------------------------------------------------------------------------------
-Sub RegisterCSVRead()
-    Const Description = "Returns the contents of a comma-separated file on disk as an array."
-    Dim ArgumentDescriptions() As String
-
-    On Error GoTo ErrHandler
-
-    ReDim ArgumentDescriptions(1 To 19)
-    ArgumentDescriptions(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV format."
-    ArgumentDescriptions(2) = "Type conversion: Boolean or string, subset of letters NDBETQ. N = convert Numbers, D = convert Dates, B = Convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = quoted fields also converted. TRUE = NDB, FALSE = no conversion."
-    ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
-    ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after another delimiter should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
-    ArgumentDescriptions(5) = "The format of dates in the file such as ""Y-M-D"", ""M-D-Y"" or ""Y/M/D"". Also supports ""ISO"" for ISO8601 (e.g. 2021-08-26T09:11:30) or ""ISOZ"" (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
-    ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
-    ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each column will be assigned ShowMissingsAs for that empty row)."
-    ArgumentDescriptions(8) = "The row in the file containing headers. Optional and defaults to 0."
-    ArgumentDescriptions(9) = "The first row in the file that's included in the return. Optional and defaults to one more than HeaderRowNum."
-    ArgumentDescriptions(10) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
-    ArgumentDescriptions(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
-    ArgumentDescriptions(12) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
-    ArgumentDescriptions(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default `TRUE`, `True` and `true` are recognised."
-    ArgumentDescriptions(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default `FALSE`, `False` and `false` are recognised."
-    ArgumentDescriptions(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default only an empty field (consecutive delimiters) is considered missing."
-    ArgumentDescriptions(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null string or #N/A! error value can be good alternatives."
-    ArgumentDescriptions(17) = "Allowed entries are ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"", and ""ANSI"", but for most files this argument can be omitted and CSVRead will detect the file's encoding."
-    ArgumentDescriptions(18) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
-    ArgumentDescriptions(19) = "For use from VBA only."
-    Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
-    Exit Sub
-
-ErrHandler:
-    Debug.Print "Warning: Registration of function CSVRead failed with error: " + Err.Description
-End Sub
-
-'---------------------------------------------------------------------------------------------------------
-' Procedure  : RegisterCSVWrite
-' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
-'              WorkBook_Open event.
-'---------------------------------------------------------------------------------------------------------
-Sub RegisterCSVWrite()
-    Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-    Dim ArgumentDescriptions() As String
-
-    On Error GoTo ErrHandler
-
-    ReDim ArgumentDescriptions(1 To 8)
-    ArgumentDescriptions(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values."
-    ArgumentDescriptions(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the function returns Data converted CSV-style to a string."
-    ArgumentDescriptions(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. Double quotes are always escaped by another double quote."
-    ArgumentDescriptions(4) = "A format string that determine how dates, including cells formatted as dates, appear in the file. If omitted, defaults to ""yyyy-mm-dd""."
-    ArgumentDescriptions(5) = "Format for datetimes. Defaults to ""ISO"" which abbreviates ""yyyy-mm-ddThh:mm:ss"". Use ""ISOZ"" for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data."
-    ArgumentDescriptions(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one character."
-    ArgumentDescriptions(7) = "If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains strings with characters whose code points exceed 255."
-    ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter ""Windows"" (the default), ""Unix"" or ""Mac"". Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings ""CRLF"", ""LF"" or ""CR""."
-    Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgumentDescriptions
-    Exit Sub
-
-ErrHandler:
-    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
-End Sub
 
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : CSVRead
@@ -189,15 +130,17 @@ End Sub
 '             https://tools.ietf.org/html/rfc4180#section-2
 '---------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-          Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-          Optional DateFormat As String, Optional Comment As String, _
-          Optional IgnoreEmptyLines As Boolean = False, Optional ByVal HeaderRowNum As Long = 0, _
-          Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
-          Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
-          Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
-          Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-          Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
-          Optional ByRef HeaderRow)
+    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
+    Optional DateFormat As String, Optional Comment As String, _
+    Optional IgnoreEmptyLines As Boolean = False, Optional ByVal HeaderRowNum As Long = 0, _
+    Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
+    Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
+    Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
+    Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
+    Optional ByRef HeaderRow)
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
@@ -223,9 +166,10 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Dim ColIndexes() As Long
     Dim ConvertQuoted As Boolean
     Dim CSVContents As String
-    Dim DateOrder As Long
     Dim CTDict As New Scripting.Dictionary
+    Dim DateOrder As Long
     Dim DateSeparator As String
+    Dim ErrRet As String
     Dim FirstThreeChars As String
     Dim i As Long
     Dim ISO8601 As Boolean
@@ -531,9 +475,52 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Exit Function
 
 ErrHandler:
-    CSVRead = "#CSVRead: " & Err.Description & "!"
+    ErrRet = "#CSVRead: " & Err.Description & "!"
     If Not STS Is Nothing Then STS.Close
+    If m_ErrorStyle = es_ReturnString Then
+        CSVRead = ErrRet
+    Else
+        Throw ErrRet
+    End If
 End Function
+
+'---------------------------------------------------------------------------------------------------------
+' Procedure  : RegisterCSVRead
+' Purpose    : Register the function CSVRead with the Excel function wizard. Suggest this function is called from a
+'              WorkBook_Open event.
+'---------------------------------------------------------------------------------------------------------
+Sub RegisterCSVRead()
+    Const Description = "Returns the contents of a comma-separated file on disk as an array."
+    Dim ArgumentDescriptions() As String
+
+    On Error GoTo ErrHandler
+
+    ReDim ArgumentDescriptions(1 To 19)
+    ArgumentDescriptions(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV format."
+    ArgumentDescriptions(2) = "Type conversion: Boolean or string, subset of letters NDBETQ. N = convert Numbers, D = convert Dates, B = Convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = quoted fields also converted. TRUE = NDB, FALSE = no conversion."
+    ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
+    ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after another delimiter should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
+    ArgumentDescriptions(5) = "The format of dates in the file such as ""Y-M-D"", ""M-D-Y"" or ""Y/M/D"". Also supports ""ISO"" for ISO8601 (e.g. 2021-08-26T09:11:30) or ""ISOZ"" (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
+    ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
+    ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each column will be assigned ShowMissingsAs for that empty row)."
+    ArgumentDescriptions(8) = "The row in the file containing headers. Optional and defaults to 0."
+    ArgumentDescriptions(9) = "The first row in the file that's included in the return. Optional and defaults to one more than HeaderRowNum."
+    ArgumentDescriptions(10) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
+    ArgumentDescriptions(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
+    ArgumentDescriptions(12) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
+    ArgumentDescriptions(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default `TRUE`, `True` and `true` are recognised."
+    ArgumentDescriptions(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default `FALSE`, `False` and `false` are recognised."
+    ArgumentDescriptions(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default only an empty field (consecutive delimiters) is considered missing."
+    ArgumentDescriptions(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null string or #N/A! error value can be good alternatives."
+    ArgumentDescriptions(17) = "Allowed entries are ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"", and ""ANSI"", but for most files this argument can be omitted and CSVRead will detect the file's encoding."
+    ArgumentDescriptions(18) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
+    ArgumentDescriptions(19) = "For use from VBA only."
+    Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
+    Exit Sub
+
+ErrHandler:
+    Debug.Print "Warning: Registration of function CSVRead failed with error: " + Err.Description
+End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : InferSourceType
@@ -2260,11 +2247,16 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
     If ShowDatesAsDates Then
         If ISO8601 Then
             CastISO8601 Field, dtResult, Converted, AcceptWithoutTimeZone, AcceptWithTimeZone
-            If Not Converted Then
-                CastToTime Field, dtResult, Converted
-            End If
         Else
             CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+        End If
+        If Not Converted Then
+            If InStr(Field, ":") > 0 Then
+                CastToTime Field, dtResult, Converted
+                If Not Converted Then
+                    CastToTimeB Field, dtResult, Converted
+                End If
+            End If
         End If
         If Converted Then
             ConvertField = dtResult
@@ -2298,6 +2290,7 @@ Private Function Unquote(ByVal Field As String, QuoteChar As String, QuoteCount 
 ErrHandler:
     Throw "#Unquote: " & Err.Description & "!"
 End Function
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastToDouble, sub-routine of ConvertField
 ' Purpose    : Casts strIn to double where strIn has specified decimals separator.
@@ -2374,12 +2367,15 @@ Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSepa
     Dim pos2 As Long
     Dim y As String
     Dim TimePart As String
+    Dim TimePartConverted As Date
+    Dim Converted2 As Boolean
     
     On Error GoTo ErrHandler
+    
     pos1 = InStr(strIn, DateSeparator)
-    If pos1 = 0 Then GoTo CheckForTime
+    If pos1 = 0 Then Exit Sub
     pos2 = InStr(pos1 + 1, strIn, DateSeparator)
-    If pos2 = 0 Then GoTo CheckForTime
+    If pos2 = 0 Then Exit Sub
 
     If DateOrder = 0 Then 'M-D-Y
         m = Left$(strIn, pos1 - 1)
@@ -2399,24 +2395,34 @@ Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSepa
     Else
         Throw "DateOrder must be 0, 1, or 2"
     End If
-    If SysDateOrder = 0 Then
-        dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y + TimePart)
-        Converted = True
-    ElseIf SysDateOrder = 1 Then
-        dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y + TimePart)
-        Converted = True
-    ElseIf SysDateOrder = 2 Then
-        dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D + TimePart)
-        Converted = True
+    If InStr(TimePart, ".") = 0 Then
+        If SysDateOrder = 0 Then
+            dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y + TimePart)
+            Converted = True
+        ElseIf SysDateOrder = 1 Then
+            dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y + TimePart)
+            Converted = True
+        ElseIf SysDateOrder = 2 Then
+            dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D + TimePart)
+            Converted = True
+        End If
+    Else
+        If Left$(TimePart, 1) <> " " Then Exit Sub
+        CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
+        If Converted2 Then
+            If SysDateOrder = 0 Then
+                dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y) + TimePartConverted
+                Converted = True
+            ElseIf SysDateOrder = 1 Then
+                dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y) + TimePartConverted
+                Converted = True
+            ElseIf SysDateOrder = 2 Then
+                dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D) + TimePartConverted
+                Converted = True
+            End If
+    
+        End If
     End If
-    Exit Sub
-
-CheckForTime:
-    If Len(strIn) <> 8 Then Exit Sub
-    If Mid$(strIn, 3, 1) <> ":" Then Exit Sub
-    If Mid$(strIn, 6, 1) <> ":" Then Exit Sub
-    dtOut = CDate(strIn) 'TODO check whether Application.International(xl24HourClock) affects the result...
-    If dtOut <= 1 Then Converted = True
 
     Exit Sub
 ErrHandler:
@@ -2454,7 +2460,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function OStoEOL(OS As String, ArgName As String) As String
 
-    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associented end of line characters."
+    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
 
     On Error GoTo ErrHandler
     Select Case LCase(OS)
@@ -2520,6 +2526,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     Const Err_Dimensions = "Data must be a range or a 2-dimensional array"
     
     Dim EOLIsWindows As Boolean
+    Dim ErrRet As String
     Dim i As Long
     Dim j As Long
     Dim Lines() As String
@@ -2596,9 +2603,44 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     
     Exit Function
 ErrHandler:
-    CSVWrite = "#CSVWrite: " & Err.Description & "!"
-    If Not T Is Nothing Then Set T = Nothing
+    ErrRet = "#CSVWrite: " & Err.Description & "!"
+    If Not T Is Nothing Then
+        T.Close
+        Set T = Nothing
+    End If
+    If m_ErrorStyle = es_ReturnString Then
+        CSVWrite = ErrRet
+    Else
+        Throw ErrRet
+    End If
 End Function
+
+'---------------------------------------------------------------------------------------------------------
+' Procedure  : RegisterCSVWrite
+' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
+'              WorkBook_Open event.
+'---------------------------------------------------------------------------------------------------------
+Sub RegisterCSVWrite()
+    Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+    Dim ArgumentDescriptions() As String
+
+    On Error GoTo ErrHandler
+
+    ReDim ArgumentDescriptions(1 To 8)
+    ArgumentDescriptions(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values."
+    ArgumentDescriptions(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the function returns Data converted CSV-style to a string."
+    ArgumentDescriptions(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. Double quotes are always escaped by another double quote."
+    ArgumentDescriptions(4) = "A format string that determine how dates, including cells formatted as dates, appear in the file. If omitted, defaults to ""yyyy-mm-dd""."
+    ArgumentDescriptions(5) = "Format for datetimes. Defaults to ""ISO"" which abbreviates ""yyyy-mm-ddThh:mm:ss"". Use ""ISOZ"" for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data."
+    ArgumentDescriptions(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one character."
+    ArgumentDescriptions(7) = "If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains strings with characters whose code points exceed 255."
+    ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter ""Windows"" (the default), ""Unix"" or ""Mac"". Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings ""CRLF"", ""LF"" or ""CR""."
+    Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgumentDescriptions
+    Exit Sub
+
+ErrHandler:
+    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
+End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : WriteLineWrap
@@ -3123,42 +3165,63 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastToTime
 ' Purpose    : Cast strings that represent a time to a date, no handling of TimeZone.
-'Example inputs:
-'                13:30
-'                13:30:10
-'                13:30:10.123
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub CastToTime(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
-
+Private Sub CastToTime(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
     Static rx As VBScript_RegExp_55.RegExp
 
-    Dim L As Long
-
     On Error GoTo ErrHandler
-    If rx Is Nothing Then
-        Set rx = New RegExp
-        With rx
-            .IgnoreCase = False
-            .Pattern = "^[0-9][0-9]:[0-9][0-9](:[0-9][0-9](\.[0-9]+)?)?$"
-            .Global = False        'Find first match only
-        End With
-    End If
-
-    L = Len(strIn)
-
-    If L < 5 Then Exit Sub
-    If Not rx.Test(strIn) Then Exit Sub
-    If L <= 8 Then
-        dtOut = CDate(strIn)
-        Converted = True
-    Else
-        dtOut = CDate(Left$(strIn, 8)) + CDbl(Mid$(strIn, 9)) / 86400
+    
+    dtOut = CDate(strIn)
+    If dtOut <= 1 Then
         Converted = True
     End If
+    
     Exit Sub
 ErrHandler:
     'Do nothing, was not a valid time (e.g. h,m or s out of range)
 End Sub
+
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : CastToTimeB
+' Purpose    : CDate does not correctly cope with times such as '04:20:10.123 am' or '04:20:10.123', i.e, times with a
+'              fractional second, so this method is called after CastToTime
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub CastToTimeB(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
+    Static rx As VBScript_RegExp_55.RegExp
+    Dim L As Long
+    Dim DecPointAt As Long
+    Dim SpaceAt
+    Dim FractionalSecond As Double
+    
+    On Error GoTo ErrHandler
+    If rx Is Nothing Then
+        Set rx = New RegExp
+        With rx
+            .IgnoreCase = True
+            .Pattern = "^[0-2]?[0-9]:[0-5]?[0-9]:[0-5]?[0-9](\.[0-9]+)( am| pm)?$"
+            .Global = False        'Find first match only
+        End With
+    End If
+
+    If Not rx.Test(strIn) Then Exit Sub
+    DecPointAt = InStr(strIn, ".")
+    If DecPointAt = 0 Then Exit Sub ' should never happen
+    SpaceAt = InStr(strIn, " ")
+    If SpaceAt = 0 Then SpaceAt = Len(strIn) + 1
+    FractionalSecond = CDbl(Mid$(strIn, DecPointAt, SpaceAt - DecPointAt)) / 86400
+    
+    dtOut = CDate(Left$(strIn, DecPointAt - 1) + Mid(strIn, SpaceAt)) + FractionalSecond
+    Converted = True
+    Exit Sub
+ErrHandler:
+
+    'Do nothing, was not a valid time (e.g. h,m or s out of range)
+End Sub
+
+
+
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastISO8601
@@ -3188,7 +3251,7 @@ End Sub
 '       IMPORTANT:       WHEN TIMEZONE IS GIVEN THE FUNCTION RETURNS THE TIME IN UTC
 
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub CastISO8601(ByVal strIn As String, dtOut As Date, ByRef Converted As Boolean, _
+Private Sub CastISO8601(ByVal strIn As String, dtOut As Date, ByRef Converted As Boolean, _
     AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
 
     Dim L As Long
@@ -3380,3 +3443,4 @@ Private Function ISOZFormatString()
 ErrHandler:
     Throw "#ISOZFormatString: " & Err.Description & "!"
 End Function
+

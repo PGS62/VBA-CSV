@@ -14,6 +14,11 @@ Function TempFolder()
     TempFolder = Environ("Temp")
 End Function
 
+Function TestFolder()
+TestFolder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
+End Function
+
+
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : ArrayEquals
 ' Purpose   : Element-wise testing for equality of two arrays - the array version of sEquals. Like the =

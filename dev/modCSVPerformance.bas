@@ -41,12 +41,20 @@ Private Sub RunSpeedTests()
     
     ws.Protect , , False
     
+    ws.Range("TimeStamp").value = "This data generated " & Format(Now, "dd-mmmm-yyyy hh:mm:ss")
+    
     FunctionNames = ws.Range("FunctionNames").value
-    JuliaResultsFile = ws.Range("JuliaResultsFile").value
+    
+    'Julia results file created by function benchmark. See julia/benchmarkCSV.jl, function benchmark
+    
+    JuliaResultsFile = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "\julia\juliaparsetimes.csv"
+    If Not FileExists(JuliaResultsFile) Then
+        Throw "Cannot find file '" + JuliaResultsFile + "'"
+    End If
     
     For Each n In ws.Names
         If InStr(n.Name, "PasteResultsHere") > 1 Then
-            Application.Goto n.RefersToRange
+            Application.GoTo n.RefersToRange
 
             For Each c In n.RefersToRange.Cells
                 c.Resize(1, NumColsInTFPRet).ClearContents
@@ -217,7 +225,7 @@ ErrHandler:
 End Function
 
 
-Sub AddCharts()
+Sub AddCharts(Optional Export As Boolean = True)
     
     Dim c As ChartObject
     Dim n As Name
@@ -254,11 +262,11 @@ Sub AddCharts()
                     Set xData = xData.Offset(, -2)
                 End If
             End With
-            AddChart xData, yData
+            AddChart xData, yData, Export
         End If
     Next n
 
-    Application.Goto ws.Cells(1, 1)
+    Application.GoTo ws.Cells(1, 1)
     ws.Protect , , prot
 
     Exit Sub
@@ -282,7 +290,7 @@ End Sub
 ' Purpose    : Adds a chart to the sheet Timings. First select the data to plot then run this macro by clicking the
 '              "Add Chart" button
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub AddChart(Optional xData As Range, Optional yData As Range)
+Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export As Boolean)
 
     Const ChartsInCol = "P"
     Const Err_BadSelection = "That selection does not look correct." + vbLf + vbLf + _
@@ -338,18 +346,26 @@ Sub AddChart(Optional xData As Range, Optional yData As Range)
     With xData
         ch.Axes(xlCategory).MinimumScale = .Cells(2, 1).value
         ch.Axes(xlCategory).MaximumScale = .Cells(.Rows.Count, 1).value
-
     End With
 
     shp.Top = TopLeftCell.Top
     shp.Left = TopLeftCell.Left
     shp.Height = 394
     shp.Width = 561
+    shp.Placement = xlMove
+    
+    If Export Then
+        Dim FileName As String, Folder As String
+        FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
+        Folder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "charts\"
+        ch.Export Folder + FileName
+    End If
 
     Exit Sub
 ErrHandler:
     Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
 
 
 
