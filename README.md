@@ -92,8 +92,6 @@ FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
 
 
-# Performance
-
 
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [lastest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
@@ -102,6 +100,25 @@ An alternative approach is to change the constant `m_ErrorStyle` (at the top of 
 Other CSV parsers are available for VBA:  
 https://github.com/ws-garcia/VBA-CSV-interface  
 https://github.com/sdkn104/VBA-CSV
+
+# Performance
+The workbook VBA-CSV.xlsm in the workbooks folder includes [code](dev/modCSVPerformance.bas) to benchmark `CSVRead` against the two alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/).
+
+The chart below (note - both axes log scales!) shows the time taken to parse a CSV file as a function of the number of rows in the file. For this test, there was a single field to each row, and all fields were an identical 20-character quoted string including a line break. The inputs to the parsing functions were so as to maximise parsing speed, such as providing an explicit delimiter character, switching off the skipping of empty lines etc. The tests were run on a Surface Book 2 laptop (i7-8650U CPU, 16GB RAM). For the Julia comparison, (the code is [here](julia/benchmarkCSV.jl)), the file was parsed to a Julia structure known as a DataFrame.
+
+![chart4](charts/Chart_3_Time_v_Rows.jpg)
+
+The largest file in the test had 1,048,576 rows and was 27.3Mb in size. The read times were as follows:
+
+|Parser| version |Read time (seconds)|
+|------|-----------|------|
+|CSVRead|0.2|5.2|
+|sdkn104|1.9|5.6|
+|ws_garcia|3.1.5|55.8|
+|CSV.jl|0.8.5| 0.3|
+
+So in this test, `CSVRead` was the fastest of the three VBA parsers, only fractionally faster than sdkn104 and some 11 times faster than ws_garcia. 
+
 
 
 
