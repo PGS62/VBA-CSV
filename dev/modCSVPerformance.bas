@@ -276,7 +276,6 @@ ErrHandler:
     TimeFourParsers = "#TimeFourParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-
 Sub AddCharts(Optional Export As Boolean = True)
     
     Dim c As ChartObject
@@ -325,7 +324,6 @@ Sub AddCharts(Optional Export As Boolean = True)
 ErrHandler:
     MsgBox "#AddCharts (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
-
 
 Sub AddChartAtSelection()
     On Error GoTo ErrHandler
@@ -378,8 +376,7 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
         wsh.Activate
         Range(xData.Address & "," & yData.Address).Select
     End If
-
-
+    
     Set shp = wsh.Shapes.AddChart2(240, xlXYScatterLines)
     Set ch = shp.Chart
     ch.SetSourceData Source:=Application.Union(xData, yData)
@@ -417,7 +414,3 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
 ErrHandler:
     Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
-
-
-
-

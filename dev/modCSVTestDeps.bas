@@ -7,12 +7,12 @@ Attribute VB_Name = "modCSVTestDeps"
 ' Document: https://github.com/PGS62/VBA-CSV#readme
 
 'This module contains "test dependencies" of CSVReadWrite, i.e. dependencies of the code used to test ModCSVReadWrite, _
-but not dependencies of ModCSVReadWrite itself which is (should be) self-contained
+ but not dependencies of ModCSVReadWrite itself which is (should be) self-contained
 
 Option Explicit
 Option Private Module
 
-#If VBA7 Then
+#If VBA7 And Win64 Then
 Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 #Else
@@ -26,14 +26,14 @@ Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCo
 '              identical to Expected. If not sets WhatDiffers to a description of what went wrong.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected As Variant, FileName As String, ByRef Observed, _
-          ByRef WhatDiffers As String, Optional AbsTol As Double, Optional RelTol As Double, Optional ConvertTypes As Variant = False, _
-          Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-          Optional DateFormat As String, Optional Comment As String, Optional IgnoreEmptyLines As Boolean = True, Optional ByVal SkipToRow As Long = 1, _
-          Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
-          Optional ByVal NumCols As Long = 0, Optional HeaderRowNum As Long, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
-          Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant = "", _
-          Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
-          Optional NumRowsExpected As Long, Optional NumColsExpected As Long, Optional ByRef HeaderRow, Optional ExpectedHeaderRow) As Boolean
+    ByRef WhatDiffers As String, Optional AbsTol As Double, Optional RelTol As Double, Optional ConvertTypes As Variant = False, _
+    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
+    Optional DateFormat As String, Optional Comment As String, Optional IgnoreEmptyLines As Boolean = True, Optional ByVal SkipToRow As Long = 1, _
+    Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
+    Optional ByVal NumCols As Long = 0, Optional HeaderRowNum As Long, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
+    Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant = "", _
+    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
+    Optional NumRowsExpected As Long, Optional NumColsExpected As Long, Optional ByRef HeaderRow, Optional ExpectedHeaderRow) As Boolean
 
     On Error GoTo ErrHandler
 
@@ -67,6 +67,15 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
             If Observed = Expected Then
                 TestCSVRead = True
                 Exit Function
+            ElseIf RegExSyntaxValid(CStr(Expected)) Then
+                If IsRegMatch(CStr(Expected), CStr(Observed)) Then
+                    TestCSVRead = True
+                    Exit Function
+                Else
+                    WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + _
+                        "' but expected a different error: '" + Expected + "'"
+                    GoTo Failed
+                End If
             Else
                 WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + _
                     "' but expected a different error: '" + Expected + "'"
@@ -103,6 +112,48 @@ End Function
 
 Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, NumCols As Long, ExtraInfo As String, Unicode As Boolean, Ragged As Boolean)
     NameThatFile = (Folder & "\" & IIf(ExtraInfo = "", "", ExtraInfo & "_") & IIf(OS = "", "", OS & "_") & Format(NumRows, "0000") & "_x_" & Format(NumCols, "000") & IIf(Unicode, "_Unicode", "_Ascii") & IIf(Ragged, "_Ragged", "") & ".csv")
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : sNCols
+' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
+'             have one row and the number of columns returned by this function.
+'---------------------------------------------------------------------------------------
+Function sNCols(Optional TheArray) As Long
+    If TypeName(TheArray) = "Range" Then
+        sNCols = TheArray.Columns.Count
+    ElseIf IsMissing(TheArray) Then
+        sNCols = 0
+    ElseIf VarType(TheArray) < vbArray Then
+        sNCols = 1
+    Else
+        Select Case NumDimensions(TheArray)
+            Case 1
+                sNCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+            Case Else
+                sNCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
+        End Select
+    End If
+End Function
+'---------------------------------------------------------------------------------------
+' Procedure : sNRows
+' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
+'---------------------------------------------------------------------------------------
+Function sNRows(Optional TheArray) As Long
+    If TypeName(TheArray) = "Range" Then
+        sNRows = TheArray.Rows.Count
+    ElseIf IsMissing(TheArray) Then
+        sNRows = 0
+    ElseIf VarType(TheArray) < vbArray Then
+        sNRows = 1
+    Else
+        Select Case NumDimensions(TheArray)
+            Case 1
+                sNRows = 1
+            Case Else
+                sNRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+        End Select
+    End If
 End Function
 
 '---------------------------------------------------------------------------------------------------------
@@ -212,28 +263,6 @@ ErrHandler:
     Throw "#sElapsedTime: " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : sNCols
-' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
-'             have one row and the number of columns returned by this function.
-'---------------------------------------------------------------------------------------
-Function sNCols(Optional TheArray) As Long
-    If TypeName(TheArray) = "Range" Then
-        sNCols = TheArray.Columns.Count
-    ElseIf IsMissing(TheArray) Then
-        sNCols = 0
-    ElseIf VarType(TheArray) < vbArray Then
-        sNCols = 1
-    Else
-        Select Case NumDimensions(TheArray)
-            Case 1
-                sNCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
-            Case Else
-                sNCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
-        End Select
-    End If
-End Function
-
 'Copy of identical function in modCVSReadWrite
 Function NumDimensions(x As Variant) As Long
     Dim i As Long
@@ -251,27 +280,6 @@ Function NumDimensions(x As Variant) As Long
     End If
 ExitPoint:
     NumDimensions = i - 1
-End Function
-
-'---------------------------------------------------------------------------------------
-' Procedure : sNRows
-' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
-'---------------------------------------------------------------------------------------
-Function sNRows(Optional TheArray) As Long
-    If TypeName(TheArray) = "Range" Then
-        sNRows = TheArray.Rows.Count
-    ElseIf IsMissing(TheArray) Then
-        sNRows = 0
-    ElseIf VarType(TheArray) < vbArray Then
-        sNRows = 1
-    Else
-        Select Case NumDimensions(TheArray)
-            Case 1
-                sNRows = 1
-            Case Else
-                sNRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
-        End Select
-    End If
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -740,8 +748,8 @@ End Function
 ' AbsTol,RelTol       : Tolerances for inexact equality comparison. See sIsApprox.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function sArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As Boolean, _
-          Optional PermitBaseDifference As Boolean = False, Optional ByRef WhatDiffers As String, _
-          Optional AbsTol As Double, Optional RelTol As Double) As Variant
+    Optional PermitBaseDifference As Boolean = False, Optional ByRef WhatDiffers As String, _
+    Optional AbsTol As Double, Optional RelTol As Double) As Variant
     
     Dim cN As Long
     Dim i As Long

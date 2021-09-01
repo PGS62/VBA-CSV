@@ -20,31 +20,30 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
 
     Dim Res As String
     Dim LitteralExpected
-    Dim ExpectedInSepFn As Boolean
     
     Const IndentBy = 4
     
     On Error GoTo ErrHandler
     
-    Res = "Case " & CStr(CaseNo) & vbLf & _
-        "TestDescription = """ & Replace(Replace(FileName, "_", " "), ".csv", "") & """" & vbLf & _
-        "FileName  = """ & FileName & """" & vbLf
+    Res = "Sub Case" & CaseNo & "(i As Long, Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
+    Res = Res & vbLf & "    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Variant, WhatDiffers As String"
+    Res = Res & vbLf
+    Res = Res & vbLf & "On Error GoTo ErrHandler"
+    
+    Res = Res & vbLf & _
+        "TestDescription = """ & Replace(Replace(FileName, "_", " "), ".csv", "") & """"
     
     If Not IsArray(ExpectedReturn) Then
         LitteralExpected = ElementToVBALitteral(ExpectedReturn)
     Else
         LitteralExpected = ArrayToVBALitteral(ExpectedReturn, , 120)
         If Left(LitteralExpected, 1) = "#" Then
-            ExpectedInSepFn = True
         End If
     End If
     
-    If Not ExpectedInSepFn Then
-        Res = Res & "Expected = " & LitteralExpected
-    Else
-        ExpectedInSepFn = True
-        Res = Res & "Expected = Expected" + Format(CaseNo, "000") + "()"
-    End If
+    Res = Res + vbLf + "Expected = " & LitteralExpected
+
+    Res = Res + vbLf + "FileName = """ & FileName & """"
 
     If Left(FileName, 4) = "http" Then
         Res = Res + vbLf + "TestRes = TestCSVRead(i, TestDescription, Expected, FileName, Observed, WhatDiffers"
@@ -126,12 +125,18 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
 
     Res = Res + ")"
     
-    If ExpectedInSepFn Then
-        Res = Res + vbLf + vbLf + vbLf + _
-            "Function Expected" & Format(CaseNo, "000") & "()" + vbLf + _
-            ArrayToVBALitteral(ExpectedReturn, "Expected" & Format(CaseNo, "000"), 10000) + vbLf + _
-            "End Function"
-    End If
+    Res = Res & vbLf & "    If TestRes Then"
+    Res = Res & vbLf & "        NumPassed = NumPassed + 1"
+    Res = Res & vbLf & "    Else"
+    Res = Res & vbLf & "        NumFailed = NumFailed + 1"
+    Res = Res & vbLf & "        ReDim Preserve Failures(LBound(Failures) To UBound(Failures) + 1)"
+    Res = Res & vbLf & "        Failures(UBound(Failures)) = WhatDiffers"
+    Res = Res & vbLf & "    End If"
+    Res = Res & vbLf & ""
+    Res = Res & vbLf & "    Exit Sub"
+    Res = Res & vbLf & "ErrHandler:"
+    Res = Res & vbLf & "    Throw ""#Case3 (line "" & CStr(Erl) + ""): "" & Err.Description & ""!"""
+    Res = Res & vbLf & "End Sub"
 
     GenerateTestCode = Transpose(Split(Res, vbLf))
 

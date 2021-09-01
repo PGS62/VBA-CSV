@@ -4,16 +4,22 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.1
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.2
 
 Option Explicit
 
 Private m_FSO As Scripting.FileSystemObject
 
-#If VBA7 Then
+#If VBA7 And Win64 Then
+'for 64-bit Excel
 Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
+Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
+Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 #Else
+'for 32-bit Excel
 Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
+Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
+Private Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 #End If
 
 Private Enum enmErrorStyle
@@ -529,7 +535,7 @@ End Sub
 Private Function InferSourceType(FileName As String) As enmSourceType
 
     On Error GoTo ErrHandler
-        If Mid$(FileName, 2, 2) = ":\" Then
+    If Mid$(FileName, 2, 2) = ":\" Then
         InferSourceType = st_File
     ElseIf Left$(FileName, 2) = "\\" Then
         InferSourceType = st_File
@@ -567,7 +573,7 @@ Private Function Download(URLAddress As String, ByVal FileName As String)
     If FileExists(FileName) Then FileDelete FileName
     Res = URLDownloadToFile(0, URLAddress, FileName, 0, 0)
     If Res <> 0 Then
-    ErrString = ParseDownloadError(CLng(Res))
+        ErrString = ParseDownloadError(CLng(Res))
         Throw "Windows API function URLDownloadToFile returned error code " & CStr(Res) & " with description '" & ErrString & "'"
     End If
     If Not FileExists(FileName) Then Throw "Windows API function URLDownloadToFile did not report an error, but appears to have not successfuly downloaded a file from " & URLAddress & " to " & FileName
@@ -808,7 +814,7 @@ End Sub
 ' Procedure  : IsCTValid
 ' Purpose    : Is a "CT string" (which can in fact be either a string or a Boolean) valid?
 ' -----------------------------------------------------------------------------------------------------------------------
-Function IsCTValid(CT As Variant) As Boolean
+Private Function IsCTValid(CT As Variant) As Boolean
 
     Static rx As VBScript_RegExp_55.RegExp
 
@@ -882,7 +888,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function StandardiseCT(CT As Variant) As String
     On Error GoTo ErrHandler
-        If VarType(CT) = vbBoolean Then
+    If VarType(CT) = vbBoolean Then
         If CT Then
             StandardiseCT = "BDN"
         Else
@@ -1054,6 +1060,17 @@ ErrHandler:
     Throw "#ParseConvertTypes: " & Err.Description & "!"
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : IsNumber
+' Purpose   : Is a singleton a number?
+'---------------------------------------------------------------------------------------
+Private Function IsNumber(x As Variant) As Boolean
+    Select Case VarType(x)
+        Case vbDouble, vbInteger, vbSingle, vbLong ', vbCurrency, vbDecimal
+            IsNumber = True
+    End Select
+End Function
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseCTString
 ' Purpose    : Parse the input ConvertTypes to set seven Boolean flags which are passed by reference.
@@ -1119,6 +1136,129 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
     Exit Sub
 ErrHandler:
     Throw "#ParseCTString: " & Err.Description & "!"
+End Sub
+'---------------------------------------------------------------------------------------
+' Procedure : sNCols
+' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
+'             have one row and the number of columns returned by this function.
+'---------------------------------------------------------------------------------------
+Private Function sNCols(Optional TheArray) As Long
+    If TypeName(TheArray) = "Range" Then
+        sNCols = TheArray.Columns.Count
+    ElseIf IsMissing(TheArray) Then
+        sNCols = 0
+    ElseIf VarType(TheArray) < vbArray Then
+        sNCols = 1
+    Else
+        Select Case NumDimensions(TheArray)
+            Case 1
+                sNCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+            Case Else
+                sNCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
+        End Select
+    End If
+End Function
+'---------------------------------------------------------------------------------------
+' Procedure : sNRows
+' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
+'---------------------------------------------------------------------------------------
+Private Function sNRows(Optional TheArray) As Long
+    If TypeName(TheArray) = "Range" Then
+        sNRows = TheArray.Rows.Count
+    ElseIf IsMissing(TheArray) Then
+        sNRows = 0
+    ElseIf VarType(TheArray) < vbArray Then
+        sNRows = 1
+    Else
+        Select Case NumDimensions(TheArray)
+            Case 1
+                sNRows = 1
+            Case Else
+                sNRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+        End Select
+    End If
+End Function
+'---------------------------------------------------------------------------------------------------------
+' Procedure : Transpose
+' Purpose   : Returns the transpose of an array.
+' Arguments
+' TheArray  : An array of arbitrary values.
+'             also converts 0-based to 1-based arrays
+'---------------------------------------------------------------------------------------------------------
+Private Function Transpose(ByVal TheArray As Variant)
+    Dim Co As Long
+    Dim i As Long
+    Dim j As Long
+    Dim m As Long
+    Dim N As Long
+    Dim Result As Variant
+    Dim Ro As Long
+    On Error GoTo ErrHandler
+    Force2DArrayR TheArray, N, m
+    Ro = LBound(TheArray, 1) - 1
+    Co = LBound(TheArray, 2) - 1
+    ReDim Result(1 To m, 1 To N)
+    For i = 1 To N
+        For j = 1 To m
+            Result(j, i) = TheArray(i + Ro, j + Co)
+        Next j
+    Next i
+    Transpose = Result
+    Exit Function
+ErrHandler:
+    Transpose = "#Transpose: " & Err.Description & "!"
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : Force2DArrayR
+' Purpose   : When writing functions to be called from sheets, we often don't want to process
+'             the inputs as Range objects, but instead as Arrays. This method converts the
+'             input into a 2-dimensional 1-based array (even if it's a single cell or single row of cells)
+'---------------------------------------------------------------------------------------
+Private Sub Force2DArrayR(ByRef RangeOrArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
+    If TypeName(RangeOrArray) = "Range" Then RangeOrArray = RangeOrArray.Value2
+    Force2DArray RangeOrArray, NR, NC
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Force2DArray
+' Purpose   : In-place amendment of singletons and one-dimensional arrays to two dimensions.
+'             singletons and 1-d arrays are returned as 2-d 1-based arrays. Leaves two
+'             two dimensional arrays untouched (i.e. a zero-based 2-d array will be left as zero-based).
+'             See also Force2DArrayR that also handles Range objects.
+'---------------------------------------------------------------------------------------
+Private Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
+    Dim TwoDArray As Variant
+
+    On Error GoTo ErrHandler
+
+    Select Case NumDimensions(TheArray)
+        Case 0
+            ReDim TwoDArray(1 To 1, 1 To 1)
+            TwoDArray(1, 1) = TheArray
+            TheArray = TwoDArray
+            NR = 1: NC = 1
+        Case 1
+            Dim i As Long
+            Dim LB As Long
+            LB = LBound(TheArray, 1)
+            NR = 1: NC = UBound(TheArray, 1) - LB + 1
+            ReDim TwoDArray(1 To 1, 1 To NC)
+            For i = 1 To UBound(TheArray, 1) - LBound(TheArray) + 1
+                TwoDArray(1, i) = TheArray(LB + i - 1)
+            Next i
+            TheArray = TwoDArray
+        Case 2
+            NR = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+            NC = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
+            'Nothing to do
+        Case Else
+            Throw "Cannot convert array of dimension greater than two"
+    End Select
+
+    Exit Sub
+ErrHandler:
+    Throw "#Force2DArray: " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2110,7 +2250,7 @@ End Function
 ' Purpose    : Count the quotes in a string, only used when applying column-by-column type conversion, because in that case
 '              it's not possible to use the count of quotes made at parsing time which is organised row-by-row.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function CountQuotes(Str As String, QuoteChar As String)
+Private Function CountQuotes(Str As String, QuoteChar As String)
     Dim N As Long
     Dim pos As Long
 
@@ -2311,7 +2451,7 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : TestCastToDate
-' Purpose    : Quick test of method CastToDate, See also RunTests() for more comprehensive testing
+' Purpose    : Quick test of method CastToDate, See also RunTests() for much more comprehensive testing
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub TestCastToDate()
     Dim strIn As String
@@ -2322,19 +2462,16 @@ Sub TestCastToDate()
     Dim SysDateSeparator As String
     Dim Converted As Boolean
     Dim i As Long
-
-    
     
     strIn = "2021-08-30 4:1:2.123": DateOrder = 2
     
-        DateSeparator = "-"
-        SysDateOrder = Application.International(xlDateOrder)
-        SysDateSeparator = Application.International(xlDateSeparator)
+    DateSeparator = "-"
+    SysDateOrder = Application.International(xlDateOrder)
+    SysDateSeparator = Application.International(xlDateSeparator)
 
-        CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+    CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
 
-        Debug.Print "StrIn = """ & strIn & """", "DateOrder = " & DateOrder, "dtOut = " & Format(dtOut, "yyyy-mmm-dd hh:mm:ss")
-    
+    Debug.Print "StrIn = """ & strIn & """", "DateOrder = " & DateOrder, "dtOut = " & Format(dtOut, "yyyy-mmm-dd hh:mm:ss")
 
 End Sub
 
@@ -2352,7 +2489,7 @@ End Sub
 '  SysDateSeparator: The Windows system date separator
 '  Converted       : Boolean flipped to TRUE if conversion takes place
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSeparator As String, _
+Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSeparator As String, _
     SysDateOrder As Long, SysDateSeparator As String, ByRef Converted As Boolean)
     
     Dim D As String
@@ -2699,7 +2836,7 @@ Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As 
             Else
                 Encode = x
             End If
-        Case vbBoolean, vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbLongLong, vbEmpty
+        Case vbBoolean, vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty 'vbLongLong - not available on 16 bit.
             Encode = CStr(x)
         Case vbDate
             If CLng(x) = CDbl(x) Then
@@ -2817,7 +2954,7 @@ ErrHandler:
 End Function
 
 Sub g(Data)
-Application.Run "SolumAddin.xlam!g", Data
+    Application.Run "SolumAddin.xlam!g", Data
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2964,15 +3101,36 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
 
     If FoundRepeated Then
         Throw "There is a conflicting definition of what the string '" & Key & _
-      "' should be converted to, both the " & TypeName(item) & " value '" & CStr(item) & _
-      "' and the " & TypeName(Sentinels(Key)) & " value '" & CStr(Sentinels(Key)) & _
-      "' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments."
+            "' should be converted to, both the " & TypeName(item) & " value '" & CStr(item) & _
+            "' and the " & TypeName(Sentinels(Key)) & " value '" & CStr(Sentinels(Key)) & _
+            "' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments."
     End If
 
     Exit Sub
 ErrHandler:
     Throw "#AddKeyToDict: " & Err.Description & "!"
 End Sub
+
+'---------------------------------------------------------------------------------------------------------
+' Procedure : sElapsedTime
+' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
+'             time stamp that can be used for time-interval measurements.
+'
+'             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
+'---------------------------------------------------------------------------------------------------------
+Private Function sElapsedTime() As Double
+    Dim a As Currency
+    Dim b As Currency
+    On Error GoTo ErrHandler
+
+    QueryPerformanceCounter a
+    QueryPerformanceFrequency b
+    sElapsedTime = a / b
+
+    Exit Function
+ErrHandler:
+    Throw "#sElapsedTime: " & Err.Description & "!"
+End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : TestSentinelSpeed
@@ -3174,7 +3332,6 @@ ErrHandler:
     'Do nothing, was not a valid time (e.g. h,m or s out of range)
 End Sub
 
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastToTimeB
 ' Purpose    : CDate does not correctly cope with times such as '04:20:10.123 am' or '04:20:10.123', i.e, times with a
@@ -3208,13 +3365,8 @@ Private Sub CastToTimeB(strIn As String, ByRef dtOut As Date, ByRef Converted As
     Converted = True
     Exit Sub
 ErrHandler:
-
     'Do nothing, was not a valid time (e.g. h,m or s out of range)
 End Sub
-
-
-
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastISO8601
@@ -3421,7 +3573,7 @@ Private Function ISOZFormatString()
     Dim RightChars
 
     On Error GoTo ErrHandler
-        TimeZone = GetLocalOffsetToUTC()
+    TimeZone = GetLocalOffsetToUTC()
 
     If TimeZone = 0 Then
         RightChars = "Z"

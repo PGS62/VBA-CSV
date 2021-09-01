@@ -73,7 +73,7 @@ Sub SaveWorkbookAndExportModules()
         End Select
 
         'only export files of the PGS62 project, not those from other _
-        CSV parsers that I have imported to compare performance.
+         CSV parsers that I have imported to compare performance.
         If Left(FileName, 6) <> "modCSV" Then
             bExport = False
         End If

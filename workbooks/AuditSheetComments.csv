@@ -1,4 +1,8 @@
 "Version","Date","Time","Author","Comment"
+63,01-Sep-2021,16:46:26,"Philip Swannell","Fixed compile errors when modCSVReadWrite is ""stand-alone""."
+62,01-Sep-2021,16:12:34,"Philip Swannell","Added 2 missing tests - 110 and 124."
+61,01-Sep-2021,15:29:45,"Philip Swannell","Deleted temporary sheets used during previous release."
+60,01-Sep-2021,15:29:12,"Philip Swannell","Changes to compile on 32bit."
 59,01-Sep-2021,10:34:58,"Philip Swannell","Code of modWrappers moved to modCSVPerformance"
 58,31-Aug-2021,09:52:55,"Philip Swannell","Workbook now more ""portable"" i.e. folder locations all relative to the path of the workbook itself."
 57,30-Aug-2021,19:35:15,"Philip Swannell","Reinstated conditional formatting on sheet Demo."

@@ -8,16 +8,15 @@ Attribute VB_Name = "modCSVXLUtils"
 
 Option Explicit
 'Functions that, in addition to CSVRead and CSVWrite, are called from the worksheets of this workbook _
-see also mod
+ see also mod
 
 Function TempFolder()
     TempFolder = Environ("Temp")
 End Function
 
 Function TestFolder()
-TestFolder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
+    TestFolder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
 End Function
-
 
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : ArrayEquals
@@ -305,7 +304,7 @@ End Function
 '              of those elements concatenated with given delimiter.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
-          Optional Arg4, Optional Delimiter As String)
+    Optional Arg4, Optional Delimiter As String)
     Dim Res() As String
     Dim Part1 As Variant
     Dim Part2 As Variant
@@ -523,7 +522,7 @@ End Function
 ' Procedure  : RegExSyntaxValid
 ' Purpose    : Tests syntax of a regular expression.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function RegExSyntaxValid(RegularExpression As String) As Boolean
+Function RegExSyntaxValid(RegularExpression As String) As Boolean
     Dim Res As Boolean
     Dim rx As VBScript_RegExp_55.RegExp
     On Error GoTo ErrHandler

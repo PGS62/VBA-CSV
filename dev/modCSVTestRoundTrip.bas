@@ -170,10 +170,9 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
         NumFailed = NumFailed + 1
     End If
 
-NumDone = NumPassed + NumFailed
-If NumDone Mod 50 = 0 Then Debug.Print Format(NumDone, "###,##0")
-
-
+    NumDone = NumPassed + NumFailed
+    If NumDone Mod 50 = 0 Then Debug.Print Format(NumDone, "###,##0")
+    
     Exit Sub
 ErrHandler:
     Throw "#RoundTripTestCore: " & Err.Description & "!"
