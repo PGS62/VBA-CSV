@@ -19,8 +19,20 @@ I re-worked the parsing code of `CSVRead` after examining "sdkn104"'s code avail
 The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance [here](#performance). For testing `CSVRead`, I also use many of the test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
 # Examples
+[Here](https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv) is a CSV file containing names of passengers on the Titanic, their sex, age and passenger class, and whether or not they survived the sinking. Missing data is indicated by the two characters `NA`.
 
+To see the data in a worksheet, enter this formula:
+`=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
+To load the data into an array in VBA:
+```vba
+Sub Demo
+Dim TitanicData 
+TitanicData = CSVRead(FileName:="https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv", _
+                      ConvertType := True, _
+                      MissingStrings :="NA")
+end Sub                      
+```
 
 
 # Documentation
