@@ -1,5 +1,5 @@
 # VBA-CSV
-CSV reading and writing for VBA and Excel spreadsheets, via two functions `CSVRead` and `CSVWrite`.
+Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, inspired by R's [fread](https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread), and Julia's [CSV.jl](https://csv.juliadata.org/stable/).
 
 # Installation
 1. Download the [latest release](https://github.com/PGS62/VBA-CSV/releases).
@@ -16,12 +16,22 @@ End Sub
 # Acknowledgements
 I re-worked the parsing code of `CSVRead` after examining "sdkn104"'s code available [here](https://github.com/sdkn104/VBA-CSV); my approach is now similar to the one employed there, and the performance is similar too.
 
-The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance here. For testing `CSVRead`, I also make use of the suite of test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
+The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance [here](#performance). For testing `CSVRead`, I also use many of the test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
 # Examples
+[Here](https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv) is a CSV file containing names of passengers on the Titanic, their sex, age and passenger class, and whether or not they survived the sinking. Missing data is indicated by the two characters `NA`.
 
+To see the data in a worksheet, enter this formula:
+`=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
-
+To load the data into an array in VBA:
+```vba
+Sub Demo()
+    Dim TitanicData
+    TitanicData = CSVRead(FileName:="https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv", _
+        ConvertTypes:=True, MissingStrings:="NA")
+End Sub
+```
 
 # Documentation
 #### _CSVRead_
@@ -92,8 +102,6 @@ FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
 
 
-# Performance
-
 
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [lastest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
@@ -103,7 +111,20 @@ Other CSV parsers are available for VBA:
 https://github.com/ws-garcia/VBA-CSV-interface  
 https://github.com/sdkn104/VBA-CSV
 
+# Performance
+On the author’s laptop `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of fields (rows x columns), the length and contents of those fields, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
 
+The workbook VBA-CSV.xlsm in the workbooks folder includes [code](dev/modCSVPerformance.bas) to benchmark `CSVRead` against the two alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/) (so not easily available from VBA). It generates plots of parse time as a function of: number of rows in the file; the number of columns in the file; the length of fields in the file; whether fields are quoted; whether fields contain embedded line breaks.
+
+One of the plots is shown below. It shows the time to parse a file with a single column, and for which all fields have twenty characters with embedded line breaks. Take care interpreting the plot – both axes are on log scale. For the largest input file plotted, CSVRead was about 10 times faster than ws_garcia and about 16 times slower than CSV.jl. (File size was 27.3Mb, parse times were 5.2 seconds, 55.8 seconds and 0.32 seconds respectively.)
+
+![chart3](charts/Chart_3_Time_v_Rows.jpg)
+
+In summary, the speed comparisons show:
+- `CSVRead` and `sdkn104` have very similar parse times.
+- `CSVRead` is generally faster than ws_garcia. But not always – see this plot in which ws_garcia is faster in some cases.
+- For realistic structures of input files (e.g. 10 columns of 17-character input, as shown here) `CSVRead` is about 40% faster than `ws_garcia`. 
+- All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
 
 # About
 Author: Philip Swannell  
