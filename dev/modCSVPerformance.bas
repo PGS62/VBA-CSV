@@ -11,6 +11,60 @@ Option Explicit
 'Code of the "Performance" worksheet
 
 ' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : Wrap_ws_garcia
+' Purpose    : Wrap to https://github.com/ws-garcia/VBA-CSV-interface
+'              Wraps version 3.1.5, (the four class module CSVInterface, ECPArrayList, ECPTextStream, parserConfig)
+' -----------------------------------------------------------------------------------------------------------------------
+Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As String)
+
+    Dim oArray() As Variant
+    Dim CSVint As CSVinterface
+
+    On Error GoTo ErrHandler
+
+    Set CSVint = New CSVinterface
+    With CSVint.parseConfig
+        .path = FileName            ' Full path to the file, including its extension.
+        .fieldsDelimiter = Delimiter         ' Columns delimiter
+        .recordsDelimiter = EOL     ' Rows delimiter
+        .skipCommentLines = False  'I think code runs faster if not testing for skipping comment lines or empty lines
+        .skipEmptyLines = False
+    End With
+    With CSVint
+        .ImportFromCSV .parseConfig    ' Import the CSV to internal object
+        .DumpToArray oArray
+    End With
+
+    Wrap_ws_garcia = oArray
+
+    Exit Function
+ErrHandler:
+    Wrap_ws_garcia = "#Wrap_ws_garcia: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : Wrap_sdkn104
+' Purpose    : Wrapper to https://github.com/sdkn104/VBA-CSV
+'              Wraps version 1.9 - module CSVUtils imported as sdkn104_CSVUtils
+' -----------------------------------------------------------------------------------------------------------------------
+Public Function Wrap_sdkn104(FileName As String, Unicode As Boolean)
+    Dim Contents As String
+    Dim FSO As New FileSystemObject
+    Dim T As Scripting.TextStream
+    
+    On Error GoTo ErrHandler
+
+    Set T = FSO.GetFile(FileName).OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+    Contents = T.ReadAll
+    T.Close
+    Wrap_sdkn104 = ParseCSVToArray(Contents)
+    
+    Exit Function
+ErrHandler:
+    Wrap_sdkn104 = "#Wrap_sdkn104: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RunSpeedTests
 ' Purpose    : Attached to the "Run Speed Tests..." button. Note the significance of the "PasteResultsHere" ranges
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -22,9 +76,8 @@ Private Sub RunSpeedTests()
     Const Title = "VBA-CSV Speed Tests"
     Const WriteFiles As Boolean = True
     Dim c As Range
-    Dim FunctionNames As Variant
     Dim JuliaResultsFile As String
-    Dim n As Name
+    Dim N As Name
     Dim Prompt As String
     Dim TestResults As Variant
     Dim ws As Worksheet
@@ -43,8 +96,6 @@ Private Sub RunSpeedTests()
     
     ws.Range("TimeStamp").value = "This data generated " & Format(Now, "dd-mmmm-yyyy hh:mm:ss")
     
-    FunctionNames = ws.Range("FunctionNames").value
-    
     'Julia results file created by function benchmark. See julia/benchmarkCSV.jl, function benchmark
     
     JuliaResultsFile = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "\julia\juliaparsetimes.csv"
@@ -52,21 +103,21 @@ Private Sub RunSpeedTests()
         Throw "Cannot find file '" + JuliaResultsFile + "'"
     End If
     
-    For Each n In ws.Names
-        If InStr(n.Name, "PasteResultsHere") > 1 Then
-            Application.GoTo n.RefersToRange
+    For Each N In ws.Names
+        If InStr(N.Name, "PasteResultsHere") > 1 Then
+            Application.GoTo N.RefersToRange
 
-            For Each c In n.RefersToRange.Cells
+            For Each c In N.RefersToRange.Cells
                 c.Resize(1, NumColsInTFPRet).ClearContents
                 TestResults = TimeFourParsers(WriteFiles, ReadFiles, c.Offset(0, -3).value, c.Offset(0, -2).value, _
-                    c.Offset(0, -1).value, Timeout, FunctionNames, False, JuliaResultsFile)
+                    c.Offset(0, -1).value, Timeout, False, JuliaResultsFile)
                 c.Resize(1, NumColsInTFPRet).value = TestResults
                 ws.Calculate
                 DoEvents
                 Application.ScreenUpdating = True
             Next
         End If
-    Next n
+    Next N
 
     AddCharts
 
@@ -85,7 +136,7 @@ End Sub
 '              after TimeOut seconds have elapsed. Leads to much more reliable timings than timing a single call.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldContains As Variant, NumRows As Long, _
-    NumCols As Long, Timeout As Double, FunctionNames As Variant, WithHeaders As Boolean, JuliaResultsFile As String)
+    NumCols As Long, Timeout As Double, WithHeaders As Boolean, JuliaResultsFile As String)
 
     Const Unicode = False
     Dim Data As Variant
@@ -161,16 +212,17 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
                 k = k + 1
                 Select Case j
                     Case 1
-                        FnName1 = FunctionNames(1, 1)
+                        FnName1 = "CSVRead" + vbLf + "v0.1"
                         DataReread1 = ThrowIfError(CSVRead(FileName, False, ",", , , , False, , , , , , , , , , "ANSI"))
                     Case 2
-                        FnName2 = FunctionNames(1, 2)
+                        FnName2 = "sdkn104" + vbLf + "v1.9"
                         DataReread2 = ThrowIfError(Wrap_sdkn104(FileName, Unicode))
                     Case 3
-                        FnName3 = FunctionNames(1, 3)
+                        FnName3 = "ws_garcia" + vbLf + "v3.1.5"
+
                         DataReread3 = ThrowIfError(Wrap_ws_garcia(FileName, ",", vbCrLf))
                     Case 4
-                        FnName4 = FunctionNames(1, 4)
+                        FnName4 = "CSV.jl" + vbLf + "v0.8.5+"
                         DataReread4 = Empty
                 End Select
                 If sElapsedTime() - Tstart > Timeout Then Exit Do
@@ -228,7 +280,7 @@ End Function
 Sub AddCharts(Optional Export As Boolean = True)
     
     Dim c As ChartObject
-    Dim n As Name
+    Dim N As Name
     Dim prot As Boolean
     Dim ws As Worksheet
     Dim xData As Range
@@ -245,9 +297,9 @@ Sub AddCharts(Optional Export As Boolean = True)
         c.Delete
     Next
 
-    For Each n In ws.Names
-        If InStr(n.Name, "PasteResultsHere") > 1 Then
-            Set yData = n.RefersToRange
+    For Each N In ws.Names
+        If InStr(N.Name, "PasteResultsHere") > 1 Then
+            Set yData = N.RefersToRange
             With yData
                 Set yData = .Offset(-1).Resize(.Rows.Count + 1, 4)
             End With
@@ -264,7 +316,7 @@ Sub AddCharts(Optional Export As Boolean = True)
             End With
             AddChart xData, yData, Export
         End If
-    Next n
+    Next N
 
     Application.GoTo ws.Cells(1, 1)
     ws.Protect , , prot

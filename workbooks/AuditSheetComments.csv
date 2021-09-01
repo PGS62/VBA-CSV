@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+59,01-Sep-2021,10:34:58,"Philip Swannell","Code of modWrappers moved to modCSVPerformance"
 58,31-Aug-2021,09:52:55,"Philip Swannell","Workbook now more ""portable"" i.e. folder locations all relative to the path of the workbook itself."
 57,30-Aug-2021,19:35:15,"Philip Swannell","Reinstated conditional formatting on sheet Demo."
 56,30-Aug-2021,18:30:12,"Philip Swannell","Deal with times with fractional seconds - CDate does not cope with them."

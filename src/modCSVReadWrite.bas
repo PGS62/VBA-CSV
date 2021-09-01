@@ -338,7 +338,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     If NumCols = 0 Then
         NumColsInReturn = NumColsFound - SkipToCol + 1
         If NumColsInReturn <= 0 Then
-            Throw "SkipToCol (" + CStr(SkipToCol) + ") exceeds the number of columns in the file (" + CStr(NumColsFound) + ")"
+            Throw "SkipToCol (" & CStr(SkipToCol) & ") exceeds the number of columns in the file (" & CStr(NumColsFound) & ")"
         End If
     Else
         NumColsInReturn = NumCols
@@ -519,7 +519,7 @@ Sub RegisterCSVRead()
     Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVRead failed with error: " + Err.Description
+    Debug.Print "Warning: Registration of function CSVRead failed with error: " & Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -568,9 +568,9 @@ Private Function Download(URLAddress As String, ByVal FileName As String)
     Res = URLDownloadToFile(0, URLAddress, FileName, 0, 0)
     If Res <> 0 Then
     ErrString = ParseDownloadError(CLng(Res))
-        Throw "Windows API function URLDownloadToFile returned error code " + CStr(Res) + " with description '" + ErrString + "'"
+        Throw "Windows API function URLDownloadToFile returned error code " & CStr(Res) & " with description '" & ErrString & "'"
     End If
-    If Not FileExists(FileName) Then Throw "Windows API function URLDownloadToFile did not report an error, but appears to have not successfuly downloaded a file from " + URLAddress + " to " + FileName
+    If Not FileExists(FileName) Then Throw "Windows API function URLDownloadToFile did not report an error, but appears to have not successfuly downloaded a file from " & URLAddress & " to " & FileName
     Download = FileName
 
     Exit Function
@@ -730,7 +730,7 @@ Private Function CreatePath(ByVal FolderPath As String)
     FolderPath = Replace(FolderPath, "/", "\")
 
     If Right$(FolderPath, 1) <> "\" Then
-        FolderPath = FolderPath + "\"
+        FolderPath = FolderPath & "\"
     End If
 
     If FolderExists(FolderPath) Then
@@ -748,7 +748,7 @@ Private Function CreatePath(ByVal FolderPath As String)
         End If
     Next i
 
-    If F Is Nothing Then Throw "Cannot create folder " + Left$(FolderPath, 3)
+    If F Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
 
     'now add folders one level at a time
     For i = Len(ParentFolderName) + 1 To Len(FolderPath)
@@ -1017,12 +1017,12 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
         CT = ConvertTypes(i, RCN)
         If IsNumber(ColIdentifier) Then
             If ColIdentifier <> CLng(ColIdentifier) Then
-                Throw Err_BadColumnIdentifier + " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & ") is " & CStr(ColIdentifier)
+                Throw Err_BadColumnIdentifier & " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & ") is " & CStr(ColIdentifier)
             ElseIf ColIdentifier < 0 Then
-                Throw Err_BadColumnIdentifier + " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & ") is " & CStr(ColIdentifier)
+                Throw Err_BadColumnIdentifier & " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & ") is " & CStr(ColIdentifier)
             End If
         ElseIf VarType(ColIdentifier) <> vbString Then
-            Throw Err_BadColumnIdentifier & " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & ") is of type " + TypeName(ColIdentifier)
+            Throw Err_BadColumnIdentifier & " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & ") is of type " & TypeName(ColIdentifier)
         End If
         If Not IsCTValid(CT) Then
             If VarType(CT) = vbString Then
@@ -1106,8 +1106,8 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
             Case "T"
                 TrimFields = True
             Case Else
-                Throw Err_ConvertTypes + " Found unrecognised character '" _
-                    + Mid$(ConvertTypes, i, 1) + "'"
+                Throw Err_ConvertTypes & " Found unrecognised character '" _
+                    & Mid$(ConvertTypes, i, 1) & "'"
         End Select
     Next i
     
@@ -1350,8 +1350,8 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
         Exit Sub
     End If
     
-    Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " + _
-        "'M/D/Y', 'D/M/Y' or 'Y/M/D'" & ". Omit to use the default date format on this PC which is """ + WindowsDateFormat() + """"
+    Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " & _
+        "'M/D/Y', 'D/M/Y' or 'Y/M/D'" & ". Omit to use the default date format on this PC which is """ & WindowsDateFormat() & """"
      
     'Replace repeated D's with a single D, etc since CastToDate only needs _
      to know the order in which the three parts of the date appear.
@@ -1372,7 +1372,7 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
     Else
         DateSeparator = Mid$(DateFormat, 2, 1)
         If DateSeparator <> "/" And DateSeparator <> "-" Then Throw Err_DateFormat
-        Select Case UCase$(Left$(DateFormat, 1) + Mid$(DateFormat, 3, 1) + Right$(DateFormat, 1))
+        Select Case UCase$(Left$(DateFormat, 1) & Mid$(DateFormat, 3, 1) & Right$(DateFormat, 1))
             Case "MDY"
                 DateOrder = 0
             Case "DMY"
@@ -1411,11 +1411,11 @@ Private Function WindowsDateFormat() As String
     DS = Application.International(xlDateSeparator)
     Select Case Application.International(xlDateOrder)
         Case 0
-            WindowsDateFormat = "M" + DS + "D" + DS + "Y"
+            WindowsDateFormat = "M" & DS & "D" & DS & "Y"
         Case 1
-            WindowsDateFormat = "D" + DS + "M" + DS + "Y"
+            WindowsDateFormat = "D" & DS & "M" & DS & "Y"
         Case 2
-            WindowsDateFormat = "Y" + DS + "M" + DS + "D"
+            WindowsDateFormat = "Y" & DS & "M" & DS & "D"
     End Select
 
     Exit Function
@@ -1639,9 +1639,9 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
     If Not Streaming Then
         'Ensure Buffer terminates with vbCrLf
         If Right$(Buffer, 1) <> vbCr And Right$(Buffer, 1) <> vbLf Then
-            Buffer = Buffer + vbCrLf
+            Buffer = Buffer & vbCrLf
         ElseIf Right$(Buffer, 1) = vbCr Then
-            Buffer = Buffer + vbLf
+            Buffer = Buffer & vbLf
         End If
         BufferUpdatedTo = Len(Buffer)
     End If
@@ -1830,7 +1830,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
                 RowDescription = "not commented "
             End If
                              
-            Throw "SkipToRow (" + CStr(SkipToRow) + ") exceeds the number of " + RowDescription + "rows in the file (" + CStr(NumRowsInFile) + ")"
+            Throw "SkipToRow (" & CStr(SkipToRow) & ") exceeds the number of " & RowDescription & "rows in the file (" & CStr(NumRowsInFile) & ")"
         Else
             'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
             NumFields = 0
@@ -2044,9 +2044,9 @@ Private Sub GetMoreFromStream(T As Scripting.TextStream, Delimiter As String, Qu
         If T.AtEndOfStream Then
             'Ensure NewChars terminates with vbCrLf
             If Right$(NewChars, 1) <> vbCr And Right$(NewChars, 1) <> vbLf Then
-                NewChars = NewChars + vbCrLf
+                NewChars = NewChars & vbCrLf
             ElseIf Right$(NewChars, 1) = vbCr Then
-                NewChars = NewChars + vbLf
+                NewChars = NewChars & vbLf
             End If
         End If
 
@@ -2111,16 +2111,16 @@ End Function
 '              it's not possible to use the count of quotes made at parsing time which is organised row-by-row.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function CountQuotes(Str As String, QuoteChar As String)
-    Dim n As Long
+    Dim N As Long
     Dim pos As Long
 
     Do
         pos = InStr(pos + 1, Str, QuoteChar)
         If pos = 0 Then
-            CountQuotes = n
+            CountQuotes = N
             Exit Function
         End If
-        n = n + 1
+        N = N + 1
     Loop
 End Function
 
@@ -2208,7 +2208,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
                 isQuoted = True
                 Field = Mid$(Field, 2, FieldLength - 2)
                 If QuoteCount > 2 Then
-                    Field = Replace(Field, QuoteChar + QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
+                    Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
                 End If
                 If ConvertQuoted Then
                     FieldLength = Len(Field)
@@ -2279,7 +2279,7 @@ Private Function Unquote(ByVal Field As String, QuoteChar As String, QuoteCount 
             If Right$(QuoteChar, 1) = QuoteChar Then
                 Field = Mid$(Field, 2, Len(Field) - 2)
                 If QuoteCount > 2 Then
-                    Field = Replace(Field, QuoteChar + QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
+                    Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar) 'TODO QuoteCharTwice arg
                 End If
             End If
         End If
@@ -2323,15 +2323,9 @@ Sub TestCastToDate()
     Dim Converted As Boolean
     Dim i As Long
 
-    For i = 1 To 3
-        Select Case i
-            Case 1
-                strIn = "20-08-2021 12:00:00": DateOrder = 1
-            Case 2
-                strIn = "08-20-2021 12:00:00": DateOrder = 0
-            Case 3
-                strIn = "2021-08-20 12:00:00": DateOrder = 2
-        End Select
+    
+    
+    strIn = "2021-08-30 4:1:2.123": DateOrder = 2
     
         DateSeparator = "-"
         SysDateOrder = Application.International(xlDateOrder)
@@ -2340,7 +2334,7 @@ Sub TestCastToDate()
         CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
 
         Debug.Print "StrIn = """ & strIn & """", "DateOrder = " & DateOrder, "dtOut = " & Format(dtOut, "yyyy-mmm-dd hh:mm:ss")
-    Next
+    
 
 End Sub
 
@@ -2397,13 +2391,13 @@ Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSepa
     End If
     If InStr(TimePart, ".") = 0 Then
         If SysDateOrder = 0 Then
-            dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y + TimePart)
+            dtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y & TimePart)
             Converted = True
         ElseIf SysDateOrder = 1 Then
-            dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y + TimePart)
+            dtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y & TimePart)
             Converted = True
         ElseIf SysDateOrder = 2 Then
-            dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D + TimePart)
+            dtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
             Converted = True
         End If
     Else
@@ -2411,13 +2405,13 @@ Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, DateSepa
         CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
         If Converted2 Then
             If SysDateOrder = 0 Then
-                dtOut = CDate(m + SysDateSeparator + D + SysDateSeparator + y) + TimePartConverted
+                dtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y) + TimePartConverted
                 Converted = True
             ElseIf SysDateOrder = 1 Then
-                dtOut = CDate(D + SysDateSeparator + m + SysDateSeparator + y) + TimePartConverted
+                dtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y) + TimePartConverted
                 Converted = True
             ElseIf SysDateOrder = 2 Then
-                dtOut = CDate(y + SysDateSeparator + m + SysDateSeparator + D) + TimePartConverted
+                dtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
                 Converted = True
             End If
     
@@ -2471,7 +2465,7 @@ Private Function OStoEOL(OS As String, ArgName As String) As String
         Case "mac", vbCr, "cr"
             OStoEOL = vbCr
         Case Else
-            Throw ArgName + Err_Invalid
+            Throw ArgName & Err_Invalid
     End Select
 
     Exit Function
@@ -2596,7 +2590,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         CSVWrite = VBA.Join(Lines, EOL)
         If Len(CSVWrite) >= 32768 Then
             If TypeName(Application.Caller) = "Range" Then
-                Throw "Cannot return string of length " + Format(CStr(Len(CSVWrite)), "#,###") + " to a cell of an Excel worksheet"
+                Throw "Cannot return string of length " & Format(CStr(Len(CSVWrite)), "#,###") & " to a cell of an Excel worksheet"
             End If
         End If
     End If
@@ -2639,7 +2633,7 @@ Sub RegisterCSVWrite()
     Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
+    Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2693,15 +2687,15 @@ Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As 
 
         Case vbString
             If InStr(x, DQ) > 0 Then
-                Encode = DQ + Replace(x, DQ, DQ2) + DQ
+                Encode = DQ & Replace(x, DQ, DQ2) & DQ
             ElseIf QuoteAllStrings Then
-                Encode = DQ + x + DQ
+                Encode = DQ & x & DQ
             ElseIf InStr(x, vbCr) > 0 Then
-                Encode = DQ + x + DQ
+                Encode = DQ & x & DQ
             ElseIf InStr(x, vbLf) > 0 Then
-                Encode = DQ + x + DQ
+                Encode = DQ & x & DQ
             ElseIf InStr(x, Delim) > 0 Then
-                Encode = DQ + x + DQ
+                Encode = DQ & x & DQ
             Else
                 Encode = x
             End If
@@ -2749,7 +2743,7 @@ Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As 
                     Encode = CStr(x)        'should never hit this line...
             End Select
         Case Else
-            Throw "Cannot convert variant of type " + TypeName(x) + " to String"
+            Throw "Cannot convert variant of type " & TypeName(x) & " to String"
     End Select
     Exit Function
 ErrHandler:
@@ -2954,8 +2948,7 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
 
     On Error GoTo ErrHandler
 
-    If VarType(Key) <> vbString Then Throw FriendlyErrorString + " but '" + CStr(Key) + "' is of type " + TypeName(Key)
-   ' If Len(Key) = 0 Then Throw FriendlyErrorString + " but a zero-length string has been provided and that is not permitted"
+    If VarType(Key) <> vbString Then Throw FriendlyErrorString & " but '" & CStr(Key) & "' is of type " & TypeName(Key)
     If Len(Key) = 0 Then Exit Sub
     
     If Not Sentinels.Exists(Key) Then
@@ -2970,9 +2963,9 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
     End If
 
     If FoundRepeated Then
-        Throw "There is a conflicting definition of what the string '" + Key + _
-      "' should be converted to, both the " + TypeName(item) + " value '" + CStr(item) + _
-      "' and the " + TypeName(Sentinels(Key)) + " value '" + CStr(Sentinels(Key)) + _
+        Throw "There is a conflicting definition of what the string '" & Key & _
+      "' should be converted to, both the " & TypeName(item) & " value '" & CStr(item) & _
+      "' and the " & TypeName(Sentinels(Key)) & " value '" & CStr(Sentinels(Key)) & _
       "' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments."
     End If
 
@@ -3000,7 +2993,7 @@ Private Sub TestSentinelSpeed()
     Dim t1 As Double, t2 As Double
     Dim i As Long
     Dim j As Long
-    Const n = 10000000
+    Const N = 10000000
     Dim Res As Variant
     Dim MaxLength As Long
     Dim AnySentinels As Boolean
@@ -3032,7 +3025,7 @@ Private Sub TestSentinelSpeed()
         End Select
 
         t1 = sElapsedTime()
-        For i = 1 To n
+        For i = 1 To N
             If Len(Field) <= MaxLength Then
                 If Sentinels.Exists(Field) Then
                     Res = Sentinels(Field)
@@ -3042,7 +3035,7 @@ Private Sub TestSentinelSpeed()
         Next i
         t2 = sElapsedTime()
 
-        Debug.Print "Conversions per second = " & Format(n / (t2 - t1), "###,###"), _
+        Debug.Print "Conversions per second = " & Format(N / (t2 - t1), "###,###"), _
             "Field = """ & Field & """" & IIf(Comment = "", "", " (" & Comment & ")")
 
     Next j
@@ -3089,7 +3082,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTestISO8601()
 
-    Const n = 1000000
+    Const N = 1000000
     Dim Converted As Boolean
     Dim dtOut As Date
     Dim i As Long
@@ -3102,7 +3095,7 @@ Private Sub SpeedTestISO8601()
 
     SysDateOrder = Application.International(xlDateOrder)
 
-    Debug.Print "Running SpeedTestISO8601 " + Format(Now(), "yyyy-mm-ddThh:mm:ss")
+    Debug.Print "Running SpeedTestISO8601 " & Format(Now(), "yyyy-mm-ddThh:mm:ss")
     For k = 1 To 9
         For j = 1 To 3
             dtOut = 0
@@ -3128,11 +3121,11 @@ Private Sub SpeedTestISO8601()
             End Select
 
             t1 = sElapsedTime()
-            For i = 1 To n
+            For i = 1 To N
                 Call CastISO8601(strIn, dtOut, Converted, True, True)
             Next i
             t2 = sElapsedTime
-            Debug.Print "Calls per second = " & Format(n / (t2 - t1), "###,###"), "strIn = """ & strIn & """", "Check = " & Application.WorksheetFunction.text(dtOut, "yyyy-mm-ddThh:mm:ss.000")
+            Debug.Print "Calls per second = " & Format(N / (t2 - t1), "###,###"), "strIn = """ & strIn & """", "Check = " & Application.WorksheetFunction.text(dtOut, "yyyy-mm-ddThh:mm:ss.000")
             DoEvents 'kick Immediate window to life
         Next j
     Next k

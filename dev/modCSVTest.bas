@@ -1453,7 +1453,19 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
                     NumCols:=1, _
                     AbsTol:=0.0000000001, _
                     ShowMissingsAs:=Empty)
-                    
+            Case 178
+                TestDescription = "Used as example in README.md"
+                FileName = "https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv"
+                Expected = Expected178()
+                TestRes = TestCSVRead(i, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+                    ConvertTypes:=True, _
+                    IgnoreEmptyLines:=False, _
+                    NumRows:=17, _
+                    MissingStrings:="NA", _
+                    ShowMissingsAs:=Empty, _
+                    HeaderRowNum:=1#, _
+                    ExpectedHeaderRow:=HStack("", "survived", "sex", "age", "passengerClass"))
+
                     
                     
                     
@@ -2306,6 +2318,15 @@ Function Expected171()
         Array("Col G", "44424", "2021-08-24T12:49:13", "True", CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", CVErr(2007), "abc", "abc""def", "Line" + vbLf + "Feed"))
 End Function
 
+
+Function Expected178()
+    Expected178 = HStack( _
+        Array("", "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine", "Allison, Mr. Hudson Joshua Crei", "Allison, Mrs. Hudson J C (Bessi", "Anderson, Mr. Harry", "Andrews, Miss. Kornelia Theodos", "Andrews, Mr. Thomas Jr", "Appleton, Mrs. Edward Dale (Cha", "Artagaveytia, Mr. Ramon", "Astor, Col. John Jacob", "Astor, Mrs. John Jacob (Madelei", "Aubart, Mme. Leontine Pauline", "Barber, Miss. Ellen Nellie", "Barkworth, Mr. Algernon Henry W", "Baumann, Mr. John D"), _
+        Array("survived", "yes", "yes", "no", "no", "no", "yes", "yes", "no", "yes", "no", "no", "yes", "yes", "yes", "yes", "no"), _
+        Array("sex", "female", "male", "female", "male", "female", "male", "female", "male", "female", "male", "male", "female", "female", "female", "male", "male"), _
+        Array("age", 29#, 0.916700006, 2#, 30#, 25#, 48#, 63#, 39#, 53#, 71#, 47#, 18#, 24#, 26#, 80#, Empty), _
+        Array("passengerClass", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st"))
+End Function
 
 
 

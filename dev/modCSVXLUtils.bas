@@ -273,7 +273,7 @@ Function SplitString(TheString As String, Optional Delimiter As String = ",")
 
     Dim i As Long
     Dim LB As Long
-    Dim n As Long
+    Dim N As Long
     Dim OneDArray
     Dim Res()
     Dim UB As Long
@@ -288,9 +288,9 @@ Function SplitString(TheString As String, Optional Delimiter As String = ",")
     
     OneDArray = VBA.Split(TheString, Delimiter, -1, vbTextCompare)
     LB = LBound(OneDArray): UB = UBound(OneDArray)
-    n = UB - LB + 1
-    ReDim Res(1 To n, 1 To 1)
-    For i = 1 To n
+    N = UB - LB + 1
+    ReDim Res(1 To N, 1 To 1)
+    For i = 1 To N
         Res(i, 1) = OneDArray(i - 1)
     Next
     SplitString = Res

@@ -199,13 +199,13 @@ End Function
 '             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
 '---------------------------------------------------------------------------------------------------------
 Function sElapsedTime() As Double
-    Dim A As Currency
-    Dim B As Currency
+    Dim a As Currency
+    Dim b As Currency
     On Error GoTo ErrHandler
 
-    QueryPerformanceCounter A
-    QueryPerformanceFrequency B
-    sElapsedTime = A / B
+    QueryPerformanceCounter a
+    QueryPerformanceFrequency b
+    sElapsedTime = a / b
 
     Exit Function
 ErrHandler:
@@ -345,32 +345,32 @@ Sub Force2DArrayR(ByRef RangeOrArray As Variant, Optional ByRef NR As Long, Opti
     Force2DArray RangeOrArray, NR, NC
 End Sub
 
-Function SafeMin(A, B)
+Function SafeMin(a, b)
     On Error GoTo ErrHandler
-    If Not IsNumberOrDate(A) Then
+    If Not IsNumberOrDate(a) Then
         SafeMin = "#Non-number found!"
-    ElseIf Not IsNumberOrDate(B) Then
+    ElseIf Not IsNumberOrDate(b) Then
         SafeMin = "#Non-number found!"
-    ElseIf A > B Then
-        SafeMin = B
+    ElseIf a > b Then
+        SafeMin = b
     Else
-        SafeMin = A
+        SafeMin = a
     End If
     Exit Function
 ErrHandler:
     SafeMin = "#" & Err.Description & "!"
 End Function
 
-Function SafeMax(A, B)
+Function SafeMax(a, b)
     On Error GoTo ErrHandler
-    If Not IsNumberOrDate(A) Then
+    If Not IsNumberOrDate(a) Then
         SafeMax = "#Non-number found!"
-    ElseIf Not IsNumberOrDate(B) Then
+    ElseIf Not IsNumberOrDate(b) Then
         SafeMax = "#Non-number found!"
-    ElseIf A > B Then
-        SafeMax = A
+    ElseIf a > b Then
+        SafeMax = a
     Else
-        SafeMax = B
+        SafeMax = b
     End If
     Exit Function
 ErrHandler:
@@ -392,14 +392,14 @@ End Function
 ' Procedure : SafeSubtract
 ' Purpose   : low-level subtraction with error handling
 '---------------------------------------------------------------------------------------
-Function SafeSubtract(A, B)
+Function SafeSubtract(a, b)
     On Error GoTo ErrHandler
-    If Not IsNumberOrDate(A) Then
+    If Not IsNumberOrDate(a) Then
         SafeSubtract = "#Non-number found!"
-    ElseIf Not IsNumberOrDate(B) Then
+    ElseIf Not IsNumberOrDate(b) Then
         SafeSubtract = "#Non-number found!"
     Else
-        SafeSubtract = A - B
+        SafeSubtract = a - b
     End If
     Exit Function
 ErrHandler:
@@ -424,13 +424,13 @@ End Function
 '
 'Note:        Avoids VBA booby trap that False = 0 and True = -1
 '---------------------------------------------------------------------------------------
-Function sEquals(A, B, Optional CaseSensitive As Boolean = False) As Variant
+Function sEquals(a, b, Optional CaseSensitive As Boolean = False) As Variant
     On Error GoTo ErrHandler
     Dim VTA As Long
     Dim VTB As Long
 
-    VTA = VarType(A)
-    VTB = VarType(B)
+    VTA = VarType(a)
+    VTB = VarType(b)
     If VTA >= vbArray Or VTB >= vbArray Then
         sEquals = "#sEquals: Function does not handle arrays. Use sArrayEquals or sArraysIdentical instead!"
         Exit Function
@@ -438,19 +438,19 @@ Function sEquals(A, B, Optional CaseSensitive As Boolean = False) As Variant
 
     If VTA = VTB Then
         If VTA = vbString And Not CaseSensitive Then
-            If Len(A) = Len(B) Then
-                sEquals = UCase$(A) = UCase$(B)
+            If Len(a) = Len(b) Then
+                sEquals = UCase$(a) = UCase$(b)
             Else
                 sEquals = False
             End If
         Else
-            sEquals = (A = B)
+            sEquals = (a = b)
         End If
     Else
         If VTA = vbBoolean Or VTB = vbBoolean Or VTA = vbString Or VTB = vbString Then
             sEquals = False
         Else
-            sEquals = (A = B)
+            sEquals = (a = b)
         End If
     End If
     Exit Function
@@ -606,15 +606,15 @@ Function Transpose(ByVal TheArray As Variant)
     Dim i As Long
     Dim j As Long
     Dim m As Long
-    Dim n As Long
+    Dim N As Long
     Dim Result As Variant
     Dim Ro As Long
     On Error GoTo ErrHandler
-    Force2DArrayR TheArray, n, m
+    Force2DArrayR TheArray, N, m
     Ro = LBound(TheArray, 1) - 1
     Co = LBound(TheArray, 2) - 1
-    ReDim Result(1 To m, 1 To n)
-    For i = 1 To n
+    ReDim Result(1 To m, 1 To N)
+    For i = 1 To N
         For j = 1 To m
             Result(j, i) = TheArray(i + Ro, j + Co)
         Next j

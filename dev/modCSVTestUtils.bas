@@ -46,7 +46,11 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
         Res = Res & "Expected = Expected" + Format(CaseNo, "000") + "()"
     End If
 
-    Res = Res + vbLf + "TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
+    If Left(FileName, 4) = "http" Then
+        Res = Res + vbLf + "TestRes = TestCSVRead(i, TestDescription, Expected, FileName, Observed, WhatDiffers"
+    Else
+        Res = Res + vbLf + "TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
+    End If
 
     If IsArray(ConvertTypes) Then
         Res = Res + ", _" + vbLf + String(IndentBy, " ") + "ConvertTypes := " & ArrayToVBALitteral(ConvertTypes)
