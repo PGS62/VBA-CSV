@@ -1,5 +1,5 @@
 # VBA-CSV
-CSV reading and writing for VBA and Excel spreadsheets, via two functions `CSVRead` and `CSVWrite`.
+Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, inspired by R's [fread](https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread), and Julia's [CSV.jl](https://csv.juliadata.org/stable/).
 
 # Installation
 1. Download the [latest release](https://github.com/PGS62/VBA-CSV/releases).
