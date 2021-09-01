@@ -26,14 +26,12 @@ To see the data in a worksheet, enter this formula:
 
 To load the data into an array in VBA:
 ```vba
-Sub Demo
-Dim TitanicData 
-TitanicData = CSVRead(FileName:="https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv", _
-                      ConvertType := True, _
-                      MissingStrings :="NA")
-end Sub                      
+Sub Demo()
+    Dim TitanicData
+    TitanicData = CSVRead(FileName:="https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv", _
+        ConvertTypes:=True, MissingStrings:="NA")
+End Sub
 ```
-
 
 # Documentation
 #### _CSVRead_
