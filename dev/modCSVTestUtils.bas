@@ -25,7 +25,7 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
     
     On Error GoTo ErrHandler
     
-    Res = "Sub Case" & CaseNo & "(i As Long, Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
+    Res = "Sub Test" & CaseNo & "(i As Long, Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
     Res = Res & vbLf & "    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Variant, WhatDiffers As String"
     Res = Res & vbLf
     Res = Res & vbLf & "On Error GoTo ErrHandler"
@@ -36,7 +36,7 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
     If Not IsArray(ExpectedReturn) Then
         LitteralExpected = ElementToVBALitteral(ExpectedReturn)
     Else
-        LitteralExpected = ArrayToVBALitteral(ExpectedReturn, , 120)
+        LitteralExpected = ArrayToVBALitteral(ExpectedReturn, , 10000)
         If Left(LitteralExpected, 1) = "#" Then
         End If
     End If
@@ -135,7 +135,7 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
     Res = Res & vbLf & ""
     Res = Res & vbLf & "    Exit Sub"
     Res = Res & vbLf & "ErrHandler:"
-    Res = Res & vbLf & "    Throw ""#Case3 (line "" & CStr(Erl) + ""): "" & Err.Description & ""!"""
+    Res = Res & vbLf & "    Throw ""#Test" & CaseNo & " (line "" & CStr(Erl) + ""): "" & Err.Description & ""!"""
     Res = Res & vbLf & "End Sub"
 
     GenerateTestCode = Transpose(Split(Res, vbLf))
