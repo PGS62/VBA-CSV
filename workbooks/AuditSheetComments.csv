@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+64,01-Sep-2021,18:11:38,"Philip Swannell","Re-ran performance tests."
 63,01-Sep-2021,16:46:26,"Philip Swannell","Fixed compile errors when modCSVReadWrite is ""stand-alone""."
 62,01-Sep-2021,16:12:34,"Philip Swannell","Added 2 missing tests - 110 and 124."
 61,01-Sep-2021,15:29:45,"Philip Swannell","Deleted temporary sheets used during previous release."

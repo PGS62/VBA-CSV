@@ -11,15 +11,15 @@ Option Explicit
 Private m_FSO As Scripting.FileSystemObject
 
 #If VBA7 And Win64 Then
-'for 64-bit Excel
-Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
-Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
-Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
+    'for 64-bit Excel
+    Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
+    Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
+    Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 #Else
-'for 32-bit Excel
-Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
-Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
-Private Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
+    'for 32-bit Excel
+    Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
+    Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
+    Private Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 #End If
 
 Private Enum enmErrorStyle
@@ -637,6 +637,10 @@ Private Function ParseDownloadError(ErrNum As Long)
     ParseDownloadError = ErrString
 End Function
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FileExists
+' Purpose    : Returns True if FileName exists on disk, False o.w.
+' -----------------------------------------------------------------------------------------------------------------------
 Private Function FileExists(FileName As String) As Boolean
     Dim F As Scripting.File
     On Error GoTo ErrHandler
@@ -648,6 +652,10 @@ ErrHandler:
     FileExists = False
 End Function
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FileDelete
+' Purpose    : Delete a file, returns True or error string.
+' -----------------------------------------------------------------------------------------------------------------------
 Private Function FileDelete(FileName As String) As Boolean
     Dim F As Scripting.File
     On Error GoTo ErrHandler
@@ -946,12 +954,12 @@ End Function
 '
 ' Parameters :
 '  ConvertTypes          :
-'  ShowNumbersAsNumbers  : Set only is ConvertTypes is not an array
-'  ShowDatesAsDates      : Set only is ConvertTypes is not an array
-'  ShowBooleansAsBooleans: Set only is ConvertTypes is not an array
-'  ShowErrorsAsErrors    : Set only is ConvertTypes is not an array
-'  ConvertQuoted         : Set only is ConvertTypes is not an array
-'  TrimFields            : Set only is ConvertTypes is not an array
+'  ShowNumbersAsNumbers  : Set only if ConvertTypes is not an array
+'  ShowDatesAsDates      : Set only if ConvertTypes is not an array
+'  ShowBooleansAsBooleans: Set only if ConvertTypes is not an array
+'  ShowErrorsAsErrors    : Set only if ConvertTypes is not an array
+'  ConvertQuoted         : Set only if ConvertTypes is not an array
+'  TrimFields            : Set only if ConvertTypes is not an array
 '  ColByColFormatting    : Set to True if ConvertTypes is an array
 '  CTDict                : Set to a dictionary keyed on the elements of the left column (top row) of ConvertTypes,
 '                          each element containing the corresponding right (or bottom) element.
@@ -1685,7 +1693,7 @@ End Function
 '                    at the end of lines.
 '  SkipToRow       : The first line of the file to appear in the return from CSVRead. However, we need to parse earlier
 '                    lines to identify where SkipToRow starts in the file - see variable HaveReachedSkipToRow.
-'  HeaderRowNum    : The row number of the headers in the file, must be less than ro equal to SkipToRow.
+'  HeaderRowNum    : The row number of the headers in the file, must be less than or equal to SkipToRow.
 '  NumRows         : The number of rows to parse. 0 for all rows from SkipToRow to the end of the file.
 '  NumRowsFound    : Set to the number of rows in the file that are on or after SkipToRow.
 '  NumColsFound    : Set to the number of columns in the file, i.e. the maximum number of fields in any single line.
@@ -2453,7 +2461,7 @@ End Sub
 ' Procedure  : TestCastToDate
 ' Purpose    : Quick test of method CastToDate, See also RunTests() for much more comprehensive testing
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub TestCastToDate()
+Private Sub TestCastToDate()
     Dim strIn As String
     Dim dtOut As Date
     Dim DateOrder As Long
@@ -3293,10 +3301,8 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseISO8601
 ' Purpose    : Test harness for calling from spreadsheets
-' Parameters :
-'  strIn:
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseISO8601(strIn As String)
+Public Function ParseISO8601(strIn As String)
     Dim dtOut As Date
     Dim Converted As Boolean
 
