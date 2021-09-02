@@ -47,26 +47,26 @@ End Enum
 '             ConvertTypes should be a string of zero or more letters from allowed characters "NDBETQ".
 '
 '             The most commonly useful letters are:
-'             1) "N" number fields are returned as numbers (Doubles).
-'             2) "D" date fields (that respect DateFormat) are returned as Dates.
-'             3) "B" fields matching TrueStrings or FalseStrings are returned as Booleans.
+'             1) `N` number fields are returned as numbers (Doubles).
+'             2) `D` date fields (that respect DateFormat) are returned as Dates.
+'             3) `B` fields matching TrueStrings or FalseStrings are returned as Booleans.
 '
-'             ConvertTypes is optional and defaults to the null string for no type conversion. TRUE is
-'             equivalent to "NDB" and FALSE to the null string.
+'             ConvertTypes is optional and defaults to the null string for no type conversion. `TRUE is`
+'             equivalent to `NDB` and `FALSE` to the null string.
 '
 '             Three further options are available:
-'             4) "E" fields that match Excel errors are converted to error values. There are fourteen of
-'             these, including #N/A, #NAME?, #VALUE! and #DIV/0!.
-'             5) "T" leading and trailing spaces are trimmed from fields. In the case of quoted fields,
+'             4) `E` fields that match Excel errors are converted to error values. There are fourteen of
+'             these, including `#N/A`, `#NAME?`, `#VALUE!` and `#DIV/0!`.
+'             5) `T` leading and trailing spaces are trimmed from fields. In the case of quoted fields,
 '             this will not remove spaces between the quotes.
-'             6) "Q" conversion happens for both quoted and unquoted fields; otherwise only unquoted fields
+'             6) `Q` conversion happens for both quoted and unquoted fields; otherwise only unquoted fields
 '             are converted.
 '
 '             For most files, correct type conversion can be achieved with ConvertTypes as a string which
 '             applies for all columns, but type conversion can also be specified on a per-column basis.
 '
 '             Enter an array (or range) with two columns or two rows, column numbers on the left/top and
-'             type conversion (subset of NDBETQ) on the right/bottom. Instead of column numbers, you can
+'             type conversion (subset of `NDBETQ`) on the right/bottom. Instead of column numbers, you can
 '             enter strings matching the contents of the header row, and a column number of zero applies to
 '             all columns not otherwise referenced.
 '
@@ -78,18 +78,18 @@ End Enum
 '             file. If it can't auto-detect the delimiter, it will assume comma. If your file includes a
 '             different character or string delimiter you should pass that as the Delimiter argument.
 '
-'             Alternatively, enter FALSE as the delimiter to treat the file as "not a delimited file". In
+'             Alternatively, enter `FALSE` as the delimiter to treat the file as "not a delimited file". In
 '             this case the return will mimic how the file would appear in a text editor such as NotePad.
-'             The file will be split into lines at all line breaks (irrespective of double-quotes) and each
+'             The file will be split into lines at all line breaks (irrespective of double quotes) and each
 '             element of the return will be a line of the file.
 ' IgnoreRepeated: Whether delimiters which appear at the start of a line, the end of a line or immediately
 '             after another delimiter should be ignored while parsing; useful-for fixed-width files with
 '             delimiter padding between fields.
-' DateFormat: The format of dates in the file such as "Y-M-D", "M-D-Y" or "Y/M/D". Also supports "ISO" for
-'             ISO8601 (e.g. 2021-08-26T09:11:30) or "ISOZ" (time zone given e.g.
+' DateFormat: The format of dates in the file such as `Y-M-D`, `M-D-Y` or `Y/M/D`. Also supports `ISO` for
+'             ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g.
 '             2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time.
 ' Comment   : Rows that start with this string will be skipped while parsing.
-' IgnoreEmptyLines: Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each
+' IgnoreEmptyLines: Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each
 '             column will be assigned ShowMissingsAs for that empty row).
 ' HeaderRowNum: The row in the file containing headers. This argument is most useful when calling from VBA,
 '             with SkipToRow set to one more than HeaderRowNum. In that case the function returns the "data
@@ -104,24 +104,24 @@ End Enum
 ' NumCols   : The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol
 '             are read.
 ' TrueStrings: Indicates how `TRUE` values are represented in the file. May be a string, an array of strings
-'             or a range containing strings; by default `TRUE`, `True` and `true` are recognised.
+'             or a range containing strings; by default, `TRUE`, `True` and `true` are recognised.
 ' FalseStrings: Indicates how `FALSE` values are represented in the file. May be a string, an array of
-'             strings or a range containing strings; by default `FALSE`, `False` and `false` are
+'             strings or a range containing strings; by default, `FALSE`, `False` and `false` are
 '             recognised.
 ' MissingStrings: Indicates how missing values are represented in the file. May be a string, an array of
-'             strings or a range containing strings. By default only an empty field (consecutive
+'             strings or a range containing strings. By default, only an empty field (consecutive
 '             delimiters) is considered missing.
 ' ShowMissingsAs: Fields which are missing in the file (consecutive delimiters) or match one of the
 '             MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null
-'             string or #N/A! error value can be good alternatives.
+'             string or `#N/A!` error value can be good alternatives.
 '
 '             If NumRows is greater than the number of rows in the file then the return is "padded" with
-'             the value of ShowMissingsAs. Likewise if NumCols is greater than the number of columns in the
-'             file.
-' Encoding  : Allowed entries are "UTF-16", "UTF-8", "UTF-8-BOM", and "ANSI", but for most files this
+'             the value of ShowMissingsAs. Likewise, if NumCols is greater than the number of columns in
+'             the file.
+' Encoding  : Allowed entries are `UTF-16`, `UTF-8`, `UTF-8-BOM`, and `ANSI`, but for most files this
 '             argument can be omitted and CSVRead will detect the file's encoding. If auto-detection does
-'             not work then it's possible that the file is encoded UTF-16 but without a byte option mark,
-'             so try entering Encoding as "UTF-16".
+'             not work then it's possible that the file is encoded `UTF-16` but without a byte option mark,
+'             so try entering Encoding as `UTF-16`.
 ' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
 '             instead of a period (3,14 vs. 3.14). CSVRead can correctly parse these numbers by passing in
 '             the DecimalSeparator as a comma, in which case comma ceases to be a candidate if the parser
@@ -506,26 +506,26 @@ Sub RegisterCSVRead()
     ArgumentDescriptions(2) = "Type conversion: Boolean or string, subset of letters NDBETQ. N = convert Numbers, D = convert Dates, B = Convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = quoted fields also converted. TRUE = NDB, FALSE = no conversion."
     ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
     ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after another delimiter should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
-    ArgumentDescriptions(5) = "The format of dates in the file such as ""Y-M-D"", ""M-D-Y"" or ""Y/M/D"". Also supports ""ISO"" for ISO8601 (e.g. 2021-08-26T09:11:30) or ""ISOZ"" (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
+    ArgumentDescriptions(5) = "The format of dates in the file such as `Y-M-D`, `M-D-Y` or `Y/M/D`. Also supports `ISO` for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
     ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
-    ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if FALSE, each column will be assigned ShowMissingsAs for that empty row)."
+    ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column will be assigned ShowMissingsAs for that empty row)."
     ArgumentDescriptions(8) = "The row in the file containing headers. Optional and defaults to 0."
     ArgumentDescriptions(9) = "The first row in the file that's included in the return. Optional and defaults to one more than HeaderRowNum."
     ArgumentDescriptions(10) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
     ArgumentDescriptions(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
     ArgumentDescriptions(12) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol are read."
-    ArgumentDescriptions(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default `TRUE`, `True` and `true` are recognised."
-    ArgumentDescriptions(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default `FALSE`, `False` and `false` are recognised."
-    ArgumentDescriptions(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default only an empty field (consecutive delimiters) is considered missing."
-    ArgumentDescriptions(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null string or #N/A! error value can be good alternatives."
-    ArgumentDescriptions(17) = "Allowed entries are ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"", and ""ANSI"", but for most files this argument can be omitted and CSVRead will detect the file's encoding."
+    ArgumentDescriptions(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
+    ArgumentDescriptions(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
+    ArgumentDescriptions(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default, only an empty field (consecutive delimiters) is considered missing."
+    ArgumentDescriptions(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null string or `#N/A!` error value can be good alternatives."
+    ArgumentDescriptions(17) = "Allowed entries are `UTF-16`, `UTF-8`, `UTF-8-BOM`, and `ANSI`, but for most files this argument can be omitted and CSVRead will detect the file's encoding."
     ArgumentDescriptions(18) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
     ArgumentDescriptions(19) = "For use from VBA only."
     Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
     Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVRead failed with error: " & Err.Description
+    Debug.Print "Warning: Registration of function CSVRead failed with error: " + Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2628,23 +2628,24 @@ End Function
 '             Excel errors or null values.
 ' FileName  : The full name of the file, including the path. Alternatively, if FileName is omitted, then the
 '             function returns Data converted CSV-style to a string.
-' QuoteAllStrings: If TRUE (the default) then elements of Data that are strings are quoted before being
-'             written to file, other elements (Numbers, Booleans, Errors) are not quoted. If FALSE then the
-'             only elements of Data that are quoted are strings containing Delimiter, line feed, carriage
-'             return or double quote. In all cases, double quotes are escaped by another double quote.
-' DateFormat: A format string that determine how dates, including cells formatted as dates, appear in the
-'             file. If omitted, defaults to "yyyy-mm-dd".
-' DateTimeFormat: Format for datetimes. Defaults to "ISO" which abbreviates "yyyy-mm-ddThh:mm:ss". Use
-'             "ISOZ" for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight
+' QuoteAllStrings: If `TRUE` (the default) then elements of Data that are strings are quoted before being
+'             written to file, other elements (Numbers, Booleans, Errors) are not quoted. If `FALSE` then
+'             the only elements of Data that are quoted are strings containing Delimiter, line feed,
+'             carriage return or double quote. In all cases, double quotes are escaped by another double
+'             quote.
+' DateFormat: A format string that determines how dates, including cells formatted as dates, appear in the
+'             file. If omitted, defaults to `yyyy-mm-dd`.
+' DateTimeFormat: Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use
+'             `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight
 '             saving may be inconsistent across the datetimes in data.
 ' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
 '             character.
-' Unicode   : If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will
-'             be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains
+' Unicode   : If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will
+'             be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but Data contains
 '             strings with characters whose code points exceed 255.
-' EOL       : Controls the line endings of the file written. Enter "Windows" (the default), "Unix" or "Mac".
+' EOL       : Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`.
 '             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
-'             or the strings "CRLF", "LF" or "CR". The last line of the file is written with a line ending.
+'             or the strings `CRLF`, `LF` or `C`. The last line of the file is written with a line ending.
 '
 ' Notes     : See also companion function CSVRead.
 '
@@ -2769,16 +2770,16 @@ Sub RegisterCSVWrite()
     ArgumentDescriptions(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values."
     ArgumentDescriptions(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the function returns Data converted CSV-style to a string."
     ArgumentDescriptions(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. Double quotes are always escaped by another double quote."
-    ArgumentDescriptions(4) = "A format string that determine how dates, including cells formatted as dates, appear in the file. If omitted, defaults to ""yyyy-mm-dd""."
-    ArgumentDescriptions(5) = "Format for datetimes. Defaults to ""ISO"" which abbreviates ""yyyy-mm-ddThh:mm:ss"". Use ""ISOZ"" for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data."
+    ArgumentDescriptions(4) = "A format string that determines how dates, including cells formatted as dates, appear in the file. If omitted, defaults to `yyyy-mm-dd`."
+    ArgumentDescriptions(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data."
     ArgumentDescriptions(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one character."
-    ArgumentDescriptions(7) = "If FALSE (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is FALSE but Data contains strings with characters whose code points exceed 255."
-    ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter ""Windows"" (the default), ""Unix"" or ""Mac"". Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings ""CRLF"", ""LF"" or ""CR""."
+    ArgumentDescriptions(7) = "If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but Data contains strings with characters whose code points exceed 255."
+    ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `C`."
     Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgumentDescriptions
     Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
+    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
