@@ -21,7 +21,7 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 # Examples
 [Rdatasets](https://vincentarelbundock.github.io/Rdatasets/) provides nearly 1,500 csv files including one containing names of passengers on the Titanic, their sex, age and passenger class, and whether or not they survived the sinking. In this particular file, missing data is indicated by the two characters `NA`.
 
-To see the data in a worksheet, enter this formula:
+To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
 `=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
 To load the data into an array in VBA:
@@ -32,6 +32,9 @@ Sub Demo()
         ConvertTypes:=True, MissingStrings:="NA")
 End Sub
 ```
+
+<a name="myfootnote1">1</a>: Assumes you're using Excel 365 with its [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
+
 
 # Documentation
 #### _CSVRead_
