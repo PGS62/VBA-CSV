@@ -110,7 +110,6 @@ FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
 
 
-
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [lastest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
 
@@ -128,10 +127,20 @@ One of the plots is shown below. It shows the time to parse a file with a single
 
 ![chart3](charts/Chart_3_Time_v_Rows.jpg)
 
+<details><summary>CLICK ME</summary>
+<p>
+    
+![chart5](charts/Chart_5_Time_v_Cols.jpg)
+    
+![chart6](charts/Chart_6_Time_v_FieldLength.jpg)
+    
+</p>
+</details>
+
 In summary, the speed comparisons show:
 - `CSVRead` and `sdkn104` have very similar parse times.
-- `CSVRead` is generally faster than ws_garcia. But not always – see this plot in which ws_garcia is faster in some cases.
-- For realistic structures of input files (e.g. 10 columns of 17-character input, as shown here) `CSVRead` is about 40% faster than `ws_garcia`. 
+- `CSVRead` is generally (but not always) faster than ws_garcia.
+- For realistic structures of input files (e.g. 10 columns of 17-character input) `CSVRead` is about 40% faster than `ws_garcia`. 
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
 
 # About
