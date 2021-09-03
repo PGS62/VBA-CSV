@@ -6,7 +6,7 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
 3. Add a reference to "Microsoft Scripting Runtime" (In VBA Editor Tools > References).
 4. Add a reference to "Microsoft VBScript Regular Expressions 5.5"
-5. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module. Example:
+5. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
 Private Sub Workbook_Open()
     RegisterCSVWrite
@@ -159,7 +159,7 @@ The files used to generate the plots above each had every field identical. So fo
 |seattlepets.csv|4.1|0.9|1|1.4|
 |**Total**|**238.6**|**70.4**|**71.6**|**142.8**|
 
-In summary, the speed comparisons show:
+In summary, the performance tests show:
 - `CSVRead` and `sdkn104` have very similar parse times.
 - `CSVRead` is generally (but not always) faster than ws_garcia.
 - For realistic structures of input files, such as those provided by Rdatasets, `CSVRead` is about twice as fast as `ws_garcia`. 
