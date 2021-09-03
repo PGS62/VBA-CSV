@@ -7,7 +7,7 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 [Examples](#examples)  
 [Documentation](#documentation)  
 &nbsp;&nbsp;&nbsp;&nbsp;[CSVRead](#csvread)  
-&nbsp;&nbsp;&nbsp;&nbsp;[CSVWrite](csvwrite)  
+&nbsp;&nbsp;&nbsp;&nbsp;[CSVWrite](#csvwrite)  
 [Errors](#errors)  
 [Testing](#testing)  
 [Alternatives](#alternatives)  
