@@ -99,7 +99,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`Unicode`|If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but `Data` contains strings with characters whose code points exceed 255.|
 |`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `C`. The last line of the file is written with a line ending.|
 
-[source](https://github.com/PGS62/VBA-CSV/blob/58edba52772550596e50d243a581e9a7a6663ac6/src/modCSVReadWrite.bas#L2622-L2755)
+[source](https://github.com/PGS62/VBA-CSV/blob/58edba52772550596e50d243a581e9a7a6663ac6/src/modCSVReadWrite.bas#L2621-L2755)
 
 # Error handling
 You can call `CSVRead` and `CSVWrite` both from spreadsheets (best with Excel 365 and [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531)) and from VBA. When an error occurs, the functions return a string starting with `#` and ending with `!` which gives an explanation of what went wrong.
