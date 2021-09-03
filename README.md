@@ -34,8 +34,8 @@ Sub Demo()
         ConvertTypes:=True, MissingStrings:="NA")
 End Sub
 ```
-
-<a name="myfootnote1">1</a>: Assumes you're using Excel 365 with its [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
+-----------------------------
+<a name="myfootnote1">Footnote 1</a>: Assumes you're using Excel 365 with its [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
 
 # Documentation
 #### _CSVRead_
@@ -104,10 +104,12 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 # Error handling
 You can call `CSVRead` and `CSVWrite` both from spreadsheets (best with Excel 365 and [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531)) and from VBA. When an error occurs, the functions return a string starting with `#` and ending with `!` which gives an explanation of what went wrong.
 
-So, to get robust error handling from VBA, you should wrap calls to `CSVRead` and `CSVWrite` inside calls to a function `ThrowIfError`([source](https://github.com/PGS62/VBA-CSV/blob/1ba77bc675c8c9a4850cd8eed5d33cf68ff20514/src/modCSVReadWrite.bas#L2918)):
+So, to get robust error handling from VBA, you should wrap calls to `CSVRead` and `CSVWrite` inside calls to a function `ThrowIfError`:
 ```vba
 FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
+[source](https://github.com/PGS62/VBA-CSV/blob/1ba77bc675c8c9a4850cd8eed5d33cf68ff20514/src/modCSVReadWrite.bas#L2918)
+
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
 
 
@@ -165,7 +167,8 @@ In summary, the performance tests show:
 - For realistic structures of input files, such as those provided by Rdatasets, `CSVRead` is about twice as fast as `ws_garcia`. 
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
 
-<a name="myfootnote2">1</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
+--------------------------------
+<a name="myfootnote2">Footnote 2</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
 
 # About
 Author: Philip Swannell  
