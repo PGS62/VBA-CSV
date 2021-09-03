@@ -1,6 +1,18 @@
 # VBA-CSV
 Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, inspired by R's [fread](https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread), and Julia's [CSV.jl](https://csv.juliadata.org/stable/).
 
+**Contents**  
+[Installation](#installation)  
+[Acknowledgements](#acknowledgements)  
+[Examples](#examples)  
+[Documentation](#documentation)  
+[Errors](#errors)  
+[Testing](#testing)  
+[Alternatives](#alternatives)  
+[Performance](#performance)  
+[Compatibility](#compatibility)  
+[About](#about)  
+
 # Installation
 1. Download the [latest release](https://github.com/PGS62/VBA-CSV/releases).
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
@@ -101,7 +113,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 
 [source](https://github.com/PGS62/VBA-CSV/blob/58edba52772550596e50d243a581e9a7a6663ac6/src/modCSVReadWrite.bas#L2621-L2755)
 
-# Error handling
+# Errors
 You can call `CSVRead` and `CSVWrite` both from spreadsheets (best with Excel 365 and [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531)) and from VBA. When an error occurs, the functions return a string starting with `#` and ending with `!` which gives an explanation of what went wrong.
 
 So, to get robust error handling from VBA, you should wrap calls to `CSVRead` and `CSVWrite` inside calls to a function `ThrowIfError`:
@@ -111,7 +123,6 @@ FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 [source](https://github.com/PGS62/VBA-CSV/blob/1ba77bc675c8c9a4850cd8eed5d33cf68ff20514/src/modCSVReadWrite.bas#L2918-L2934)
 
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
-
 
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [latest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
