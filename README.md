@@ -19,7 +19,7 @@ I re-worked the parsing code of `CSVRead` after examining "sdkn104"'s code avail
 The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance [here](#performance). For testing `CSVRead`, I also use many of the test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
 # Examples
-[Rdatasets](https://vincentarelbundock.github.io/Rdatasets/) provides nearly 1,500 csv files including one containing names of passengers on the Titanic, their sex, age and passenger class, and whether or not they survived the sinking. In this particular file, missing data is indicated by the two characters `NA`.
+[Rdatasets](https://vincentarelbundock.github.io/Rdatasets/) provides nearly 1,752 csv files including one containing names of passengers on the Titanic, their sex, age and passenger class, and whether or not they survived the sinking. In this particular file, missing data is indicated by the two characters `NA`.
 
 To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
 `=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
@@ -123,24 +123,46 @@ On the author’s laptop `CSVRead` parses files at speeds of up to 14Mb per seco
 
 The workbook VBA-CSV.xlsm in the workbooks folder includes [code](dev/modCSVPerformance.bas) to benchmark `CSVRead` against the two alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/) (so not easily available from VBA). It generates plots of parse time as a function of: number of rows in the file; the number of columns in the file; the length of fields in the file; whether fields are quoted; whether fields contain embedded line breaks.
 
-One of the plots is shown below. It shows the time to parse a file with a single column, and for which all fields have twenty characters with embedded line breaks. Take care interpreting the plot – both axes are on log scale. For the largest input file plotted, CSVRead was about 10 times faster than ws_garcia and about 16 times slower than CSV.jl. (File size was 27.3Mb, parse times were 5.2 seconds, 55.8 seconds and 0.32 seconds respectively.)
+The first plot (below) shows the time to parse a file with a single column, and for which all fields have twenty characters with embedded line breaks. Take care interpreting the plot – both axes are on log scale. For the largest input file plotted, CSVRead was about 10 times faster than ws_garcia and about 16 times slower than CSV.jl. In this case the file had 1,048,576 rows and was 27.3Mb in size, parse times were: CSVRead 5.2 seconds; ws_garcia 55.8 seconds; and CSV.jl 0.32 seconds.
 
 ![chart3](charts/Chart_3_Time_v_Rows.jpg)
 
-<details><summary>CLICK ME</summary>
-<p>
-    
+A second plot shows the influence of the number of columns on parsing time. The files examined all had eight rows and the number of columns varied from 1 to 8,192. All fields were an unquoted 16-character string. The code of ws_garcia can be seen to perform relatively badly on files with a very large number of columns. The largest file in the test had 8,192 columns and was 1.1Mb in size. parse time for ws_garcia was ??? versus ??? for CSVRead.
 ![chart5](charts/Chart_5_Time_v_Cols.jpg)
-    
+
+A third plot below shows the influence of field length on parsing time. The files examined all had 1,024 rows and eight columns. In each file, all fields were identical and were the character "x" repeated some number L times. L varied fom 1 in the first file to 16,384 in the last. This test shows ws_garcia performing best of the three VBA parsers for L between 64 and 2,048.
 ![chart6](charts/Chart_6_Time_v_FieldLength.jpg)
     
-</p>
-</details>
+The files used to generate the plots above each had every field identical. So for a more realistic measure of comparitive speed we studied the parse times for the 20 largest files provided in Rdatasets. The test code is in modCSVDataSets of the workbook VBA-CSV.xlsm. Here are the results:
+
+|File Name|Size (Mb)|CSVRead<br/>parse time|sdkn104<br/>parse time|ws_garcia<br/>parse time|
+|---------|---------|-------------------|------------------|--------------------|
+|military.csv|75.8|21.4|20.7|34.1|
+|Birthdays.csv|17|5.9|6|10.3|
+|wvs_justifbribe.csv|13.9|4.1|4.2|8.2|
+|flights.csv|36.7|12|12.7|32.9|
+|wvs_immig.csv|12.5|4.1|4.3|7.4|
+|Fertility.csv|13.1|4.4|4.7|9.2|
+|avandia.csv|6.8|1.7|1.8|2.4|
+|AthleteGrad.csv|7|1.6|1.7|2.9|
+|mortgages.csv|7.4|2.2|2.3|4.4|
+|mammogram.csv|2.2|0.7|0.7|1.1|
+|InstEval.csv|3|1|1.1|2|
+|gss_abortion.csv|5.4|1.8|1.9|5.2|
+|TV16.csv|7.5|2.1|2.1|6.1|
+|gss_wages.csv|6|1.4|1.4|2.6|
+|CPSSW8.csv|2.6|0.7|0.7|1.1|
+|eq_passengercars.csv|7.2|1|1|1.4|
+|movies.csv|6.1|2|2.1|7.3|
+|diamonds.csv|3.2|1|1.1|2.2|
+|gov_transfers_density.csv|1.1|0.3|0.3|0.5|
+|seattlepets.csv|4.1|0.9|1|1.4|
+|**Total**|**238.6**|**70.4**|**71.6**|**142.8**|
 
 In summary, the speed comparisons show:
 - `CSVRead` and `sdkn104` have very similar parse times.
 - `CSVRead` is generally (but not always) faster than ws_garcia.
-- For realistic structures of input files (e.g. 10 columns of 17-character input) `CSVRead` is about 40% faster than `ws_garcia`. 
+- For realistic structures of input files, such as those provided by Rdatasets, `CSVRead` is about twice as fast as `ws_garcia`. 
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
 
 # About
