@@ -51,7 +51,7 @@ End Enum
 '             2) `D` date fields (that respect DateFormat) are returned as Dates.
 '             3) `B` fields matching TrueStrings or FalseStrings are returned as Booleans.
 '
-'             ConvertTypes is optional and defaults to the null string for no type conversion. `TRUE is`
+'             ConvertTypes is optional and defaults to the null string for no type conversion. `TRUE` is
 '             equivalent to `NDB` and `FALSE` to the null string.
 '
 '             Three further options are available:
@@ -91,10 +91,12 @@ End Enum
 ' Comment   : Rows that start with this string will be skipped while parsing.
 ' IgnoreEmptyLines: Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each
 '             column will be assigned ShowMissingsAs for that empty row).
-' HeaderRowNum: The row in the file containing headers. This argument is most useful when calling from VBA,
-'             with SkipToRow set to one more than HeaderRowNum. In that case the function returns the "data
-'             rows", and the header rows are returned via the by-reference argument HeaderRow. Optional and
-'             defaults to 0.
+' HeaderRowNum: The row in the file containing headers. Type conversion is not applied to fields in the
+'             header row, though leading and trailing spaces are trimmed.
+'
+'             This argument is most useful when calling from VBA, with SkipToRow set to one more than
+'             HeaderRowNum. In that case the function returns the rows starting from SkipToRow, and the
+'             header row is returned via the by-reference argument HeaderRow. Optional and defaults to 0.
 ' SkipToRow : The first row in the file that's included in the return. Optional and defaults to one more
 '             than HeaderRowNum.
 ' SkipToCol : The column in the file at which reading starts. Optional and defaults to 1 to read from the
@@ -411,6 +413,15 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             HeaderRow = HeaderRowTruncated
         End If
     End If
+    
+    'In this case no type conversion should be applied to the top row of the return
+    If HeaderRowNum = SkipToRow Then
+        If AnyConversion Then
+            For i = 1 To MinLngs(sNCols(HeaderRow), NumColsInReturn)
+                ReturnArray(1, i) = HeaderRow(1, i)
+            Next
+        End If
+    End If
 
     If ColByColFormatting Then
         Dim NR As Long, NC As Long, CT As Variant, UnQuotedHeader As String, NCH As Long, Field As String, QC As Long
@@ -509,7 +520,7 @@ Sub RegisterCSVRead()
     ArgumentDescriptions(5) = "The format of dates in the file such as `Y-M-D`, `M-D-Y` or `Y/M/D`. Also supports `ISO` for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
     ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
     ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column will be assigned ShowMissingsAs for that empty row)."
-    ArgumentDescriptions(8) = "The row in the file containing headers. Optional and defaults to 0."
+    ArgumentDescriptions(8) = "The row in the file containing headers. Optional and defaults to 0. Type conversion is not applied to fields in the header row, though leading and trailing spaces are trimmed."
     ArgumentDescriptions(9) = "The first row in the file that's included in the return. Optional and defaults to one more than HeaderRowNum."
     ArgumentDescriptions(10) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the first column."
     ArgumentDescriptions(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the end of the file are read."
@@ -2015,7 +2026,7 @@ Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() 
     ReDim Res(1 To 1, 1 To NC)
     For i = j To j - NC + 1 Step -1
         Field = Mid$(Buffer, Starts(i), Lengths(i))
-        Res(1, NC + i - j) = Unquote(Field, """", QuoteCounts(i))
+        Res(1, NC + i - j) = Unquote(Trim(Field), """", QuoteCounts(i))
     Next i
     GetLastParsedRow = Res
 

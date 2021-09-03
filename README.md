@@ -61,7 +61,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`DateFormat`|The format of dates in the file such as `Y-M-D`, `M-D-Y` or `Y/M/D`. Also supports `ISO` for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time.|
 |`Comment`|Rows that start with this string will be skipped while parsing.|
 |`IgnoreEmptyLines`|Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column will be assigned `ShowMissingsAs` for that empty row).|
-|`HeaderRowNum`|The row in the file containing headers. This argument is most useful when calling from VBA, with `SkipToRow` set to one more than `HeaderRowNum`. In that case the function returns the "data rows", and the header rows are returned via the by-reference argument `HeaderRow`. Optional and defaults to 0.|
+|`HeaderRowNum`|The row in the file containing headers. Type conversion is not applied to fields in the header row, though leading and trailing spaces are trimmed.<br/><br/>This argument is most useful when calling from VBA, with `SkipToRow` set to one more than `HeaderRowNum`. In that case the function returns the rows starting from `SkipToRow`, and the header row is returned via the by-reference argument `HeaderRow`. Optional and defaults to 0.|
 |`SkipToRow`|The first row in the file that's included in the return. Optional and defaults to one more than `HeaderRowNum`.|
 |`SkipToCol`|The column in the file at which reading starts. Optional and defaults to 1 to read from the first column.|
 |`NumRows`|The number of rows to read from the file. If omitted (or zero), all rows from `SkipToRow` to the end of the file are read.|

@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+69,03-Sep-2021,09:18:48,"Philip Swannell","HeaderRow now trimmed."
+68,02-Sep-2021,18:29:22,"Philip Swannell","Removed two old Performance sheets."
 67,02-Sep-2021,17:37:40,"Philip Swannell","Updated docstrings."
 66,02-Sep-2021,09:49:36,"Philip Swannell","Amending Tests"
 65,02-Sep-2021,09:29:32,"Philip Swannell","Recovering from Git woes and their consequences for tests."

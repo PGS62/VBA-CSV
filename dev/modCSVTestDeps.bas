@@ -25,7 +25,7 @@ Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCo
 ' Purpose    : Kernel of the method RunTests, uses sArryasIdentical to check that data read by function CSVRead is
 '              identical to Expected. If not sets WhatDiffers to a description of what went wrong.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected As Variant, FileName As String, ByRef Observed, _
+Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected As Variant, FileName As String, ByRef Observed, _
     ByRef WhatDiffers As String, Optional AbsTol As Double, Optional RelTol As Double, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
     Optional DateFormat As String, Optional Comment As String, Optional IgnoreEmptyLines As Boolean = True, Optional ByVal SkipToRow As Long = 1, _
@@ -38,7 +38,7 @@ Function TestCSVRead(CaseNo As Long, ByVal TestDescription As String, Expected A
     On Error GoTo ErrHandler
 
     WhatDiffers = ""
-    TestDescription = "Case " + CStr(CaseNo) + " " + TestDescription
+    TestDescription = "Case " + CStr(TestNo) + " " + TestDescription
 
     Observed = CSVRead(FileName, ConvertTypes, Delimiter, IgnoreRepeated, DateFormat, Comment, IgnoreEmptyLines, HeaderRowNum, SkipToRow, _
         SkipToCol, NumRows, NumCols, TrueStrings, FalseStrings, MissingStrings, ShowMissingsAs, Encoding, DecimalSeparator, HeaderRow)

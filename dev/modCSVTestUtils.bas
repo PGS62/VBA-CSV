@@ -14,7 +14,7 @@ Option Explicit
 ' Purpose    : Metaprogramming - generate the VBA code for a given test, used on worksheet Test to genenerate a single
 '              case statement for method RunTests.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, ConvertTypes As Variant, Delimiter As Variant, IgnoreRepeated As Boolean, DateFormat As String, _
+Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, ConvertTypes As Variant, Delimiter As Variant, IgnoreRepeated As Boolean, DateFormat As String, _
     Comment As String, IgnoreEmptyLines As Boolean, HeaderRowNum As Long, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, TrueStrings As String, _
     FalseStrings As String, MissingStrings As String, Encoding As Variant, DecimalSeparator As String, ExpectedHeaderRow As Variant)
 
@@ -25,7 +25,7 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
     
     On Error GoTo ErrHandler
     
-    Res = "Sub Test" & CaseNo & "(i As Long, Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
+    Res = "Sub Test" & TestNo & "(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
     Res = Res & vbLf & "    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Variant, WhatDiffers As String"
     Res = Res & vbLf
     Res = Res & vbLf & "On Error GoTo ErrHandler"
@@ -46,9 +46,9 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
     Res = Res + vbLf + "FileName = """ & FileName & """"
 
     If Left(FileName, 4) = "http" Then
-        Res = Res + vbLf + "TestRes = TestCSVRead(i, TestDescription, Expected, FileName, Observed, WhatDiffers"
+        Res = Res + vbLf + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, FileName, Observed, WhatDiffers"
     Else
-        Res = Res + vbLf + "TestRes = TestCSVRead(i, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
+        Res = Res + vbLf + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
     End If
 
     If IsArray(ConvertTypes) Then
@@ -135,7 +135,7 @@ Function GenerateTestCode(CaseNo As Long, FileName, ExpectedReturn As Variant, C
     Res = Res & vbLf & ""
     Res = Res & vbLf & "    Exit Sub"
     Res = Res & vbLf & "ErrHandler:"
-    Res = Res & vbLf & "    Throw ""#Test" & CaseNo & " (line "" & CStr(Erl) + ""): "" & Err.Description & ""!"""
+    Res = Res & vbLf & "    Throw ""#Test" & TestNo & " (line "" & CStr(Erl) + ""): "" & Err.Description & ""!"""
     Res = Res & vbLf & "End Sub"
 
     GenerateTestCode = Transpose(Split(Res, vbLf))
