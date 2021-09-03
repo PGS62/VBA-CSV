@@ -170,6 +170,9 @@ In summary, the performance tests show:
 --------------------------------
 <a name="myfootnote2">Footnote 2</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
 
+# Compatibility
+VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available), and not iOS or Android (since VBA is not available). It has been tested on Excel 365, both 64-bit and 32-bit. It _should_ work on earlier versions of Office but has not yet been tested on them.
+
 # About
 Author: Philip Swannell  
 Licence: MIT
