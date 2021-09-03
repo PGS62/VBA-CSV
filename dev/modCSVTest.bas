@@ -4062,7 +4062,7 @@ Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
-        ExpectedHeaderRow:=HStack("Col2", "Col2", "Col3", "Col4", "Col5", "Col6"))
+        ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "Col6"))
         
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
