@@ -120,7 +120,7 @@ https://github.com/ws-garcia/VBA-CSV-interface
 https://github.com/sdkn104/VBA-CSV
 
 # Performance
-On the author’s laptop `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
+On a test machine<sup>[2](#myfootnote2)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
 
 The workbook VBA-CSV.xlsm in the workbooks folder includes [code](dev/modCSVPerformance.bas) to benchmark `CSVRead` against the two alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/) (so not easily available from VBA). It generates plots of parse time as a function of number of rows, number of columns and field length.
 
@@ -130,10 +130,10 @@ The first plot shows the influence of the number of rows on parsing time. The fi
 A second plot shows the influence of the number of columns on parsing time. The files examined all had eight rows and the number of columns varied from 1 to 8,192. All fields were an unquoted 16-character string. The code of ws_garcia can be seen to perform relatively badly on files with a very large number of columns. The largest file in the test had 8,192 columns and was 1.1Mb in size. parse times were: CSVRead 0.13 seconds; ws_garcia 64.4 seconds; and CSV.jl 0.08 seconds.
 ![chart5](charts/Chart_5_Time_v_Cols.jpg)
 
-A third plot shows the influence of field length on parsing time. The files examined all had 1,024 rows and eight columns. In each file, all fields were identical and were the character "x" repeated some number L times. L varied fom 1 in the first file to 16,384 in the last. This test shows ws_garcia performing best of the three VBA parsers for L between 64 and 2,048.
+A third plot shows the influence of field length on parsing time. The files examined all had 1,024 rows and eight columns. In each file, all fields were identical and were the character "x" repeated some number `L` times. `L` varied fom 1 in the first file to 16,384 in the last. This test shows ws_garcia performing best of the three VBA parsers for `L` between 64 and 2,048.
 ![chart6](charts/Chart_6_Time_v_FieldLength.jpg)
     
-The files used to generate the plots above each had every field identical. So for a more realistic measure of comparitive speed we studied the parse times for the 20 largest files provided in [Rdatasets](https://vincentarelbundock.github.io/Rdatasets/). The test code is in modCSVDataSets of the workbook VBA-CSV.xlsm. Here are the results:
+The files used to generate the plots above each had every field identical. So for a more realistic measure of comparitive speed we studied the parse times for the 20 largest files provided in [Rdatasets](https://vincentarelbundock.github.io/Rdatasets/). The test code is in modCSVDataSets of the workbook VBA-CSV.xlsm. Here are the results, which show `CSVRead` to have very similar speed to sdkn104, and to be about twice as fast as ws_garcia.
 
 |File Name|Size (Mb)|CSVRead<br/>parse time<br/>(seconds)|sdkn104<br/>parse time<br/>(seconds)|ws_garcia<br/>parse time<br/>(seconds)|
 |---------|---------|-------------------|------------------|--------------------|
@@ -164,6 +164,8 @@ In summary, the performance tests show:
 - `CSVRead` is generally (but not always) faster than ws_garcia.
 - For realistic structures of input files, such as those provided by Rdatasets, `CSVRead` is about twice as fast as `ws_garcia`. 
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
+
+<a name="myfootnote2">1</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
 
 # About
 Author: Philip Swannell  
