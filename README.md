@@ -108,7 +108,7 @@ So, to get robust error handling from VBA, you should wrap calls to `CSVRead` an
 ```vba
 FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
-[source](https://github.com/PGS62/VBA-CSV/blob/1ba77bc675c8c9a4850cd8eed5d33cf68ff20514/src/modCSVReadWrite.bas#L2918)
+[source](https://github.com/PGS62/VBA-CSV/blob/1ba77bc675c8c9a4850cd8eed5d33cf68ff20514/src/modCSVReadWrite.bas#L2918-L2934)
 
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
 
