@@ -38,7 +38,7 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
 `=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
-![example1](screenshots/example1.JPG)
+![example2](screenshots/example2.JPG)
 
 To load the data into an array in VBA:
 ```vba
@@ -124,7 +124,7 @@ FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
 [source](https://github.com/PGS62/VBA-CSV/blob/1ba77bc675c8c9a4850cd8eed5d33cf68ff20514/src/modCSVReadWrite.bas#L2918-L2934)
 
-An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
+An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from spreadsheet formulas will return `#VALUE!` if any error happens, with no description provided.
 
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [latest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
