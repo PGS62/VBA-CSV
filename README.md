@@ -176,7 +176,7 @@ The files used to generate the plots above each had every field identical. So fo
 
 In summary, the performance tests show:
 - `CSVRead` and `sdkn104` have very similar parse times.
-- `CSVRead` is generally (but not always) faster than ws_garcia.
+- `CSVRead` is generally (but not always) faster than `ws_garcia`.
 - For realistic structures of input files, such as those provided by Rdatasets, `CSVRead` is about twice as fast as `ws_garcia`. 
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
 
