@@ -38,7 +38,7 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
 `=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
-![example1](screenshots/example1.JPG)
+![example2](screenshots/example2.JPG)
 
 To load the data into an array in VBA:
 ```vba
@@ -124,7 +124,7 @@ FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
 [source](https://github.com/PGS62/VBA-CSV/blob/1ba77bc675c8c9a4850cd8eed5d33cf68ff20514/src/modCSVReadWrite.bas#L2918-L2934)
 
-An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from Excel will return `#VALUE!` if any error happens, with no description provided.
+An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from spreadsheet formulas will return `#VALUE!` if any error happens, with no description provided.
 
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/dev/modCSVTest.bas), or run it yourself if you download the [latest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
@@ -148,7 +148,7 @@ A second plot shows the influence of the number of columns on parsing time. The 
 A third plot shows the influence of field length on parsing time. The files examined all had 1,024 rows and eight columns. In each file, all fields were identical and were the character "x" repeated some number `L` times. `L` varied fom 1 in the first file to 16,384 in the last. This test shows ws_garcia performing best of the three VBA parsers for `L` between 64 and 2,048.
 ![chart6](charts/Chart_6_Time_v_FieldLength.jpg)
     
-The files used to generate the plots above each had every field identical. So for a more realistic measure of comparitive speed we studied the parse times for the 20 largest files provided in [Rdatasets](https://vincentarelbundock.github.io/Rdatasets/). The test code is in modCSVDataSets of the workbook VBA-CSV.xlsm. Here are the results, which show `CSVRead` to have very similar speed to sdkn104, and to be about twice as fast as ws_garcia.
+The files used to generate the plots above each had every field identical. So for a more realistic measure of comparitive speed we studied the parse times for the 20 largest files provided in [Rdatasets](https://vincentarelbundock.github.io/Rdatasets/). The test code is in [modCSVTestRDatasets.bas](dev/modCSVTestRDatasets.bas) of the workbook VBA-CSV.xlsm. Here are the results, which show `CSVRead` to have very similar speed to sdkn104, and to be about twice as fast as ws_garcia.
 
 |File Name|Size (Mb)|CSVRead<br/>parse time<br/>(seconds)|sdkn104<br/>parse time<br/>(seconds)|ws_garcia<br/>parse time<br/>(seconds)|
 |---------|---------|-------------------|------------------|--------------------|
@@ -176,7 +176,7 @@ The files used to generate the plots above each had every field identical. So fo
 
 In summary, the performance tests show:
 - `CSVRead` and `sdkn104` have very similar parse times.
-- `CSVRead` is generally (but not always) faster than ws_garcia.
+- `CSVRead` is generally (but not always) faster than `ws_garcia`.
 - For realistic structures of input files, such as those provided by Rdatasets, `CSVRead` is about twice as fast as `ws_garcia`. 
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
 
