@@ -151,8 +151,8 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     
     WhatDiffers = ""
 
-    NR = sNRows(Data)
-    NC = sNCols(Data)
+    NR = NRows(Data)
+    NC = NCols(Data)
 
     FileName = NameThatFile(Folder, OS, NR, NC, ExtraInfo, CBool(Unicode), False)
 
@@ -161,7 +161,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     'The Call to CSVRead has to infer both Encoding and EOL
     DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
     
-    If sArraysIdentical(Data, DataReadBack, True, False, WhatDiffers) Then
+    If ArraysIdentical(Data, DataReadBack, True, False, WhatDiffers) Then
         NumPassed = NumPassed + 1
     Else
         Debug.Print String(100, "=")

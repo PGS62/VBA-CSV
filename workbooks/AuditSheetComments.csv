@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+70,05-Sep-2021,08:27:44,"Philip Swannell","Renamed functions sNRows -> NRows etc."
 69,03-Sep-2021,09:18:48,"Philip Swannell","HeaderRow now trimmed."
 68,02-Sep-2021,18:29:22,"Philip Swannell","Removed two old Performance sheets."
 67,02-Sep-2021,17:37:40,"Philip Swannell","Updated docstrings."

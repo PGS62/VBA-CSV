@@ -12,7 +12,7 @@ Option Explicit
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : GenerateTestCode
 ' Purpose    : Metaprogramming - generate the VBA code for a given test, used on worksheet Test to genenerate a single
-'              case statement for method RunTests.
+'              method to be called from RunTests.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, ConvertTypes As Variant, Delimiter As Variant, IgnoreRepeated As Boolean, DateFormat As String, _
     Comment As String, IgnoreEmptyLines As Boolean, HeaderRowNum As Long, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, TrueStrings As String, _
@@ -21,17 +21,18 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     Dim Res As String
     Dim LitteralExpected
     
-    Const IndentBy = 4
+    Const Indent = "    "
+    Const Indent2 = "        "
     
     On Error GoTo ErrHandler
     
     Res = "Sub Test" & TestNo & "(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
-    Res = Res & vbLf & "    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Variant, WhatDiffers As String"
+    Res = Res & vbLf & "    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String"
     Res = Res & vbLf
-    Res = Res & vbLf & "On Error GoTo ErrHandler"
+    Res = Res & vbLf & Indent & "On Error GoTo ErrHandler"
     
     Res = Res & vbLf & _
-        "TestDescription = """ & Replace(Replace(FileName, "_", " "), ".csv", "") & """"
+        Indent + "TestDescription = """ & Replace(Replace(FileName, "_", " "), ".csv", "") & """"
     
     If Not IsArray(ExpectedReturn) Then
         LitteralExpected = ElementToVBALitteral(ExpectedReturn)
@@ -41,97 +42,91 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
         End If
     End If
     
-    Res = Res + vbLf + "Expected = " & LitteralExpected
+    Res = Res + vbLf + Indent + "Expected = " & LitteralExpected
 
-    Res = Res + vbLf + "FileName = """ & FileName & """"
+    Res = Res + vbLf + Indent + "FileName = """ & FileName & """"
 
     If Left(FileName, 4) = "http" Then
-        Res = Res + vbLf + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, FileName, Observed, WhatDiffers"
+        Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, FileName, Observed, WhatDiffers"
     Else
-        Res = Res + vbLf + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
+        Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
     End If
 
     If IsArray(ConvertTypes) Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "ConvertTypes := " & ArrayToVBALitteral(ConvertTypes)
-
+        Res = Res + ", _" + vbLf + Indent2 + "ConvertTypes := " & ArrayToVBALitteral(ConvertTypes)
     ElseIf ConvertTypes <> False And ConvertTypes <> "" Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "ConvertTypes := " & ElementToVBALitteral(ConvertTypes)
+        Res = Res + ", _" + vbLf + Indent2 + "ConvertTypes := " & ElementToVBALitteral(ConvertTypes)
     End If
 
     If Delimiter <> "" Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "Delimiter := " & ElementToVBALitteral(Delimiter)
+        Res = Res + ", _" + vbLf + Indent2 + "Delimiter := " & ElementToVBALitteral(Delimiter)
     End If
     If IgnoreRepeated = True Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "IgnoreRepeated := True"
+        Res = Res + ", _" + vbLf + Indent2 + "IgnoreRepeated := True"
     End If
     If DateFormat <> "" Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "DateFormat := " & ElementToVBALitteral(DateFormat)
+        Res = Res + ", _" + vbLf + Indent2 + "DateFormat := " & ElementToVBALitteral(DateFormat)
     End If
     If Comment <> "" Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "Comment := " & ElementToVBALitteral(Comment)
+        Res = Res + ", _" + vbLf + Indent2 + "Comment := " & ElementToVBALitteral(Comment)
     End If
     If IgnoreEmptyLines <> True Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "IgnoreEmptyLines := " & ElementToVBALitteral(IgnoreEmptyLines)
+        Res = Res + ", _" + vbLf + Indent2 + "IgnoreEmptyLines := " & ElementToVBALitteral(IgnoreEmptyLines)
     End If
     
     If SkipToRow <> 1 And SkipToRow <> 0 Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "SkipToRow := " & CStr(SkipToRow)
+        Res = Res + ", _" + vbLf + Indent2 + "SkipToRow := " & CStr(SkipToRow)
     End If
     If SkipToCol <> 1 And SkipToCol <> 0 Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "SkipToCol := " & CStr(SkipToCol)
+        Res = Res + ", _" + vbLf + Indent2 + "SkipToCol := " & CStr(SkipToCol)
     End If
     If NumRows <> 0 Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "NumRows := " & CStr(NumRows)
+        Res = Res + ", _" + vbLf + Indent2 + "NumRows := " & CStr(NumRows)
     End If
     If NumCols <> 0 Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "NumCols := " & CStr(NumCols)
+        Res = Res + ", _" + vbLf + Indent2 + "NumCols := " & CStr(NumCols)
     End If
     If TrueStrings <> "" Then
         If InStr(TrueStrings, ",") = 0 Then
-            Res = Res + ", _" + vbLf + String(IndentBy, " ") + "TrueStrings := " & ElementToVBALitteral(TrueStrings)
+            Res = Res + ", _" + vbLf + Indent2 + "TrueStrings := " & ElementToVBALitteral(TrueStrings)
         Else
-            Res = Res + ", _" + vbLf + String(IndentBy, " ") + "TrueStrings := " & ArrayToVBALitteral(VBA.Split(TrueStrings, ","))
+            Res = Res + ", _" + vbLf + Indent2 + "TrueStrings := " & ArrayToVBALitteral(VBA.Split(TrueStrings, ","))
         End If
     End If
     If FalseStrings <> "" Then
         If InStr(FalseStrings, ",") = 0 Then
-            Res = Res + ", _" + vbLf + String(IndentBy, " ") + "FalseStrings := " & ElementToVBALitteral(FalseStrings)
+            Res = Res + ", _" + vbLf + Indent2 + "FalseStrings := " & ElementToVBALitteral(FalseStrings)
         Else
-            Res = Res + ", _" + vbLf + String(IndentBy, " ") + "FalseStrings := " & ArrayToVBALitteral(VBA.Split(FalseStrings, ","))
+            Res = Res + ", _" + vbLf + Indent2 + "FalseStrings := " & ArrayToVBALitteral(VBA.Split(FalseStrings, ","))
         End If
     End If
     If MissingStrings <> "" Then
         If InStr(MissingStrings, ",") = 0 Then
-            Res = Res + ", _" + vbLf + String(IndentBy, " ") + "MissingStrings := " & ElementToVBALitteral(MissingStrings)
+            Res = Res + ", _" + vbLf + Indent2 + "MissingStrings := " & ElementToVBALitteral(MissingStrings)
         Else
-            Res = Res + ", _" + vbLf + String(IndentBy, " ") + "MissingStrings := " & ArrayToVBALitteral(VBA.Split(MissingStrings, ","))
+            Res = Res + ", _" + vbLf + Indent2 + "MissingStrings := " & ArrayToVBALitteral(VBA.Split(MissingStrings, ","))
         End If
     End If
     
-    Res = Res + ", _" + vbLf + String(IndentBy, " ") + "ShowMissingsAs := Empty"
+    Res = Res + ", _" + vbLf + Indent2 + "ShowMissingsAs := Empty"
     If Encoding <> "" And Not IsEmpty(Encoding) Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "Encoding := " & ElementToVBALitteral(Encoding)
+        Res = Res + ", _" + vbLf + Indent2 + "Encoding := " & ElementToVBALitteral(Encoding)
     End If
     If DecimalSeparator <> "." And DecimalSeparator <> "" Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "DecimalSeparator := " & ElementToVBALitteral(DecimalSeparator)
+        Res = Res + ", _" + vbLf + Indent2 + "DecimalSeparator := " & ElementToVBALitteral(DecimalSeparator)
     End If
     If HeaderRowNum <> 0 Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "HeaderRowNum := " & ElementToVBALitteral(HeaderRowNum)
+        Res = Res + ", _" + vbLf + Indent2 + "HeaderRowNum := " & ElementToVBALitteral(HeaderRowNum)
     End If
     
-    If Not sArraysIdentical(ExpectedHeaderRow, "#Not requested!") Then
-        Res = Res + ", _" + vbLf + String(IndentBy, " ") + "ExpectedHeaderRow := " & ArrayToVBALitteral(ExpectedHeaderRow)
+    If Not ArraysIdentical(ExpectedHeaderRow, "#Not requested!") Then
+        Res = Res + ", _" + vbLf + Indent2 + "ExpectedHeaderRow := " & ArrayToVBALitteral(ExpectedHeaderRow)
     End If
 
     Res = Res + ")"
     
-    Res = Res & vbLf & "    If TestRes Then"
-    Res = Res & vbLf & "        NumPassed = NumPassed + 1"
-    Res = Res & vbLf & "    Else"
-    Res = Res & vbLf & "        NumFailed = NumFailed + 1"
-    Res = Res & vbLf & "        ReDim Preserve Failures(LBound(Failures) To UBound(Failures) + 1)"
-    Res = Res & vbLf & "        Failures(UBound(Failures)) = WhatDiffers"
-    Res = Res & vbLf & "    End If"
+    Res = Res & vbLf & Indent + "AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures"
+    
     Res = Res & vbLf & ""
     Res = Res & vbLf & "    Exit Sub"
     Res = Res & vbLf & "ErrHandler:"

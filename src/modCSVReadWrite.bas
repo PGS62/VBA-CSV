@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.2
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.3
 
 Option Explicit
 
@@ -398,8 +398,8 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     If Ragged Then
         If Not IsEmpty(HeaderRow) Then
-            If sNCols(HeaderRow) < sNCols(ReturnArray) + SkipToCol - 1 Then
-                ReDim Preserve HeaderRow(1 To 1, 1 To sNCols(ReturnArray) + SkipToCol - 1)
+            If NCols(HeaderRow) < NCols(ReturnArray) + SkipToCol - 1 Then
+                ReDim Preserve HeaderRow(1 To 1, 1 To NCols(ReturnArray) + SkipToCol - 1)
             End If
         End If
     End If
@@ -417,7 +417,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     'In this case no type conversion should be applied to the top row of the return
     If HeaderRowNum = SkipToRow Then
         If AnyConversion Then
-            For i = 1 To MinLngs(sNCols(HeaderRow), NumColsInReturn)
+            For i = 1 To MinLngs(NCols(HeaderRow), NumColsInReturn)
                 ReturnArray(1, i) = HeaderRow(1, i)
             Next
         End If
@@ -425,12 +425,12 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     If ColByColFormatting Then
         Dim NR As Long, NC As Long, CT As Variant, UnQuotedHeader As String, NCH As Long, Field As String, QC As Long
-        NR = sNRows(ReturnArray)
-        NC = sNCols(ReturnArray)
+        NR = NRows(ReturnArray)
+        NC = NCols(ReturnArray)
         If IsEmpty(HeaderRow) Then
             NCH = 0
         Else
-            NCH = sNCols(HeaderRow) 'possible that headers has fewer than expected columns if file is ragged
+            NCH = NCols(HeaderRow) 'possible that headers has fewer than expected columns if file is ragged
         End If
 
         For j = 1 To NC
@@ -1014,8 +1014,8 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
         End If
     End If
 
-    NR = sNRows(ConvertTypes)
-    NC = sNCols(ConvertTypes)
+    NR = NRows(ConvertTypes)
+    NC = NCols(ConvertTypes)
     If NR = 2 And NC = 2 Then
         'Tricky - have we been given two rows or two columns?
         If Not IsCTValid(ConvertTypes(2, 2)) Then Throw Err_ConvertTypes
@@ -1157,43 +1157,43 @@ ErrHandler:
     Throw "#ParseCTString: " & Err.Description & "!"
 End Sub
 '---------------------------------------------------------------------------------------
-' Procedure : sNCols
+' Procedure : NCols
 ' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
 '             have one row and the number of columns returned by this function.
 '---------------------------------------------------------------------------------------
-Private Function sNCols(Optional TheArray) As Long
+Private Function NCols(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
-        sNCols = TheArray.Columns.Count
+        NCols = TheArray.Columns.Count
     ElseIf IsMissing(TheArray) Then
-        sNCols = 0
+        NCols = 0
     ElseIf VarType(TheArray) < vbArray Then
-        sNCols = 1
+        NCols = 1
     Else
         Select Case NumDimensions(TheArray)
             Case 1
-                sNCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+                NCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
             Case Else
-                sNCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
+                NCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
         End Select
     End If
 End Function
 '---------------------------------------------------------------------------------------
-' Procedure : sNRows
+' Procedure : NRows
 ' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
 '---------------------------------------------------------------------------------------
-Private Function sNRows(Optional TheArray) As Long
+Private Function NRows(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
-        sNRows = TheArray.Rows.Count
+        NRows = TheArray.Rows.Count
     ElseIf IsMissing(TheArray) Then
-        sNRows = 0
+        NRows = 0
     ElseIf VarType(TheArray) < vbArray Then
-        sNRows = 1
+        NRows = 1
     Else
         Select Case NumDimensions(TheArray)
             Case 1
-                sNRows = 1
+                NRows = 1
             Case Else
-                sNRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+                NRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
         End Select
     End If
 End Function
@@ -2480,7 +2480,6 @@ Private Sub TestCastToDate()
     Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     Dim Converted As Boolean
-    Dim i As Long
     
     strIn = "2021-08-30 4:1:2.123": DateOrder = 2
     
@@ -3132,24 +3131,24 @@ ErrHandler:
 End Sub
 
 '---------------------------------------------------------------------------------------------------------
-' Procedure : sElapsedTime
+' Procedure : ElapsedTime
 ' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
 '             time stamp that can be used for time-interval measurements.
 '
 '             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
 '---------------------------------------------------------------------------------------------------------
-Private Function sElapsedTime() As Double
+Private Function ElapsedTime() As Double
     Dim a As Currency
     Dim b As Currency
     On Error GoTo ErrHandler
 
     QueryPerformanceCounter a
     QueryPerformanceFrequency b
-    sElapsedTime = a / b
+    ElapsedTime = a / b
 
     Exit Function
 ErrHandler:
-    Throw "#sElapsedTime: " & Err.Description & "!"
+    Throw "#ElapsedTime: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3202,7 +3201,7 @@ Private Sub TestSentinelSpeed()
                 Comment = "A sentinel, one of the elements of TrueStrings"
         End Select
 
-        t1 = sElapsedTime()
+        t1 = ElapsedTime()
         For i = 1 To N
             If Len(Field) <= MaxLength Then
                 If Sentinels.Exists(Field) Then
@@ -3211,7 +3210,7 @@ Private Sub TestSentinelSpeed()
                 End If
             End If
         Next i
-        t2 = sElapsedTime()
+        t2 = ElapsedTime()
 
         Debug.Print "Conversions per second = " & Format(N / (t2 - t1), "###,###"), _
             "Field = """ & Field & """" & IIf(Comment = "", "", " (" & Comment & ")")
@@ -3298,11 +3297,11 @@ Private Sub SpeedTestISO8601()
                     strIn = "2021-08-24T15:18:01.123+05:00"
             End Select
 
-            t1 = sElapsedTime()
+            t1 = ElapsedTime()
             For i = 1 To N
                 Call CastISO8601(strIn, dtOut, Converted, True, True)
             Next i
-            t2 = sElapsedTime
+            t2 = ElapsedTime
             Debug.Print "Calls per second = " & Format(N / (t2 - t1), "###,###"), "strIn = """ & strIn & """", "Check = " & Application.WorksheetFunction.text(dtOut, "yyyy-mm-ddThh:mm:ss.000")
             DoEvents 'kick Immediate window to life
         Next j
@@ -3357,7 +3356,6 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastToTimeB(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
     Static rx As VBScript_RegExp_55.RegExp
-    Dim L As Long
     Dim DecPointAt As Long
     Dim SpaceAt
     Dim FractionalSecond As Double

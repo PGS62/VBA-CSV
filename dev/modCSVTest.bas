@@ -7,10 +7,10 @@ Attribute VB_Name = "modCSVTest"
 
 Option Explicit
 
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RunTests
-' Purpose    : Multiple calls to TestCSVRead against many different data files, of which many are from
+' Purpose    : Multiple calls to TestCSVRead, via functions Test1, Test2 etc. Tests against many different data files,
+'              and combinations of arguments. Many of the files taken from
 '              https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef NumSkipped As Long, ByRef Failures() As String)
@@ -319,15 +319,16 @@ Sub AccumulateResults(TestRes As Boolean, ByRef NumPassed, ByRef NumFailed As Lo
     End If
 End Sub
 
-
 Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
-    TestDescription = "test_one_row_of_data.csv"
-    FileName = "test_one_row_of_data.csv"
+    TestDescription = "test one row of data.cscv"
     Expected = HStack(1#, 2#, 3#)
-    TestRes = TestCSVRead(1, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N")
+    FileName = "test_one_row_of_data.cscv"
+    TestRes = TestCSVRead(1, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
@@ -1770,7 +1771,7 @@ Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
     If TestRes Then
         'Same test as here:
         'https://github.com/JuliaData/CSV.jl/blob/953636a363525e3027d690b8a30448d115249bf9/test/testfiles.jl#L317
-        TestRes = IsEmpty(Observed(sNRows(Observed) - 2, 17))
+        TestRes = IsEmpty(Observed(NRows(Observed) - 2, 17))
         If Not TestRes Then WhatDiffers = "Case 76 latest (1) FAILED, Test was that element in 17th col, last but 2 row should be empty"
     End If
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
@@ -2299,7 +2300,7 @@ Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
     TestDescription = "test good ISO8601 with DateFormat = ISO"
     FileName = "test_good_ISO8601.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=3)
-    For k = 1 To sNRows(Expected)
+    For k = 1 To NRows(Expected)
         If VarType(Expected(k, 1)) = vbDouble Then
             Expected(k, 1) = CDate(Expected(k, 1))
         End If
@@ -2328,7 +2329,7 @@ Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good ISO8601 with DateFormat = ISOZ"
     FileName = "test_good_ISO8601.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=4)
-    For k = 1 To sNRows(Expected)
+    For k = 1 To NRows(Expected)
         If VarType(Expected(k, 1)) = vbDouble Then
             Expected(k, 1) = CDate(Expected(k, 1))
         End If
@@ -2379,7 +2380,7 @@ Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good Y-M-D"
     FileName = "test_good_Y-M-D.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
-    For k = 1 To sNRows(Expected)
+    For k = 1 To NRows(Expected)
         Expected(k, 1) = CDate(Expected(k, 1))
     Next k
     TestRes = TestCSVRead(102, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
@@ -2428,7 +2429,7 @@ Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good D-M-Y"
     FileName = "test_good_D-M-Y.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
-    For k = 1 To sNRows(Expected)
+    For k = 1 To NRows(Expected)
         Expected(k, 1) = CDate(Expected(k, 1))
     Next k
     TestRes = TestCSVRead(104, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
@@ -2477,7 +2478,7 @@ Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good M-D-Y"
     FileName = "test_good_M-D-Y.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
-    For k = 1 To sNRows(Expected)
+    For k = 1 To NRows(Expected)
         Expected(k, 1) = CDate(Expected(k, 1))
     Next k
     TestRes = TestCSVRead(106, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
@@ -3965,7 +3966,7 @@ Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test various time formats"
     FileName = "test_various_time_formats.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
-    For k = 1 To sNRows(Expected)
+    For k = 1 To NRows(Expected)
         If VarType(Expected(k, 1)) = vbDouble Then
             Expected(k, 1) = CDate(Expected(k, 1))
         End If
@@ -3993,7 +3994,7 @@ Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test y-m-d dates with fractional seconds"
     FileName = "test_y-m-d_dates_with_fractional_seconds.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
-    For k = 1 To sNRows(Expected)
+    For k = 1 To NRows(Expected)
         If VarType(Expected(k, 1)) = vbDouble Then
             Expected(k, 1) = CDate(Expected(k, 1))
         End If
@@ -4070,8 +4071,3 @@ Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
 ErrHandler:
     Throw "#Test179 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
-
-
-
-
-

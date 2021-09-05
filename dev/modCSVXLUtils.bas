@@ -20,9 +20,9 @@ End Function
 
 '---------------------------------------------------------------------------------------------------------
 ' Procedure : ArrayEquals
-' Purpose   : Element-wise testing for equality of two arrays - the array version of sEquals. Like the =
+' Purpose   : Element-wise testing for equality of two arrays - the array version of Equals. Like the =
 '             operator in Excel array formulas, but capable of comparing error values, so
-'             always returns an array of logicals. See also sArraysIdentical.
+'             always returns an array of logicals. See also ArraysIdentical.
 ' Arguments
 ' Array1    : The first array to compare, with arbitrary values - numbers, text, errors, logicals etc.
 ' Array2    : The second array to compare, with arbitrary values - numbers, text, errors, logicals etc.
@@ -44,7 +44,7 @@ Function ArrayEquals(Array1 As Variant, Array2 As Variant, Optional CaseSensitiv
     Dim j As Long
 
     If VarType(Array1) < vbArray And VarType(Array2) < vbArray And VarType(CaseSensitive) = vbBoolean Then
-        ArrayEquals = sEquals(Array1, Array2, CBool(CaseSensitive))
+        ArrayEquals = Equals(Array1, Array2, CBool(CaseSensitive))
     Else
 
         Force2DArrayR Array1, NR1, NC1
@@ -64,10 +64,10 @@ Function ArrayEquals(Array1 As Variant, Array2 As Variant, Optional CaseSensitiv
             NCMax = NC1
             NCMin = NC2
         End If
-        Ret = sFill(CVErr(xlErrNA), NRMax, NCMax)
+        Ret = Fill(CVErr(xlErrNA), NRMax, NCMax)
         For i = 1 To NRMin
             For j = 1 To NCMin
-                Ret(i, j) = sEquals(Array1(i, j), Array2(i, j))
+                Ret(i, j) = Equals(Array1(i, j), Array2(i, j))
             Next j
         Next i
   
@@ -233,10 +233,10 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : sFill
+' Procedure  : Fill
 ' Purpose    : Creates an array filled with the value x
 ' -----------------------------------------------------------------------------------------------------------------------
-Function sFill(ByVal x As Variant, ByVal NumRows As Long, ByVal NumCols As Long)
+Function Fill(ByVal x As Variant, ByVal NumRows As Long, ByVal NumCols As Long)
 
     On Error GoTo ErrHandler
 
@@ -252,11 +252,11 @@ Function sFill(ByVal x As Variant, ByVal NumRows As Long, ByVal NumCols As Long)
         Next j
     Next i
 
-    sFill = Result
+    Fill = Result
 
     Exit Function
 ErrHandler:
-    sFill = "#sFill: " & Err.Description & "!"
+    Fill = "#Fill: " & Err.Description & "!"
 End Function
 
 '---------------------------------------------------------------------------------------------------------
@@ -322,7 +322,7 @@ Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
     Force2DArrayR Arg3
     Force2DArrayR Arg4
 
-    ReDim Res(1 To sNRows(Arg1) * sNCols(Arg1) * sNRows(Arg2) * sNCols(Arg2) * sNRows(Arg3) * sNCols(Arg4) * sNRows(Arg4) * sNCols(Arg4), 1 To 1)
+    ReDim Res(1 To NRows(Arg1) * NCols(Arg1) * NRows(Arg2) * NCols(Arg2) * NRows(Arg3) * NCols(Arg4) * NRows(Arg4) * NCols(Arg4), 1 To 1)
     For Each Part1 In Arg1
         Part1 = CStr(Part1)
         For Each Part2 In Arg2
@@ -366,7 +366,7 @@ Function MakeGoodStringsBad(GoodStrings, Optional InsertThis As String = "x")
     Dim k As Long
 
     ReDim Res1D(1 To 1)
-    For i = 1 To sNRows(GoodStrings)
+    For i = 1 To NRows(GoodStrings)
         For j = 0 To Len(GoodStrings(i, 1)) + 1
             k = k + 1
             If k > UBound(Res1D) Then

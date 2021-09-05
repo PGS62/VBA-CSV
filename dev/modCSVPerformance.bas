@@ -198,7 +198,7 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
 
     ThrowIfError CreatePath(Folder)
 
-    Data = sFill(EachFieldContains, NumRows, NumCols)
+    Data = Fill(EachFieldContains, NumRows, NumCols)
     FileName = NameThatFile(Folder, OS, NumRows, NumCols, Replace(ExtraInfo, " ", "-"), Unicode, False)
     If WriteFiles Then
         ThrowIfError CSVWrite(Data, FileName, False)
@@ -207,7 +207,7 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
     If ReadFiles Then
         For j = 1 To 4
             k = 0
-            Tstart = sElapsedTime()
+            Tstart = ElapsedTime()
             Do
                 k = k + 1
                 Select Case j
@@ -225,10 +225,10 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
                         FnName4 = "CSV.jl" + vbLf + "v0.8.5+"
                         DataReread4 = Empty
                 End Select
-                If sElapsedTime() - Tstart > Timeout Then Exit Do
+                If ElapsedTime() - Tstart > Timeout Then Exit Do
             Loop
 
-            Tend = sElapsedTime()
+            Tend = ElapsedTime()
         
             Select Case j
                 Case 1

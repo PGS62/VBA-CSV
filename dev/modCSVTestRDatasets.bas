@@ -39,7 +39,7 @@ Sub TestAgainstRDatasets()
         "csv\ggplot2movies\movies.csv", "csv\ggplot2\diamonds.csv", _
         "csv\causaldata\gov_transfers_density.csv", "csv\openintro\seattlepets.csv")
 
-    Result = sFill("", UBound(Files) - LBound(Files) + 2, 5)
+    Result = Fill("", UBound(Files) - LBound(Files) + 2, 5)
     Result(1, 1) = "File Name"
     Result(1, 2) = "Size"
     Result(1, 3) = "CSVRead time"
@@ -54,13 +54,13 @@ Sub TestAgainstRDatasets()
     For i = LBound(Files) To UBound(Files)
         FileName = DatasetsFolder & Files(i)
         If Not FileExists(FileName) Then Throw "Cannot find file '" + FileName + "'"
-        t1 = sElapsedTime()
+        t1 = ElapsedTime()
         CSVResult = CSVRead(FileName)
-        t2 = sElapsedTime()
+        t2 = ElapsedTime()
         sdkn104Result = Wrap_sdkn104(FileName, False)
-        t3 = sElapsedTime()
+        t3 = ElapsedTime()
         ws_garciaResult = Wrap_ws_garcia(FileName, ",", vbCrLf)
-        t4 = sElapsedTime()
+        t4 = ElapsedTime()
         
         ThrowIfError CSVResult
         ThrowIfError ws_garciaResult
@@ -81,9 +81,3 @@ Sub TestAgainstRDatasets()
 ErrHandler:
     MsgBox "#TestAgainstRDatasets (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
-
-
-
-
-
-

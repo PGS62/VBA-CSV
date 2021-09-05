@@ -44,7 +44,7 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
         SkipToCol, NumRows, NumCols, TrueStrings, FalseStrings, MissingStrings, ShowMissingsAs, Encoding, DecimalSeparator, HeaderRow)
         
     If Not IsMissing(ExpectedHeaderRow) Then
-        If Not sArraysIdentical(ExpectedHeaderRow, HeaderRow, True, False, WhatDiffers) Then
+        If Not ArraysIdentical(ExpectedHeaderRow, HeaderRow, True, False, WhatDiffers) Then
             WhatDiffers = TestDescription + " FAILED. HeaderRow failed to match ExpectedHeaderRow: " & WhatDiffers
             GoTo Failed
         End If
@@ -52,9 +52,9 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
 
     If NumRowsExpected <> 0 Or NumColsExpected <> 0 Then
         'In this case we only check the size of the return
-        If sNRows(Observed) <> NumRowsExpected Or sNCols(Observed) <> NumColsExpected Then
+        If NRows(Observed) <> NumRowsExpected Or NCols(Observed) <> NumColsExpected Then
             WhatDiffers = TestDescription + " FAILED, expected dimensions: " + CStr(NumRowsExpected) + _
-                ", " + CStr(NumColsExpected) + " observed dimensions: " + CStr(sNRows(Observed)) + ", " + CStr(sNCols(Observed))
+                ", " + CStr(NumColsExpected) + " observed dimensions: " + CStr(NRows(Observed)) + ", " + CStr(NCols(Observed))
             GoTo Failed
         Else
             TestCSVRead = True
@@ -88,7 +88,7 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
     End If
 
     If NumDimensions(Observed) = 2 And NumDimensions(Expected) = 2 Then
-        If sArraysIdentical(Observed, Expected, True, False, WhatDiffers, AbsTol, RelTol) Then
+        If ArraysIdentical(Observed, Expected, True, False, WhatDiffers, AbsTol, RelTol) Then
             TestCSVRead = True
             Exit Function
         Else
@@ -115,43 +115,43 @@ Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, Num
 End Function
 
 '---------------------------------------------------------------------------------------
-' Procedure : sNCols
+' Procedure : NCols
 ' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
 '             have one row and the number of columns returned by this function.
 '---------------------------------------------------------------------------------------
-Function sNCols(Optional TheArray) As Long
+Function NCols(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
-        sNCols = TheArray.Columns.Count
+        NCols = TheArray.Columns.Count
     ElseIf IsMissing(TheArray) Then
-        sNCols = 0
+        NCols = 0
     ElseIf VarType(TheArray) < vbArray Then
-        sNCols = 1
+        NCols = 1
     Else
         Select Case NumDimensions(TheArray)
             Case 1
-                sNCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+                NCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
             Case Else
-                sNCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
+                NCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
         End Select
     End If
 End Function
 '---------------------------------------------------------------------------------------
-' Procedure : sNRows
+' Procedure : NRows
 ' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
 '---------------------------------------------------------------------------------------
-Function sNRows(Optional TheArray) As Long
+Function NRows(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
-        sNRows = TheArray.Rows.Count
+        NRows = TheArray.Rows.Count
     ElseIf IsMissing(TheArray) Then
-        sNRows = 0
+        NRows = 0
     ElseIf VarType(TheArray) < vbArray Then
-        sNRows = 1
+        NRows = 1
     Else
         Select Case NumDimensions(TheArray)
             Case 1
-                sNRows = 1
+                NRows = 1
             Case Else
-                sNRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+                NRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
         End Select
     End If
 End Function
@@ -243,24 +243,24 @@ ErrHandler:
 End Function
 
 '---------------------------------------------------------------------------------------------------------
-' Procedure : sElapsedTime
+' Procedure : ElapsedTime
 ' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
 '             time stamp that can be used for time-interval measurements.
 '
 '             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
 '---------------------------------------------------------------------------------------------------------
-Function sElapsedTime() As Double
+Function ElapsedTime() As Double
     Dim a As Currency
     Dim b As Currency
     On Error GoTo ErrHandler
 
     QueryPerformanceCounter a
     QueryPerformanceFrequency b
-    sElapsedTime = a / b
+    ElapsedTime = a / b
 
     Exit Function
 ErrHandler:
-    Throw "#sElapsedTime: " & Err.Description & "!"
+    Throw "#ElapsedTime: " & Err.Description & "!"
 End Function
 
 'Copy of identical function in modCVSReadWrite
@@ -415,13 +415,13 @@ ErrHandler:
 End Function
 
 '---------------------------------------------------------------------------------------------------------
-' Procedure : sEquals
+' Procedure : Equals
 ' Purpose   : Returns TRUE if a is equal to b, FALSE otherwise. a and b may be numbers, strings,
 '             Booleans or Excel error values, but not arrays. For testing equality of
-'             arrays see ArrayEquals and sArraysIdentical.
+'             arrays see ArrayEquals and ArraysIdentical.
 '             Examples
-'             sEquals(1,1) = TRUE
-'             sEquals(#DIV0!,1) = FALSE
+'             Equals(1,1) = TRUE
+'             Equals(#DIV0!,1) = FALSE
 ' Arguments
 ' a         : The first value to compare. Must be a single cell (not an array) but can contain numbers,
 '             text, logical value or error values.
@@ -432,7 +432,7 @@ End Function
 '
 'Note:        Avoids VBA booby trap that False = 0 and True = -1
 '---------------------------------------------------------------------------------------
-Function sEquals(a, b, Optional CaseSensitive As Boolean = False) As Variant
+Function Equals(a, b, Optional CaseSensitive As Boolean = False) As Variant
     On Error GoTo ErrHandler
     Dim VTA As Long
     Dim VTB As Long
@@ -440,39 +440,39 @@ Function sEquals(a, b, Optional CaseSensitive As Boolean = False) As Variant
     VTA = VarType(a)
     VTB = VarType(b)
     If VTA >= vbArray Or VTB >= vbArray Then
-        sEquals = "#sEquals: Function does not handle arrays. Use sArrayEquals or sArraysIdentical instead!"
+        Equals = "#Equals: Function does not handle arrays. Use sArrayEquals or ArraysIdentical instead!"
         Exit Function
     End If
 
     If VTA = VTB Then
         If VTA = vbString And Not CaseSensitive Then
             If Len(a) = Len(b) Then
-                sEquals = UCase$(a) = UCase$(b)
+                Equals = UCase$(a) = UCase$(b)
             Else
-                sEquals = False
+                Equals = False
             End If
         Else
-            sEquals = (a = b)
+            Equals = (a = b)
         End If
     Else
         If VTA = vbBoolean Or VTB = vbBoolean Or VTA = vbString Or VTB = vbString Then
-            sEquals = False
+            Equals = False
         Else
-            sEquals = (a = b)
+            Equals = (a = b)
         End If
     End If
     Exit Function
 ErrHandler:
-    sEquals = False
+    Equals = False
 End Function
 
 '---------------------------------------------------------------------------------------------------------
-' Procedure : sIsApprox
+' Procedure : IsApprox
 'Purpose:    Inexact equality comparison: for numeric x and y, True if
 '            Abs(x-y) <= Max(AbsTol, RelTol*max(Abs(x), Abs(y))).
 '            Similar to Julia's function of the same name.
 '---------------------------------------------------------------------------------------------------------
-Function sIsApprox(ByVal x, ByVal y, Optional CaseSensitive As Boolean = False, Optional AbsTol As Double, Optional RelTol As Double)
+Function IsApprox(ByVal x, ByVal y, Optional CaseSensitive As Boolean = False, Optional AbsTol As Double, Optional RelTol As Double)
 
     Dim CompareTo As Double
     Dim VTA As Long
@@ -483,7 +483,7 @@ Function sIsApprox(ByVal x, ByVal y, Optional CaseSensitive As Boolean = False, 
     VTA = VarType(x)
     VTB = VarType(y)
     If VTA >= vbArray Or VTB >= vbArray Then
-        sIsApprox = "#sIsApprox: Function does not handle arrays. Use sArrayNearlyEquals or sArraysNearlyIdentical instead!"
+        IsApprox = "#IsApprox: Function does not handle arrays. Use sArrayNearlyEquals or sArraysNearlyIdentical instead!"
         Exit Function
     End If
 
@@ -491,11 +491,11 @@ Function sIsApprox(ByVal x, ByVal y, Optional CaseSensitive As Boolean = False, 
     If IsNumberOrDate(x) Then
         If IsNumberOrDate(y) Then
             If x = y Then
-                sIsApprox = True
+                IsApprox = True
                 Exit Function
             ElseIf AbsTol = 0 Then
                 If RelTol = 0 Then
-                    sIsApprox = False
+                    IsApprox = False
                     Exit Function
                 End If
             End If
@@ -509,7 +509,7 @@ Function sIsApprox(ByVal x, ByVal y, Optional CaseSensitive As Boolean = False, 
             If AbsTol > CompareTo Then
                 CompareTo = AbsTol
             End If
-            sIsApprox = Abs(x - y) < CompareTo
+            IsApprox = Abs(x - y) < CompareTo
             Exit Function
         End If
     End If
@@ -517,24 +517,24 @@ Function sIsApprox(ByVal x, ByVal y, Optional CaseSensitive As Boolean = False, 
     If VTA = VTB Then
         If VTA = vbString And Not CaseSensitive Then
             If Len(x) = Len(y) Then
-                sIsApprox = UCase$(x) = UCase$(y)
+                IsApprox = UCase$(x) = UCase$(y)
             Else
-                sIsApprox = False
+                IsApprox = False
             End If
         Else
-            sIsApprox = (x = y)
+            IsApprox = (x = y)
         End If
     Else
         If VTA = vbBoolean Or VTB = vbBoolean Or VTA = vbString Or VTB = vbString Then
-            sIsApprox = False
+            IsApprox = False
         Else
-            sIsApprox = (x = y)
+            IsApprox = (x = y)
         End If
     End If
 
     Exit Function
 ErrHandler:
-    sIsApprox = False
+    IsApprox = False
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -732,7 +732,7 @@ ErrHandler:
 End Function
 
 '---------------------------------------------------------------------------------------------------------
-' Procedure : sArraysIdentical
+' Procedure : ArraysIdentical
 ' Purpose   : Returns TRUE if the two input arrays are identical. That is, they are the same size and
 '             shape and every pair of elements are equal.
 '
@@ -745,9 +745,9 @@ End Function
 '             omitted. If used from VBA code, then setting it to TRUE allows "zero-based"
 '             arrays to be compared with "one-based" arrays.
 ' WhatDiffers: passed by reference and set to a string describing the differences found.
-' AbsTol,RelTol       : Tolerances for inexact equality comparison. See sIsApprox.
+' AbsTol,RelTol       : Tolerances for inexact equality comparison. See IsApprox.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function sArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As Boolean, _
+Function ArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As Boolean, _
     Optional PermitBaseDifference As Boolean = False, Optional ByRef WhatDiffers As String, _
     Optional AbsTol As Double, Optional RelTol As Double) As Variant
     
@@ -768,16 +768,16 @@ Function sArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As 
     If (UBound(Array1, 1) - LBound(Array1, 1)) <> (UBound(Array2, 1) - LBound(Array2, 1)) Then
         WhatDiffers = "Row count different: " + CStr(1 + (UBound(Array1, 1) - LBound(Array1, 1))) + " vs " _
             + CStr(1 + (UBound(Array2, 1) - LBound(Array2, 1)))
-        sArraysIdentical = False
+        ArraysIdentical = False
     ElseIf (UBound(Array1, 2) - LBound(Array1, 2)) <> (UBound(Array2, 2) - LBound(Array2, 2)) Then
         WhatDiffers = "Column count different: " + CStr(1 + (UBound(Array1, 2) - LBound(Array1, 2))) + " vs " _
             + CStr(1 + (UBound(Array2, 2) - LBound(Array2, 2)))
-        sArraysIdentical = False
+        ArraysIdentical = False
     Else
         If Not PermitBaseDifference Then
             If (LBound(Array1, 1) <> LBound(Array2, 1)) Or (LBound(Array1, 2) <> LBound(Array2, 2)) Then
                 WhatDiffers = "Lower bounds different"
-                sArraysIdentical = False
+                ArraysIdentical = False
                 Exit Function
             End If
         End If
@@ -785,23 +785,23 @@ Function sArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As 
         cN = LBound(Array2, 2) - LBound(Array1, 2)
         For i = LBound(Array1, 1) To UBound(Array1, 1)
             For j = LBound(Array1, 2) To UBound(Array1, 2)
-                If Not sIsApprox(Array1(i, j), Array2(i + rN, j + cN), CaseSensitive, AbsTol, RelTol) Then
+                If Not IsApprox(Array1(i, j), Array2(i + rN, j + cN), CaseSensitive, AbsTol, RelTol) Then
                     NumDiff = NumDiff + 1
                     If NumDiff = 1 Then
                         WhatDiffers = "first difference at " + CStr(i) + "," + CStr(j) + ": " + _
                             TypeName(Array1(i, j)) + " '" + CStr(Array1(i, j)) + "' vs " + _
                             TypeName(Array2(i + rN, j + cN)) + " '" + CStr(Array2(i + rN, j + cN)) + "' SafeSubtract = " & SafeSubtract(Array1(i, j), Array2(i, j))
                     End If
-                    sArraysIdentical = False
+                    ArraysIdentical = False
                 Else
                     NumSame = NumSame + 1
                 End If
             Next j
         Next i
         If NumDiff = 0 Then
-            sArraysIdentical = True
+            ArraysIdentical = True
         Else
-            sArraysIdentical = False
+            ArraysIdentical = False
             WhatDiffers = CStr(NumDiff) + " of " + CStr(NumDiff + NumSame) + " elements differ, " + WhatDiffers
         End If
 
@@ -809,7 +809,7 @@ Function sArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As 
 
     Exit Function
 ErrHandler:
-    sArraysIdentical = "#sArraysIdentical (line " & CStr(Erl) + "): " & Err.Description & "!"
+    ArraysIdentical = "#ArraysIdentical (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 '---------------------------------------------------------------------------------------
