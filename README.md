@@ -11,6 +11,7 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 [Errors](#errors)  
 [Testing](#testing)  
 [Alternatives](#alternatives)  
+[Notes](#notes)  
 [Performance](#performance)  
 [Compatibility](#compatibility)  
 [About](#about)  
@@ -89,7 +90,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion except that quoted fields are unquoted. |
 
-[source](https://github.com/PGS62/VBA-CSV/blob/4f6719f4ea698c46292a7614619ca4f9ad88bd60/src/modCSVReadWrite.bas#L38-L502)
+[source](https://github.com/PGS62/VBA-CSV/blob/2ea08f7756768c4c0782145d4e9fee6ec2f9e042/src/modCSVReadWrite.bas#L41-L507)
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
@@ -112,7 +113,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`Unicode`|If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but `Data` contains strings with characters whose code points exceed 255.|
 |`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `C`. The last line of the file is written with a line ending.|
 
-[source](https://github.com/PGS62/VBA-CSV/blob/4f6719f4ea698c46292a7614619ca4f9ad88bd60/src/modCSVReadWrite.bas#L2631-L2766)
+[source](https://github.com/PGS62/VBA-CSV/blob/2ea08f7756768c4c0782145d4e9fee6ec2f9e042/src/modCSVReadWrite.bas#L2792-L2927)
 
 # Errors
 You can call `CSVRead` and `CSVWrite` both from spreadsheets (best with Excel 365 and [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531)) and from VBA. When an error occurs, the functions return a string starting with `#` and ending with `!` which gives an explanation of what went wrong.
@@ -121,7 +122,7 @@ So, to get robust error handling from VBA, you should wrap calls to `CSVRead` an
 ```vba
 FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
-[source](https://github.com/PGS62/VBA-CSV/blob/4f6719f4ea698c46292a7614619ca4f9ad88bd60/src/modCSVReadWrite.bas#L2917-L2933)
+[source](https://github.com/PGS62/VBA-CSV/blob/2ea08f7756768c4c0782145d4e9fee6ec2f9e042/src/modCSVReadWrite.bas#L3082-L3098)
 
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from spreadsheet formulas will return `#VALUE!` if any error happens, with no description provided.
 
@@ -132,6 +133,21 @@ An alternative approach is to change the constant `m_ErrorStyle` (at the top of 
 Other CSV parsers are available for VBA:  
 https://github.com/ws-garcia/VBA-CSV-interface  
 https://github.com/sdkn104/VBA-CSV
+
+# Notes
+### Line endings
+`CSVRead` automatically detects a file's line endings, whether they be Windows-style (`CRLF`), Unix-style (`LF`) or (pre-OSX) Mac (`CR`). Files with mixed line-endings are handled by taking any instance of either `CRLF`, `CR` or `LF` (outside quoted regions) to indicate a line ending.
+
+### Fractional seconds in dates and times
+During type conversion, `CSVRead` accepts dates and times where the number of seconds includes a decimal fraction. For example the time`10:13:20.500` is half a second later than the time `10:13:20`. This contrasts with the VBA function [`CDate`](https://docs.microsoft.com/en-us/office/vba/language/concepts/getting-started/type-conversion-functions) where executing
+`CDate("10:13:20.500")` results in an error.
+
+### Array Lower Bounds
+The return from `CSVRead` is an array with lower bounds of one. If you prefer array lower bounds to be zero, then edit the constant `m_LBound` (at the top of `modCSVReadWrite.bas`) to be 0 rather than 1.  
+[source](https://github.com/PGS62/VBA-CSV/blob/2ea08f7756768c4c0782145d4e9fee6ec2f9e042/src/modCSVReadWrite.bas#L32-L33)
+
+### Excel limit on string length
+If the `FileName` argument to `CSVWrite` is omitted, then instead of writing a file to disk, the function returns a string in CSV format. But there is a [limit](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) on the total number of characters that an Excel cell can contain of 32,767. If the return would otherwise be longer then an error string is returned. This limit does not apply when calling `CSVWrite` from VBA.
 
 # Performance
 On a test machine<sup>[2](#myfootnote2)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
