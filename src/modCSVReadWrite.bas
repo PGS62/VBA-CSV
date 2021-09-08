@@ -47,7 +47,7 @@ End Enum
 ' ConvertTypes: Controls whether fields in the file are converted to typed values or remain as strings, and
 '             sets the treatment of "quoted fields" and space characters.
 '
-'             ConvertTypes should be a string of zero or more letters from allowed characters "NDBETQ".
+'             ConvertTypes should be a string of zero or more letters from allowed characters `NDBETQ`.
 '
 '             The most commonly useful letters are:
 '             1) `N` number fields are returned as numbers (Doubles).
@@ -132,8 +132,8 @@ End Enum
 '             the DecimalSeparator as a comma, in which case comma ceases to be a candidate if the parser
 '             needs to guess the Delimiter.
 ' HeaderRow : This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is
-'             populated with the contents of the header row, with no type conversion except that quoted
-'             fields are unquoted.
+'             populated with the contents of the header row, with no type conversion, though leading and
+'             trailing spaces are removed.
 '
 ' Notes     : See also companion function CSVRead.
 '
@@ -150,6 +150,8 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
     Optional ByRef HeaderRow)
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
