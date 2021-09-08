@@ -1,4 +1,8 @@
 "Version","Date","Time","Author","Comment"
+74,08-Sep-2021,09:11:08,"Philip Swannell","Improved ""word-wrapping"" in modCSVReadWrite."
+73,07-Sep-2021,13:47:20,"Philip Swannell","Improved speed of method CastToDate."
+72,07-Sep-2021,11:22:35,"Philip Swannell","Can now (optionally) set array lower bounds to zero."
+71,06-Sep-2021,14:22:38,"Philip Swannell","Changes to method CastToDate"
 70,05-Sep-2021,08:27:44,"Philip Swannell","Renamed functions sNRows -> NRows etc."
 69,03-Sep-2021,09:18:48,"Philip Swannell","HeaderRow now trimmed."
 68,02-Sep-2021,18:29:22,"Philip Swannell","Removed two old Performance sheets."

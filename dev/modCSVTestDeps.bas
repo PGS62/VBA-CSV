@@ -36,15 +36,16 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
     Optional NumRowsExpected As Long, Optional NumColsExpected As Long, Optional ByRef HeaderRow, Optional ExpectedHeaderRow) As Boolean
 
     On Error GoTo ErrHandler
+    Const PermitBaseDifference = True
 
     WhatDiffers = ""
-    TestDescription = "Case " + CStr(TestNo) + " " + TestDescription
+    TestDescription = "Test " + CStr(TestNo) + " " + TestDescription
 
     Observed = CSVRead(FileName, ConvertTypes, Delimiter, IgnoreRepeated, DateFormat, Comment, IgnoreEmptyLines, HeaderRowNum, SkipToRow, _
         SkipToCol, NumRows, NumCols, TrueStrings, FalseStrings, MissingStrings, ShowMissingsAs, Encoding, DecimalSeparator, HeaderRow)
         
     If Not IsMissing(ExpectedHeaderRow) Then
-        If Not ArraysIdentical(ExpectedHeaderRow, HeaderRow, True, False, WhatDiffers) Then
+        If Not ArraysIdentical(ExpectedHeaderRow, HeaderRow, True, PermitBaseDifference, WhatDiffers) Then
             WhatDiffers = TestDescription + " FAILED. HeaderRow failed to match ExpectedHeaderRow: " & WhatDiffers
             GoTo Failed
         End If
@@ -88,7 +89,7 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
     End If
 
     If NumDimensions(Observed) = 2 And NumDimensions(Expected) = 2 Then
-        If ArraysIdentical(Observed, Expected, True, False, WhatDiffers, AbsTol, RelTol) Then
+        If ArraysIdentical(Observed, Expected, True, PermitBaseDifference, WhatDiffers, AbsTol, RelTol) Then
             TestCSVRead = True
             Exit Function
         Else
@@ -790,7 +791,7 @@ Function ArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As B
                     If NumDiff = 1 Then
                         WhatDiffers = "first difference at " + CStr(i) + "," + CStr(j) + ": " + _
                             TypeName(Array1(i, j)) + " '" + CStr(Array1(i, j)) + "' vs " + _
-                            TypeName(Array2(i + rN, j + cN)) + " '" + CStr(Array2(i + rN, j + cN)) + "' SafeSubtract = " & SafeSubtract(Array1(i, j), Array2(i, j))
+                            TypeName(Array2(i + rN, j + cN)) + " '" + CStr(Array2(i + rN, j + cN)) + "' SafeSubtract = " & SafeSubtract(Array1(i, j), Array2(i + rN, j + cN))
                     End If
                     ArraysIdentical = False
                 Else

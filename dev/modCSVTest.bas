@@ -214,7 +214,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test177 Folder, NumPassed, NumFailed, Failures
     Test178 Folder, NumPassed, NumFailed, Failures
     Test179 Folder, NumPassed, NumFailed, Failures
-
+    Test180 Folder, NumPassed, NumFailed, Failures
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -255,7 +255,7 @@ ErrHandler:
     MsgBox "#RunTestsFromButton (line " & CStr(Erl) + "): " & Err.Description & "!", vbCritical
 End Sub
 
-Sub PasteFailures(NumFailures As Long, Optional Failures)
+Private Sub PasteFailures(NumFailures As Long, Optional Failures)
     On Error GoTo ErrHandler
     With shTestResults
         .Unprotect
@@ -309,7 +309,7 @@ ErrHandler:
     FileExists = False
 End Function
 
-Sub AccumulateResults(TestRes As Boolean, ByRef NumPassed, ByRef NumFailed As Long, WhatDiffers As String, ByRef Failures() As String)
+Private Sub AccumulateResults(TestRes As Boolean, ByRef NumPassed, ByRef NumFailed As Long, WhatDiffers As String, ByRef Failures() As String)
     If TestRes Then
         NumPassed = NumPassed + 1
     Else
@@ -317,6 +317,22 @@ Sub AccumulateResults(TestRes As Boolean, ByRef NumPassed, ByRef NumFailed As Lo
         ReDim Preserve Failures(LBound(Failures) To UBound(Failures) + 1)
         Failures(UBound(Failures)) = WhatDiffers
     End If
+End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : CastDoublesToDates
+' Purpose    : Cast all elements of x that are of type Double to type Date
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub CastDoublesToDates(ByRef x As Variant)
+    Dim i As Long
+    Dim j As Long
+    For i = LBound(x, 1) To UBound(x, 1)
+        For j = LBound(x, 2) To UBound(x, 2)
+            If VarType(x(i, j)) = vbDouble Then
+                x(i, j) = CDate(x(i, j))
+            End If
+        Next
+    Next
 End Sub
 
 Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1771,8 +1787,8 @@ Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
     If TestRes Then
         'Same test as here:
         'https://github.com/JuliaData/CSV.jl/blob/953636a363525e3027d690b8a30448d115249bf9/test/testfiles.jl#L317
-        TestRes = IsEmpty(Observed(NRows(Observed) - 2, 17))
-        If Not TestRes Then WhatDiffers = "Case 76 latest (1) FAILED, Test was that element in 17th col, last but 2 row should be empty"
+        TestRes = IsEmpty(Observed(UBound(Observed, 1) - 2, LBound(Observed, 2) + 16))
+        If Not TestRes Then WhatDiffers = "Test 76 latest (1) FAILED, Test was that element in 17th col, last but 2 row should be empty"
     End If
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
@@ -2128,7 +2144,7 @@ Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
         Next
         If Total <> 2499772 Then
             TestRes = False
-            WhatDiffers = "Case 92 pandas zeros FAILED, Test was that sum of elements be 2,499,772, but instead its " + Format(Total, "###,###")
+            WhatDiffers = "Test 92 pandas zeros FAILED, Test was that sum of elements be 2,499,772, but instead its " + Format(Total, "###,###")
         End If
     End If
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
@@ -2292,7 +2308,7 @@ ErrHandler:
 End Sub
 
 Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the third column (via CDate) _
@@ -2300,11 +2316,7 @@ Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
     TestDescription = "test good ISO8601 with DateFormat = ISO"
     FileName = "test_good_ISO8601.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=3)
-    For k = 1 To NRows(Expected)
-        If VarType(Expected(k, 1)) = vbDouble Then
-            Expected(k, 1) = CDate(Expected(k, 1))
-        End If
-    Next k
+    CastDoublesToDates Expected
     TestRes = TestCSVRead(99, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
@@ -2321,7 +2333,7 @@ ErrHandler:
 End Sub
 
 Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the fourth column (via CDate) _
@@ -2329,11 +2341,7 @@ Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good ISO8601 with DateFormat = ISOZ"
     FileName = "test_good_ISO8601.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=4)
-    For k = 1 To NRows(Expected)
-        If VarType(Expected(k, 1)) = vbDouble Then
-            Expected(k, 1) = CDate(Expected(k, 1))
-        End If
-    Next k
+    CastDoublesToDates Expected
     TestRes = TestCSVRead(100, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
@@ -2372,7 +2380,7 @@ ErrHandler:
 End Sub
 
 Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
@@ -2380,9 +2388,7 @@ Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good Y-M-D"
     FileName = "test_good_Y-M-D.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
-    For k = 1 To NRows(Expected)
-        Expected(k, 1) = CDate(Expected(k, 1))
-    Next k
+    CastDoublesToDates Expected
     TestRes = TestCSVRead(102, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
@@ -2421,7 +2427,7 @@ ErrHandler:
 End Sub
 
 Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
@@ -2429,9 +2435,7 @@ Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good D-M-Y"
     FileName = "test_good_D-M-Y.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
-    For k = 1 To NRows(Expected)
-        Expected(k, 1) = CDate(Expected(k, 1))
-    Next k
+    CastDoublesToDates Expected
     TestRes = TestCSVRead(104, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
@@ -2470,7 +2474,7 @@ ErrHandler:
 End Sub
 
 Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
@@ -2478,9 +2482,7 @@ Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test good M-D-Y"
     FileName = "test_good_M-D-Y.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
-    For k = 1 To NRows(Expected)
-        Expected(k, 1) = CDate(Expected(k, 1))
-    Next k
+    CastDoublesToDates Expected
     TestRes = TestCSVRead(106, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
@@ -3960,17 +3962,13 @@ ErrHandler:
 End Sub
 
 Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test various time formats"
     FileName = "test_various_time_formats.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
-    For k = 1 To NRows(Expected)
-        If VarType(Expected(k, 1)) = vbDouble Then
-            Expected(k, 1) = CDate(Expected(k, 1))
-        End If
-    Next k
+    CastDoublesToDates Expected
     TestRes = TestCSVRead(176, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         DateFormat:="Y-M-D", _
@@ -3988,17 +3986,13 @@ ErrHandler:
 End Sub
 
 Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test y-m-d dates with fractional seconds"
     FileName = "test_y-m-d_dates_with_fractional_seconds.csv"
     Expected = CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
-    For k = 1 To NRows(Expected)
-        If VarType(Expected(k, 1)) = vbDouble Then
-            Expected(k, 1) = CDate(Expected(k, 1))
-        End If
-    Next k
+    CastDoublesToDates Expected
     TestRes = TestCSVRead(177, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         DateFormat:="Y-M-D", _
@@ -4071,3 +4065,33 @@ Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
 ErrHandler:
     Throw "#Test179 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
+Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test array lower bounds"
+    Expected = HStack(Array("Col1", 1#, 2#, 3#), Array("Col2", 4#, 5#, 6#), Array("Col3", 7#, 8#, 9#))
+    FileName = "test_array_lower_bounds.csv"
+    TestRes = TestCSVRead(180, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+        
+    If TestRes Then
+        If LBound(Observed, 1) <> 1 Then
+            TestRes = False
+            WhatDiffers = "Test 180 test array lowwer bounds FAILED, Test was that array lower bound should be 1"
+        End If
+    End If
+        
+        
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test180 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+
+

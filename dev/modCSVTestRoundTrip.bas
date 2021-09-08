@@ -68,7 +68,6 @@ Public Sub RoundTripTest()
                                 NumTests = NumTests + 1
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
                                 RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
-                              
                             Next DateFormat
                         Next AllowLineFeed
 
@@ -78,7 +77,6 @@ Public Sub RoundTripTest()
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDates"
                             RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
-                          
                         Next DateFormat
 
                         'For Strings, we need to vary AllowLineFeed
@@ -106,7 +104,6 @@ Public Sub RoundTripTest()
                             End If
                             RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), _
                                 CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
-                            
                         Next k
                         DoEvents 'Kick Immediate window back to life?
                     Next NCols
@@ -140,14 +137,15 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     Unicode As Boolean, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String, _
     ByRef NumPassed As Long, ByRef NumFailed As Long)
 
-    Dim DataReadBack
-
-    On Error GoTo ErrHandler
-    Dim FileName As String
-    Dim NR As Long
-    Dim NC As Long
-    Dim NumDone As Long
     Const ConvertTypes = "NDBE" 'must use this for round-tripping to work.
+    Const PermitBaseDifference = True
+    Dim DataReadBack
+    Dim FileName As String
+    Dim NC As Long
+    Dim NR As Long
+    Dim NumDone As Long
+    
+    On Error GoTo ErrHandler
     
     WhatDiffers = ""
 
@@ -161,7 +159,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     'The Call to CSVRead has to infer both Encoding and EOL
     DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
     
-    If ArraysIdentical(Data, DataReadBack, True, False, WhatDiffers) Then
+    If ArraysIdentical(Data, DataReadBack, True, PermitBaseDifference, WhatDiffers) Then
         NumPassed = NumPassed + 1
     Else
         Debug.Print String(100, "=")
