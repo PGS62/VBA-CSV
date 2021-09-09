@@ -558,7 +558,11 @@ End Sub
 Private Function InferSourceType(FileName As String) As enmSourceType
 
     On Error GoTo ErrHandler
-    If Mid$(FileName, 2, 2) = ":\" Then
+    If InStr(FileName, vbLf) > 0 Then 'vbLf and vbCr are not permitted characters in file names or urls
+        InferSourceType = st_String
+    ElseIf InStr(FileName, vbCr) > 0 Then
+        InferSourceType = st_String
+    ElseIf Mid$(FileName, 2, 2) = ":\" Then
         InferSourceType = st_File
     ElseIf Left$(FileName, 2) = "\\" Then
         InferSourceType = st_File
@@ -566,12 +570,14 @@ Private Function InferSourceType(FileName As String) As enmSourceType
         InferSourceType = st_URL
     ElseIf Left$(FileName, 7) = "http://" Then
         InferSourceType = st_URL
-    ElseIf InStr(FileName, vbLf) > 0 Then
-        InferSourceType = st_String
-    ElseIf InStr(FileName, vbCr) > 0 Then
-        InferSourceType = st_String
     Else
-        InferSourceType = st_File
+        'Doesn't look like either file with path, url or string in CSV format
+        InferSourceType = st_String
+        If Len(FileName) < 1000 Then
+            If FileExists(FileName) Then 'file exists in current working directory
+                InferSourceType = st_File
+            End If
+        End If
     End If
 
     Exit Function
