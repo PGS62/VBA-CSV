@@ -176,6 +176,11 @@ ErrHandler:
     Throw "#RoundTripTestCore: " & Err.Description & "!"
 End Sub
 
+Sub sgrsg()
+Debug.Print RandomString(False, False, vbLf)
+End Sub
+
+
 Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
 
     Const maxlen = 20
@@ -190,14 +195,14 @@ Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL 
 
     For i = 1 To length
         If Unicode Then
-            Mid(Res, i, 1) = ChrW(33 + Rnd() * 370)
+            Mid$(Res, i, 1) = ChrW(33 + Rnd() * 370)
         Else
-            Mid(Res, i, 1) = Chr(34 + Rnd() * 88)
+            Mid$(Res, i, 1) = Chr(34 + Rnd() * 88)
         End If
 
         If Not AllowLineFeed Then
-            If Mid(Res, i, 1) = vbLf Or Mid(Res, i, 1) = vbCr Then
-                Mid(Res, i, 1) = " "
+            If Mid$(Res, i, 1) = vbLf Or Mid$(Res, i, 1) = vbCr Then
+                Mid$(Res, i, 1) = " "
             End If
         End If
     Next
@@ -205,7 +210,7 @@ Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL 
     If AllowLineFeed Then
         If length > 5 Then
             If Rnd() < 0.2 Then
-                Mid(Res, length / 2, Len(EOL)) = EOL
+                Mid$(Res, length / 2, Len(EOL)) = EOL
             End If
         End If
     End If

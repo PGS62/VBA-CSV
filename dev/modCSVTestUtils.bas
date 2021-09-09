@@ -43,7 +43,7 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
         LitteralExpected = ElementToVBALitteral(ExpectedReturn)
     Else
         LitteralExpected = ArrayToVBALitteral(ExpectedReturn, , 10000)
-        If Left(LitteralExpected, 1) = "#" Then
+        If Left$(LitteralExpected, 1) = "#" Then
         End If
     End If
     
@@ -51,7 +51,7 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
 
     Res = Res + vbLf + Indent + "FileName = """ & FileName & """"
 
-    If Left(FileName, 4) = "http" Then
+    If Left$(FileName, 4) = "http" Then
         Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, FileName, Observed, WhatDiffers"
     Else
         Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
@@ -182,7 +182,7 @@ Function ElementToVBALitteral(x)
     ElseIf IsEmpty(x) Then
         ElementToVBALitteral = "Empty"
     ElseIf IsError(x) Then
-        ElementToVBALitteral = "CVErr(" & Mid(CStr(x), 7) & ")"
+        ElementToVBALitteral = "CVErr(" & Mid$(CStr(x), 7) & ")"
     End If
 
     Exit Function
@@ -253,9 +253,9 @@ Function HandleWideString(TheStr As String)
     Dim i As Long
     Dim Res As String
 
-    Res = "ChrW(" + CStr(AscW(Left(TheStr, 1))) + ")"
+    Res = "ChrW(" + CStr(AscW(Left$(TheStr, 1))) + ")"
     For i = 2 To Len(TheStr)
-        Res = Res + " + ChrW(" + CStr(AscW(Mid(TheStr, i, 1))) + ")"
+        Res = Res + " + ChrW(" + CStr(AscW(Mid$(TheStr, i, 1))) + ")"
         If i Mod 10 = 1 Then
             Res = Res + " _" & vbLf
         End If
@@ -272,7 +272,7 @@ Function IsWideString(TheStr As String) As Boolean
 
     On Error GoTo ErrHandler
     For i = 1 To Len(TheStr)
-        If AscW(Mid(TheStr, i, 1)) > 255 Then
+        If AscW(Mid$(TheStr, i, 1)) > 255 Then
             IsWideString = True
         End If
         Exit For
@@ -295,5 +295,3 @@ Function UnPack(Str As Variant)
         End If
     End If
 End Function
-
-

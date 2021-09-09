@@ -30,8 +30,8 @@ Sub SaveWorkbookAndExportModules()
     On Error GoTo ErrHandler
 
     Set wb = ThisWorkbook
-    Folder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "src"
-    Folder2 = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "dev"
+    Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "src"
+    Folder2 = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "dev"
 
     Prompt = "Save the workbook and export modules to '" + Folder + "'?"
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
@@ -74,7 +74,7 @@ Sub SaveWorkbookAndExportModules()
 
         'only export files of the PGS62 project, not those from other _
          CSV parsers that I have imported to compare performance.
-        If Left(FileName, 6) <> "modCSV" Then
+        If Left$(FileName, 6) <> "modCSV" Then
             bExport = False
         End If
 

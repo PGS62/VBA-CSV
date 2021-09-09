@@ -915,5 +915,3 @@ Function StringBetweenStrings(TheString, LeftString, RightString, Optional Inclu
 ErrHandler:
     StringBetweenStrings = "#StringBetweenStrings (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
-
-

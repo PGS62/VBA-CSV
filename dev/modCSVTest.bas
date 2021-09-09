@@ -19,7 +19,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
 
     On Error GoTo ErrHandler
     Folder = ThisWorkbook.path
-    Folder = Left(Folder, InStrRev(Folder, "\")) + "testfiles\"
+    Folder = Left$(Folder, InStrRev(Folder, "\")) + "testfiles\"
 
     If Not FolderExists(Folder) Then Throw "Cannot find folder: '" + Folder + "'"
     Test1 Folder, NumPassed, NumFailed, Failures

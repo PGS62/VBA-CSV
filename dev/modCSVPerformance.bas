@@ -98,7 +98,7 @@ Private Sub RunSpeedTests()
     
     'Julia results file created by function benchmark. See julia/benchmarkCSV.jl, function benchmark
     
-    JuliaResultsFile = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "\julia\juliaparsetimes.csv"
+    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "\julia\juliaparsetimes.csv"
     If Not FileExists(JuliaResultsFile) Then
         Throw "Cannot find file '" + JuliaResultsFile + "'"
     End If
@@ -177,7 +177,7 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
     If VarType(EachFieldContains) = vbDouble Then
         ExtraInfo = "Doubles"
     ElseIf VarType(EachFieldContains) = vbString Then
-        If Left(EachFieldContains, 1) = """" And Right(EachFieldContains, 1) = """" Then
+        If Left$(EachFieldContains, 1) = """" And Right$(EachFieldContains, 1) = """" Then
             If InStr(EachFieldContains, vbLf) > 0 Then
                 ExtraInfo = "Quoted_Strings_with LF_length_" & Len(EachFieldContains)
             Else
@@ -407,7 +407,7 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
         Dim FileName As String
         Dim Folder As String
         FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
-        Folder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "charts\"
+        Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "charts\"
         ch.Export Folder + FileName
     End If
 

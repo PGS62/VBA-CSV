@@ -12,7 +12,7 @@ Sub TestAgainstRDatasets()
     
     Dim ResultsFile As String
     
-    ResultsFile = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + _
+    ResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + _
         "testresults\SpeedTestRDatasets.csv"
     
     Dim CSVResult

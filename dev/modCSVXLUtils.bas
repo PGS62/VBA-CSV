@@ -15,7 +15,7 @@ Function TempFolder()
 End Function
 
 Function TestFolder()
-    TestFolder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
+    TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
 End Function
 
 '---------------------------------------------------------------------------------------------------------
@@ -400,7 +400,7 @@ Private Function InsertInString(InsertThis As String, ByVal InToThis As String, 
         AtPoint = 1
     End If
 
-    Mid(InToThis, AtPoint, Len(InsertThis)) = InsertThis
+    Mid$(InToThis, AtPoint, Len(InsertThis)) = InsertThis
     InsertInString = InToThis
     Exit Function
 ErrHandler:
