@@ -136,7 +136,7 @@ https://github.com/sdkn104/VBA-CSV
 
 # Notes
 ### Line endings
-`CSVRead` automatically detects a file's line endings, whether they be Windows-style (`CRLF`), Unix-style (`LF`) or (pre-OSX) Mac (`CR`). Files with mixed line-endings are handled by taking any instance of either `CRLF`, `CR` or `LF` (outside quoted regions) to indicate a line ending.
+`CSVRead` automatically detects a file's line endings, whether they be Windows (`CRLF`), Unix (`LF`) or (pre-OSX) Mac (`CR`). Files with mixed line-endings are handled by taking any instance of either `CRLF`, `CR` or `LF` (outside quoted regions) to indicate a line ending.
 
 ### Fractional seconds in dates and times
 During type conversion, `CSVRead` accepts dates and times where the number of seconds includes a decimal fraction. For example the time`10:13:20.500` is half a second later than the time `10:13:20`. This contrasts with the VBA function [`CDate`](https://docs.microsoft.com/en-us/office/vba/language/concepts/getting-started/type-conversion-functions) where executing
