@@ -18,8 +18,8 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     Comment As String, IgnoreEmptyLines As Boolean, HeaderRowNum As Long, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, TrueStrings As String, _
     FalseStrings As String, MissingStrings As String, Encoding As Variant, DecimalSeparator As String, ExpectedHeaderRow As Variant)
 
-    Dim Res As String
     Dim LitteralExpected
+    Dim Res As String
     
     Const Indent = "    "
     Const Indent2 = "        "
@@ -27,7 +27,12 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     On Error GoTo ErrHandler
     
     Res = "Sub Test" & TestNo & "(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
-    Res = Res & vbLf & "    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String"
+    Res = Res & vbLf & Indent & "Dim Expected"
+    Res = Res & vbLf & Indent & "Dim FileName As String"
+    Res = Res & vbLf & Indent & "Dim Observed"
+    Res = Res & vbLf & Indent & "Dim TestDescription As String"
+    Res = Res & vbLf & Indent & "Dim TestRes As Boolean"
+    Res = Res & vbLf & Indent & "Dim WhatDiffers As String"
     Res = Res & vbLf
     Res = Res & vbLf & Indent & "On Error GoTo ErrHandler"
     
@@ -192,7 +197,10 @@ End Function
 '              assumes functions HStack and VStack are available.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function ArrayToVBALitteral(TheData As Variant, Optional AssignTo As String, Optional LengthLimit As Long = 5000)
-    Dim NR As Long, NC As Long, i As Long, j As Long
+    Dim i As Long
+    Dim j As Long
+    Dim NC As Long
+    Dim NR As Long
     Dim Res As String
 
     On Error GoTo ErrHandler
@@ -287,4 +295,5 @@ Function UnPack(Str As Variant)
         End If
     End If
 End Function
+
 

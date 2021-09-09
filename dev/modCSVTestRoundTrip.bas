@@ -32,13 +32,13 @@ Public Sub RoundTripTest()
     Dim k As Long
     Dim NCols As Variant
     Dim NRows As Variant
+    Dim NumFailed As Long
+    Dim NumPassed As Long
     Dim NumTests As Long
     Dim OS As Variant
+    Dim Prompt As String
     Dim Unicode As Variant
     Dim WhatDiffers As String
-    Dim NumPassed As Long
-    Dim NumFailed As Long
-    Dim Prompt As String
     Const Title = "VBA-CSV Round Trip Tests"
     
     On Error GoTo ErrHandler
@@ -472,3 +472,4 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
 ErrHandler:
     Throw "#RandomVariants: " & Err.Description & "!"
 End Function
+

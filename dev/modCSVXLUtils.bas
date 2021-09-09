@@ -31,17 +31,17 @@ End Function
 '---------------------------------------------------------------------------------------------------------
 Function ArrayEquals(Array1 As Variant, Array2 As Variant, Optional CaseSensitive As Variant = False)
     On Error GoTo ErrHandler
-    Dim NR1 As Long
-    Dim NC1 As Long
-    Dim NR2 As Long
-    Dim NC2 As Long
-    Dim Ret() As Variant
-    Dim NRMax As Long
-    Dim NRMin As Long
-    Dim NCMax As Long
-    Dim NCMin As Long
     Dim i As Long
     Dim j As Long
+    Dim NC1 As Long
+    Dim NC2 As Long
+    Dim NCMax As Long
+    Dim NCMin As Long
+    Dim NR1 As Long
+    Dim NR2 As Long
+    Dim NRMax As Long
+    Dim NRMin As Long
+    Dim Ret() As Variant
 
     If VarType(Array1) < vbArray And VarType(Array2) < vbArray And VarType(CaseSensitive) = vbBoolean Then
         ArrayEquals = Equals(Array1, Array2, CBool(CaseSensitive))
@@ -112,7 +112,9 @@ End Function
 ' Purpose    : Returns the contents of a file as a string
 ' -----------------------------------------------------------------------------------------------------------------------
 Function FileReadAll(FileName As String)
-    Dim FSO As New FileSystemObject, F As Scripting.File, T As Scripting.TextStream
+    Dim F As Scripting.File
+    Dim FSO As New FileSystemObject
+    Dim T As Scripting.TextStream
     On Error GoTo ErrHandler
     Set F = FSO.GetFile(FileName)
     Set T = F.OpenAsTextStream()
@@ -305,12 +307,12 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
     Optional Arg4, Optional Delimiter As String)
-    Dim Res() As String
+    Dim k As Long
     Dim Part1 As Variant
     Dim Part2 As Variant
     Dim Part3 As Variant
     Dim Part4 As Variant
-    Dim k As Long
+    Dim Res() As String
 
     On Error GoTo ErrHandler
     If IsMissing(Arg2) Then Arg2 = ""
@@ -630,3 +632,4 @@ ErrHandler:
     RegExReplace = "#RegExReplace (line " & CStr(Erl) + "): " & Err.Description & "!"
     Set rx = Nothing
 End Function
+

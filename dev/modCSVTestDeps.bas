@@ -755,9 +755,9 @@ Function ArraysIdentical(ByVal Array1, ByVal Array2, Optional CaseSensitive As B
     Dim cN As Long
     Dim i As Long
     Dim j As Long
-    Dim rN As Long
-    Dim NumSame As Long
     Dim NumDiff As Long
+    Dim NumSame As Long
+    Dim rN As Long
     
     On Error GoTo ErrHandler
 
@@ -825,9 +825,9 @@ Function IsNumber(x As Variant) As Boolean
 End Function
 
 Function FileCopy(SourceFile As String, TargetFile As String)
+    Dim CopyOfErr As String
     Dim F As Scripting.File
     Dim FSO As Scripting.FileSystemObject
-    Dim CopyOfErr As String
     On Error GoTo ErrHandler
     Set FSO = New FileSystemObject
     Set F = FSO.GetFile(SourceFile)
@@ -915,4 +915,5 @@ Function StringBetweenStrings(TheString, LeftString, RightString, Optional Inclu
 ErrHandler:
     StringBetweenStrings = "#StringBetweenStrings (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
+
 

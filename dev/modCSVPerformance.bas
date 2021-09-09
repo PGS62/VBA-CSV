@@ -17,8 +17,8 @@ Option Explicit
 ' -----------------------------------------------------------------------------------------------------------------------
 Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As String)
 
-    Dim oArray() As Variant
     Dim CSVint As CSVinterface
+    Dim oArray() As Variant
 
     On Error GoTo ErrHandler
 
@@ -151,7 +151,9 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
     Dim FnName2 As String
     Dim FnName3 As String
     Dim FnName4 As String
+    Dim Folder As String
     Dim j As Long
+    Dim JuliaResults As Variant
     Dim k As Double
     Dim NumCalls1 As Long
     Dim NumCalls2 As Long
@@ -165,8 +167,6 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
     Dim t4 As Variant
     Dim Tend As Double
     Dim Tstart As Double
-    Dim Folder As String
-    Dim JuliaResults As Variant
 
     On Error GoTo ErrHandler
     
@@ -404,7 +404,8 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
     shp.Placement = xlMove
     
     If Export Then
-        Dim FileName As String, Folder As String
+        Dim FileName As String
+        Dim Folder As String
         FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
         Folder = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "charts\"
         ch.Export Folder + FileName
@@ -414,3 +415,4 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
 ErrHandler:
     Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+

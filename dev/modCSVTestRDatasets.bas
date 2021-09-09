@@ -15,17 +15,17 @@ Sub TestAgainstRDatasets()
     ResultsFile = Left(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + _
         "testresults\SpeedTestRDatasets.csv"
     
+    Dim CSVResult
+    Dim FileName As String
+    Dim Files
     Dim i As Long
+    Dim Result
+    Dim sdkn104Result
     Dim t1 As Double
     Dim t2 As Double
     Dim t3 As Double
     Dim t4 As Double
-    Dim FileName As String
-    Dim Files
-    Dim CSVResult
     Dim ws_garciaResult
-    Dim sdkn104Result
-    Dim Result
 
     On Error GoTo ErrHandler
     Files = Array("csv\openintro\military.csv", "csv\mosaicData\Birthdays.csv", _
@@ -81,3 +81,4 @@ Sub TestAgainstRDatasets()
 ErrHandler:
     MsgBox "#TestAgainstRDatasets (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+

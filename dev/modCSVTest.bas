@@ -225,12 +225,12 @@ End Sub
 ' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub RunTestsFromButton()
-    Dim NumPassed As Long
-    Dim NumFailed As Long
-    Dim NumSkipped As Long
     Dim Failures() As String
-    Dim ProtectContents As Boolean
     Dim IncludeLargeFiles As Boolean
+    Dim NumFailed As Long
+    Dim NumPassed As Long
+    Dim NumSkipped As Long
+    Dim ProtectContents As Boolean
 
     On Error GoTo ErrHandler
 
@@ -336,7 +336,12 @@ Private Sub CastDoublesToDates(ByRef x As Variant)
 End Sub
 
 Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test one row of data.cscv"
@@ -353,7 +358,12 @@ ErrHandler:
 End Sub
 
 Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test empty file newlines"
@@ -368,7 +378,12 @@ ErrHandler:
 End Sub
 
 Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test single column"
@@ -385,7 +400,12 @@ ErrHandler:
 End Sub
 
 Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "comma decimal"
@@ -400,7 +420,12 @@ ErrHandler:
 End Sub
 
 Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test missing last column"
@@ -419,7 +444,12 @@ ErrHandler:
 End Sub
 
 Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "initial spaces when ignore repeated"
@@ -434,7 +464,12 @@ ErrHandler:
 End Sub
 
 Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test not enough columns"
@@ -455,7 +490,12 @@ ErrHandler:
 End Sub
 
 Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test comments1"
@@ -470,7 +510,12 @@ ErrHandler:
 End Sub
 
 Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test comments multichar"
@@ -485,7 +530,12 @@ ErrHandler:
 End Sub
 
 Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test correct trailing missings"
@@ -505,7 +555,12 @@ ErrHandler:
 End Sub
 
 Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test not enough columns2"
@@ -526,7 +581,12 @@ ErrHandler:
 End Sub
 
 Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test tab null empty.txt"
@@ -546,7 +606,12 @@ ErrHandler:
 End Sub
 
 Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test basic"
@@ -561,7 +626,12 @@ ErrHandler:
 End Sub
 
 Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test basic pipe"
@@ -576,7 +646,12 @@ ErrHandler:
 End Sub
 
 Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test mac line endings"
@@ -591,7 +666,12 @@ ErrHandler:
 End Sub
 
 Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test newline line endings"
@@ -606,7 +686,12 @@ ErrHandler:
 End Sub
 
 Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test delim.tsv"
@@ -621,7 +706,12 @@ ErrHandler:
 End Sub
 
 Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test delim.wsv"
@@ -636,7 +726,12 @@ ErrHandler:
 End Sub
 
 Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test tab null string.txt"
@@ -659,7 +754,12 @@ ErrHandler:
 End Sub
 
 Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test crlf line endings"
@@ -674,7 +774,12 @@ ErrHandler:
 End Sub
 
 Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test header on row 4"
@@ -693,7 +798,12 @@ ErrHandler:
 End Sub
 
 Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test missing last field"
@@ -708,7 +818,12 @@ ErrHandler:
 End Sub
 
 Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test no header"
@@ -723,7 +838,12 @@ ErrHandler:
 End Sub
 
 Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test dates"
@@ -739,7 +859,12 @@ ErrHandler:
 End Sub
 
 Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test excel date formats"
@@ -754,7 +879,12 @@ ErrHandler:
 End Sub
 
 Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test repeated delimiters"
@@ -775,7 +905,12 @@ ErrHandler:
 End Sub
 
 Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test simple quoted"
@@ -790,7 +925,12 @@ ErrHandler:
 End Sub
 
 Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test footer missing"
@@ -809,7 +949,12 @@ ErrHandler:
 End Sub
 
 Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
     'The is test is fragile in that line endings in text files can get flipped from vbLf to vbCrLf as files are pushed and pulled to git.
 
     On Error GoTo ErrHandler
@@ -825,7 +970,12 @@ ErrHandler:
 End Sub
 
 Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test missing value"
@@ -840,7 +990,12 @@ ErrHandler:
 End Sub
 
 Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test truestrings"
@@ -862,7 +1017,12 @@ ErrHandler:
 End Sub
 
 Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test floats"
@@ -877,7 +1037,12 @@ ErrHandler:
 End Sub
 
 Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test utf8"
@@ -892,7 +1057,12 @@ ErrHandler:
 End Sub
 
 Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test windows"
@@ -907,7 +1077,12 @@ ErrHandler:
 End Sub
 
 Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test missing value NULL"
@@ -925,7 +1100,12 @@ ErrHandler:
 End Sub
 
 Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Note we must pass "Q" option to treat quoted numbers as numbers
@@ -945,7 +1125,12 @@ ErrHandler:
 End Sub
 
 Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We don't support SkipFooter
@@ -968,7 +1153,12 @@ ErrHandler:
 End Sub
 
 Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test utf8 with BOM"
@@ -983,7 +1173,12 @@ ErrHandler:
 End Sub
 
 Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We don't distinguish between different types of number, so this test a bit moot
@@ -1005,7 +1200,12 @@ ErrHandler:
 End Sub
 
 Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "issue 198 part2"
@@ -1029,7 +1229,12 @@ ErrHandler:
 End Sub
 
 Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Not sure how julia handles this, could not find in https://github.com/JuliaData/CSV.jl/blob/main/test/testfiles.jl
@@ -1046,7 +1251,12 @@ ErrHandler:
 End Sub
 
 Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test multiple missing"
@@ -1068,7 +1278,12 @@ ErrHandler:
 End Sub
 
 Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test string delimiters"
@@ -1088,7 +1303,12 @@ ErrHandler:
 End Sub
 
 Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "bools"
@@ -1107,7 +1327,12 @@ ErrHandler:
 End Sub
 
 Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "boolext"
@@ -1126,7 +1351,12 @@ ErrHandler:
 End Sub
 
 Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test comment first row"
@@ -1141,7 +1371,12 @@ ErrHandler:
 End Sub
 
 Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'NB this parses differently from how parsed by CSV.jl, we put col5, row one as number, they as string thanks to the presence of not-parsable-to-number in the cell below (the culprit is the comma in "2,773.9000")
@@ -1164,7 +1399,12 @@ ErrHandler:
 End Sub
 
 Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test comments multiple"
@@ -1183,7 +1423,12 @@ ErrHandler:
 End Sub
 
 Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'NotePad++ identifies the encoding of this file as UTF-16 Little Endian. There is no BOM, so we have to explicitly pass Encoding as "UTF-16"
@@ -1199,7 +1444,12 @@ ErrHandler:
 End Sub
 
 Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'NotePad++ identifies the encoding of this file as UTF-16 Little Endian. There is no BOM, so we have to explicitly explicitly pass Encoding as "UTF-16"
@@ -1215,7 +1465,12 @@ ErrHandler:
 End Sub
 
 Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test types"
@@ -1242,7 +1497,12 @@ ErrHandler:
 End Sub
 
 Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test 508"
@@ -1260,7 +1520,12 @@ ErrHandler:
 End Sub
 
 Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "issue 198"
@@ -1288,7 +1553,12 @@ ErrHandler:
 End Sub
 
 Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "error comment.txt"
@@ -1308,7 +1578,12 @@ ErrHandler:
 End Sub
 
 Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "bug555.txt"
@@ -1333,7 +1608,12 @@ ErrHandler:
 End Sub
 
 Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "precompile small"
@@ -1360,7 +1640,12 @@ ErrHandler:
 End Sub
 
 Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "stocks"
@@ -1382,7 +1667,12 @@ ErrHandler:
 End Sub
 
 Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Tests handling of lines that start with a delimiter when IgnoreRepeated = true
@@ -1403,7 +1693,12 @@ ErrHandler:
 End Sub
 
 Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "TechCrunchcontinentalUSA"
@@ -1432,7 +1727,12 @@ ErrHandler:
 End Sub
 
 Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "issue 120"
@@ -1468,7 +1768,12 @@ ErrHandler:
 End Sub
 
 Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Tests trimming fields
@@ -1494,7 +1799,12 @@ ErrHandler:
 End Sub
 
 Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "double quote quotechar and escapechar"
@@ -1515,7 +1825,12 @@ ErrHandler:
 End Sub
 
 Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "baseball"
@@ -1546,7 +1861,12 @@ ErrHandler:
 End Sub
 
 Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1567,7 +1887,12 @@ ErrHandler:
 End Sub
 
 Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1585,7 +1910,12 @@ ErrHandler:
 End Sub
 
 Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1603,7 +1933,12 @@ ErrHandler:
 End Sub
 
 Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1621,7 +1956,12 @@ ErrHandler:
 End Sub
 
 Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1639,7 +1979,12 @@ ErrHandler:
 End Sub
 
 Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1657,7 +2002,12 @@ ErrHandler:
 End Sub
 
 Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1675,7 +2025,12 @@ ErrHandler:
 End Sub
 
 Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1696,7 +2051,12 @@ ErrHandler:
 End Sub
 
 Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1714,7 +2074,12 @@ ErrHandler:
 End Sub
 
 Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1732,7 +2097,12 @@ ErrHandler:
 End Sub
 
 Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1750,7 +2120,12 @@ ErrHandler:
 End Sub
 
 Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
@@ -1771,7 +2146,12 @@ ErrHandler:
 End Sub
 
 Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "latest (1)"
@@ -1798,7 +2178,12 @@ ErrHandler:
 End Sub
 
 Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "int64 overflow"
@@ -1816,7 +2201,12 @@ ErrHandler:
 End Sub
 
 Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "FL insurance sample"
@@ -1853,7 +2243,12 @@ ErrHandler:
 End Sub
 
 Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "FL insurance sample"
@@ -1872,7 +2267,12 @@ ErrHandler:
 End Sub
 
 Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test float in int column"
@@ -1889,7 +2289,12 @@ ErrHandler:
 End Sub
 
 Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test skip args"
@@ -1904,7 +2309,12 @@ ErrHandler:
 End Sub
 
 Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test skip args"
@@ -1919,7 +2329,12 @@ ErrHandler:
 End Sub
 
 Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test skip args"
@@ -1939,7 +2354,12 @@ ErrHandler:
 End Sub
 
 Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test skip args with comments"
@@ -1954,7 +2374,12 @@ ErrHandler:
 End Sub
 
 Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test skip args with comments"
@@ -1969,7 +2394,12 @@ ErrHandler:
 End Sub
 
 Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test skip args with comments"
@@ -1989,7 +2419,12 @@ ErrHandler:
 End Sub
 
 Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test triangular"
@@ -2017,7 +2452,12 @@ ErrHandler:
 End Sub
 
 Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test strange delimiter"
@@ -2041,7 +2481,12 @@ ErrHandler:
 End Sub
 
 Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test ignoring repeated multicharacter delimiter"
@@ -2066,7 +2511,12 @@ ErrHandler:
 End Sub
 
 Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test empty file"
@@ -2082,7 +2532,12 @@ ErrHandler:
 End Sub
 
 Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "table test.txt"
@@ -2122,7 +2577,14 @@ ErrHandler:
 End Sub
 
 Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String, k As Long, m As Long
+    Dim Expected
+    Dim FileName As String
+    Dim k As Long
+    Dim m As Long
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
 
@@ -2154,7 +2616,12 @@ ErrHandler:
     Throw "#Test92 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "heat flux.dat"
@@ -2177,7 +2644,12 @@ ErrHandler:
 End Sub
 
 Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'UTF-8 BOM, and streamed
@@ -2218,7 +2690,12 @@ ErrHandler:
 End Sub
 
 Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test d-m-y with time"
@@ -2240,7 +2717,12 @@ ErrHandler:
 End Sub
 
 Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test m-d-y with time"
@@ -2262,7 +2744,12 @@ ErrHandler:
 End Sub
 
 Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test y-m-d with time"
@@ -2284,7 +2771,12 @@ ErrHandler:
 End Sub
 
 Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "attenu"
@@ -2308,7 +2800,12 @@ ErrHandler:
 End Sub
 
 Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the third column (via CDate) _
@@ -2333,7 +2830,12 @@ ErrHandler:
 End Sub
 
 Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the fourth column (via CDate) _
@@ -2358,7 +2860,12 @@ ErrHandler:
 End Sub
 
 Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Test that parsing strings that almost but not correct ISO8601 does not convert to dates
@@ -2380,7 +2887,12 @@ ErrHandler:
 End Sub
 
 Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
@@ -2405,7 +2917,12 @@ ErrHandler:
 End Sub
 
 Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Test that parsing strings that almost but not correct Y-M-D does not convert to dates
@@ -2427,7 +2944,12 @@ ErrHandler:
 End Sub
 
 Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
@@ -2452,7 +2974,12 @@ ErrHandler:
 End Sub
 
 Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Test that parsing strings that almost but not correct D-M-Y does not convert to dates
@@ -2474,7 +3001,12 @@ ErrHandler:
 End Sub
 
 Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'We test that the first column converts (via CSVRead) to the same date as the second column (via CDate) _
@@ -2499,7 +3031,12 @@ ErrHandler:
 End Sub
 
 Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Test that parsing strings that almost but not correct M-D-Y does not convert to dates
@@ -2521,7 +3058,12 @@ ErrHandler:
 End Sub
 
 Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "ampm"
@@ -2556,7 +3098,12 @@ ErrHandler:
 End Sub
 
 Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "time"
@@ -2573,7 +3120,12 @@ ErrHandler:
 End Sub
 
 Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test datetimes"
@@ -2593,7 +3145,12 @@ ErrHandler:
 End Sub
 
 Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "dash as null"
@@ -2611,7 +3168,12 @@ ErrHandler:
 End Sub
 
 Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     'Different from Julia equivalent in that elements of first column have different type whereas Julia parses col 1 to be all strings
@@ -2630,7 +3192,12 @@ ErrHandler:
 End Sub
 
 Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test one row of data"
@@ -2647,7 +3214,12 @@ ErrHandler:
 End Sub
 
 Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "plus as null"
@@ -2665,7 +3237,12 @@ ErrHandler:
 End Sub
 
 Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "categorical"
@@ -2682,7 +3259,12 @@ ErrHandler:
 End Sub
 
 Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test file issue 154"
@@ -2704,7 +3286,12 @@ ErrHandler:
 End Sub
 
 Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test int sentinel"
@@ -2731,7 +3318,12 @@ ErrHandler:
 End Sub
 
 Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
     'The is test is fragile in that line endings in text files can get flipped from vbLf to vbCrLf as files are pushed and pulled to git.
     On Error GoTo ErrHandler
     TestDescription = "escape row starts"
@@ -2751,7 +3343,12 @@ ErrHandler:
 End Sub
 
 Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "Sacramentorealestatetransactions"
@@ -2770,7 +3367,12 @@ ErrHandler:
 End Sub
 
 Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "log001 vehicle status flags 0.txt"
@@ -2788,7 +3390,12 @@ ErrHandler:
 End Sub
 
 Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "SalesJan2009"
@@ -2820,7 +3427,12 @@ ErrHandler:
 End Sub
 
 Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "GSM2230757 human1 umifm counts"
@@ -2839,7 +3451,12 @@ ErrHandler:
 End Sub
 
 Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "SacramentocrimeJanuary2006"
@@ -2868,7 +3485,12 @@ ErrHandler:
 End Sub
 
 Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test empty lines"
@@ -2884,7 +3506,12 @@ ErrHandler:
 End Sub
 
 Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test padding"
@@ -2908,7 +3535,12 @@ ErrHandler:
 End Sub
 
 Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test not delimited"
@@ -2925,7 +3557,12 @@ ErrHandler:
 End Sub
 
 Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test string first argument"
@@ -2945,7 +3582,12 @@ ErrHandler:
 End Sub
 
 Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "Fielding"
@@ -2964,7 +3606,12 @@ ErrHandler:
 End Sub
 
 Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "precompile"
@@ -2992,7 +3639,12 @@ ErrHandler:
 End Sub
 
 Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "precompile"
@@ -3012,7 +3664,12 @@ ErrHandler:
 End Sub
 
 Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "big types"
@@ -3036,7 +3693,12 @@ ErrHandler:
 End Sub
 
 Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test headers"
@@ -3060,7 +3722,12 @@ ErrHandler:
 End Sub
 
 Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test ragged headers"
@@ -3093,7 +3760,12 @@ ErrHandler:
 End Sub
 
 Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test header on row 4"
@@ -3113,7 +3785,12 @@ ErrHandler:
 End Sub
 
 Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3131,7 +3808,12 @@ ErrHandler:
 End Sub
 
 Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3149,7 +3831,12 @@ ErrHandler:
 End Sub
 
 Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3167,7 +3854,12 @@ ErrHandler:
 End Sub
 
 Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3185,7 +3877,12 @@ ErrHandler:
 End Sub
 
 Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3203,7 +3900,12 @@ ErrHandler:
 End Sub
 
 Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3223,7 +3925,12 @@ ErrHandler:
 End Sub
 
 Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3241,7 +3948,12 @@ ErrHandler:
 End Sub
 
 Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3259,7 +3971,12 @@ ErrHandler:
 End Sub
 
 Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3277,7 +3994,12 @@ ErrHandler:
 End Sub
 
 Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3295,7 +4017,12 @@ ErrHandler:
 End Sub
 
 Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3313,7 +4040,12 @@ ErrHandler:
 End Sub
 
 Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3331,7 +4063,12 @@ ErrHandler:
 End Sub
 
 Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3349,7 +4086,12 @@ ErrHandler:
 End Sub
 
 Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3367,7 +4109,12 @@ ErrHandler:
 End Sub
 
 Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3385,7 +4132,12 @@ ErrHandler:
 End Sub
 
 Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3403,7 +4155,12 @@ ErrHandler:
 End Sub
 
 Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3422,7 +4179,12 @@ ErrHandler:
 End Sub
 
 Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3440,7 +4202,12 @@ ErrHandler:
 End Sub
 
 Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3458,7 +4225,12 @@ ErrHandler:
 End Sub
 
 Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test ragged headers, take 2"
@@ -3481,7 +4253,12 @@ ErrHandler:
 End Sub
 
 Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
@@ -3511,7 +4288,12 @@ ErrHandler:
 End Sub
 
 Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test not delimited.txt"
@@ -3536,7 +4318,12 @@ ErrHandler:
 End Sub
 
 Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3554,7 +4341,12 @@ ErrHandler:
 End Sub
 
 Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3573,7 +4365,12 @@ ErrHandler:
 End Sub
 
 Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test too few headers"
@@ -3604,7 +4401,12 @@ ErrHandler:
 End Sub
 
 Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3622,7 +4424,12 @@ ErrHandler:
 End Sub
 
 Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test quoted headers"
@@ -3653,7 +4460,12 @@ ErrHandler:
 End Sub
 
 Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3674,7 +4486,12 @@ ErrHandler:
 End Sub
 
 Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3695,7 +4512,12 @@ ErrHandler:
 End Sub
 
 Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3713,7 +4535,12 @@ ErrHandler:
 End Sub
 
 Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3731,7 +4558,12 @@ ErrHandler:
 End Sub
 
 Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test not delimited.txt"
@@ -3751,7 +4583,12 @@ ErrHandler:
 End Sub
 
 Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test dateformat"
@@ -3773,7 +4610,12 @@ ErrHandler:
 End Sub
 
 Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3791,7 +4633,12 @@ ErrHandler:
 End Sub
 
 Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
@@ -3809,7 +4656,12 @@ ErrHandler:
 End Sub
 
 Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "download airline safety"
@@ -3846,7 +4698,12 @@ ErrHandler:
 End Sub
 
 Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
@@ -3882,7 +4739,12 @@ ErrHandler:
 End Sub
 
 Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
@@ -3908,7 +4770,12 @@ ErrHandler:
 End Sub
 
 Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
@@ -3926,7 +4793,12 @@ ErrHandler:
 End Sub
 
 Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
@@ -3944,7 +4816,12 @@ ErrHandler:
 End Sub
 
 Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
@@ -3962,7 +4839,12 @@ ErrHandler:
 End Sub
 
 Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test various time formats"
@@ -3986,7 +4868,12 @@ ErrHandler:
 End Sub
 
 Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test y-m-d dates with fractional seconds"
@@ -4010,7 +4897,12 @@ ErrHandler:
 End Sub
 
 Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "Used as example in README.md"
@@ -4037,7 +4929,12 @@ ErrHandler:
 End Sub
 
 Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test headers in fixed width file"
@@ -4067,7 +4964,12 @@ ErrHandler:
 End Sub
 
 Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim TestDescription As String, FileName As String, Expected, Observed, TestRes As Boolean, WhatDiffers As String
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
     TestDescription = "test array lower bounds"
@@ -4084,14 +4986,11 @@ Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
             WhatDiffers = "Test 180 test array lowwer bounds FAILED, Test was that array lower bound should be 1"
         End If
     End If
-        
-        
+
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
     Throw "#Test180 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
-
-
 
