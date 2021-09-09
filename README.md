@@ -111,7 +111,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`DateTimeFormat`|Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data.|
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
 |`Unicode`|If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but `Data` contains strings with characters whose code points exceed 255.|
-|`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `C`. The last line of the file is written with a line ending.|
+|`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
 
 [source](https://github.com/PGS62/VBA-CSV/blob/2ea08f7756768c4c0782145d4e9fee6ec2f9e042/src/modCSVReadWrite.bas#L2792-L2927)
 
@@ -136,13 +136,13 @@ https://github.com/sdkn104/VBA-CSV
 
 # Notes
 ### Line endings
-`CSVRead` automatically detects a file's line endings, whether they be Windows-style (`CRLF`), Unix-style (`LF`) or (pre-OSX) Mac (`CR`). Files with mixed line-endings are handled by taking any instance of either `CRLF`, `CR` or `LF` (outside quoted regions) to indicate a line ending.
+`CSVRead` automatically detects a file's line endings, whether they be Windows (`CRLF`), Unix (`LF`) or (pre-OSX) Mac (`CR`). Files with mixed line-endings are handled by taking any instance of either `CRLF`, `CR` or `LF` (outside quoted regions) to indicate a line ending.
 
 ### Fractional seconds in dates and times
 During type conversion, `CSVRead` accepts dates and times where the number of seconds includes a decimal fraction. For example the time`10:13:20.500` is half a second later than the time `10:13:20`. This contrasts with the VBA function [`CDate`](https://docs.microsoft.com/en-us/office/vba/language/concepts/getting-started/type-conversion-functions) where executing
 `CDate("10:13:20.500")` results in an error.
 
-### Array Lower Bounds
+### Array lower bounds
 The return from `CSVRead` is an array with lower bounds of one. If you prefer array lower bounds to be zero, then edit the constant `m_LBound` (at the top of `modCSVReadWrite.bas`) to be 0 rather than 1.  
 [source](https://github.com/PGS62/VBA-CSV/blob/2ea08f7756768c4c0782145d4e9fee6ec2f9e042/src/modCSVReadWrite.bas#L32-L33)
 
