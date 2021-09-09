@@ -111,7 +111,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`DateTimeFormat`|Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data.|
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
 |`Unicode`|If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but `Data` contains strings with characters whose code points exceed 255.|
-|`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `C`. The last line of the file is written with a line ending.|
+|`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
 
 [source](https://github.com/PGS62/VBA-CSV/blob/2ea08f7756768c4c0782145d4e9fee6ec2f9e042/src/modCSVReadWrite.bas#L2792-L2927)
 
