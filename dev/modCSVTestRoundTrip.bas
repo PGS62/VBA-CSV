@@ -131,7 +131,7 @@ End Sub
 '              and test that the read-back data is identical to the starting data. For round-tripping to work we must write
 '              with QuoteAllStrings being TRUE and read back with ShowMissingsAs being Empty (to be able to distinguish
 '              Empty and null string. Also method RandomDoubles only generates doubles that have exact representation as
-'              strings (avoid errors of order 10E-15).
+'              strings (avoid differences of order 10E-15).
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Variant, DateFormat As String, _
     Unicode As Boolean, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String, _
@@ -175,11 +175,6 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
 ErrHandler:
     Throw "#RoundTripTestCore: " & Err.Description & "!"
 End Sub
-
-Sub sgrsg()
-Debug.Print RandomString(False, False, vbLf)
-End Sub
-
 
 Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
 
@@ -427,22 +422,26 @@ ErrHandler:
     Throw "#RandomVariant: " & Err.Description & "!"
 End Function
 
-'Copy of identical function in modCVS so that copy there can be Private
+'Copy of identical function in modCSVReadWrite so that copy there can be Private
 Private Function OStoEOL(OS As String, ArgName As String) As String
 
     Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
 
+    On Error GoTo ErrHandler
     Select Case LCase(OS)
-        Case "windows", vbCrLf
+        Case "windows", vbCrLf, "crlf"
             OStoEOL = vbCrLf
-        Case "unix", vbLf
+        Case "unix", "linux", vbLf, "lf"
             OStoEOL = vbLf
-        Case "mac", vbCr
+        Case "mac", vbCr, "cr"
             OStoEOL = vbCr
         Case Else
-            Throw ArgName + Err_Invalid
+            Throw ArgName & Err_Invalid
     End Select
-    
+
+    Exit Function
+ErrHandler:
+    Throw "#OStoEOL: " & Err.Description & "!"
 End Function
 
 'Public because called from worksheet "Demo"

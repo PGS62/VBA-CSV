@@ -7,23 +7,23 @@ Attribute VB_Name = "modCSVTestDeps"
 ' Document: https://github.com/PGS62/VBA-CSV#readme
 
 'This module contains "test dependencies" of CSVReadWrite, i.e. dependencies of the code used to test ModCSVReadWrite, _
- but not dependencies of ModCSVReadWrite itself which is (should be) self-contained
+ but not dependencies of ModCSVReadWrite itself which is (should be) self-contained.
 
 Option Explicit
 Option Private Module
 
 #If VBA7 And Win64 Then
-Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
-Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
+    Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
+    Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 #Else
-Private Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
-Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
+    Private Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
+    Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 #End If
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : TestCSVRead
 ' Purpose    : Kernel of the method RunTests, uses sArryasIdentical to check that data read by function CSVRead is
-'              identical to Expected. If not sets WhatDiffers to a description of what went wrong.
+'              identical to Expected. If not, sets WhatDiffers to a description of what went wrong.
 ' -----------------------------------------------------------------------------------------------------------------------
 Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected As Variant, FileName As String, ByRef Observed, _
     ByRef WhatDiffers As String, Optional AbsTol As Double, Optional RelTol As Double, Optional ConvertTypes As Variant = False, _
@@ -264,7 +264,7 @@ ErrHandler:
     Throw "#ElapsedTime: " & Err.Description & "!"
 End Function
 
-'Copy of identical function in modCVSReadWrite
+'Copy of identical function in modCSVReadWrite
 Function NumDimensions(x As Variant) As Long
     Dim i As Long
     Dim y As Long

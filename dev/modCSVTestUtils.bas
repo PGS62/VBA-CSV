@@ -51,7 +51,7 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
 
     Res = Res + vbLf + Indent + "FileName = """ & FileName & """"
 
-    If Left$(FileName, 4) = "http" Then
+    If Left$(FileName, 4) = "http" Or InStr(FileName, ",") > 0 Then
         Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, FileName, Observed, WhatDiffers"
     Else
         Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"

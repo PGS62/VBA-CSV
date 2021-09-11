@@ -29,8 +29,8 @@ End Enum
 
 Private Const m_ErrorStyle = es_ReturnString
 
-Private Const m_LBound = 1 'Sets the array lower bounds of the return from CSVRead. _
-                            To return zero-based arrays, change the value of this constant to 0.
+Private Const m_LBound = 1 'Sets the array lower bounds of the return from CSVRead.
+                           'To return zero-based arrays, change the value of this constant to 0.
 
 Private Enum enmSourceType
     st_File = 0
@@ -38,7 +38,7 @@ Private Enum enmSourceType
     st_String = 2
 End Enum
 
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CSVRead
 ' Purpose   : Returns the contents of a comma-separated file on disk as an array.
 ' Arguments
@@ -139,7 +139,7 @@ End Enum
 '
 '             For discussion of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
     Optional DateFormat As String, Optional Comment As String, _
@@ -513,11 +513,11 @@ ErrHandler:
     End If
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVRead
 ' Purpose    : Register the function CSVRead with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Sub RegisterCSVRead()
     Const Description = "Returns the contents of a comma-separated file on disk as an array."
     Dim ArgumentDescriptions() As String
@@ -585,11 +585,11 @@ ErrHandler:
     Throw "#InferSourceType: " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Download
 ' Purpose   : Downloads bits from the Internet and saves them to a file.
 '             See https://msdn.microsoft.com/en-us/library/ms775123(v=vs.85).aspx
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function Download(URLAddress As String, ByVal FileName As String)
     Dim ErrString As String
     Dim Res
@@ -727,10 +727,10 @@ ErrHandler:
     Throw "#FileFromPath: " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : FolderExists
 ' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function FolderExists(ByVal FolderPath As String)
     Dim F As Scripting.Folder
     
@@ -744,15 +744,15 @@ ErrHandler:
     FolderExists = False
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CreatePath
 ' Purpose   : Creates a folder on disk. FolderPath can be passed in as C:\This\That\TheOther even if the
 '             folder C:\This does not yet exist. If successful returns the name of the
-'             folder. If not successful returns an error string.
+'             folder. If not successful throws an error.
 ' Arguments
 ' FolderPath: Path of the folder to be created. For example C:\temp\My_New_Folder. It does not matter if
 '             this path has a terminating backslash or not.
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function CreatePath(ByVal FolderPath As String)
 
     Dim F As Scripting.Folder
@@ -851,7 +851,7 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : IsCTValid
-' Purpose    : Is a "CT string" (which can in fact be either a string or a Boolean) valid?
+' Purpose    : Is a "Convert Types string" (which can in fact be either a string or a Boolean) valid?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function IsCTValid(CT As Variant) As Boolean
 
@@ -951,7 +951,7 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : OneDArrayToTwoDArray
-' Purpose    : Convert 1-d array of 2-element 1-d arrays into a 1-based, two-column, 2-d array
+' Purpose    : Convert 1-d array of 2-element 1-d arrays into a 1-based, two-column, 2-d array.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function OneDArrayToTwoDArray(x As Variant)
     Const Err_1DArray = "If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements"
@@ -994,6 +994,8 @@ End Function
 '  ConvertQuoted         : Set only if ConvertTypes is not an array
 '  TrimFields            : Set only if ConvertTypes is not an array
 '  ColByColFormatting    : Set to True if ConvertTypes is an array
+'  HeaderRowNum          : As passed to CSVRead, used to throw an error if HeaderRowNum has not been specified when
+'                          it needs to have been.
 '  CTDict                : Set to a dictionary keyed on the elements of the left column (top row) of ConvertTypes,
 '                          each element containing the corresponding right (or bottom) element.
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1102,10 +1104,10 @@ ErrHandler:
     Throw "#ParseConvertTypes: " & Err.Description & "!"
 End Sub
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : IsNumber
 ' Purpose   : Is a singleton a number?
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function IsNumber(x As Variant) As Boolean
     Select Case VarType(x)
         Case vbDouble, vbInteger, vbSingle, vbLong ', vbCurrency, vbDecimal
@@ -1180,11 +1182,11 @@ ErrHandler:
     Throw "#ParseCTString: " & Err.Description & "!"
 End Sub
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NCols
 ' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
 '             have one row and the number of columns returned by this function.
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function NCols(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
         NCols = TheArray.Columns.Count
@@ -1202,10 +1204,10 @@ Private Function NCols(Optional TheArray) As Long
     End If
 End Function
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NRows
 ' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function NRows(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
         NRows = TheArray.Rows.Count
@@ -1223,13 +1225,13 @@ Private Function NRows(Optional TheArray) As Long
     End If
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Transpose
 ' Purpose   : Returns the transpose of an array.
 ' Arguments
 ' TheArray  : An array of arbitrary values.
-'             also converts 0-based to 1-based arrays
-'---------------------------------------------------------------------------------------------------------
+'             Return is always 1-based, even when input is zero-based.
+'----------------------------------------------------------------------------------------------------------------------
 Private Function Transpose(ByVal TheArray As Variant)
     Dim Co As Long
     Dim i As Long
@@ -1254,24 +1256,24 @@ ErrHandler:
     Transpose = "#Transpose: " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Force2DArrayR
 ' Purpose   : When writing functions to be called from sheets, we often don't want to process
 '             the inputs as Range objects, but instead as Arrays. This method converts the
 '             input into a 2-dimensional 1-based array (even if it's a single cell or single row of cells)
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Sub Force2DArrayR(ByRef RangeOrArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
     If TypeName(RangeOrArray) = "Range" Then RangeOrArray = RangeOrArray.Value2
     Force2DArray RangeOrArray, NR, NC
 End Sub
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Force2DArray
 ' Purpose   : In-place amendment of singletons and one-dimensional arrays to two dimensions.
 '             singletons and 1-d arrays are returned as 2-d 1-based arrays. Leaves two
 '             two dimensional arrays untouched (i.e. a zero-based 2-d array will be left as zero-based).
 '             See also Force2DArrayR that also handles Range objects.
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
     Dim TwoDArray As Variant
 
@@ -1747,7 +1749,8 @@ End Function
 '                    appear in the return from CSVRead under the assumption that argument SkipToCol is 1.
 '  QuoteCounts     : Set to an array of size at least NumFields. Element k gives the number of QuoteChars that appear in
 '                    the kth field.
-'  HeaderRow       : Set equal to the contents of the header row in the file, no type conversion other than unquoting.
+'  HeaderRow       : Set equal to the contents of the header row in the file, no type conversion, but quoted fields are
+'                    unquoted and leading and trailing spaces are removed.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, Delimiter As String, _
     Comment As String, IgnoreEmptyLines As Boolean, IgnoreRepeated As Boolean, SkipToRow As Long, _
@@ -2805,7 +2808,7 @@ ErrHandler:
     Throw "#OStoEOL: " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CSVWrite
 ' Purpose   : Creates a comma-separated file on disk containing Data. Any existing file of the same
 '             name is overwritten. If successful, the function returns FileName, otherwise an "error
@@ -2838,7 +2841,7 @@ End Function
 '
 '             For discussion of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
     Optional ByVal DateTimeFormat As String = "ISO", _
@@ -2942,11 +2945,11 @@ ErrHandler:
     End If
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVWrite
 ' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Sub RegisterCSVWrite()
     Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
     Dim ArgumentDescriptions() As String
@@ -3095,13 +3098,13 @@ Private Sub Throw(ByVal ErrorString As String)
     Err.Raise vbObjectError + 1, , ErrorString
 End Sub
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : ThrowIfError
 ' Purpose   : In the event of an error, methods intended to be callable from spreadsheets
 '             return an error string (starts with "#", ends with "!"). ThrowIfError allows such
 '             methods to be used from VBA code while keeping error handling robust
 '             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Public Function ThrowIfError(Data As Variant)
     ThrowIfError = Data
     If VarType(Data) = vbString Then
@@ -3113,11 +3116,11 @@ Public Function ThrowIfError(Data As Variant)
     End If
 End Function
 
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NumDimensions
 ' Purpose   : Returns the number of dimensions in an array variable, or 0 if the variable
 '             is not an array.
-'---------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function NumDimensions(x As Variant) As Long
     Dim i As Long
     Dim y As Long
@@ -3311,13 +3314,13 @@ ErrHandler:
     Throw "#AddKeyToDict: " & Err.Description & "!"
 End Sub
 
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 ' Procedure : ElapsedTime
 ' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
 '             time stamp that can be used for time-interval measurements.
 '
 '             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
-'---------------------------------------------------------------------------------------------------------
+'----------------------------------------------------------------------------------------------------------------------
 Private Function ElapsedTime() As Double
     Dim a As Currency
     Dim b As Currency
@@ -3480,7 +3483,7 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastISO8601
-' Purpose    : Convert ISO8601 formatted datestrings to UTC date. Handles the following formats. https://xkcd.com/1179/
+' Purpose    : Convert ISO8601 formatted datestrings to UTC date. https://xkcd.com/1179/
 
 'Always accepts dates without time
 'Format                        Example

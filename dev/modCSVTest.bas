@@ -215,6 +215,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test178 Folder, NumPassed, NumFailed, Failures
     Test179 Folder, NumPassed, NumFailed, Failures
     Test180 Folder, NumPassed, NumFailed, Failures
+    Test181 Folder, NumPassed, NumFailed, Failures
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -4993,4 +4994,28 @@ Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
 ErrHandler:
     Throw "#Test180 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
+Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test literal with no line feed"
+    Expected = HStack(1#, 2#, 3#)
+    FileName = "1,2,3"
+    TestRes = TestCSVRead(181, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test181 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
 

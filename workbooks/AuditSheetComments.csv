@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+80,11-Sep-2021,09:42:04,"Philip Swannell","Added test for FileName being literal with no line feed."
+79,11-Sep-2021,09:22:25,"Philip Swannell","Code comments only."
 78,09-Sep-2021,12:33:41,"Philip Swannell","Change to InferSourceType"
 77,09-Sep-2021,10:28:41,"Philip Swannell","mid -> mid$"
 76,09-Sep-2021,09:04:37,"Philip Swannell","Ran method AmendVBACode"
