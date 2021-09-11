@@ -115,11 +115,11 @@ Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, Num
     NameThatFile = (Folder & "\" & IIf(ExtraInfo = "", "", ExtraInfo & "_") & IIf(OS = "", "", OS & "_") & Format(NumRows, "0000") & "_x_" & Format(NumCols, "000") & IIf(Unicode, "_Unicode", "_Ascii") & IIf(Ragged, "_Ragged", "") & ".csv")
 End Function
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NCols
 ' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
 '             have one row and the number of columns returned by this function.
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function NCols(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
         NCols = TheArray.Columns.Count
@@ -136,10 +136,10 @@ Function NCols(Optional TheArray) As Long
         End Select
     End If
 End Function
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NRows
 ' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function NRows(Optional TheArray) As Long
     If TypeName(TheArray) = "Range" Then
         NRows = TheArray.Rows.Count
@@ -157,7 +157,7 @@ Function NRows(Optional TheArray) As Long
     End If
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CreatePath
 ' Purpose   : Creates a folder on disk. FolderPath can be passed in as C:\This\That\TheOther even if the
 '             folder C:\This does not yet exist. If successful returns the name of the
@@ -165,7 +165,7 @@ End Function
 ' Arguments
 ' FolderPath: Path of the folder to be created. For example C:\temp\My_New_Folder. It does not matter if
 '             this path has a terminating backslash or not.
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function CreatePath(ByVal FolderPath As String)
 
     Dim F As Scripting.Folder
@@ -227,10 +227,10 @@ ErrHandler:
     CreatePath = "#CreatePath: " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : FolderExists
 ' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Private Function FolderExists(ByVal FolderPath As String)
     Dim F As Scripting.Folder
     Dim FSO As Scripting.FileSystemObject
@@ -243,13 +243,13 @@ ErrHandler:
     FolderExists = False
 End Function
 
-'---------------------------------------------------------------------------------------------------------
-' Procedure : ElapsedTime
-' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
-'             time stamp that can be used for time-interval measurements.
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ElapsedTime
+' Purpose    : Retrieves the current value of the performance counter, which is a high resolution (<1us)
+'              time stamp that can be used for time-interval measurements.
 '
-'             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
-'---------------------------------------------------------------------------------------------------------
+'              See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
+' -----------------------------------------------------------------------------------------------------------------------
 Function ElapsedTime() As Double
     Dim a As Currency
     Dim b As Currency
@@ -291,10 +291,10 @@ Public Sub Throw(ByVal ErrorString As String)
     Err.Raise vbObjectError + 1, , ErrorString
 End Sub
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CreateMissing
 ' Purpose   : Returns a variant of type Missing
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function CreateMissing()
     CreateMissing = CM2()
 End Function
@@ -302,13 +302,13 @@ Function CM2(Optional OptionalArg As Variant)
     CM2 = OptionalArg
 End Function
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Force2DArray
 ' Purpose   : In-place amendment of singletons and one-dimensional arrays to two dimensions.
 '             singletons and 1-d arrays are returned as 2-d 1-based arrays. Leaves two
 '             two dimensional arrays untouched (i.e. a zero-based 2-d array will be left as zero-based).
 '             See also Force2DArrayR that also handles Range objects.
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
     Dim TwoDArray As Variant
 
@@ -343,12 +343,12 @@ ErrHandler:
     Throw "#Force2DArray (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Force2DArrayR
 ' Purpose   : When writing functions to be called from sheets, we often don't want to process
 '             the inputs as Range objects, but instead as Arrays. This method converts the
 '             input into a 2-dimensional 1-based array (even if it's a single cell or single row of cells)
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Sub Force2DArrayR(ByRef RangeOrArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
     If TypeName(RangeOrArray) = "Range" Then RangeOrArray = RangeOrArray.Value2
     Force2DArray RangeOrArray, NR, NC
@@ -386,10 +386,10 @@ ErrHandler:
     SafeMax = "#" & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : IsNumberOrDate
 ' Purpose   : Is a singleton a number or date
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function IsNumberOrDate(x As Variant) As Boolean
     Select Case VarType(x)
         Case vbDouble, vbInteger, vbSingle, vbLong, vbDate
@@ -397,10 +397,10 @@ Function IsNumberOrDate(x As Variant) As Boolean
     End Select
 End Function
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : SafeSubtract
 ' Purpose   : low-level subtraction with error handling
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function SafeSubtract(a, b)
     On Error GoTo ErrHandler
     If Not IsNumberOrDate(a) Then
@@ -415,7 +415,7 @@ ErrHandler:
     SafeSubtract = "#" & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Equals
 ' Purpose   : Returns TRUE if a is equal to b, FALSE otherwise. a and b may be numbers, strings,
 '             Booleans or Excel error values, but not arrays. For testing equality of
@@ -432,7 +432,7 @@ End Function
 '             defaults to FALSE (case insensitive matching).
 '
 'Note:        Avoids VBA booby trap that False = 0 and True = -1
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function Equals(a, b, Optional CaseSensitive As Boolean = False) As Variant
     On Error GoTo ErrHandler
     Dim VTA As Long
@@ -467,12 +467,12 @@ ErrHandler:
     Equals = False
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : IsApprox
 'Purpose:    Inexact equality comparison: for numeric x and y, True if
 '            Abs(x-y) <= Max(AbsTol, RelTol*max(Abs(x), Abs(y))).
 '            Similar to Julia's function of the same name.
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function IsApprox(ByVal x, ByVal y, Optional CaseSensitive As Boolean = False, Optional AbsTol As Double, Optional RelTol As Double)
 
     Dim CompareTo As Double
@@ -538,12 +538,12 @@ ErrHandler:
     IsApprox = False
 End Function
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NonStringToString
 ' Purpose   : Convert non-string to string in a way that mimics how the non-string would
 '             be displayed in an Excel cell. Used by functions such as ConcatenateStrings
 '             and Examine (aka g)
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Private Function NonStringToString(x As Variant, Optional AddSingleQuotesToStings As Boolean = False)
     Dim Res As String
     On Error GoTo ErrHandler
@@ -603,13 +603,13 @@ ErrHandler:
     SafeCStr = "#Cannot represent " + TypeName(x) + "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : Transpose
 ' Purpose   : Returns the transpose of an array.
 ' Arguments
 ' TheArray  : An array of arbitrary values.
 '             also converts 0-based to 1-based arrays
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function Transpose(ByVal TheArray As Variant)
     Dim Co As Long
     Dim i As Long
@@ -634,14 +634,14 @@ ErrHandler:
     Transpose = "#Transpose (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : HStack
 ' Purpose   : Places arrays horizontally side by side. If the arrays are of unequal height then they will be padded
 '             underneath with #NA! values.
 '  Notes   1) Input arrays to range can have 0,1, or 2 dimensions
 '          2) output array has lower bound 1, whatever the lower bounds of the inputs
 '          3) input arrays of 1 dimension are treated as if they were columns, different from SAI equivalent fn.
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function HStack(ParamArray Arrays())
 
     Dim AllC As Long
@@ -732,7 +732,7 @@ ErrHandler:
     HStack = "#HStack (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : ArraysIdentical
 ' Purpose   : Returns TRUE if the two input arrays are identical. That is, they are the same size and
 '             shape and every pair of elements are equal.
@@ -813,10 +813,10 @@ ErrHandler:
     ArraysIdentical = "#ArraysIdentical (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : IsNumber
 ' Purpose   : Is a singleton a number?
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function IsNumber(x As Variant) As Boolean
     Select Case VarType(x)
         Case vbDouble, vbInteger, vbSingle, vbLong ', vbCurrency, vbDecimal
@@ -841,7 +841,7 @@ ErrHandler:
     Throw "#" + CopyOfErr + "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : sStringBetweenStrings
 ' Purpose   : The function returns the substring of the input TheString which lies between LeftString
 '             and RightString.
@@ -858,7 +858,7 @@ End Function
 ' IncludeRightString: If TRUE, then if RightString appears in TheString (and appears after the first occurance
 '             of LeftString) then the return will include RightString. This argument is
 '             optional and defaults to FALSE.
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function StringBetweenStrings(TheString, LeftString, RightString, Optional IncludeLeftString As Boolean, Optional IncludeRightString As Boolean)
     Dim MatchPoint1 As Long        ' the position of the first character to return
     Dim MatchPoint2 As Long        ' the position of the last character to return

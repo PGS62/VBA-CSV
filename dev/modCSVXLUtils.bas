@@ -18,7 +18,7 @@ Function TestFolder()
     TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : ArrayEquals
 ' Purpose   : Element-wise testing for equality of two arrays - the array version of Equals. Like the =
 '             operator in Excel array formulas, but capable of comparing error values, so
@@ -28,7 +28,7 @@ End Function
 ' Array2    : The second array to compare, with arbitrary values - numbers, text, errors, logicals etc.
 ' CaseSensitive: Determines if comparison of strings is done in a case sensitive manner. If omitted
 '             defaults to FALSE (case insensitive matching).
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function ArrayEquals(Array1 As Variant, Array2 As Variant, Optional CaseSensitive As Variant = False)
     On Error GoTo ErrHandler
     Dim i As Long
@@ -126,14 +126,14 @@ ErrHandler:
     Throw "#FileReadAll (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : VStack
 ' Purpose   : Places arrays vertically on top of one another. If the arrays are of unequal width then they will be
 '             padded to the right with #NA! values.
 '  Notes   1) Input arrays to range can have 0, 1, or 2 dimensions.
 '          2) output array has lower bound 1, whatever the lower bounds of the inputs.
 '          3) input arrays of 1 dimension are treated as if they were rows, same as SAI equivalent fn.
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function VStack(ParamArray Arrays())
     Dim AllC As Long
     Dim AllR As Long
@@ -261,7 +261,7 @@ ErrHandler:
     Fill = "#Fill: " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : SplitString
 ' Purpose   : Breaks up TheString into sub-strings with breaks at the positions at which the Delimiter
 '             character appears, and returns the sub-strings as a two-dimensional, 1-based, 1 column array.
@@ -269,7 +269,7 @@ End Function
 ' TheString : The string to be split.
 ' Delimiter : The delimiter string, can be multiple characters. The search for the delimiter
 '             is case insensitive.
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function SplitString(TheString As String, Optional Delimiter As String = ",")
 
     Dim i As Long
@@ -407,7 +407,7 @@ ErrHandler:
     Throw "#InsertInString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : IsRegMatch
 ' Purpose   : Implements Regular Expressions exposed by "Microsoft VBScript Regular Expressions 5.5".
 '             The function returns TRUE if StringToSearch matches RegularExpression, FALSE
@@ -455,7 +455,7 @@ End Function
 '             Further reading:
 '             http://www.regular-expressions.info/
 '             https://en.wikipedia.org/wiki/Regular_expression
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function IsRegMatch(RegularExpression As String, ByVal StringToSearch As Variant, Optional CaseSensitive As Boolean = False)
     Dim i As Long
     Dim j As Long
@@ -541,7 +541,7 @@ ErrHandler:
     RegExSyntaxValid = False
 End Function
 
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : RegExReplace
 ' Purpose   : Uses regular expressions to make replacement in a set of input strings.
 '
@@ -569,7 +569,7 @@ End Function
 '             $´        The suffix, that is, the part of the target sequence that follows
 '             the match.
 '             $$        A single $ character.
-'---------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Function RegExReplace(InputString As Variant, RegularExpression As String, Replacement As String, Optional CaseSensitive As Boolean)
     Dim i As Long
     Dim j As Long

@@ -38,7 +38,7 @@ Private Enum enmSourceType
     st_String = 2
 End Enum
 
-'----------------------------------------------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------------------------------------------------------------
 ' Procedure : CSVRead
 ' Purpose   : Returns the contents of a comma-separated file on disk as an array.
 ' Arguments

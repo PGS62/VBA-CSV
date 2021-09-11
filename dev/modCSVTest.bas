@@ -281,11 +281,11 @@ ErrHandler:
     Throw "#PasteFailures (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : FolderExists
 ' Purpose   : Returns True or False. Does not matter whether FolderPath has a terminating
 '             backslash.
-'---------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Private Function FolderExists(ByVal FolderPath As String)
     Dim F As Scripting.Folder
     Dim FSO As Scripting.FileSystemObject
