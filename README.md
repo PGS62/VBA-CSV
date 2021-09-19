@@ -205,5 +205,3 @@ VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available
 Author: Philip Swannell  
 Licence: MIT
 
-test edit
-
