@@ -1454,9 +1454,9 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef Cha
         CharSet = "_autodetect_all"
         useADODB = False
         HasBOM = False
-
         Exit Sub
     End If
+    
     intAsc2Chr = Asc(T.Read(1))
     
     If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
@@ -1465,14 +1465,12 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef Cha
         CharSet = "utf-16"
         useADODB = False
         HasBOM = True
-
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
         TriState = TristateTrue
         CharSet = "utf-16"
         useADODB = False
         HasBOM = True
-
     Else
         If T.AtEndOfStream Then
             TriState = TristateFalse
@@ -1807,6 +1805,8 @@ End Function
 '              Buffer into a two-dimensional array.
 ' Parameters :
 '  ContentsOrStream: The contents of a CSV file as a string, or else a Scripting.TextStream.
+'  useADODB        : Pass as True when ContentsOrStream is ADODB.Stream, False when it's Scripting.TextStream,
+'                    ignored when it's a string.
 '  QuoteChar       : The quote character, usually ascii 34 ("), which allow fields to contain characters that would
 '                    otherwise be significant to parsing, such as delimiters or new line characters.
 '  Delimiter       : The string that separates fields within each line. Typically a single character, but needn't be.
@@ -2449,24 +2449,24 @@ End Function
 '  QuoteChar            : The quote character, typically ". No support for different opening and closing quote characters
 '                         or different escape character.
 '  QuoteCount           : How many quote characters does Field contain?
-'  ConvertQuoted        : Should quoted fields (after quote removal) be converted according to args ShowNumbersAsNumbers
-'                         ShowDatesAsDates, and the contents of Sentinels.
+'  ConvertQuoted        : Should quoted fields (after quote removal) be converted according to arguments
+'                         ShowNumbersAsNumbers, ShowDatesAsDates, and the contents of Sentinels.
 'Numbers
 '  ShowNumbersAsNumbers : If Field is a string representation of a number should the function return that number?
 '  SepStandard          : Is the decimal separator the same as the system defaults? If True then the next two arguments
 '                         are ignored.
-'  DecimalSeparator     : The decimal separator used in the input string.
+'  DecimalSeparator     : The decimal separator used in Field.
 '  SysDecimalSeparator  : The default decimal separator on the system.
 'Dates
 '  ShowDatesAsDates     : If Field is a string representation of a date should the function return that date?
-'  ISO8601              : If field is a date, does it respect (a subset of) ISO8601?
-'  AcceptWithoutTimeZone: In the case of ISO8601 dates, should conversion be dates-with-time that have no time zone
-'                         information?
-'  AcceptWithTimeZone   : In the case of ISO8601 dates, should conversion be dates-with-time that have time zone
-'                         information?
+'  ISO8601              : If Field is a date, does it respect (a subset of) ISO8601?
+'  AcceptWithoutTimeZone: In the case of ISO8601 dates, should conversion be applied to dates-with-time that have no time
+'                         zone information?
+'  AcceptWithTimeZone   : In the case of ISO8601 dates, should conversion be applied to dates-with-time that have time
+'                         zone information?
 '  DateOrder            : If Field is a string representation what order of parts must it respect (not relevant if
 '                         ISO8601 is True) 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
-'  DateSeparator        : The date separator, must be one of "-" or "/".
+'  DateSeparator        : The date separator, must be either "-" or "/".
 '  SysDateOrder         : The Windows system date order. 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
 '  SysDateSeparator     : The Windows system date separator.
 'Booleans, Errors, Missings
@@ -2513,7 +2513,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
     End If
 
     If QuoteCount > 0 Then
-        If Left$(Field, 1) = QuoteChar Then 'NOTE definition of quoted is both first and last characters must be quote characters
+        If Left$(Field, 1) = QuoteChar Then 'NOTE definition of quoted is both first and last characters must be quote characters.
             If Right$(QuoteChar, 1) = QuoteChar Then
                 isQuoted = True
                 Field = Mid$(Field, 2, FieldLength - 2)
@@ -2585,7 +2585,7 @@ Private Function Unquote(ByVal Field As String, QuoteChar As String, QuoteCount 
 
     On Error GoTo ErrHandler
     If QuoteCount > 0 Then
-        If Left$(Field, 1) = QuoteChar Then 'NOTE definition of quoted is both first and last characters must be quote characters
+        If Left$(Field, 1) = QuoteChar Then
             If Right$(QuoteChar, 1) = QuoteChar Then
                 Field = Mid$(Field, 2, Len(Field) - 2)
                 If QuoteCount > 2 Then
@@ -3092,7 +3092,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : WriteLineWrap
 ' Purpose    : Wrapper to TextStream.Write[Line] to give more informative error message than "invalid procedure call or
-'              argument" if the error is caused by attempting to write characters with code>255 to a stream opened with
+'              argument" if the error is caused by attempting to write illegal characters to a stream opened with
 '              TriStateFalse.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, Unicode As Boolean)
