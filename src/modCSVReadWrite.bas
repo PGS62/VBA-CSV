@@ -38,7 +38,7 @@ Private Enum enmSourceType
     st_String = 2
 End Enum
 
-' ------------------------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CSVRead
 ' Purpose   : Returns the contents of a comma-separated file on disk as an array.
 ' Arguments
@@ -123,10 +123,10 @@ End Enum
 '             If NumRows is greater than the number of rows in the file then the return is "padded" with
 '             the value of ShowMissingsAs. Likewise, if NumCols is greater than the number of columns in
 '             the file.
-' Encoding  : Allowed entries are `UTF-16`, `UTF-8`, `UTF-8-BOM`, and `ANSI`, but for most files this
-'             argument can be omitted and CSVRead will detect the file's encoding. If auto-detection does
-'             not work then it's possible that the file is encoded `UTF-16` but without a byte option mark,
-'             so try entering Encoding as `UTF-16`.
+' Encoding  : Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be
+'             omitted and CSVRead will detect the file's encoding. If auto-detection does not work then
+'             it's possible that the file is encoded `UTF-16` but without a byte option mark to identify it
+'             as such, so try entering Encoding as `UTF-16`.
 ' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
 '             instead of a period (3,14 vs. 3.14). CSVRead can correctly parse these numbers by passing in
 '             the DecimalSeparator as a comma, in which case comma ceases to be a candidate if the parser
@@ -139,7 +139,7 @@ End Enum
 '
 '             For discussion of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
-'----------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
     Optional DateFormat As String, Optional Comment As String, _
@@ -516,11 +516,11 @@ ErrHandler:
     End If
 End Function
 
-'----------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVRead
 ' Purpose    : Register the function CSVRead with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
-'----------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Sub RegisterCSVRead()
     Const Description = "Returns the contents of a comma-separated file on disk as an array."
     Dim ArgumentDescriptions() As String
@@ -531,7 +531,7 @@ Sub RegisterCSVRead()
     ArgumentDescriptions(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV format."
     ArgumentDescriptions(2) = "Type conversion: Boolean or string, subset of letters NDBETQ. N = convert Numbers, D = convert Dates, B = Convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = quoted fields also converted. TRUE = NDB, FALSE = no conversion."
     ArgumentDescriptions(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's contents as would be displayed in a text editor."
-    ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after another delimiter should be ignored while parsing; useful-for fixed-width files with delimiter padding between fields."
+    ArgumentDescriptions(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after another delimiter should be ignored while parsing; useful for fixed-width files with delimiter padding between fields."
     ArgumentDescriptions(5) = "The format of dates in the file such as `Y-M-D`, `M-D-Y` or `Y/M/D`. Also supports `ISO` for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. 2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
     ArgumentDescriptions(6) = "Rows that start with this string will be skipped while parsing."
     ArgumentDescriptions(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column will be assigned ShowMissingsAs for that empty row)."
@@ -544,7 +544,7 @@ Sub RegisterCSVRead()
     ArgumentDescriptions(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
     ArgumentDescriptions(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default, only an empty field (consecutive delimiters) is considered missing."
     ArgumentDescriptions(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null string or `#N/A!` error value can be good alternatives."
-    ArgumentDescriptions(17) = "Allowed entries are `UTF-16`, `UTF-8`, `UTF-8-BOM`, and `ANSI`, but for most files this argument can be omitted and CSVRead will detect the file's encoding."
+    ArgumentDescriptions(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be omitted and CSVRead will detect the file's encoding."
     ArgumentDescriptions(18) = "The character that represents a decimal point. If omitted, then the value from Windows regional settings is used."
     ArgumentDescriptions(19) = "For use from VBA only."
     Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgumentDescriptions
@@ -2941,7 +2941,7 @@ ErrHandler:
     Throw "#OStoEOL: " & Err.Description & "!"
 End Function
 
-'----------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CSVWrite
 ' Purpose   : Creates a comma-separated file on disk containing Data. Any existing file of the same
 '             name is overwritten. If successful, the function returns FileName, otherwise an "error
@@ -2963,9 +2963,9 @@ End Function
 '             saving may be inconsistent across the datetimes in data.
 ' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
 '             character.
-' Unicode   : If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will
-'             be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but Data contains
-'             strings with characters whose code points exceed 255.
+' Unicode   : If `FALSE` (the default) the file written will be encoded as `ANSI`. If TRUE the file written
+'             will be encoded `UTF-16 LE BOM`. An error will result if this argument is `FALSE` but Data
+'             contains characters that cannot be written to an ANSI file.
 ' EOL       : Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`.
 '             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
 '             or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.
@@ -2974,7 +2974,7 @@ End Function
 '
 '             For discussion of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
-'----------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
     Optional ByVal DateTimeFormat As String = "ISO", _
@@ -3078,11 +3078,11 @@ ErrHandler:
     End If
 End Function
 
-'----------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVWrite
 ' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
-'----------------------------------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------------------------------------
 Sub RegisterCSVWrite()
     Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
     Dim ArgumentDescriptions() As String
@@ -3096,8 +3096,8 @@ Sub RegisterCSVWrite()
     ArgumentDescriptions(4) = "A format string that determines how dates, including cells formatted as dates, appear in the file. If omitted, defaults to `yyyy-mm-dd`."
     ArgumentDescriptions(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data."
     ArgumentDescriptions(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one character."
-    ArgumentDescriptions(7) = "If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but Data contains strings with characters whose code points exceed 255."
-    ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `C`."
+    ArgumentDescriptions(7) = "If `FALSE` (the default) the file written will be encoded as `ANSI`. If TRUE the file written will be encoded `UTF-16 LE BOM`. An error will result if this argument is `FALSE` but Data contains characters that cannot be written to an ANSI file."
+    ArgumentDescriptions(8) = "Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`."
     Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgumentDescriptions
     Exit Sub
 

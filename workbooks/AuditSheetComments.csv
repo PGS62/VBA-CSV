@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+89,20-Sep-2021,14:32:52,"Philip Swannell","Updated docstrings."
+88,20-Sep-2021,10:21:24,"Philip Swannell","Changes on Test sheet."
 87,20-Sep-2021,09:43:41,"Philip Swannell","Added five more tests to be sure we interpret ANSI, UTF-8, UTF-8-BOM, UTF-16-LE-BOM and UTF-16-BE-BOM correctly."
 86,19-Sep-2021,19:14:42,"Philip Swannell","Now use ADODB.Stream for UTF-8 files and Scripting.Stream for ASCII, ANSI and UTF-16."
 85,19-Sep-2021,18:31:01,"Philip Swannell","ReadTextWrapper mostly solves the performance problem."
