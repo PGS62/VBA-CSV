@@ -221,6 +221,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test184 Folder, NumPassed, NumFailed, Failures
     Test185 Folder, NumPassed, NumFailed, Failures
     Test186 Folder, NumPassed, NumFailed, Failures
+    Test187 Folder, NumPassed, NumFailed, Failures
 
     Exit Sub
 ErrHandler:
@@ -5032,8 +5033,8 @@ End Sub
 '              255_characters-UTF-8-BOM.csv, 255_characters-UTF-16-BE-BOM.csv, 255_characters-UTF-16-LE-BOM.csv
 ' -----------------------------------------------------------------------------------------------------------------------
 Function TwoFiveFiveChars()
-    Dim Res
     Dim i As Long
+    Dim Res
 
     On Error GoTo ErrHandler
     Res = Fill("", 256, 2)
@@ -5160,5 +5161,30 @@ Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     Exit Sub
 ErrHandler:
     Throw "#Test186 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test mac line endings"
+    Expected = HStack(Array("1,2,3", "4,5,6"))
+    FileName = "test_mac_line_endings.csv"
+    TestRes = TestCSVRead(187, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        Delimiter:=False, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        NumRows:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test187 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 

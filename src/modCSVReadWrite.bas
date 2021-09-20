@@ -150,8 +150,6 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
     Optional ByRef HeaderRow)
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
@@ -213,15 +211,15 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim Starts() As Long
     Dim strDelimiter As String
     Dim Stream As Object 'either ADODB.Stream or Scripting.TextStram
+    Dim CharSet As String
+    Dim HasBOM As Boolean
     Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     Dim SysDecimalSeparator As String
     Dim TempFile As String
     Dim TrimFields As Boolean
     Dim TriState As Long
-    Dim CharSet As String
     Dim useADODB As Boolean
-    Dim HasBOM As Boolean
     
     On Error GoTo ErrHandler
 
@@ -1753,63 +1751,51 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ShowTextFile
 ' Purpose    : Parse any text file to a 1-column two-dimensional array of strings. No splitting into columns and no
-'              casting.
+'              casting. This method is not very efficient for large files for which we only want to show a few lines.
+'              An earlier version used .SkipLine and .ReadLine for much greater efficiency in such cases, but .SkipLine
+'              and .ReadLine don't work for files with Mac line endings. TODO: Write efficient version that works for
+'              all line endings (use a buffer and method GetMoreFromStream etc.)
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ShowTextFile(Stream As Object, StartRow As Long, NumRows As Long)
-
+    
     Dim Contents1D() As String
     Dim Contents2D() As String
     Dim i As Long
+    Dim NRout As Long
     Dim ReadAll As String
 
     On Error GoTo ErrHandler
 
-    For i = 1 To StartRow - 1
-        Stream.SkipLine
-    Next
+    ReadAll = ReadAllFromStream(Stream)
 
-    If NumRows = 0 Then
-        ReadAll = ReadAllFromStream(Stream)
-
-        If InStr(ReadAll, vbCr) > 0 Then
-            ReadAll = Replace(ReadAll, vbCrLf, vbLf)
-            ReadAll = Replace(ReadAll, vbCr, vbLf)
-        End If
-
-        'Text files may or may not be terminated by EOL characters...
-        If Right$(ReadAll, 1) = vbLf Then
-            ReadAll = Left$(ReadAll, Len(ReadAll) - 1)
-        End If
-
-        If Len(ReadAll) = 0 Then
-            ReDim Contents1D(0 To 0)
-        Else
-            Contents1D = VBA.Split(ReadAll, vbLf)
-        End If
-        ReDim Contents2D(1 To UBound(Contents1D) - LBound(Contents1D) + 1, 1 To 1)
-        For i = LBound(Contents1D) To UBound(Contents1D)
-            Contents2D(i + 1, 1) = Contents1D(i)
-        Next i
-    ElseIf TypeName(Stream) = "Stream" Then
-        ReDim Contents2D(1 To NumRows, 1 To 1)
-
-        For i = 1 To NumRows 'Does this work for files with Mac line endings?
-            If Stream.EOS Then Exit For
-            Contents2D(i, 1) = Stream.ReadText(-2) '-2 reads one line from stream
-        Next i
-
-        Stream.Close
-    ElseIf TypeName(Stream) = "TextStream" Then
-        ReDim Contents2D(1 To NumRows, 1 To 1)
-
-        For i = 1 To NumRows 'Does this work for files with Mac line endings
-            If Stream.AtEndOfStream Then Exit For
-            Contents2D(i, 1) = Stream.ReadLine
-        Next i
-    Else
-        Throw "Stream of unknown type: " + TypeName(Stream)
+    If InStr(ReadAll, vbCr) > 0 Then
+        ReadAll = Replace(ReadAll, vbCrLf, vbLf)
+        ReadAll = Replace(ReadAll, vbCr, vbLf)
     End If
 
+    'Text files may or may not be terminated by EOL characters...
+    If Right$(ReadAll, 1) = vbLf Then
+        ReadAll = Left$(ReadAll, Len(ReadAll) - 1)
+    End If
+
+    If Len(ReadAll) = 0 Then
+        ReDim Contents1D(0 To 0)
+    Else
+        Contents1D = VBA.Split(ReadAll, vbLf)
+    End If
+        
+    NRout = UBound(Contents1D) - LBound(Contents1D) + 1 - StartRow + 1
+    If NumRows > 0 Then
+        If NRout > NumRows Then
+            NRout = NumRows
+        End If
+    End If
+        
+    ReDim Contents2D(1 To NRout, 1 To 1)
+    For i = 1 To NRout
+        Contents2D(i, 1) = Contents1D(i - 1 + StartRow - 1)
+    Next i
+    
     ShowTextFile = Contents2D
 
     Exit Function
@@ -1878,8 +1864,8 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
     Dim QuoteCount As Long
     Dim RowNum As Long
     Dim SearchFor() As String
-    Dim Streaming As Boolean
     Dim Stream As Object
+    Dim Streaming As Boolean
     Dim tmp As Long
     Dim Which As Long
 
@@ -2172,8 +2158,8 @@ Private Sub SkipLines(Streaming As Boolean, useADODB As Boolean, Comment As Stri
           Stream As Object, Delimiter As String, ByRef Buffer As String, ByRef i As Long, QuoteChar As String, _
           ByVal PosLF As Long, ByVal PosCR As Long, ByRef BufferUpdatedTo As Long)
     
-    Dim LookAheadBy As Long
     Dim AtEndOfStream As Boolean
+    Dim LookAheadBy As Long
     Dim SkipThisLine As Boolean
     On Error GoTo ErrHandler
     Do
@@ -2236,9 +2222,9 @@ Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Strea
           Delimiter As String, QuoteChar As String, ByRef Which As Long, ByRef Buffer As String, _
           ByRef BufferUpdatedTo As Long)
 
+    Dim AtEndOfStream As Boolean
     Dim InstrRes As Long
     Dim PrevBufferUpdatedTo As Long
-    Dim AtEndOfStream As Boolean
 
     On Error GoTo ErrHandler
 
@@ -2337,14 +2323,14 @@ Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As St
                               just the first line of a file. Suggest 5000? Note that when reading _
                               an entire file (NumRows argument to CSVRead is zero) function _
                               GetMoreFromStream is not called.
+    Dim AtEndOfStream As Boolean
     Dim ExpandBufferBy As Long
     Dim FirstPass As Boolean
     Dim i As Long
+    Dim IsScripting As Boolean
     Dim NCharsToWriteToBuffer As Long
     Dim NewChars
     Dim OKToExit
-    Dim IsScripting As Boolean
-    Dim AtEndOfStream As Boolean
 
     On Error GoTo ErrHandler
     
@@ -2980,8 +2966,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional ByVal DateTimeFormat As String = "ISO", _
     Optional Delimiter As String = ",", Optional Unicode As Boolean, _
     Optional ByVal EOL As String = "")
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a " & _
@@ -3951,3 +3935,4 @@ Private Function ISOZFormatString()
 ErrHandler:
     Throw "#ISOZFormatString: " & Err.Description & "!"
 End Function
+
