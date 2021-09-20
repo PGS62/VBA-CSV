@@ -19,9 +19,12 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 # Installation
 1. Download the [latest release](https://github.com/PGS62/VBA-CSV/releases).
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
-3. Add a reference to "Microsoft Scripting Runtime" (In VBA Editor Tools > References).
-4. Add a reference to "Microsoft VBScript Regular Expressions 5.5"
-5. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
+3. Add three references (In VBA Editor Tools > References)
+   * `Microsoft Scripting Runtime`
+   * `Microsoft VBScript Regular Expressions 5.5` (or the latest version available)
+   * `Microsoft ActiveX Data Objects 6.0 Library` (or the latest version available)
+   ![vbareferences](screenshots/VBAReferences.png)
+4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
 Private Sub Workbook_Open()
     RegisterCSVWrite
@@ -86,7 +89,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`FalseStrings`|Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `FALSE`, `False` and `false` are recognised.|
 |`MissingStrings`|Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default, only an empty field (consecutive delimiters) is considered missing.|
 |`ShowMissingsAs`|Fields which are missing in the file (consecutive delimiters) or match one of the `MissingStrings` are returned in the array as `ShowMissingsAs`. Defaults to Empty, but the null string or `#N/A!` error value can be good alternatives.<br/><br/>If `NumRows` is greater than the number of rows in the file then the return is "padded" with the value of `ShowMissingsAs`. Likewise, if `NumCols` is greater than the number of columns in the file.|
-|`Encoding`|Allowed entries are `UTF-16`, `UTF-8`, `UTF-8-BOM`, and `ANSI`, but for most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work then it's possible that the file is encoded `UTF-16` but without a byte option mark, so try entering `Encoding` as `UTF-16`.|
+|`Encoding`|Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work then it's possible that the file is encoded `UTF-16` but without a byte option mark to identify it as such, so try entering `Encoding` as `UTF-16`.|
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
@@ -110,7 +113,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`DateFormat`|A format string that determines how dates, including cells formatted as dates, appear in the file. If omitted, defaults to `yyyy-mm-dd`.|
 |`DateTimeFormat`|Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data.|
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
-|`Unicode`|If `FALSE` (the default) the file written will be encoded UTF-8. If TRUE the file written will be encoded UTF-16 LE BOM. An error will result if this argument is `FALSE` but `Data` contains strings with characters whose code points exceed 255.|
+|`Unicode`|If `FALSE` (the default) the file written will be encoded as `ANSI`. If TRUE the file written will be encoded `UTF-16 LE BOM`. An error will result if this argument is `FALSE` but `Data` contains characters that cannot be written to an ANSI file.|
 |`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
 
 [source](https://github.com/PGS62/VBA-CSV/blob/bb740ad692f954849281a3a155b6b20772d02832/src/modCSVReadWrite.bas#L2802-L2937)

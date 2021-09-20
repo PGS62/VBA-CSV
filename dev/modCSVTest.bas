@@ -216,6 +216,12 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test179 Folder, NumPassed, NumFailed, Failures
     Test180 Folder, NumPassed, NumFailed, Failures
     Test181 Folder, NumPassed, NumFailed, Failures
+    Test182 Folder, NumPassed, NumFailed, Failures
+    Test183 Folder, NumPassed, NumFailed, Failures
+    Test184 Folder, NumPassed, NumFailed, Failures
+    Test185 Folder, NumPassed, NumFailed, Failures
+    Test186 Folder, NumPassed, NumFailed, Failures
+
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -327,13 +333,15 @@ End Sub
 Private Sub CastDoublesToDates(ByRef x As Variant)
     Dim i As Long
     Dim j As Long
-    For i = LBound(x, 1) To UBound(x, 1)
-        For j = LBound(x, 2) To UBound(x, 2)
-            If VarType(x(i, j)) = vbDouble Then
-                x(i, j) = CDate(x(i, j))
-            End If
+    If NumDimensions(x) = 2 Then
+        For i = LBound(x, 1) To UBound(x, 1)
+            For j = LBound(x, 2) To UBound(x, 2)
+                If VarType(x(i, j)) = vbDouble Then
+                    x(i, j) = CDate(x(i, j))
+                End If
+            Next
         Next
-    Next
+    End If
 End Sub
 
 Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1530,22 +1538,22 @@ Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
 
     On Error GoTo ErrHandler
     TestDescription = "issue 198"
-    FileName = "issue_198.csv"
     Expected = HStack( _
-        Array(Empty, CDate("2018-Apr-18"), CDate("2018-Apr-17"), CDate("2018-Apr-16"), CDate("2018-Apr-15"), CDate("2018-Apr-14"), CDate("2018-Apr-13")), _
+        Array(Empty, 43208#, 43207#, 43206#, 43205#, 43204#, 43203#), _
         Array("Taux de l'Eonia (moyenne mensuelle)", -0.368, -0.368, -0.367, Empty, Empty, -0.364), _
-        Array("EURIBOR Ã  1 mois", -0.371, -0.371, -0.371, Empty, Empty, -0.371), _
-        Array("EURIBOR Ã  12 mois", -0.189, -0.189, -0.189, Empty, Empty, -0.19), _
-        Array("EURIBOR Ã  3 mois", -0.328, -0.328, -0.329, Empty, Empty, -0.329), _
-        Array("EURIBOR Ã  6 mois", -0.271, -0.27, -0.27, Empty, Empty, -0.271), _
-        Array("EURIBOR Ã  9 mois", -0.219, -0.219, -0.219, Empty, Empty, -0.219))
-
+        Array("EURIBOR à 1 mois", -0.371, -0.371, -0.371, Empty, Empty, -0.371), _
+        Array("EURIBOR à 12 mois", -0.189, -0.189, -0.189, Empty, Empty, -0.19), _
+        Array("EURIBOR à 3 mois", -0.328, -0.328, -0.329, Empty, Empty, -0.329), _
+        Array("EURIBOR à 6 mois", -0.271, -0.27, -0.27, Empty, Empty, -0.271), _
+        Array("EURIBOR à 9 mois", -0.219, -0.219, -0.219, Empty, Empty, -0.219))
+    FileName = "issue_198.csv"
     TestRes = TestCSVRead(53, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="D/M/Y", _
         MissingStrings:="-", _
         ShowMissingsAs:=Empty, _
-        DecimalSeparator:=",")
+        DecimalSeparator:=",", _
+        Encoding:="UTF-8")
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
@@ -4027,8 +4035,8 @@ Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding be either ""UTF-16"", ""UTF-8"", ""UTF-8-BOM"" or ""ANSI"".!!"
     TestRes = TestCSVRead(145, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
@@ -5018,4 +5026,139 @@ ErrHandler:
     Throw "#Test181 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : TwoFiveFiveChars
+' Purpose    : Returns the contents of files 255_characters-ANSI.csv, 255_characters-UTF-8.csv,
+'              255_characters-UTF-8-BOM.csv, 255_characters-UTF-16-BE-BOM.csv, 255_characters-UTF-16-LE-BOM.csv
+' -----------------------------------------------------------------------------------------------------------------------
+Function TwoFiveFiveChars()
+    Dim Res
+    Dim i As Long
+
+    On Error GoTo ErrHandler
+    Res = Fill("", 256, 2)
+    Res(1, 1) = "N"
+    Res(1, 2) = "Char"
+    For i = 2 To 256
+        Res(i, 1) = CStr(i - 1)
+        Res(i, 2) = Chr(i - 1)
+    Next
+    Res(11, 2) = vbCrLf 'Have CRLF here to counteract git's annoying habit of "correcting" mixed line endings when pushing and pulling from remote
+    Res(14, 2) = vbCrLf
+
+    TwoFiveFiveChars = Res
+
+    Exit Function
+ErrHandler:
+    Throw "#TwoFiveFiveChars (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Function
+
+Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "255 characters-ANSI"
+    FileName = "255_characters-ANSI.csv"
+    Expected = TwoFiveFiveChars()
+    TestRes = TestCSVRead(182, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        ConvertTypes:=False, _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test182 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "255 characters-UTF-8"
+    Expected = TwoFiveFiveChars()
+    FileName = "255_characters-UTF-8.csv"
+    TestRes = TestCSVRead(183, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test183 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "255 characters-UTF-8-BOM"
+    Expected = TwoFiveFiveChars()
+    FileName = "255_characters-UTF-8-BOM.csv"
+    TestRes = TestCSVRead(184, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test184 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "255 characters-UTF-16-BE-BOM"
+    Expected = TwoFiveFiveChars()
+    FileName = "255_characters-UTF-16-BE-BOM.csv"
+    TestRes = TestCSVRead(185, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    Exit Sub
+ErrHandler:
+    Throw "#Test185 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "255 characters-UTF-16-LE-BOM"
+    Expected = TwoFiveFiveChars()
+    FileName = "255_characters-UTF-16-LE-BOM.csv"
+    TestRes = TestCSVRead(186, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    Exit Sub
+ErrHandler:
+    Throw "#Test186 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
 
