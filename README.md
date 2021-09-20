@@ -93,7 +93,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
-[source](https://github.com/PGS62/VBA-CSV/blob/bb740ad692f954849281a3a155b6b20772d02832/src/modCSVReadWrite.bas#L41-L514)
+[source](https://github.com/PGS62/VBA-CSV/blob/ff35a76b06d6589d3cdf83f737a87164dd3f362d/src/modCSVReadWrite.bas#L41-L513)
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
@@ -116,7 +116,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`Unicode`|If `FALSE` (the default) the file written will be encoded as `ANSI`. If TRUE the file written will be encoded `UTF-16 LE BOM`. An error will result if this argument is `FALSE` but `Data` contains characters that cannot be written to an ANSI file.|
 |`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
 
-[source](https://github.com/PGS62/VBA-CSV/blob/bb740ad692f954849281a3a155b6b20772d02832/src/modCSVReadWrite.bas#L2802-L2937)
+[source](https://github.com/PGS62/VBA-CSV/blob/ff35a76b06d6589d3cdf83f737a87164dd3f362d/src/modCSVReadWrite.bas#L2928-L3063)
 
 # Errors
 You can call `CSVRead` and `CSVWrite` both from spreadsheets (best with Excel 365 and [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531)) and from VBA. When an error occurs, the functions return a string starting with `#` and ending with `!` which gives an explanation of what went wrong.
@@ -125,7 +125,7 @@ So, to get robust error handling from VBA, you should wrap calls to `CSVRead` an
 ```vba
 FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
-[source](https://github.com/PGS62/VBA-CSV/blob/bb740ad692f954849281a3a155b6b20772d02832/src/modCSVReadWrite.bas#L3092-L3108)
+[source](https://github.com/PGS62/VBA-CSV/blob/ff35a76b06d6589d3cdf83f737a87164dd3f362d/src/modCSVReadWrite.bas#L3232-3248)
 
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from spreadsheet formulas will return `#VALUE!` if any error happens, with no description provided.
 
