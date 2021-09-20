@@ -180,15 +180,15 @@ Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL 
 
     Const maxlen = 20
     Dim i As Long
-    Dim length As Long
+    Dim Length As Long
     Dim Res As String
     
     On Error GoTo ErrHandler
     
-    length = CLng(1 + Rnd() * maxlen)
-    Res = String(length, " ")
+    Length = CLng(1 + Rnd() * maxlen)
+    Res = String(Length, " ")
 
-    For i = 1 To length
+    For i = 1 To Length
         If Unicode Then
             Mid$(Res, i, 1) = ChrW(33 + Rnd() * 370)
         Else
@@ -203,9 +203,9 @@ Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL 
     Next
 
     If AllowLineFeed Then
-        If length > 5 Then
+        If Length > 5 Then
             If Rnd() < 0.2 Then
-                Mid$(Res, length / 2, Len(EOL)) = EOL
+                Mid$(Res, Length / 2, Len(EOL)) = EOL
             End If
         End If
     End If

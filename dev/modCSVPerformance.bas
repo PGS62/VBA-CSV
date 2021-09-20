@@ -98,7 +98,7 @@ Private Sub RunSpeedTests()
     
     'Julia results file created by function benchmark. See julia/benchmarkCSV.jl, function benchmark
     
-    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "\julia\juliaparsetimes.csv"
+    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "julia\juliaparsetimes.csv"
     If Not FileExists(JuliaResultsFile) Then
         Throw "Cannot find file '" + JuliaResultsFile + "'"
     End If
@@ -116,6 +116,7 @@ Private Sub RunSpeedTests()
                 DoEvents
                 Application.ScreenUpdating = True
             Next
+            ThisWorkbook.Save
         End If
     Next N
 
@@ -170,7 +171,7 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
 
     On Error GoTo ErrHandler
     
-    JuliaResults = CSVRead(JuliaResultsFile, True)
+    JuliaResults = ThrowIfError(CSVRead(JuliaResultsFile, True))
     
     OS = ""
     
