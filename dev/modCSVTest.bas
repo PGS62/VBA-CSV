@@ -224,7 +224,8 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test187 Folder, NumPassed, NumFailed, Failures
     Test188 Folder, NumPassed, NumFailed, Failures
     Test189 Folder, NumPassed, NumFailed, Failures
-
+    Test190 Folder, NumPassed, NumFailed, Failures
+    Test191 Folder, NumPassed, NumFailed, Failures
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -4291,6 +4292,7 @@ Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
+        SkipToRow:=1#, _
         ExpectedHeaderRow:=HStack("Type", "Col A", "Col B", "Col C", "Col D", "Col E", "Col F", "Col G"))
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
@@ -4404,6 +4406,7 @@ Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
+        SkipToRow:=1, _
         ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "", "", "", "", ""))
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
@@ -4463,6 +4466,7 @@ Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
+        SkipToRow:=1, _
         ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8", "Col9", "Col10"))
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
@@ -4693,6 +4697,7 @@ Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
+        SkipToRow:=1, _
         ExpectedHeaderRow:=HStack( _
         "airline", _
         "avail_seat_km_per_week", _
@@ -4932,6 +4937,7 @@ Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         MissingStrings:="NA", _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
+        SkipToRow:=1, _
         ExpectedHeaderRow:=HStack("", "survived", "sex", "age", "passengerClass"))
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
@@ -4966,6 +4972,7 @@ Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
+        SkipToRow:=1, _
         ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "Col6"))
         
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
@@ -5241,4 +5248,71 @@ Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
 ErrHandler:
     Throw "#Test189 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
+Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "norwegian data"
+    Expected = Empty
+    FileName = "norwegian_data.csv"
+    TestRes = TestCSVRead(190, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="Y-M-D", _
+        IgnoreEmptyLines:=False, _
+        MissingStrings:="NULL", _
+        ShowMissingsAs:=Empty, _
+        Encoding:="UTF-8", _
+        HeaderRowNum:=1#, _
+        NumRowsExpected:=1230, _
+        NumColsExpected:=83, _
+        ExpectedHeaderRow:=HStack("regine_area", "main_no", "point_no", "param_key", "version_no_end", "station_name", "station_status_name", "dt_start_date", "dt_end_date", "percent_missing_days", _
+        "first_year_regulation", "start_year", "end_year", "aktuell_avrenningskart", "excluded_years", "tilgang", "latitude", "longitude", "utm_east_z33", "utm_north_z33", _
+        "regulation_part_area", "regulation_part_reservoirs", "transfer_area_in", "transfer_area_out", "drainage_basin_key", "area_norway", "area_total", "comment", "drainage_dens", "dt_registration_date", _
+        "dt_regul_date", "gradient_1085", "gradient_basin", "gradient_river", "height_minimum", "height_hypso_10", "height_hypso_20", "height_hypso_30", "height_hypso_40", "height_hypso_50", _
+        "height_hypso_60", "height_hypso_70", "height_hypso_80", "height_hypso_90", "height_maximum", "length_km_basin", "length_km_river", "ocean_polar_angle", "ocean_polar_distance", "perc_agricul", _
+        "perc_bog", "perc_eff_bog", "perc_eff_lake", "perc_forest", "perc_glacier", "perc_lake", "perc_mountain", "perc_urban", "prec_intens_max", "utm_zone_gravi", _
+        "utm_east_gravi", "utm_north_gravi", "utm_zone_inlet", "utm_east_inlet", "utm_north_inlet", "br1_middelavrenning_1930_1960", "br2_Tilsigsberegning", "br3_Regional_flomfrekvensanalyse", "br5_Regional_lavvannsanalyse", "br6_Klimastudier", _
+        "br7_Klimascenarier", "br9_Flomvarsling", "br11_FRIEND", "br12_GRDC", "br23_HBV", "br24_middelavrenning_1961_1990", "br26_TotalAvlop", "br31_FlomserierPrim", "br32_FlomserierSekundar", "br33_Flomkart_aktive_ureg", _
+        "br34_Hydrologisk_referanseserier_klimastudier", "br38_Flomkart_aktive_ureg_periode", "br39_Flomkart_nedlagt_stasjon"))
+
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test190 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "csv segfault.txt"
+    Expected = Empty
+    FileName = "csv_segfault.txt"
+    TestRes = TestCSVRead(191, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        NumRowsExpected:=468, _
+        NumColsExpected:=9, _
+        IgnoreEmptyLines:=True, _
+        ShowMissingsAs:=Empty, _
+        Encoding:="UTF-8", _
+        HeaderRowNum:=1#, _
+        ExpectedHeaderRow:=HStack("Time (CEST)", "Latitude", "Longitude", "Course", "kts", "mph", "feet", "Rate", "Reporting Facility"))
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test191 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
 

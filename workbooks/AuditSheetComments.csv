@@ -1,4 +1,8 @@
 "Version","Date","Time","Author","Comment"
+98,21-Sep-2021,16:07:53,"Philip Swannell","Simplified declaraion of CSVRead by not providing unncessary defaults."
+97,21-Sep-2021,15:59:29,"Philip Swannell","More tests using files from the Julia CSV.jl test suite."
+96,21-Sep-2021,15:24:56,"Philip Swannell","Fixed bug that SkipToRow was not defaulting to HeaderRowNum+1 when omitted."
+95,21-Sep-2021,14:45:00,"Philip Swannell","Corrected typos on worksheet ""Test""."
 94,21-Sep-2021,14:15:29,"Philip Swannell","Method ParseTextFile replaces methods ShowTextFile and SplitCSVContents. Better performance when Delimited = False."
 93,20-Sep-2021,17:56:34,"Philip Swannell","Docstring changes."
 92,20-Sep-2021,17:11:28,"Philip Swannell","Rewrote ShowTextFile to work for files with Mac line endings."

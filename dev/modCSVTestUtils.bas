@@ -44,10 +44,16 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     Else
         LitteralExpected = ArrayToVBALitteral(ExpectedReturn, , 10000)
         If Left$(LitteralExpected, 1) = "#" Then
+            Dim TestSizeOnly As Boolean
+            TestSizeOnly = True
         End If
     End If
     
-    Res = Res + vbLf + Indent + "Expected = " & LitteralExpected
+    If TestSizeOnly Then
+        Res = Res + vbLf + Indent + "Expected = Empty"
+    Else
+        Res = Res + vbLf + Indent + "Expected = " & LitteralExpected
+    End If
 
     Res = Res + vbLf + Indent + "FileName =  " & ElementToVBALitteral(FileName)
 
@@ -55,6 +61,10 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
         Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, FileName, Observed, WhatDiffers"
     Else
         Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, Folder + FileName, Observed, WhatDiffers"
+    End If
+    If TestSizeOnly Then
+        Res = Res + ", _" + vbLf + Indent2 + "NumRowsExpected := " & CStr(NRows(ExpectedReturn))
+        Res = Res + ", _" + vbLf + Indent2 + "NumColsExpected := " & CStr(NCols(ExpectedReturn))
     End If
 
     If IsArray(ConvertTypes) Then
@@ -75,11 +85,10 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     If Comment <> "" Then
         Res = Res + ", _" + vbLf + Indent2 + "Comment := " & ElementToVBALitteral(Comment)
     End If
-    If IgnoreEmptyLines <> True Then
+    If IgnoreEmptyLines <> False Then
         Res = Res + ", _" + vbLf + Indent2 + "IgnoreEmptyLines := " & ElementToVBALitteral(IgnoreEmptyLines)
     End If
-    
-    If SkipToRow <> 1 And SkipToRow <> 0 Then
+    If SkipToRow <> (HeaderRowNum + 1) And (SkipToRow <> 0) Then
         Res = Res + ", _" + vbLf + Indent2 + "SkipToRow := " & CStr(SkipToRow)
     End If
     If SkipToCol <> 1 And SkipToCol <> 0 Then

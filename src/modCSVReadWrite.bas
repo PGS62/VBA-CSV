@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.6
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.7
 
 Option Explicit
 
@@ -143,13 +143,15 @@ End Enum
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
     Optional DateFormat As String, Optional Comment As String, _
-    Optional IgnoreEmptyLines As Boolean = False, Optional ByVal HeaderRowNum As Long = 0, _
-    Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
+    Optional IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+    Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
+    Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
     Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
+    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String, _
     Optional ByRef HeaderRow)
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
