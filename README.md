@@ -62,12 +62,12 @@ Returns the contents of a comma-separated file on disk as an array.
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
     Optional DateFormat As String, Optional Comment As String, _
-    Optional IgnoreEmptyLines As Boolean = False, Optional ByVal HeaderRowNum As Long = 0, _
-    Optional ByVal SkipToRow As Long = 1, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long = 0, Optional ByVal NumCols As Long = 0, _
+    Optional IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+    Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
+    Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
     Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
+    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String, _
     Optional ByRef HeaderRow)
 ```
 
@@ -89,7 +89,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`FalseStrings`|Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `FALSE`, `False` and `false` are recognised.|
 |`MissingStrings`|Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default, only an empty field (consecutive delimiters) is considered missing.|
 |`ShowMissingsAs`|Fields which are missing in the file (consecutive delimiters) or match one of the `MissingStrings` are returned in the array as `ShowMissingsAs`. Defaults to Empty, but the null string or `#N/A!` error value can be good alternatives.<br/><br/>If `NumRows` is greater than the number of rows in the file then the return is "padded" with the value of `ShowMissingsAs`. Likewise, if `NumCols` is greater than the number of columns in the file.|
-|`Encoding`|Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work then it's possible that the file is encoded `UTF-16` but without a byte option mark to identify it as such, so try entering `Encoding` as `UTF-16`.|
+|`Encoding`|Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work then it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte option mark to identify the encoding. Experiment with `Encoding` as each of `UTF-8` and `UTF-16`.|
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
