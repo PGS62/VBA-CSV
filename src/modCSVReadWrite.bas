@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.5
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.6
 
 Option Explicit
 
@@ -150,8 +150,6 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
     Optional ByRef HeaderRow)
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents"
@@ -292,21 +290,8 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
        
     If InStr(Comment, DQ) > 0 Or InStr(Comment, vbLf) > 0 Or InStr(Comment, vbCrLf) > 0 Then Throw Err_Comment
     'End of input validation
-          
-    If SourceType = st_String Then
-        CSVContents = FileName
-        
-        If NotDelimited Then
-            CSVRead = SplitCSVContents(CSVContents, SkipToRow, NumRows)
-            Exit Function
-        End If
-        
-        Call ParseCSVContents(CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, IgnoreRepeated, SkipToRow, _
-            HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, Starts, Lengths, RowIndexes, _
-            ColIndexes, QuoteCounts, HeaderRow)
-    Else
-        If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-        
+    
+    If SourceType = st_File Then
         If FunctionWizardActive() Then
             Set SF = m_FSO.GetFile(FileName)
             If SF.Size > 1000000 Then
@@ -314,7 +299,22 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                 Exit Function
             End If
         End If
+    End If
     
+    If NotDelimited Then
+        CSVRead = ParseTextFile(FileName, SourceType <> st_String, useADODB, CharSet, TriState, SkipToRow, NumRows)
+        Exit Function
+    End If
+          
+    If SourceType = st_String Then
+        CSVContents = FileName
+        
+        Call ParseCSVContents(CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, IgnoreRepeated, SkipToRow, _
+            HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, Ragged, Starts, Lengths, RowIndexes, _
+            ColIndexes, QuoteCounts, HeaderRow)
+    Else
+        If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+            
         If useADODB Then
             Set Stream = New ADODB.Stream
             Stream.CharSet = CharSet
@@ -324,11 +324,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         Else
             Set Stream = m_FSO.GetFile(FileName).OpenAsTextStream(ForReading, TriState)
             If Stream.AtEndOfStream Then Throw Err_FileEmpty
-        End If
-    
-        If NotDelimited Then
-            CSVRead = ShowTextFile(Stream, SkipToRow, NumRows)
-            Exit Function
         End If
 
         If SkipToRow = 1 And NumRows = 0 Then
@@ -953,30 +948,6 @@ ErrHandler:
     Throw "#IsCTValid: " & Err.Description & "!"
 End Function
 
-Private Function TestParseConvertTypes()
-    Dim ColByColFormatting As Boolean
-    Dim ConvertQuoted As Boolean
-    Dim ConvertTypes As Variant
-    Dim CTDict As New Scripting.Dictionary
-    Dim ShowBooleansAsBooleans As Boolean
-    Dim ShowDatesAsDates As Boolean
-    Dim ShowErrorsAsErrors As Boolean
-    Dim ShowNumbersAsNumbers As Boolean
-    Dim TrimFields As Boolean
-
-    ConvertTypes = Array(Array(1, "B"), Array(2, "N"))
-
-    On Error GoTo ErrHandler
-    ParseConvertTypes ConvertTypes, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
-        ShowErrorsAsErrors, ConvertQuoted, TrimFields, ColByColFormatting, 1, CTDict
-
-    TestParseConvertTypes = True
-    Exit Function
-ErrHandler:
-    TestParseConvertTypes = "#TestParseConvertTypes: " & Err.Description & "!"
-    Debug.Print TestParseConvertTypes
-End Function
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CTsEqual
 ' Purpose    : Test if two CT strings (strings to define type conversion) are equal, i.e. will have the same effect
@@ -1069,7 +1040,7 @@ End Function
 '  ColByColFormatting    : Set to True if ConvertTypes is an array
 '  HeaderRowNum          : As passed to CSVRead, used to throw an error if HeaderRowNum has not been specified when
 '                          it needs to have been.
-'  CTDict                : Set to a dictionary keyed on the elements of the left column (top row) of ConvertTypes,
+'  CTDict                : Set to a dictionary keyed on the elements of the left column (or top row) of ConvertTypes,
 '                          each element containing the corresponding right (or bottom) element.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
@@ -1326,7 +1297,7 @@ Private Function Transpose(ByVal TheArray As Variant)
     Transpose = Result
     Exit Function
 ErrHandler:
-    Transpose = "#Transpose: " & Err.Description & "!"
+    Throw "#Transpose: " & Err.Description & "!"
 End Function
 
 '----------------------------------------------------------------------------------------------------------------------
@@ -1694,109 +1665,6 @@ Private Function WindowsDateFormat() As String
     Exit Function
 ErrHandler:
     WindowsDateFormat = "Cannot determine!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : SplitCSVContents
-' Purpose    : Used when the CSVReads arg FileName is a CSVString and Delimiter is FALSE.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function SplitCSVContents(CSVContents As String, StartRow As Long, NumRows As Long)
-    Dim Contents1D() As String
-    Dim Contents2D() As String
-    Dim i As Long
-    Dim LastElement As String
-    Dim LB As Long
-    Dim LoopTo As Long
-
-    On Error GoTo ErrHandler
-    If Len(CSVContents) = 1 Then
-        ReDim Contents1D(0 To 0)
-    Else
-        CSVContents = Replace(CSVContents, vbCrLf, vbLf)
-        CSVContents = Replace(CSVContents, vbCr, vbLf)
-        Contents1D = VBA.Split(CSVContents, vbLf)
-        LastElement = Contents1D(UBound(Contents1D))
-        If LastElement = "" Then 'Because last line of CSV may or may not terminate with a line feed
-            ReDim Preserve Contents1D(LBound(Contents1D) To UBound(Contents1D) - 1)
-        End If
-    End If
-    LB = LBound(Contents1D)
-
-    Dim NumRowsInReturn As Long
-    If NumRows = 0 Then
-        NumRowsInReturn = (UBound(Contents1D) - LBound(Contents1D) + 1) - (StartRow - 1)
-        LoopTo = NumRowsInReturn
-    Else
-        NumRowsInReturn = NumRows
-        LoopTo = MinLngs(NumRowsInReturn, (UBound(Contents1D) - LBound(Contents1D) + 1) - (StartRow - 1))
-    End If
-
-    ReDim Contents2D(1 To NumRowsInReturn, 1 To 1)
-
-    For i = 1 To LoopTo
-        Contents2D(i, 1) = Contents1D(LB - 1 + i + StartRow - 1)
-    Next i
-
-    SplitCSVContents = Contents2D
-
-    Exit Function
-ErrHandler:
-    Throw "#SplitCSVContents: " & Err.Description & "!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : ShowTextFile
-' Purpose    : Parse any text file to a 1-column two-dimensional array of strings. No splitting into columns and no
-'              casting. This method is not very efficient for large files for which we only want to show a few lines.
-'              An earlier version used .SkipLine and .ReadLine for much greater efficiency in such cases, but .SkipLine
-'              and .ReadLine don't work for files with Mac line endings. TODO: Write efficient version that works for
-'              all line endings (use a buffer and method GetMoreFromStream etc.)
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function ShowTextFile(Stream As Object, StartRow As Long, NumRows As Long)
-    
-    Dim Contents1D() As String
-    Dim Contents2D() As String
-    Dim i As Long
-    Dim NRout As Long
-    Dim ReadAll As String
-
-    On Error GoTo ErrHandler
-
-    ReadAll = ReadAllFromStream(Stream)
-
-    If InStr(ReadAll, vbCr) > 0 Then
-        ReadAll = Replace(ReadAll, vbCrLf, vbLf)
-        ReadAll = Replace(ReadAll, vbCr, vbLf)
-    End If
-
-    'Text files may or may not be terminated by EOL characters...
-    If Right$(ReadAll, 1) = vbLf Then
-        ReadAll = Left$(ReadAll, Len(ReadAll) - 1)
-    End If
-
-    If Len(ReadAll) = 0 Then
-        ReDim Contents1D(0 To 0)
-    Else
-        Contents1D = VBA.Split(ReadAll, vbLf)
-    End If
-        
-    NRout = UBound(Contents1D) - LBound(Contents1D) + 1 - StartRow + 1
-    If NumRows > 0 Then
-        If NRout > NumRows Then
-            NRout = NumRows
-        End If
-    End If
-        
-    ReDim Contents2D(1 To NRout, 1 To 1)
-    For i = 1 To NRout
-        Contents2D(i, 1) = Contents1D(i - 1 + StartRow - 1)
-    Next i
-    
-    ShowTextFile = Contents2D
-
-    Exit Function
-ErrHandler:
-    Throw "#ShowTextFile: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2392,7 +2260,7 @@ Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As St
 
     'Line below arranges that when calling Instr(Buffer,....) we don't pointlessly scan the space characters _
      we can be sure that there is space in the buffer to write the extra characters thanks to
-    Mid$(Buffer, BufferUpdatedTo + 1, Len(Delimiter) + 3) = vbCrLf & QuoteChar & Delimiter
+    Mid$(Buffer, BufferUpdatedTo + 1, 2 + Len(QuoteChar) + Len(Delimiter)) = vbCrLf & QuoteChar & Delimiter
 
     Exit Sub
 ErrHandler:
@@ -3136,11 +3004,11 @@ End Sub
 '             128,130,131,132,133,134,135,136,137,138,139,140,142,145,146,147,148,149,150,151,152,153,154,155,156,158,159
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function CanWriteCharToAscii(c As String) As Boolean
-1         If AscW(c) > 255 Then
-2             CanWriteCharToAscii = False
-3         Else
-4             CanWriteCharToAscii = Chr(AscW(c)) = c
-5         End If
+    If AscW(c) > 255 Then
+        CanWriteCharToAscii = False
+    Else
+        CanWriteCharToAscii = Chr(AscW(c)) = c
+    End If
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3936,3 +3804,167 @@ ErrHandler:
     Throw "#ISOZFormatString: " & Err.Description & "!"
 End Function
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ParseTextFile
+' Purpose    : Convert a text file to a 2-dim array with one column, one line of file to one element of array, works for
+'              files with any style of line endings - Windows, Mac, Unix, or a mixture of line endings.
+' Parameters :
+'  FileNameOrContents : FileName or CSV-style string.
+'  isFile             : If True then fist argument is the name of a file, else it's a CSV-style string.
+'  useADODB           : Should the file be read using ADODB.Stream rather than Scripting.TextStream? Necessary only for
+'                       UTF-8 files.
+'  CharSet            : Used only if useADODB is True and isFile is True.
+'  TriState           : Used only if useADODB is False and isFile is True.
+'  SkipToLine         : Return starts at this line of the file.
+'  NumLinesToReturn   : This many lines are returned. Pass zero for all lines from SkipToLine.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, useADODB As Boolean, CharSet As String, TriState As Long, _
+    SkipToLine As Long, NumLinesToReturn As Long)
+
+    Const Err_FileEmpty = "File is empty"
+    Dim Buffer As String
+    Dim BufferUpdatedTo As Long
+    Dim FoundCR As Boolean
+    Dim HaveReachedSkipToLine As Boolean
+    Dim i As Long 'Index to read from Buffer
+    Dim j As Long 'Index to write to Starts, Lengths
+    Dim Lengths() As Long
+    Dim NumLinesFound As Long
+    Dim PosCR As Long
+    Dim PosLF As Long
+    Dim ReturnArray() As String
+    Dim SearchFor() As String
+    Dim SF As Scripting.File
+    Dim Starts() As Long
+    Dim Stream As Object
+    Dim Streaming As Boolean
+    Dim tmp As Long
+    Dim Which As Long
+
+    On Error GoTo ErrHandler
+    
+    If isFile Then
+        If useADODB Then
+            Set Stream = New ADODB.Stream
+            Stream.CharSet = CharSet
+            Stream.Open
+            Stream.LoadFromFile FileNameOrContents
+            If Stream.EOS Then Throw Err_FileEmpty
+        Else
+            If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+            Set Stream = m_FSO.GetFile(FileNameOrContents).OpenAsTextStream(ForReading, TriState)
+            If Stream.AtEndOfStream Then Throw Err_FileEmpty
+        End If
+    
+        If NumLinesToReturn = 0 Then
+            Buffer = ReadAllFromStream(Stream)
+            Streaming = False
+        Else
+            Call GetMoreFromStream(Stream, "", "", Buffer, BufferUpdatedTo)
+            Streaming = True
+        End If
+    Else
+        Buffer = FileNameOrContents
+        Streaming = False
+    End If
+       
+    If Streaming Then
+        ReDim SearchFor(1 To 2)
+        SearchFor(1) = vbLf
+        SearchFor(2) = vbCr
+    End If
+
+    ReDim Starts(1 To 8): ReDim Lengths(1 To 8)
+    
+    If Not Streaming Then
+        'Ensure Buffer terminates with vbCrLf
+        If Right$(Buffer, 1) <> vbCr And Right$(Buffer, 1) <> vbLf Then
+            Buffer = Buffer & vbCrLf
+        ElseIf Right$(Buffer, 1) = vbCr Then
+            Buffer = Buffer & vbLf
+        End If
+        BufferUpdatedTo = Len(Buffer)
+    End If
+    
+    NumLinesFound = 0
+    i = 0: j = 1
+    
+    Starts(1) = i + 1
+    If SkipToLine = 1 Then HaveReachedSkipToLine = True
+
+    Do
+        If Not Streaming Then
+            If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
+            If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
+            If PosCR < PosLF Then
+                FoundCR = True
+                i = PosCR
+            Else
+                FoundCR = False
+                i = PosLF
+            End If
+        Else
+            i = SearchInBuffer(SearchFor, i + 1, Stream, useADODB, "", "", Which, Buffer, BufferUpdatedTo)
+            FoundCR = (Which = 2)
+        End If
+
+        If i >= BufferUpdatedTo + 1 Then
+            Exit Do
+        End If
+
+        If j + 1 > UBound(Starts) Then
+            ReDim Preserve Starts(1 To UBound(Starts) * 2)
+            ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
+        End If
+
+        Lengths(j) = i - Starts(j)
+        If FoundCR Then
+            If Mid$(Buffer, i + 1, 1) = vbLf Then
+                'Ending is Windows rather than Mac or Unix.
+                i = i + 1
+            End If
+        End If
+                    
+        Starts(j + 1) = i + 1
+                    
+        j = j + 1
+        NumLinesFound = NumLinesFound + 1
+        If Not HaveReachedSkipToLine Then
+            If NumLinesFound = SkipToLine - 1 Then
+                HaveReachedSkipToLine = True
+                tmp = Starts(j)
+                ReDim Starts(1 To 8): ReDim Lengths(1 To 8)
+                j = 1: NumLinesFound = 0
+                Starts(1) = tmp
+            End If
+        ElseIf NumLinesToReturn > 0 Then
+            If NumLinesFound = NumLinesToReturn Then
+                Exit Do
+            End If
+        End If
+    Loop
+   
+    If SkipToLine > NumLinesFound Then
+        If NumLinesToReturn = 0 Then 'Attempting to read from SkipToLine to the end of the file, but that would be zero or _
+                                      a negative number of rows. So throw an error.
+                             
+            Throw "SkipToLine (" & CStr(SkipToLine) & ") exceeds the number of lines in the file (" & CStr(NumLinesFound) & ")"
+        Else
+            'Attempting to read a set number of rows, function will return an array of null strings
+            NumLinesFound = 0
+        End If
+    End If
+    If NumLinesToReturn = 0 Then NumLinesToReturn = NumLinesFound
+
+    ReDim ReturnArray(1 To NumLinesToReturn, 1 To 1)
+
+    For i = 1 To MinLngs(NumLinesToReturn, NumLinesFound)
+        ReturnArray(i, 1) = Mid$(Buffer, Starts(i), Lengths(i))
+    Next i
+
+    ParseTextFile = ReturnArray
+
+    Exit Function
+ErrHandler:
+    Throw "#ParseTextFile: " & Err.Description & "!"
+End Function

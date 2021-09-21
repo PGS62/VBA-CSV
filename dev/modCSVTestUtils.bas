@@ -37,7 +37,7 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     Res = Res & vbLf & Indent & "On Error GoTo ErrHandler"
     
     Res = Res & vbLf & _
-        Indent + "TestDescription = """ & Replace(Replace(FileName, "_", " "), ".csv", "") & """"
+        Indent + "TestDescription = """ & Replace(Replace(Replace(Replace(FileName, vbLf, ""), vbCr, ""), "_", " "), ".csv", "") & """"
     
     If Not IsArray(ExpectedReturn) Then
         LitteralExpected = ElementToVBALitteral(ExpectedReturn)
@@ -49,7 +49,7 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     
     Res = Res + vbLf + Indent + "Expected = " & LitteralExpected
 
-    Res = Res + vbLf + Indent + "FileName = """ & FileName & """"
+    Res = Res + vbLf + Indent + "FileName =  " & ElementToVBALitteral(FileName)
 
     If Left$(FileName, 4) = "http" Or InStr(FileName, ",") > 0 Then
         Res = Res + vbLf + Indent + "TestRes = TestCSVRead(" & TestNo & ", TestDescription, Expected, FileName, Observed, WhatDiffers"

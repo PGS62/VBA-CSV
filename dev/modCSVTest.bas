@@ -222,6 +222,8 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test185 Folder, NumPassed, NumFailed, Failures
     Test186 Folder, NumPassed, NumFailed, Failures
     Test187 Folder, NumPassed, NumFailed, Failures
+    Test188 Folder, NumPassed, NumFailed, Failures
+    Test189 Folder, NumPassed, NumFailed, Failures
 
     Exit Sub
 ErrHandler:
@@ -5186,5 +5188,57 @@ Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     Exit Sub
 ErrHandler:
     Throw "#Test187 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "FileName passed as CSV Contents, parse as not delimited"
+    Expected = HStack(Array("2", "3", "4", "5", "6"))
+    FileName = "1" + vbCrLf + "2" + vbCrLf + "3" + vbCrLf + "4" + vbCrLf + "5" + vbCrLf + "6" + vbCrLf + "7" + vbCrLf + "8" + vbCrLf + "9" + vbCrLf + "10" + vbCrLf + ""
+    TestRes = TestCSVRead(188, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        Delimiter:=False, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        NumRows:=5, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test188 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "FileName passed as CSV Contents, parse as delimited"
+    Expected = HStack(Array(5#, 8#), Array(6#, 9#))
+    FileName = "1,2,3" + vbCrLf + "4,5,6" + vbCrLf + "7,8,9" + vbCrLf + "10,11,12" + vbCrLf + "13,14,15" + vbCrLf + "16,17,18" + vbCrLf + ""
+    TestRes = TestCSVRead(189, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        SkipToCol:=2, _
+        NumRows:=2, _
+        NumCols:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test189 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
