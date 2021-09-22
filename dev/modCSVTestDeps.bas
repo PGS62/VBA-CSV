@@ -52,12 +52,11 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
     End If
 
     If NumRowsExpected <> 0 Or NumColsExpected <> 0 Then
-        'In this case we only check the size of the return
         If NRows(Observed) <> NumRowsExpected Or NCols(Observed) <> NumColsExpected Then
             WhatDiffers = TestDescription + " FAILED, expected dimensions: " + CStr(NumRowsExpected) + _
                 ", " + CStr(NumColsExpected) + " observed dimensions: " + CStr(NRows(Observed)) + ", " + CStr(NCols(Observed))
             GoTo Failed
-        Else
+        ElseIf IsEmpty(Expected) Then
             TestCSVRead = True
             Exit Function
         End If

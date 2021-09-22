@@ -150,6 +150,8 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional DecimalSeparator As String, _
     Optional ByRef HeaderRow)
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -2891,6 +2893,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional ByVal DateTimeFormat As String = "ISO", _
     Optional Delimiter As String = ",", Optional Unicode As Boolean, _
     Optional ByVal EOL As String = "")
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a " & _
@@ -3076,7 +3080,9 @@ End Sub
 '             128,130,131,132,133,134,135,136,137,138,139,140,142,145,146,147,148,149,150,151,152,153,154,155,156,158,159
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function CanWriteCharToAscii(c As String) As Boolean
-    If AscW(c) > 255 Then
+    Dim code As Long
+    code = AscW(c)
+    If code > 255 Or code < 0 Then
         CanWriteCharToAscii = False
     Else
         CanWriteCharToAscii = Chr(AscW(c)) = c

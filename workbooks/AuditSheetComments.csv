@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+101,22-Sep-2021,11:58:31,"Philip Swannell","Deleted older of the two Performance sheets."
+100,22-Sep-2021,11:56:33,"Philip Swannell","Added tests for date-time parsing, including decimal fractions of a second for D-M-Y, M-D-Y and Y-M-D."
 99,21-Sep-2021,17:39:25,"Philip Swannell","Reduced the number of lines> 122 in length"
 98,21-Sep-2021,16:07:53,"Philip Swannell","Simplified declaraion of CSVRead by not providing unncessary defaults."
 97,21-Sep-2021,15:59:29,"Philip Swannell","More tests using files from the Julia CSV.jl test suite."
