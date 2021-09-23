@@ -323,7 +323,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             
         If useADODB Then
-            Set Stream = New ADODB.Stream
+            Set Stream = CreateObject("ADODB.Stream")
             Stream.CharSet = CharSet
             Stream.Open
             Stream.LoadFromFile FileName
@@ -3591,7 +3591,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     
     If isFile Then
         If useADODB Then
-            Set Stream = New ADODB.Stream
+            Set Stream = CreateObject("ADODB.Stream")
             Stream.CharSet = CharSet
             Stream.Open
             Stream.LoadFromFile FileNameOrContents
@@ -3870,7 +3870,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
                 OneLineJoined = VBA.Join(OneLine, Delimiter) & EOL
                 Stream.WriteText OneLineJoined
             Next i
-            Stream.SaveToFile FileName, adSaveCreateOverWrite
+            Stream.SaveToFile FileName, 2 'adSaveCreateOverWrite
 
             CSVWrite = FileName
         Else
