@@ -93,7 +93,7 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
-[source](https://github.com/PGS62/VBA-CSV/blob/ff35a76b06d6589d3cdf83f737a87164dd3f362d/src/modCSVReadWrite.bas#L41-L513)
+[source](https://github.com/PGS62/VBA-CSV/blob/28beaf2ca62f3fe72bffb1273e73ac52179597b7/src/modCSVReadWrite.bas#L41-L520)
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
@@ -116,7 +116,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`Encoding`|Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this argument is `ANSI` but `Data` contains characters that cannot be written to an ANSI file. `UTF-8` and `UTF-16` files are written with a byte option mark.|
 |`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
 
-[source](https://github.com/PGS62/VBA-CSV/blob/ff35a76b06d6589d3cdf83f737a87164dd3f362d/src/modCSVReadWrite.bas#L2928-L3063)
+[source](https://github.com/PGS62/VBA-CSV/blob/28beaf2ca62f3fe72bffb1273e73ac52179597b7/src/modCSVReadWrite.bas#L2857-L2993)
 
 # Errors
 You can call `CSVRead` and `CSVWrite` both from spreadsheets (best with Excel 365 and [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531)) and from VBA. When an error occurs, the functions return a string starting with `#` and ending with `!` which gives an explanation of what went wrong.
@@ -125,7 +125,7 @@ So, to get robust error handling from VBA, you should wrap calls to `CSVRead` an
 ```vba
 FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
-[source](https://github.com/PGS62/VBA-CSV/blob/ff35a76b06d6589d3cdf83f737a87164dd3f362d/src/modCSVReadWrite.bas#L3232-3248)
+[source](https://github.com/PGS62/VBA-CSV/blob/28beaf2ca62f3fe72bffb1273e73ac52179597b7/src/modCSVReadWrite.bas#L3178-L3194)
 
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from spreadsheet formulas will return `#VALUE!` if any error happens, with no description provided.
 
@@ -147,7 +147,7 @@ During type conversion, `CSVRead` accepts dates and times where the number of se
 
 ### Array lower bounds
 The return from `CSVRead` is an array with lower bounds of one. If you prefer array lower bounds to be zero, then edit the constant `m_LBound` (at the top of `modCSVReadWrite.bas`) to be 0 rather than 1.  
-[source](https://github.com/PGS62/VBA-CSV/blob/bb740ad692f954849281a3a155b6b20772d02832/src/modCSVReadWrite.bas#L32-L33)
+[source](https://github.com/PGS62/VBA-CSV/blob/28beaf2ca62f3fe72bffb1273e73ac52179597b7/src/modCSVReadWrite.bas#L32-L33)
 
 ### Excel limit on string length
 If the `FileName` argument to `CSVWrite` is omitted, then instead of writing a file to disk, the function returns a string in CSV format. But there is a [limit](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) on the total number of characters that an Excel cell can contain of 32,767. If the return would otherwise be longer then an error string is returned. This limit does not apply when calling `CSVWrite` from VBA.
