@@ -14,11 +14,11 @@ Option Explicit
 '              Tests include:
 '           *  Embedded line feeds in quoted strings.
 '           *  Files with Windows, Unix or (old) Mac line endings.
-'           *  Both unicode and ascii files.
-'           *  That the delimiter is automatically detected by CSVRead (reliable only if files have all strings quoted).
-'           *  That unicode vs ascii is automatically detected.
+'           *  Ansi, UTF-8 and UTF-16 encoded files.
+'           *  That the delimiter is automatically detected by CSVRead (more reliable if files have all strings quoted).
+'           *  That Encoding is automatically detected.
 '           *  That line endings are automatically detected.
-'Results are printed to the VBA immediate window, if a difference is detected
+'Results are printed to the VBA immediate window, if a difference is detected.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub RoundTripTest()
 
@@ -37,7 +37,7 @@ Public Sub RoundTripTest()
     Dim NumTests As Long
     Dim OS As Variant
     Dim Prompt As String
-    Dim Unicode As Variant
+    Dim Encoding As Variant
     Dim WhatDiffers As String
     Const Title = "VBA-CSV Round Trip Tests"
     
@@ -46,7 +46,7 @@ Public Sub RoundTripTest()
     Folder = Environ("Temp") & "\VBA-CSV\RoundTripTests"
 
     Prompt = "Run Round Trip Tests?" + vbLf + vbLf + _
-        "Note this will generate 1,620 files in folder" + vbLf + _
+        "Note this will generate 2,430 files in folder" + vbLf + _
         Environ("Temp") & "\VBA-CSV\RoundTripTests"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
@@ -56,7 +56,7 @@ Public Sub RoundTripTest()
     For Each OS In Array("Windows", "Unix", "Mac")
         EOL = IIf(OS = "Windows", vbCrLf, IIf(OS = "Unix", vbLf, vbCr))
     
-        For Each Unicode In Array(True, False)
+        For Each Encoding In Array("ANSI", "UTF-8", "UTF-16")
             For Each Delimiter In Array(",", "::::")
                 For Each NRows In Array(1, 2, 20)
                     For Each NCols In Array(1, 2, 10)
@@ -64,10 +64,10 @@ Public Sub RoundTripTest()
                         'For Variants we need to vary AllowLineFeed and DateFormat
                         For Each AllowLineFeed In Array(True, False)
                             For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
-                                Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CBool(Unicode), EOL)
+                                Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CStr(Encoding), EOL)
                                 NumTests = NumTests + 1
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
-                                RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
+                                RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CStr(Encoding), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
                             Next DateFormat
                         Next AllowLineFeed
 
@@ -76,15 +76,15 @@ Public Sub RoundTripTest()
                             Data = RandomDates(CLng(NRows), CLng(NCols))
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDates"
-                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CStr(Encoding), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
                         Next DateFormat
 
                         'For Strings, we need to vary AllowLineFeed
                         For Each AllowLineFeed In Array(True, False)
-                            Data = RandomStrings(CLng(NRows), CLng(NCols), CBool(Unicode), CBool(AllowLineFeed), EOL)
+                            Data = RandomStrings(CLng(NRows), CLng(NCols), CStr(Encoding), CBool(AllowLineFeed), EOL)
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & IIf(AllowLineFeed, "RandomStringsWithLineFeeds", "RandomStrings")
-                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CStr(Encoding), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
                         Next AllowLineFeed
 
                         For k = 1 To 4
@@ -102,14 +102,14 @@ Public Sub RoundTripTest()
                                 Data = RandomLongs(CLng(NRows), CLng(NCols))
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomLongs"
                             End If
-                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CBool(Unicode), _
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CStr(Encoding), _
                                 CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
                         Next k
                         DoEvents 'Kick Immediate window back to life?
                     Next NCols
                 Next NRows
             Next Delimiter
-        Next Unicode
+        Next Encoding
     Next OS
     Debug.Print "Finished. NumPassed = " + Format(NumPassed, "###,##0") & " NumFailed = " & Format(NumFailed, "###,##0")
     If NumFailed = 0 Then
@@ -134,7 +134,7 @@ End Sub
 '              strings (avoid differences of order 10E-15).
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Variant, DateFormat As String, _
-    Unicode As Boolean, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String, _
+    Encoding As String, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String, _
     ByRef NumPassed As Long, ByRef NumFailed As Long)
 
     Const ConvertTypes = "NDBE" 'must use this for round-tripping to work.
@@ -152,9 +152,9 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     NR = NRows(Data)
     NC = NCols(Data)
 
-    FileName = NameThatFile(Folder, OS, NR, NC, ExtraInfo, CBool(Unicode), False)
+    FileName = NameThatFile(Folder, OS, NR, NC, ExtraInfo, Encoding, False)
 
-    ThrowIfError CSVWrite(Data, FileName, True, DateFormat, , Delimiter, Unicode, EOL)
+    ThrowIfError CSVWrite(Data, FileName, True, DateFormat, , Delimiter, Encoding, EOL)
 
     'The Call to CSVRead has to infer both Encoding and EOL
     DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
@@ -176,23 +176,25 @@ ErrHandler:
     Throw "#RoundTripTestCore: " & Err.Description & "!"
 End Sub
 
-Private Function RandomString(AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
+Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL As String)
 
     Const maxlen = 20
     Dim i As Long
     Dim Length As Long
     Dim Res As String
+    Dim ansi As Boolean
     
     On Error GoTo ErrHandler
     
     Length = CLng(1 + Rnd() * maxlen)
     Res = String(Length, " ")
+    ansi = UCase(Encoding) = "ANSI"
 
     For i = 1 To Length
-        If Unicode Then
-            Mid$(Res, i, 1) = ChrW(33 + Rnd() * 370)
-        Else
+        If ansi Then
             Mid$(Res, i, 1) = Chr(34 + Rnd() * 88)
+        Else
+            Mid$(Res, i, 1) = ChrW(33 + Rnd() * 370)
         End If
 
         If Not AllowLineFeed Then
@@ -217,7 +219,7 @@ ErrHandler:
     Throw "#RandomString: " & Err.Description & "!"
 End Function
 
-Private Function RandomStrings(NumRows As Long, NumCols As Long, Unicode As Boolean, AllowLineFeed As Boolean, EOL As String)
+Private Function RandomStrings(NumRows As Long, NumCols As Long, Encoding As String, AllowLineFeed As Boolean, EOL As String)
 
     Dim i As Long
     Dim j As Long
@@ -228,7 +230,7 @@ Private Function RandomStrings(NumRows As Long, NumCols As Long, Unicode As Bool
     ReDim Result(1 To NumRows, 1 To NumCols)
     For i = 1 To NumRows
         For j = 1 To NumCols
-            Result(i, j) = RandomString(AllowLineFeed, Unicode, EOL)
+            Result(i, j) = RandomString(AllowLineFeed, Encoding, EOL)
         Next j
     Next i
     If AllowLineFeed Then
@@ -381,7 +383,7 @@ ErrHandler:
     Throw "#RandomErrorValues: " & Err.Description & "!"
 End Function
 
-Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Unicode As Boolean, EOL As String)
+Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Encoding As String, EOL As String)
 
     Dim N As Long
     Const NUMTYPES = 11
@@ -397,7 +399,7 @@ Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, U
         Case 3
             RandomVariant = RandomDouble()
         Case 4
-            RandomVariant = RandomString(AllowLineFeed, Unicode, EOL)
+            RandomVariant = RandomString(AllowLineFeed, Encoding, EOL)
         Case 5
             RandomVariant = RandomDate()
         Case 6
@@ -445,7 +447,7 @@ ErrHandler:
 End Function
 
 'Public because called from worksheet "Demo"
-Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, Unicode As Boolean, ByVal EOL As String)
+Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, Encoding As String, ByVal EOL As String)
 
     Application.Volatile
 
@@ -461,7 +463,7 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
 
     For i = 1 To NRows
         For j = 1 To NCols
-            Res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Unicode, EOL)
+            Res(i, j) = RandomVariant(DateFormat, AllowLineFeed, Encoding, EOL)
         Next j
     Next i
     If AllowLineFeed Then

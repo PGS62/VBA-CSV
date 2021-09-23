@@ -101,7 +101,7 @@ Creates a comma-separated file on disk containing `Data`. Any existing file of t
 Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
     Optional ByVal DateTimeFormat As String = "ISO", _
-    Optional Delimiter As String = ",", Optional Unicode As Boolean, _
+    Optional Delimiter As String = ",", Optional Encoding As String = "ANSI", _
     Optional ByVal EOL As String = "")
 ```
 
@@ -113,7 +113,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
 |`DateFormat`|A format string that determines how dates, including cells formatted as dates, appear in the file. If omitted, defaults to `yyyy-mm-dd`.|
 |`DateTimeFormat`|Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data.|
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
-|`Unicode`|If `FALSE` (the default) the file written will be encoded as `ANSI`. If TRUE the file written will be encoded `UTF-16 LE BOM`. An error will result if this argument is `FALSE` but `Data` contains characters that cannot be written to an ANSI file.|
+|`Encoding`|Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this argument is `ANSI` but `Data` contains characters that cannot be written to an ANSI file. `UTF-8` and `UTF-16` files are written with a byte option mark.|
 |`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
 
 [source](https://github.com/PGS62/VBA-CSV/blob/ff35a76b06d6589d3cdf83f737a87164dd3f362d/src/modCSVReadWrite.bas#L2928-L3063)

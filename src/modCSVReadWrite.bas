@@ -2829,345 +2829,6 @@ ErrHandler:
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : OStoEOL
-' Purpose    : Convert text describing an operating system to the end-of-line marker employed. Note that "Mac" converts
-'              to vbCr but Apple operating systems since OSX use vbLf, matching Unix.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function OStoEOL(OS As String, ArgName As String) As String
-
-    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
-
-    On Error GoTo ErrHandler
-    Select Case LCase(OS)
-        Case "windows", vbCrLf, "crlf"
-            OStoEOL = vbCrLf
-        Case "unix", "linux", vbLf, "lf"
-            OStoEOL = vbLf
-        Case "mac", vbCr, "cr"
-            OStoEOL = vbCr
-        Case Else
-            Throw ArgName & Err_Invalid
-    End Select
-
-    Exit Function
-ErrHandler:
-    Throw "#OStoEOL: " & Err.Description & "!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure : CSVWrite
-' Purpose   : Creates a comma-separated file on disk containing Data. Any existing file of the same
-'             name is overwritten. If successful, the function returns FileName, otherwise an "error
-'             string" (starts with `#`, ends with `!`) describing what went wrong.
-' Arguments
-' Data      : An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty,
-'             Excel errors or null values.
-' FileName  : The full name of the file, including the path. Alternatively, if FileName is omitted, then the
-'             function returns Data converted CSV-style to a string.
-' QuoteAllStrings: If `TRUE` (the default) then elements of Data that are strings are quoted before being
-'             written to file, other elements (Numbers, Booleans, Errors) are not quoted. If `FALSE` then
-'             the only elements of Data that are quoted are strings containing Delimiter, line feed,
-'             carriage return or double quote. In all cases, double quotes are escaped by another double
-'             quote.
-' DateFormat: A format string that determines how dates, including cells formatted as dates, appear in the
-'             file. If omitted, defaults to `yyyy-mm-dd`.
-' DateTimeFormat: Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use
-'             `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight
-'             saving may be inconsistent across the datetimes in data.
-' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
-'             character.
-' Unicode   : If `FALSE` (the default) the file written will be encoded as `ANSI`. If TRUE the file written
-'             will be encoded `UTF-16 LE BOM`. An error will result if this argument is `FALSE` but Data
-'             contains characters that cannot be written to an ANSI file.
-' EOL       : Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`.
-'             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
-'             or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.
-'
-' Notes     : See also companion function CSVRead.
-'
-'             For discussion of the CSV format see
-'             https://tools.ietf.org/html/rfc4180#section-2
-' -----------------------------------------------------------------------------------------------------------------------
-Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
-    Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
-    Optional ByVal DateTimeFormat As String = "ISO", _
-    Optional Delimiter As String = ",", Optional Unicode As Boolean, _
-    Optional ByVal EOL As String = "")
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
-
-    Const DQ = """"
-    Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a " & _
-        "double  quote, line feed or carriage return"
-    Const Err_Dimensions = "Data must be a range or a 2-dimensional array"
-    
-    Dim EOLIsWindows As Boolean
-    Dim ErrRet As String
-    Dim i As Long
-    Dim j As Long
-    Dim Lines() As String
-    Dim OneLine() As String
-    Dim OneLineJoined As String
-    Dim T As Scripting.TextStream
-    Dim WriteToFile As Boolean
-
-    On Error GoTo ErrHandler
-
-    WriteToFile = Len(FileName) > 0
-
-    If EOL = "" Then
-        If WriteToFile Then
-            EOL = vbCrLf
-        Else
-            EOL = vbLf
-        End If
-    End If
-
-    EOL = OStoEOL(EOL, "EOL")
-    EOLIsWindows = EOL = vbCrLf
-
-    If Len(Delimiter) = 0 Or Left$(Delimiter, 1) = DQ Or Left$(Delimiter, 1) = vbLf Or Left$(Delimiter, 1) = vbCr Then
-        Throw Err_Delimiter
-    End If
-    
-    Select Case UCase(DateTimeFormat)
-        Case "ISO"
-            DateTimeFormat = "yyyy-mm-ddThh:mm:ss"
-        Case "ISOZ"
-            DateTimeFormat = ISOZFormatString()
-    End Select
-
-    If TypeName(Data) = "Range" Then
-        'Preserve elements of type Date by using .Value, not .Value2
-        Data = Data.value
-    End If
-    
-    If NumDimensions(Data) <> 2 Then Throw Err_Dimensions
-    ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
-    
-    If WriteToFile Then
-        If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-        Set T = m_FSO.CreateTextFile(FileName, True, Unicode)
-        
-        For i = LBound(Data) To UBound(Data)
-            For j = LBound(Data, 2) To UBound(Data, 2)
-                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
-            Next j
-            OneLineJoined = VBA.Join(OneLine, Delimiter)
-            WriteLineWrap T, OneLineJoined, EOLIsWindows, EOL, Unicode
-        Next i
-
-        T.Close: Set T = Nothing
-        CSVWrite = FileName
-    Else
-
-        ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
-        
-        For i = LBound(Data) To UBound(Data)
-            For j = LBound(Data, 2) To UBound(Data, 2)
-                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
-            Next j
-            Lines(i) = VBA.Join(OneLine, Delimiter)
-        Next i
-        CSVWrite = VBA.Join(Lines, EOL)
-        If Len(CSVWrite) >= 32768 Then
-            If TypeName(Application.Caller) = "Range" Then
-                Throw "Cannot return string of length " & Format(CStr(Len(CSVWrite)), "#,###") & _
-                    " to a cell of an Excel worksheet"
-            End If
-        End If
-    End If
-    
-    Exit Function
-ErrHandler:
-    ErrRet = "#CSVWrite: " & Err.Description & "!"
-    If Not T Is Nothing Then
-        T.Close
-        Set T = Nothing
-    End If
-    If m_ErrorStyle = es_ReturnString Then
-        CSVWrite = ErrRet
-    Else
-        Throw ErrRet
-    End If
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : RegisterCSVWrite
-' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
-'              WorkBook_Open event.
-' -----------------------------------------------------------------------------------------------------------------------
-Sub RegisterCSVWrite()
-    Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same " & _
-                        "name is overwritten. If successful, the function returns FileName, otherwise an ""error " & _
-                        "string"" (starts with `#`, ends with `!`) describing what went wrong."
-    Dim ArgDescs() As String
-
-    On Error GoTo ErrHandler
-
-    ReDim ArgDescs(1 To 8)
-    ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
-                  "Excel errors or null values."
-    ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
-                  "function returns Data converted CSV-style to a string."
-    ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
-                  "FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. " & _
-                  "Double quotes are always escaped by another double quote."
-    ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
-                  "file. If omitted, defaults to `yyyy-mm-dd`."
-    ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
-                  "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
-                  "inconsistent across the datetimes in data."
-    ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
-                  "character."
-    ArgDescs(7) = "If `FALSE` (the default) the file written will be encoded as `ANSI`. If TRUE the file written " & _
-                  "will be encoded `UTF-16 LE BOM`. An error will result if this argument is `FALSE` but Data " & _
-                  "contains characters that cannot be written to an ANSI file."
-    ArgDescs(8) = "Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. " & _
-                  "Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or " & _
-                  "the strings `CRLF`, `LF` or `CR`."
-    Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
-    Exit Sub
-
-ErrHandler:
-    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
-End Sub
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : WriteLineWrap
-' Purpose    : Wrapper to TextStream.Write[Line] to give more informative error message than "invalid procedure call or
-'              argument" if the error is caused by attempting to write illegal characters to a stream opened with
-'              TriStateFalse.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, Unicode As Boolean)
-
-    Dim ErrDesc As String
-    Dim ErrNum As Long
-    Dim i As Long
-
-    On Error GoTo ErrHandler
-    If EOLIsWindows Then
-        T.WriteLine text
-    Else
-        T.Write text
-        T.Write EOL
-    End If
-
-    Exit Sub
-
-ErrHandler:
-    ErrNum = Err.Number
-    ErrDesc = Err.Description
-    If Not Unicode Then
-        If ErrNum = 5 Then
-            For i = 1 To Len(text)
-                If Not CanWriteCharToAscii(Mid$(text, i, 1)) Then
-                    ErrDesc = "Data contains characters that cannot be written to an ascii file (first found is '" & _
-                        Mid$(text, i, 1) & "' with unicode character code " & AscW(Mid$(text, i, 1)) & _
-                        "). Try calling CSVWrite with argument Unicode as True"
-                    Exit For
-                End If
-            Next i
-        End If
-    End If
-    Throw "#WriteLineWrap: " & ErrDesc & "!"
-End Sub
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : CanWriteCharToAscii
-' Purpose    : Not all characters for which AscW(c) < 255 can be written to an ascii file. If AscW(c) is in the following
-'              list then they cannot:
-'             128,130,131,132,133,134,135,136,137,138,139,140,142,145,146,147,148,149,150,151,152,153,154,155,156,158,159
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function CanWriteCharToAscii(c As String) As Boolean
-    Dim code As Long
-    code = AscW(c)
-    If code > 255 Or code < 0 Then
-        CanWriteCharToAscii = False
-    Else
-        CanWriteCharToAscii = Chr(AscW(c)) = c
-    End If
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : Encode
-' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As String, DateTimeFormat As String, _
-    Delim As String) As String
-    
-    Const DQ = """"
-    Const DQ2 = """"""
-
-    On Error GoTo ErrHandler
-    Select Case VarType(x)
-
-        Case vbString
-            If InStr(x, DQ) > 0 Then
-                Encode = DQ & Replace(x, DQ, DQ2) & DQ
-            ElseIf QuoteAllStrings Then
-                Encode = DQ & x & DQ
-            ElseIf InStr(x, vbCr) > 0 Then
-                Encode = DQ & x & DQ
-            ElseIf InStr(x, vbLf) > 0 Then
-                Encode = DQ & x & DQ
-            ElseIf InStr(x, Delim) > 0 Then
-                Encode = DQ & x & DQ
-            Else
-                Encode = x
-            End If
-        Case vbBoolean, vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty 'vbLongLong - not available on 16 bit.
-            Encode = CStr(x)
-        Case vbDate
-            If CLng(x) = CDbl(x) Then
-                Encode = Format$(x, DateFormat)
-            Else
-                Encode = Format$(x, DateTimeFormat)
-            End If
-        Case vbNull
-            Encode = "NULL"
-        Case vbError
-            Select Case CStr(x) 'Editing this case statement? Edit also its inverse, see method MakeSentinels
-                Case "Error 2000"
-                    Encode = "#NULL!"
-                Case "Error 2007"
-                    Encode = "#DIV/0!"
-                Case "Error 2015"
-                    Encode = "#VALUE!"
-                Case "Error 2023"
-                    Encode = "#REF!"
-                Case "Error 2029"
-                    Encode = "#NAME?"
-                Case "Error 2036"
-                    Encode = "#NUM!"
-                Case "Error 2042"
-                    Encode = "#N/A"
-                Case "Error 2043"
-                    Encode = "#GETTING_DATA!"
-                Case "Error 2045"
-                    Encode = "#SPILL!"
-                Case "Error 2046"
-                    Encode = "#CONNECT!"
-                Case "Error 2047"
-                    Encode = "#BLOCKED!"
-                Case "Error 2048"
-                    Encode = "#UNKNOWN!"
-                Case "Error 2049"
-                    Encode = "#FIELD!"
-                Case "Error 2050"
-                    Encode = "#CALC!"
-                Case Else
-                    Encode = CStr(x)        'should never hit this line...
-            End Select
-        Case Else
-            Throw "Cannot convert variant of type " & TypeName(x) & " to String"
-    End Select
-    Exit Function
-ErrHandler:
-    Throw "#Encode: " & Err.Description & "!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Throw
 ' Purpose    : Simple error handling.
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3840,6 +3501,7 @@ End Sub
 
 'See "gogeek"'s post at _
 https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : GetLocalOffsetToUTC
 ' Purpose    : Get the PC's offset to UTC.
@@ -4054,5 +3716,369 @@ ErrHandler:
     Throw "#ParseTextFile: " & Err.Description & "!"
 End Function
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : RegisterCSVWrite
+' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
+'              WorkBook_Open event.
+' -----------------------------------------------------------------------------------------------------------------------
+Sub RegisterCSVWrite()
+    Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same " & _
+                        "name is overwritten. If successful, the function returns FileName, otherwise an ""error " & _
+                        "string"" (starts with `#`, ends with `!`) describing what went wrong."
+    Dim ArgDescs() As String
 
+    On Error GoTo ErrHandler
+
+    ReDim ArgDescs(1 To 8)
+    ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
+                  "Excel errors or null values."
+    ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
+                  "function returns Data converted CSV-style to a string."
+    ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
+                  "FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. " & _
+                  "Double quotes are always escaped by another double quote."
+    ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
+                  "file. If omitted, defaults to `yyyy-mm-dd`."
+    ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
+                  "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
+                  "inconsistent across the datetimes in data."
+    ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
+                  "character."
+    ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this " & _
+                  "argument is `ANSI` but Data contains characters that cannot be written to an ANSI file. `UTF-8` " & _
+                  "and `UTF-16` files are written with a byte option mark."
+    ArgDescs(8) = "Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. " & _
+                  "Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or " & _
+                  "the strings `CRLF`, `LF` or `CR`."
+    Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
+    Exit Sub
+
+ErrHandler:
+    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
+End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure : CSVWrite
+' Purpose   : Creates a comma-separated file on disk containing Data. Any existing file of the same
+'             name is overwritten. If successful, the function returns FileName, otherwise an "error
+'             string" (starts with `#`, ends with `!`) describing what went wrong.
+' Arguments
+' Data      : An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty,
+'             Excel errors or null values.
+' FileName  : The full name of the file, including the path. Alternatively, if FileName is omitted, then the
+'             function returns Data converted CSV-style to a string.
+' QuoteAllStrings: If `TRUE` (the default) then elements of Data that are strings are quoted before being
+'             written to file, other elements (Numbers, Booleans, Errors) are not quoted. If `FALSE` then
+'             the only elements of Data that are quoted are strings containing Delimiter, line feed,
+'             carriage return or double quote. In all cases, double quotes are escaped by another double
+'             quote.
+' DateFormat: A format string that determines how dates, including cells formatted as dates, appear in the
+'             file. If omitted, defaults to `yyyy-mm-dd`.
+' DateTimeFormat: Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use
+'             `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight
+'             saving may be inconsistent across the datetimes in data.
+' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
+'             character.
+' Encoding  : Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this
+'             argument is `ANSI` but Data contains characters that cannot be written to an ANSI file.
+'             `UTF-8` and `UTF-16` files are written with a byte option mark.
+' EOL       : Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`.
+'             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
+'             or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.
+'
+' Notes     : See also companion function CSVRead.
+'
+'             For discussion of the CSV format see
+'             https://tools.ietf.org/html/rfc4180#section-2
+' -----------------------------------------------------------------------------------------------------------------------
+Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
+    Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
+    Optional ByVal DateTimeFormat As String = "ISO", _
+    Optional Delimiter As String = ",", Optional Encoding As String = "ANSI", _
+    Optional ByVal EOL As String = "")
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
+
+    Const DQ = """"
+    Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a " & _
+        "double  quote, line feed or carriage return"
+    Const Err_Dimensions = "Data must be a range or a 2-dimensional array"
+    Const Err_Encoding = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
+    
+    Dim EOLIsWindows As Boolean
+    Dim ErrRet As String
+    Dim i As Long
+    Dim j As Long
+    Dim Lines() As String
+    Dim OneLine() As String
+    Dim OneLineJoined As String
+    Dim Stream As Object
+    Dim WriteToFile As Boolean
+    Dim Unicode As Boolean
+
+    On Error GoTo ErrHandler
+    
+    Select Case UCase(Encoding)
+        Case "ANSI", "UTF-8", "UTF-16"
+        Case Else
+            Throw Err_Encoding
+    End Select
+
+    WriteToFile = Len(FileName) > 0
+
+    If EOL = "" Then
+        If WriteToFile Then
+            EOL = vbCrLf
+        Else
+            EOL = vbLf
+        End If
+    End If
+
+    EOL = OStoEOL(EOL, "EOL")
+    EOLIsWindows = EOL = vbCrLf
+
+    If Len(Delimiter) = 0 Or Left$(Delimiter, 1) = DQ Or Left$(Delimiter, 1) = vbLf Or Left$(Delimiter, 1) = vbCr Then
+        Throw Err_Delimiter
+    End If
+    
+    Select Case UCase(DateTimeFormat)
+        Case "ISO"
+            DateTimeFormat = "yyyy-mm-ddThh:mm:ss"
+        Case "ISOZ"
+            DateTimeFormat = ISOZFormatString()
+    End Select
+
+    If TypeName(Data) = "Range" Then
+        'Preserve elements of type Date by using .Value, not .Value2
+        Data = Data.value
+    End If
+    
+    If NumDimensions(Data) <> 2 Then Throw Err_Dimensions
+    ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
+    
+    If WriteToFile Then
+        If UCase(Encoding) = "UTF-8" Then
+            Set Stream = CreateObject("ADODB.Stream")
+            Stream.Open
+            Stream.Type = 2 'Text
+            Stream.CharSet = "utf-8"
+    
+            For i = LBound(Data) To UBound(Data)
+                For j = LBound(Data, 2) To UBound(Data, 2)
+                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
+                Next j
+                OneLineJoined = VBA.Join(OneLine, Delimiter) & EOL
+                Stream.WriteText OneLineJoined
+            Next i
+            Stream.SaveToFile FileName, adSaveCreateOverWrite
+
+            CSVWrite = FileName
+        Else
+            Unicode = UCase(Encoding) = "UTF-16"
+            If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+            Set Stream = m_FSO.CreateTextFile(FileName, True, Unicode)
+  
+            For i = LBound(Data) To UBound(Data)
+                For j = LBound(Data, 2) To UBound(Data, 2)
+                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
+                Next j
+                OneLineJoined = VBA.Join(OneLine, Delimiter)
+                WriteLineWrap Stream, OneLineJoined, EOLIsWindows, EOL, Unicode
+            Next i
+
+            Stream.Close: Set Stream = Nothing
+            CSVWrite = FileName
+        End If
+    Else
+
+        ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
+  
+        For i = LBound(Data) To UBound(Data)
+            For j = LBound(Data, 2) To UBound(Data, 2)
+                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
+            Next j
+            Lines(i) = VBA.Join(OneLine, Delimiter)
+        Next i
+        CSVWrite = VBA.Join(Lines, EOL)
+        If Len(CSVWrite) >= 32768 Then
+            If TypeName(Application.Caller) = "Range" Then
+                Throw "Cannot return string of length " & Format(CStr(Len(CSVWrite)), "#,###") & _
+                    " to a cell of an Excel worksheet"
+            End If
+        End If
+    End If
+    
+    Exit Function
+ErrHandler:
+    ErrRet = "#CSVWrite: " & Err.Description & "!"
+    If Not Stream Is Nothing Then
+        Stream.Close
+        Set Stream = Nothing
+    End If
+    If m_ErrorStyle = es_ReturnString Then
+        CSVWrite = ErrRet
+    Else
+        Throw ErrRet
+    End If
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : OStoEOL
+' Purpose    : Convert text describing an operating system to the end-of-line marker employed. Note that "Mac" converts
+'              to vbCr but Apple operating systems since OSX use vbLf, matching Unix.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function OStoEOL(OS As String, ArgName As String) As String
+
+    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
+
+    On Error GoTo ErrHandler
+    Select Case LCase(OS)
+        Case "windows", vbCrLf, "crlf"
+            OStoEOL = vbCrLf
+        Case "unix", "linux", vbLf, "lf"
+            OStoEOL = vbLf
+        Case "mac", vbCr, "cr"
+            OStoEOL = vbCr
+        Case Else
+            Throw ArgName & Err_Invalid
+    End Select
+
+    Exit Function
+ErrHandler:
+    Throw "#OStoEOL: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : Encode
+' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As String, DateTimeFormat As String, _
+    Delim As String) As String
+    
+    Const DQ = """"
+    Const DQ2 = """"""
+
+    On Error GoTo ErrHandler
+    Select Case VarType(x)
+
+        Case vbString
+            If InStr(x, DQ) > 0 Then
+                Encode = DQ & Replace(x, DQ, DQ2) & DQ
+            ElseIf QuoteAllStrings Then
+                Encode = DQ & x & DQ
+            ElseIf InStr(x, vbCr) > 0 Then
+                Encode = DQ & x & DQ
+            ElseIf InStr(x, vbLf) > 0 Then
+                Encode = DQ & x & DQ
+            ElseIf InStr(x, Delim) > 0 Then
+                Encode = DQ & x & DQ
+            Else
+                Encode = x
+            End If
+        Case vbBoolean, vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty 'vbLongLong - not available on 16 bit.
+            Encode = CStr(x)
+        Case vbDate
+            If CLng(x) = CDbl(x) Then
+                Encode = Format$(x, DateFormat)
+            Else
+                Encode = Format$(x, DateTimeFormat)
+            End If
+        Case vbNull
+            Encode = "NULL"
+        Case vbError
+            Select Case CStr(x) 'Editing this case statement? Edit also its inverse, see method MakeSentinels
+                Case "Error 2000"
+                    Encode = "#NULL!"
+                Case "Error 2007"
+                    Encode = "#DIV/0!"
+                Case "Error 2015"
+                    Encode = "#VALUE!"
+                Case "Error 2023"
+                    Encode = "#REF!"
+                Case "Error 2029"
+                    Encode = "#NAME?"
+                Case "Error 2036"
+                    Encode = "#NUM!"
+                Case "Error 2042"
+                    Encode = "#N/A"
+                Case "Error 2043"
+                    Encode = "#GETTING_DATA!"
+                Case "Error 2045"
+                    Encode = "#SPILL!"
+                Case "Error 2046"
+                    Encode = "#CONNECT!"
+                Case "Error 2047"
+                    Encode = "#BLOCKED!"
+                Case "Error 2048"
+                    Encode = "#UNKNOWN!"
+                Case "Error 2049"
+                    Encode = "#FIELD!"
+                Case "Error 2050"
+                    Encode = "#CALC!"
+                Case Else
+                    Encode = CStr(x)        'should never hit this line...
+            End Select
+        Case Else
+            Throw "Cannot convert variant of type " & TypeName(x) & " to String"
+    End Select
+    Exit Function
+ErrHandler:
+    Throw "#Encode: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : WriteLineWrap
+' Purpose    : Wrapper to TextStream.Write[Line] to give more informative error message than "invalid procedure call or
+'              argument" if the error is caused by attempting to write illegal characters to a stream opened with
+'              TriStateFalse.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, Unicode As Boolean)
+
+    Dim ErrDesc As String
+    Dim ErrNum As Long
+    Dim i As Long
+
+    On Error GoTo ErrHandler
+    If EOLIsWindows Then
+        T.WriteLine text
+    Else
+        T.Write text
+        T.Write EOL
+    End If
+
+    Exit Sub
+
+ErrHandler:
+    ErrNum = Err.Number
+    ErrDesc = Err.Description
+    If Not Unicode Then
+        If ErrNum = 5 Then
+            For i = 1 To Len(text)
+                If Not CanWriteCharToAscii(Mid$(text, i, 1)) Then
+                    ErrDesc = "Data contains characters that cannot be written to an ascii file (first found is '" & _
+                        Mid$(text, i, 1) & "' with unicode character code " & AscW(Mid$(text, i, 1)) & _
+                        "). Try calling CSVWrite with argument Encoding as ""UTF-8"" or ""UTF-16"""
+                    Exit For
+                End If
+            Next i
+        End If
+    End If
+    Throw "#WriteLineWrap: " & ErrDesc & "!"
+End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : CanWriteCharToAscii
+' Purpose    : Not all characters for which AscW(c) < 255 can be written to an ascii file. If AscW(c) is in the following
+'              list then they cannot:
+'             128,130,131,132,133,134,135,136,137,138,139,140,142,145,146,147,148,149,150,151,152,153,154,155,156,158,159
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function CanWriteCharToAscii(c As String) As Boolean
+    Dim code As Long
+    code = AscW(c)
+    If code > 255 Or code < 0 Then
+        CanWriteCharToAscii = False
+    Else
+        CanWriteCharToAscii = Chr(AscW(c)) = c
+    End If
+End Function
 

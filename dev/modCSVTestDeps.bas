@@ -110,8 +110,8 @@ ErrHandler:
     Throw "#TestCSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, NumCols As Long, ExtraInfo As String, Unicode As Boolean, Ragged As Boolean)
-    NameThatFile = (Folder & "\" & IIf(ExtraInfo = "", "", ExtraInfo & "_") & IIf(OS = "", "", OS & "_") & Format(NumRows, "0000") & "_x_" & Format(NumCols, "000") & IIf(Unicode, "_Unicode", "_Ascii") & IIf(Ragged, "_Ragged", "") & ".csv")
+Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, NumCols As Long, ExtraInfo As String, Encoding As String, Ragged As Boolean)
+    NameThatFile = (Folder & "\" & IIf(ExtraInfo = "", "", ExtraInfo & "_") & IIf(OS = "", "", OS & "_") & Format(NumRows, "0000") & "_x_" & Format(NumCols, "000") & "_" & Encoding & IIf(Ragged, "_Ragged", "") & ".csv")
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

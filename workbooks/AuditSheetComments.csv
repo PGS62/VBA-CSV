@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+103,23-Sep-2021,13:13:34,"Philip Swannell","CSVWrite now takes argument Encoding rather than Unicode."
+102,23-Sep-2021,10:05:55,"Philip Swannell","Added to TODO list."
 101,22-Sep-2021,11:58:31,"Philip Swannell","Deleted older of the two Performance sheets."
 100,22-Sep-2021,11:56:33,"Philip Swannell","Added tests for date-time parsing, including decimal fractions of a second for D-M-Y, M-D-Y and Y-M-D."
 99,21-Sep-2021,17:39:25,"Philip Swannell","Reduced the number of lines> 122 in length"
