@@ -19,11 +19,12 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 # Installation
 1. Download the [latest release](https://github.com/PGS62/VBA-CSV/releases).
 2. Import `src\modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
-3. Add three references (In VBA Editor Tools > References)
+3. Add two references (In VBA Editor Tools > References)
    * `Microsoft Scripting Runtime`
-   * `Microsoft VBScript Regular Expressions 5.5` (or the latest version available)
-   * `Microsoft ActiveX Data Objects 6.0 Library` (or the latest version available)
-   ![vbareferences](screenshots/VBAReferences.png)
+   * `Microsoft VBScript Regular Expressions 5.5` (or the latest version available)  
+   &nbsp;&nbsp;
+   <img src="https://github.com/PGS62/VBA-CSV/blob/main/screenshots/VBAReferences2.png" width=50% height = 50%>
+   
 4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
 Private Sub Workbook_Open()
@@ -149,11 +150,16 @@ During type conversion, `CSVRead` accepts dates and times where the number of se
 The return from `CSVRead` is an array with lower bounds of one. If you prefer array lower bounds to be zero, then edit the constant `m_LBound` (at the top of `modCSVReadWrite.bas`) to be 0 rather than 1.  
 [source](https://github.com/PGS62/VBA-CSV/blob/28beaf2ca62f3fe72bffb1273e73ac52179597b7/src/modCSVReadWrite.bas#L32-L33)
 
-### Excel limit on string length
-If the `FileName` argument to `CSVWrite` is omitted, then instead of writing a file to disk, the function returns a string in CSV format. But there is a [limit](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) on the total number of characters that an Excel cell can contain of 32,767. If the return would otherwise be longer then an error string is returned. This limit does not apply when calling `CSVWrite` from VBA.
+### Excel limits on string length
+There is a [limit](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) on the total number of characters that an Excel cell can contain of 32,767. Therefore, when `CSVWrite` is called from a worksheet formula with the `FileName` argument omitted, the function will return an error string if the return would otherwise be longer than 32,767 characters. Similarly `CSVRead`, when called from a worksheet formula, will return an error string if any individual field to be returned is longer than 32,767.
+
+Certain<sup>[2](#myfootnote2)</sup> versions of Excel had a much lower limit of 255 on the length of string elements within arrays returned to a worksheet by a VBA UDF. When used on such Excel versions, `CSVRead` returns the `#VALUE!` error if the function is attempting to return an array containing a string longer than 255 characters. 
+
+--------------------------------
+<a name="myfootnote2">Footnote 2</a>: Excel 2010 had this 255 character limit, Excel 365 does not. I don't yet know whether the limit applied to Excel 2013, 2016 and 2019.
 
 # Performance
-On a test machine<sup>[2](#myfootnote2)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
+On a test machine<sup>[3](#myfootnote3)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
 
 The workbook VBA-CSV.xlsm in the workbooks folder includes [code](dev/modCSVPerformance.bas) to benchmark `CSVRead` against the two alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/) (so not easily available from VBA). It generates plots of parse time as a function of number of rows, number of columns and field length.
 
@@ -199,7 +205,7 @@ In summary, the performance tests show:
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
 
 --------------------------------
-<a name="myfootnote2">Footnote 2</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
+<a name="myfootnote3">Footnote 3</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
 
 # Compatibility
 VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available), and not iOS or Android (since VBA is not available). It has been tested on Excel 365, both 64-bit and 32-bit. It _should_ work on earlier versions of Office but has not yet been tested on them.
