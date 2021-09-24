@@ -235,6 +235,8 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test198 Folder, NumPassed, NumFailed, Failures
     Test199 Folder, NumPassed, NumFailed, Failures
     Test200 Folder, NumPassed, NumFailed, Failures
+    Test201 Folder, NumPassed, NumFailed, Failures
+    Test202 Folder, NumPassed, NumFailed, Failures
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -5588,5 +5590,70 @@ Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     Exit Sub
 ErrHandler:
     Throw "#Test200 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+
+'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
+Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+    Dim Formula As String, wb As Workbook, r As Range
+
+    On Error GoTo ErrHandler
+    TestDescription = "test 32K limit"
+    Expected = "#CSVRead: The file has a field (row 2, column 2) of length 33,000. Excel cells cannot contain strings longer than 32,767!"
+    FileName = "test_32K_limit.csv"
+    
+    Formula = "=CSVRead(""" & Folder & FileName & """, TRUE)"
+    
+    shHiddenSheet.Unprotect
+    shHiddenSheet.UsedRange.Clear
+    Set r = shHiddenSheet.Cells(1, 1)
+    r.Formula2 = Formula
+    Observed = r.value
+    TestRes = Observed = Expected
+    If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    shHiddenSheet.UsedRange.Clear
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test201 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
+Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected
+    Dim FileName As String
+    Dim Observed
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+    Dim Formula As String, wb As Workbook, r As Range
+
+    On Error GoTo ErrHandler
+    TestDescription = "test 32K limit"
+    Expected = "#CSVRead: #ParseTextFile: Line 2 of the file is of length 33,002. Excel cells cannot contain strings longer than 32,767!!"
+    FileName = "test_32K_limit.csv"
+    
+    Formula = "=CSVRead(""" & Folder & FileName & """, FALSE,FALSE)"
+    
+    shHiddenSheet.Unprotect
+    shHiddenSheet.UsedRange.Clear
+    Set r = shHiddenSheet.Cells(1, 1)
+    r.Formula2 = Formula
+    Observed = r.value
+    TestRes = Observed = Expected
+    If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    shHiddenSheet.UsedRange.Clear
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test202 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
