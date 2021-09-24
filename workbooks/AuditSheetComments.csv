@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+108,24-Sep-2021,17:34:00,"Philip Swannell","Added code to generate CSVReadTitanic.gif."
 107,24-Sep-2021,13:05:07,"Philip Swannell","Added tests for breach of 32k limit on field length when calling from Excel."
 106,24-Sep-2021,12:46:59,"Philip Swannell","Sorted methods in module modCSVReadWrite"
 105,24-Sep-2021,10:56:00,"Philip Swannell","Work on 32k/255 limit for returning strings to Excel"

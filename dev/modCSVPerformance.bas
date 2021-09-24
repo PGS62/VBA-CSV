@@ -105,7 +105,7 @@ Private Sub RunSpeedTests()
     
     For Each N In ws.Names
         If InStr(N.Name, "PasteResultsHere") > 1 Then
-            Application.GoTo N.RefersToRange
+            Application.Goto N.RefersToRange
 
             For Each c In N.RefersToRange.Cells
                 c.Resize(1, NumColsInTFPRet).ClearContents
@@ -318,7 +318,7 @@ Sub AddCharts(Optional Export As Boolean = True)
         End If
     Next N
 
-    Application.GoTo ws.Cells(1, 1)
+    Application.Goto ws.Cells(1, 1)
     ws.Protect , , prot
 
     Exit Sub
