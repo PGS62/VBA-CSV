@@ -53,7 +53,7 @@ Sub Demo()
         ConvertTypes:=True, MissingStrings:="NA")
 End Sub
 ```
-A simple "round-tripping" demo:  
+A simple "round-tripping" demo (F5 to replay)
 ![CSVReadWrite](screenshots/CSVReadWrite8.gif)
 
 -----------------------------
