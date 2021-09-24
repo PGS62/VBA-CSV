@@ -156,7 +156,7 @@ The return from `CSVRead` is an array with lower bounds of one. If you prefer ar
 ### Excel limits on string length
 There is a [limit](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) on the total number of characters that an Excel cell can contain of 32,767. Therefore, when `CSVWrite` is called from a worksheet formula with the `FileName` argument omitted, the function will return an error string if the return would otherwise be longer than 32,767 characters. Similarly `CSVRead`, when called from a worksheet formula, will return an error string if any individual field to be returned is longer than 32,767.
 
-Certain<sup>[2](#myfootnote2)</sup> versions of Excel had a much lower limit of 255 on the length of string elements within arrays returned to a worksheet by a VBA UDF. When used on such Excel versions, `CSVRead` returns the `#VALUE!` error if the function is attempting to return an array containing a string longer than 255 characters. 
+Certain<sup>[2](#myfootnote2)</sup> versions of Excel had a much lower limit of 255 on the length of string elements within arrays returned to a worksheet by a VBA UDF.
 
 --------------------------------
 <a name="myfootnote2">Footnote 2</a>: Excel 2010 had this 255 character limit, Excel 365 does not. I don't yet know whether the limit applied to Excel 2013, 2016 and 2019.
