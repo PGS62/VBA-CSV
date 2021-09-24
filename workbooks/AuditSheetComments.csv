@@ -1,4 +1,6 @@
 "Version","Date","Time","Author","Comment"
+107,24-Sep-2021,13:05:07,"Philip Swannell","Added tests for breach of 32k limit on field length when calling from Excel."
+106,24-Sep-2021,12:46:59,"Philip Swannell","Sorted methods in module modCSVReadWrite"
 105,24-Sep-2021,10:56:00,"Philip Swannell","Work on 32k/255 limit for returning strings to Excel"
 104,23-Sep-2021,14:01:02,"Philip Swannell","Late bind to ADODB. It would make installation simpler if late bound to Scripting run time and regular expressions but that I suspect that would hit performance."
 103,23-Sep-2021,13:13:34,"Philip Swannell","CSVWrite now takes argument Encoding rather than Unicode."

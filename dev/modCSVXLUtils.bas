@@ -141,7 +141,7 @@ Function VStack(ParamArray Arrays())
     Dim i As Long
     Dim j As Long
     Dim k As Long
-    Dim R As Long
+    Dim r As Long
     Dim R0 As Long
     Dim ReturnArray()
     On Error GoTo ErrHandler
@@ -155,21 +155,21 @@ Function VStack(ParamArray Arrays())
         For i = LBound(Arrays) To UBound(Arrays)
             If TypeName(Arrays(i)) = "Range" Then Arrays(i) = Arrays(i).value
             If IsMissing(Arrays(i)) Then
-                R = 0: c = 0
+                r = 0: c = 0
             Else
                 Select Case NumDimensions(Arrays(i))
                     Case 0
-                        R = 1: c = 1
+                        r = 1: c = 1
                     Case 1
-                        R = 1
+                        r = 1
                         c = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
                     Case 2
-                        R = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
+                        r = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
                         c = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
                 End Select
             End If
             If c > AllC Then AllC = c
-            AllR = AllR + R
+            AllR = AllR + r
         Next i
 
         If AllR = 0 Then
@@ -184,19 +184,19 @@ Function VStack(ParamArray Arrays())
             If Not IsMissing(Arrays(i)) Then
                 Select Case NumDimensions(Arrays(i))
                     Case 0
-                        R = 1: c = 1
+                        r = 1: c = 1
                         ReturnArray(R0, 1) = Arrays(i)
                     Case 1
-                        R = 1
+                        r = 1
                         c = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
                         For j = 1 To c
                             ReturnArray(R0, j) = Arrays(i)(j + LBound(Arrays(i)) - 1)
                         Next j
                     Case 2
-                        R = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
+                        r = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
                         c = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
 
-                        For j = 1 To R
+                        For j = 1 To r
                             For k = 1 To c
                                 ReturnArray(R0 + j - 1, k) = Arrays(i)(j + LBound(Arrays(i), 1) - 1, k + LBound(Arrays(i), 2) - 1)
                             Next k
@@ -204,13 +204,13 @@ Function VStack(ParamArray Arrays())
 
                 End Select
                 If c < AllC Then
-                    For j = 1 To R
+                    For j = 1 To r
                         For k = c + 1 To AllC
                             ReturnArray(R0 + j - 1, k) = NA
                         Next k
                     Next j
                 End If
-                R0 = R0 + R
+                R0 = R0 + r
             End If
         Next i
 
