@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.9
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.11
 
 Option Explicit
 
@@ -150,8 +150,6 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional DecimalSeparator As String, _
     Optional ByRef HeaderRow)
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -171,7 +169,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Const Err_SkipToRow = "SkipToRow must be at least 1."
     Const Err_Comment = "Comment must not contain double-quote, line feed or carriage return"
     Const Err_HeaderRowNum = "HeaderRowNum must be greater than or equal to zero and less than or equal to SkipToRow"
-    Const Err_32K = "The file has a field of length greater than 32,767 which cannot be displayed in an Excel worksheet"
     
     Dim AcceptWithoutTimeZone As Boolean
     Dim AcceptWithTimeZone As Boolean
@@ -211,7 +208,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim RowIndexes() As Long
     Dim Sentinels As New Scripting.Dictionary
     Dim SepStandard As Boolean
-    Dim SF As Scripting.File
     Dim ShowBooleansAsBooleans As Boolean
     Dim ShowDatesAsDates As Boolean
     Dim ShowErrorsAsErrors As Boolean
@@ -787,156 +783,6 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : FileExists
-' Purpose    : Returns True if FileName exists on disk, False o.w.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function FileExists(FileName As String) As Boolean
-    Dim F As Scripting.File
-    On Error GoTo ErrHandler
-    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-    Set F = m_FSO.GetFile(FileName)
-    FileExists = True
-    Exit Function
-ErrHandler:
-    FileExists = False
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : FileDelete
-' Purpose    : Delete a file, returns True or error string.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function FileDelete(FileName As String) As Boolean
-    Dim F As Scripting.File
-    On Error GoTo ErrHandler
-
-    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-    Set F = m_FSO.GetFile(FileName)
-    F.Delete
-    FileDelete = True
-
-    Exit Function
-ErrHandler:
-    Throw "#FileDelete: " & Err.Description & "!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : FileFromPath
-' Purpose    : Split file-with-path to file name (if ReturnFileName is True) or path otherwise.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function FileFromPath(FullFileName As String, Optional ReturnFileName As Boolean = True) As Variant
-    Dim SlashPos As Long
-    Dim SlashPos2 As Long
-
-    On Error GoTo ErrHandler
-
-    SlashPos = InStrRev(FullFileName, "\")
-    SlashPos2 = InStrRev(FullFileName, "/")
-    If SlashPos2 > SlashPos Then SlashPos = SlashPos2
-    If SlashPos = 0 Then Throw "Neither '\' nor '/' found"
-
-    If ReturnFileName Then
-        FileFromPath = Mid$(FullFileName, SlashPos + 1)
-    Else
-        FileFromPath = Left$(FullFileName, SlashPos - 1)
-    End If
-
-    Exit Function
-ErrHandler:
-    Throw "#FileFromPath: " & Err.Description & "!"
-End Function
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : FolderExists
-' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
-'----------------------------------------------------------------------------------------------------------------------
-Private Function FolderExists(ByVal FolderPath As String)
-    Dim F As Scripting.Folder
-    
-    On Error GoTo ErrHandler
-    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-    
-    Set F = m_FSO.GetFolder(FolderPath)
-    FolderExists = True
-    Exit Function
-ErrHandler:
-    FolderExists = False
-End Function
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : CreatePath
-' Purpose   : Creates a folder on disk. FolderPath can be passed in as C:\This\That\TheOther even if the
-'             folder C:\This does not yet exist. If successful returns the name of the
-'             folder. If not successful throws an error.
-' Arguments
-' FolderPath: Path of the folder to be created. For example C:\temp\My_New_Folder. It does not matter if
-'             this path has a terminating backslash or not.
-'----------------------------------------------------------------------------------------------------------------------
-Private Function CreatePath(ByVal FolderPath As String)
-
-    Dim F As Scripting.Folder
-    Dim i As Long
-    Dim isUNC As Boolean
-    Dim ParentFolderName
-    Dim ThisFolderName As String
-
-    On Error GoTo ErrHandler
-
-    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-
-    If Left$(FolderPath, 2) = "\\" Then
-        isUNC = True
-    ElseIf Mid$(FolderPath, 2, 2) <> ":\" Or _
-        Asc(UCase$(Left$(FolderPath, 1))) < 65 Or _
-        Asc(UCase$(Left$(FolderPath, 1))) > 90 Then
-        Throw "First three characters of FolderPath must give drive letter followed by "":\"" or else be""\\"" for " & _
-            "UNC folder name"
-    End If
-
-    FolderPath = Replace(FolderPath, "/", "\")
-
-    If Right$(FolderPath, 1) <> "\" Then
-        FolderPath = FolderPath & "\"
-    End If
-
-    If FolderExists(FolderPath) Then
-        GoTo EarlyExit
-    End If
-
-    'Go back until we find parent folder that does exist
-    For i = Len(FolderPath) - 1 To 3 Step -1
-        If Mid$(FolderPath, i, 1) = "\" Then
-            If FolderExists(Left$(FolderPath, i)) Then
-                Set F = m_FSO.GetFolder(Left$(FolderPath, i))
-                ParentFolderName = Left$(FolderPath, i)
-                Exit For
-            End If
-        End If
-    Next i
-
-    If F Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
-
-    'now add folders one level at a time
-    For i = Len(ParentFolderName) + 1 To Len(FolderPath)
-        If Mid$(FolderPath, i, 1) = "\" Then
-            
-            ThisFolderName = Mid$(FolderPath, InStrRev(FolderPath, "\", i - 1) + 1, _
-                i - 1 - InStrRev(FolderPath, "\", i - 1))
-            F.SubFolders.Add ThisFolderName
-            Set F = m_FSO.GetFolder(Left$(FolderPath, i))
-        End If
-    Next i
-
-EarlyExit:
-    Set F = m_FSO.GetFolder(FolderPath)
-    CreatePath = F.path
-    Set F = Nothing
-
-    Exit Function
-ErrHandler:
-    Throw "#CreatePath: " & Err.Description & "!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseEncoding
 ' Purpose    : Set by-ref arguments
 ' Parameters :
@@ -1245,17 +1091,6 @@ ErrHandler:
     Throw "#ParseConvertTypes: " & Err.Description & "!"
 End Sub
 
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : IsNumber
-' Purpose   : Is a singleton a number?
-'----------------------------------------------------------------------------------------------------------------------
-Private Function IsNumber(x As Variant) As Boolean
-    Select Case VarType(x)
-        Case vbDouble, vbInteger, vbSingle, vbLong ', vbCurrency, vbDecimal
-            IsNumber = True
-    End Select
-End Function
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseCTString
 ' Purpose    : Parse the input ConvertTypes to set seven Boolean flags which are passed by reference.
@@ -1323,132 +1158,6 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
     Exit Sub
 ErrHandler:
     Throw "#ParseCTString: " & Err.Description & "!"
-End Sub
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : NCols
-' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
-'             have one row and the number of columns returned by this function.
-'----------------------------------------------------------------------------------------------------------------------
-Private Function NCols(Optional TheArray) As Long
-    If TypeName(TheArray) = "Range" Then
-        NCols = TheArray.Columns.Count
-    ElseIf IsMissing(TheArray) Then
-        NCols = 0
-    ElseIf VarType(TheArray) < vbArray Then
-        NCols = 1
-    Else
-        Select Case NumDimensions(TheArray)
-            Case 1
-                NCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
-            Case Else
-                NCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
-        End Select
-    End If
-End Function
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : NRows
-' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
-'----------------------------------------------------------------------------------------------------------------------
-Private Function NRows(Optional TheArray) As Long
-    If TypeName(TheArray) = "Range" Then
-        NRows = TheArray.Rows.Count
-    ElseIf IsMissing(TheArray) Then
-        NRows = 0
-    ElseIf VarType(TheArray) < vbArray Then
-        NRows = 1
-    Else
-        Select Case NumDimensions(TheArray)
-            Case 1
-                NRows = 1
-            Case Else
-                NRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
-        End Select
-    End If
-End Function
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : Transpose
-' Purpose   : Returns the transpose of an array.
-' Arguments
-' TheArray  : An array of arbitrary values.
-'             Return is always 1-based, even when input is zero-based.
-'----------------------------------------------------------------------------------------------------------------------
-Private Function Transpose(ByVal TheArray As Variant)
-    Dim Co As Long
-    Dim i As Long
-    Dim j As Long
-    Dim m As Long
-    Dim N As Long
-    Dim Result As Variant
-    Dim Ro As Long
-    On Error GoTo ErrHandler
-    Force2DArrayR TheArray, N, m
-    Ro = LBound(TheArray, 1) - 1
-    Co = LBound(TheArray, 2) - 1
-    ReDim Result(1 To m, 1 To N)
-    For i = 1 To N
-        For j = 1 To m
-            Result(j, i) = TheArray(i + Ro, j + Co)
-        Next j
-    Next i
-    Transpose = Result
-    Exit Function
-ErrHandler:
-    Throw "#Transpose: " & Err.Description & "!"
-End Function
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : Force2DArrayR
-' Purpose   : When writing functions to be called from sheets, we often don't want to process
-'             the inputs as Range objects, but instead as Arrays. This method converts the
-'             input into a 2-dimensional 1-based array (even if it's a single cell or single row of cells)
-'----------------------------------------------------------------------------------------------------------------------
-Private Sub Force2DArrayR(ByRef RangeOrArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
-    If TypeName(RangeOrArray) = "Range" Then RangeOrArray = RangeOrArray.Value2
-    Force2DArray RangeOrArray, NR, NC
-End Sub
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : Force2DArray
-' Purpose   : In-place amendment of singletons and one-dimensional arrays to two dimensions.
-'             singletons and 1-d arrays are returned as 2-d 1-based arrays. Leaves two
-'             two dimensional arrays untouched (i.e. a zero-based 2-d array will be left as zero-based).
-'             See also Force2DArrayR that also handles Range objects.
-'----------------------------------------------------------------------------------------------------------------------
-Private Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
-    Dim TwoDArray As Variant
-
-    On Error GoTo ErrHandler
-
-    Select Case NumDimensions(TheArray)
-        Case 0
-            ReDim TwoDArray(1 To 1, 1 To 1)
-            TwoDArray(1, 1) = TheArray
-            TheArray = TwoDArray
-            NR = 1: NC = 1
-        Case 1
-            Dim i As Long
-            Dim LB As Long
-            LB = LBound(TheArray, 1)
-            NR = 1: NC = UBound(TheArray, 1) - LB + 1
-            ReDim TwoDArray(1 To 1, 1 To NC)
-            For i = 1 To UBound(TheArray, 1) - LBound(TheArray) + 1
-                TwoDArray(1, i) = TheArray(LB + i - 1)
-            Next i
-            TheArray = TwoDArray
-        Case 2
-            NR = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
-            NC = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
-            'Nothing to do
-        Case Else
-            Throw "Cannot convert array of dimension greater than two"
-    End Select
-
-    Exit Sub
-ErrHandler:
-    Throw "#Force2DArray: " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2373,22 +2082,6 @@ ErrHandler:
     Throw "#GetMoreFromStream: " & Err.Description & "!"
 End Sub
 
-Private Function MaxLngs(x As Long, y As Long) As Long
-    If x > y Then
-        MaxLngs = x
-    Else
-        MaxLngs = y
-    End If
-End Function
-
-Private Function MinLngs(x As Long, y As Long) As Long
-    If x > y Then
-        MinLngs = y
-    Else
-        MinLngs = x
-    End If
-End Function
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CountQuotes
 ' Purpose    : Count the quotes in a string, only used when applying column-by-column type conversion, because in that
@@ -2873,32 +2566,6 @@ ErrHandler:
     'Do nothing - was not a string representing a date with the specified date order and date separator.
 End Sub
 
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : Throw
-' Purpose    : Simple error handling.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Sub Throw(ByVal ErrorString As String)
-    Err.Raise vbObjectError + 1, , ErrorString
-End Sub
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : ThrowIfError
-' Purpose   : In the event of an error, methods intended to be callable from spreadsheets
-'             return an error string (starts with "#", ends with "!"). ThrowIfError allows such
-'             methods to be used from VBA code while keeping error handling robust
-'             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
-'----------------------------------------------------------------------------------------------------------------------
-Public Function ThrowIfError(Data As Variant)
-    ThrowIfError = Data
-    If VarType(Data) = vbString Then
-        If Left$(Data, 1) = "#" Then
-            If Right$(Data, 1) = "!" Then
-                Throw CStr(Data)
-            End If
-        End If
-    End If
-End Function
-
 '----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NumDimensions
 ' Purpose   : Returns the number of dimensions in an array variable, or 0 if the variable
@@ -2920,23 +2587,6 @@ Private Function NumDimensions(x As Variant) As Long
     End If
 ExitPoint:
     NumDimensions = i - 1
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : FunctionWizardActive
-' Purpose    : Test if Excel's Function Wizard is active to allow early exit in slow functions.
-' https://stackoverflow.com/questions/20866484/can-i-disable-a-vba-udf-calculation-when-the-insert-function-function-arguments
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function FunctionWizardActive() As Boolean
-    
-    On Error GoTo ErrHandler
-    If Not Application.CommandBars("Standard").Controls(1).Enabled Then
-        FunctionWizardActive = True
-    End If
-
-    Exit Function
-ErrHandler:
-    Throw "#FunctionWizardActive: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3101,27 +2751,6 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
 ErrHandler:
     Throw "#AddKeyToDict: " & Err.Description & "!"
 End Sub
-
-'----------------------------------------------------------------------------------------------------------------------
-' Procedure : ElapsedTime
-' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
-'             time stamp that can be used for time-interval measurements.
-'
-'             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
-'----------------------------------------------------------------------------------------------------------------------
-Private Function ElapsedTime() As Double
-    Dim a As Currency
-    Dim b As Currency
-    On Error GoTo ErrHandler
-
-    QueryPerformanceCounter a
-    QueryPerformanceFrequency b
-    ElapsedTime = a / b
-
-    Exit Function
-ErrHandler:
-    Throw "#ElapsedTime: " & Err.Description & "!"
-End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : SpeedTest_Sentinels
@@ -3615,7 +3244,6 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     Const Err_FileEmpty = "File is empty"
     Dim Buffer As String
     Dim BufferUpdatedTo As Long
-    Dim CallingFromExcel As Boolean
     Dim FoundCR As Boolean
     Dim HaveReachedSkipToLine As Boolean
     Dim i As Long 'Index to read from Buffer
@@ -3626,7 +3254,6 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     Dim PosLF As Long
     Dim ReturnArray() As String
     Dim SearchFor() As String
-    Dim SF As Scripting.File
     Dim Starts() As Long
     Dim Stream As Object
     Dim Streaming As Boolean
@@ -3777,6 +3404,373 @@ ErrHandler:
     Throw "#ParseTextFile: " & Err.Description & "!"
 End Function
 
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : ElapsedTime
+' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
+'             time stamp that can be used for time-interval measurements.
+'
+'             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
+'----------------------------------------------------------------------------------------------------------------------
+Private Function ElapsedTime() As Double
+    Dim a As Currency
+    Dim b As Currency
+    On Error GoTo ErrHandler
+
+    QueryPerformanceCounter a
+    QueryPerformanceFrequency b
+    ElapsedTime = a / b
+
+    Exit Function
+ErrHandler:
+    Throw "#ElapsedTime: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FunctionWizardActive
+' Purpose    : Test if Excel's Function Wizard is active to allow early exit in slow functions.
+' https://stackoverflow.com/questions/20866484/can-i-disable-a-vba-udf-calculation-when-the-insert-function-function-arguments
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function FunctionWizardActive() As Boolean
+    
+    On Error GoTo ErrHandler
+    If Not Application.CommandBars("Standard").Controls(1).Enabled Then
+        FunctionWizardActive = True
+    End If
+
+    Exit Function
+ErrHandler:
+    Throw "#FunctionWizardActive: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : Throw
+' Purpose    : Simple error handling.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub Throw(ByVal ErrorString As String)
+    Err.Raise vbObjectError + 1, , ErrorString
+End Sub
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : ThrowIfError
+' Purpose   : In the event of an error, methods intended to be callable from spreadsheets
+'             return an error string (starts with "#", ends with "!"). ThrowIfError allows such
+'             methods to be used from VBA code while keeping error handling robust
+'             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
+'----------------------------------------------------------------------------------------------------------------------
+Public Function ThrowIfError(Data As Variant)
+    ThrowIfError = Data
+    If VarType(Data) = vbString Then
+        If Left$(Data, 1) = "#" Then
+            If Right$(Data, 1) = "!" Then
+                Throw CStr(Data)
+            End If
+        End If
+    End If
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FileExists
+' Purpose    : Returns True if FileName exists on disk, False o.w.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function FileExists(FileName As String) As Boolean
+    Dim F As Scripting.File
+    On Error GoTo ErrHandler
+    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+    Set F = m_FSO.GetFile(FileName)
+    FileExists = True
+    Exit Function
+ErrHandler:
+    FileExists = False
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : FolderExists
+' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
+'----------------------------------------------------------------------------------------------------------------------
+Private Function FolderExists(ByVal FolderPath As String)
+    Dim F As Scripting.Folder
+    
+    On Error GoTo ErrHandler
+    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+    
+    Set F = m_FSO.GetFolder(FolderPath)
+    FolderExists = True
+    Exit Function
+ErrHandler:
+    FolderExists = False
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FileDelete
+' Purpose    : Delete a file, returns True or error string.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function FileDelete(FileName As String) As Boolean
+    Dim F As Scripting.File
+    On Error GoTo ErrHandler
+
+    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+    Set F = m_FSO.GetFile(FileName)
+    F.Delete
+    FileDelete = True
+
+    Exit Function
+ErrHandler:
+    Throw "#FileDelete: " & Err.Description & "!"
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : CreatePath
+' Purpose   : Creates a folder on disk. FolderPath can be passed in as C:\This\That\TheOther even if the
+'             folder C:\This does not yet exist. If successful returns the name of the
+'             folder. If not successful throws an error.
+' Arguments
+' FolderPath: Path of the folder to be created. For example C:\temp\My_New_Folder. It does not matter if
+'             this path has a terminating backslash or not.
+'----------------------------------------------------------------------------------------------------------------------
+Private Function CreatePath(ByVal FolderPath As String)
+
+    Dim F As Scripting.Folder
+    Dim i As Long
+    Dim isUNC As Boolean
+    Dim ParentFolderName
+    Dim ThisFolderName As String
+
+    On Error GoTo ErrHandler
+
+    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+
+    If Left$(FolderPath, 2) = "\\" Then
+        isUNC = True
+    ElseIf Mid$(FolderPath, 2, 2) <> ":\" Or _
+        Asc(UCase$(Left$(FolderPath, 1))) < 65 Or _
+        Asc(UCase$(Left$(FolderPath, 1))) > 90 Then
+        Throw "First three characters of FolderPath must give drive letter followed by "":\"" or else be""\\"" for " & _
+            "UNC folder name"
+    End If
+
+    FolderPath = Replace(FolderPath, "/", "\")
+
+    If Right$(FolderPath, 1) <> "\" Then
+        FolderPath = FolderPath & "\"
+    End If
+
+    If FolderExists(FolderPath) Then
+        GoTo EarlyExit
+    End If
+
+    'Go back until we find parent folder that does exist
+    For i = Len(FolderPath) - 1 To 3 Step -1
+        If Mid$(FolderPath, i, 1) = "\" Then
+            If FolderExists(Left$(FolderPath, i)) Then
+                Set F = m_FSO.GetFolder(Left$(FolderPath, i))
+                ParentFolderName = Left$(FolderPath, i)
+                Exit For
+            End If
+        End If
+    Next i
+
+    If F Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
+
+    'now add folders one level at a time
+    For i = Len(ParentFolderName) + 1 To Len(FolderPath)
+        If Mid$(FolderPath, i, 1) = "\" Then
+            
+            ThisFolderName = Mid$(FolderPath, InStrRev(FolderPath, "\", i - 1) + 1, _
+                i - 1 - InStrRev(FolderPath, "\", i - 1))
+            F.SubFolders.Add ThisFolderName
+            Set F = m_FSO.GetFolder(Left$(FolderPath, i))
+        End If
+    Next i
+
+EarlyExit:
+    Set F = m_FSO.GetFolder(FolderPath)
+    CreatePath = F.path
+    Set F = Nothing
+
+    Exit Function
+ErrHandler:
+    Throw "#CreatePath: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FileFromPath
+' Purpose    : Split file-with-path to file name (if ReturnFileName is True) or path otherwise.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function FileFromPath(FullFileName As String, Optional ReturnFileName As Boolean = True) As Variant
+    Dim SlashPos As Long
+    Dim SlashPos2 As Long
+
+    On Error GoTo ErrHandler
+
+    SlashPos = InStrRev(FullFileName, "\")
+    SlashPos2 = InStrRev(FullFileName, "/")
+    If SlashPos2 > SlashPos Then SlashPos = SlashPos2
+    If SlashPos = 0 Then Throw "Neither '\' nor '/' found"
+
+    If ReturnFileName Then
+        FileFromPath = Mid$(FullFileName, SlashPos + 1)
+    Else
+        FileFromPath = Left$(FullFileName, SlashPos - 1)
+    End If
+
+    Exit Function
+ErrHandler:
+    Throw "#FileFromPath: " & Err.Description & "!"
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : IsNumber
+' Purpose   : Is a singleton a number?
+'----------------------------------------------------------------------------------------------------------------------
+Private Function IsNumber(x As Variant) As Boolean
+    Select Case VarType(x)
+        Case vbDouble, vbInteger, vbSingle, vbLong ', vbCurrency, vbDecimal
+            IsNumber = True
+    End Select
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : NCols
+' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
+'             have one row and the number of columns returned by this function.
+'----------------------------------------------------------------------------------------------------------------------
+Private Function NCols(Optional TheArray) As Long
+    If TypeName(TheArray) = "Range" Then
+        NCols = TheArray.Columns.Count
+    ElseIf IsMissing(TheArray) Then
+        NCols = 0
+    ElseIf VarType(TheArray) < vbArray Then
+        NCols = 1
+    Else
+        Select Case NumDimensions(TheArray)
+            Case 1
+                NCols = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+            Case Else
+                NCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
+        End Select
+    End If
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : NRows
+' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
+'----------------------------------------------------------------------------------------------------------------------
+Private Function NRows(Optional TheArray) As Long
+    If TypeName(TheArray) = "Range" Then
+        NRows = TheArray.Rows.Count
+    ElseIf IsMissing(TheArray) Then
+        NRows = 0
+    ElseIf VarType(TheArray) < vbArray Then
+        NRows = 1
+    Else
+        Select Case NumDimensions(TheArray)
+            Case 1
+                NRows = 1
+            Case Else
+                NRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+        End Select
+    End If
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : Transpose
+' Purpose   : Returns the transpose of an array.
+' Arguments
+' TheArray  : An array of arbitrary values.
+'             Return is always 1-based, even when input is zero-based.
+'----------------------------------------------------------------------------------------------------------------------
+Private Function Transpose(ByVal TheArray As Variant)
+    Dim Co As Long
+    Dim i As Long
+    Dim j As Long
+    Dim m As Long
+    Dim N As Long
+    Dim Result As Variant
+    Dim Ro As Long
+    On Error GoTo ErrHandler
+    Force2DArrayR TheArray, N, m
+    Ro = LBound(TheArray, 1) - 1
+    Co = LBound(TheArray, 2) - 1
+    ReDim Result(1 To m, 1 To N)
+    For i = 1 To N
+        For j = 1 To m
+            Result(j, i) = TheArray(i + Ro, j + Co)
+        Next j
+    Next i
+    Transpose = Result
+    Exit Function
+ErrHandler:
+    Throw "#Transpose: " & Err.Description & "!"
+End Function
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : Force2DArrayR
+' Purpose   : When writing functions to be called from sheets, we often don't want to process
+'             the inputs as Range objects, but instead as Arrays. This method converts the
+'             input into a 2-dimensional 1-based array (even if it's a single cell or single row of cells)
+'----------------------------------------------------------------------------------------------------------------------
+Private Sub Force2DArrayR(ByRef RangeOrArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
+    If TypeName(RangeOrArray) = "Range" Then RangeOrArray = RangeOrArray.Value2
+    Force2DArray RangeOrArray, NR, NC
+End Sub
+
+'----------------------------------------------------------------------------------------------------------------------
+' Procedure : Force2DArray
+' Purpose   : In-place amendment of singletons and one-dimensional arrays to two dimensions.
+'             singletons and 1-d arrays are returned as 2-d 1-based arrays. Leaves two
+'             two dimensional arrays untouched (i.e. a zero-based 2-d array will be left as zero-based).
+'             See also Force2DArrayR that also handles Range objects.
+'----------------------------------------------------------------------------------------------------------------------
+Private Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
+    Dim TwoDArray As Variant
+
+    On Error GoTo ErrHandler
+
+    Select Case NumDimensions(TheArray)
+        Case 0
+            ReDim TwoDArray(1 To 1, 1 To 1)
+            TwoDArray(1, 1) = TheArray
+            TheArray = TwoDArray
+            NR = 1: NC = 1
+        Case 1
+            Dim i As Long
+            Dim LB As Long
+            LB = LBound(TheArray, 1)
+            NR = 1: NC = UBound(TheArray, 1) - LB + 1
+            ReDim TwoDArray(1 To 1, 1 To NC)
+            For i = 1 To UBound(TheArray, 1) - LBound(TheArray) + 1
+                TwoDArray(1, i) = TheArray(LB + i - 1)
+            Next i
+            TheArray = TwoDArray
+        Case 2
+            NR = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
+            NC = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
+            'Nothing to do
+        Case Else
+            Throw "Cannot convert array of dimension greater than two"
+    End Select
+
+    Exit Sub
+ErrHandler:
+    Throw "#Force2DArray: " & Err.Description & "!"
+End Sub
+
+Private Function MaxLngs(x As Long, y As Long) As Long
+    If x > y Then
+        MaxLngs = x
+    Else
+        MaxLngs = y
+    End If
+End Function
+
+Private Function MinLngs(x As Long, y As Long) As Long
+    If x > y Then
+        MinLngs = y
+    Else
+        MinLngs = x
+    End If
+End Function
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVWrite
 ' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
@@ -3857,8 +3851,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional ByVal DateTimeFormat As String = "ISO", _
     Optional Delimiter As String = ",", Optional Encoding As String = "ANSI", _
     Optional ByVal EOL As String = "")
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ = """"
     Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a " & _
