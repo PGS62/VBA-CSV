@@ -171,12 +171,15 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Const Err_SkipToRow = "SkipToRow must be at least 1."
     Const Err_Comment = "Comment must not contain double-quote, line feed or carriage return"
     Const Err_HeaderRowNum = "HeaderRowNum must be greater than or equal to zero and less than or equal to SkipToRow"
+    Const Err_32K = "The file has a field of length greater than 32,767 which cannot be displayed in an Excel worksheet"
     
     Dim AcceptWithoutTimeZone As Boolean
     Dim AcceptWithTimeZone As Boolean
     Dim Adj As Long
     Dim AnyConversion As Boolean
     Dim AnySentinels As Boolean
+    Dim CallingFromWorksheet As Boolean
+    Dim CharSet As String
     Dim ColByColFormatting As Boolean
     Dim ColIndexes() As Long
     Dim ConvertQuoted As Boolean
@@ -185,6 +188,8 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim DateOrder As Long
     Dim DateSeparator As String
     Dim ErrRet As String
+    Dim Err_StringTooLong As String
+    Dim HasBOM As Boolean
     Dim i As Long
     Dim ISO8601 As Boolean
     Dim j As Long
@@ -192,6 +197,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim Lengths() As Long
     Dim m As Long
     Dim MaxSentinelLength As Long
+    Dim MSLIA As Long
     Dim NeedToFill As Boolean
     Dim NotDelimited As Boolean
     Dim NumColsFound As Long
@@ -215,8 +221,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim Starts() As Long
     Dim strDelimiter As String
     Dim Stream As Object 'either ADODB.Stream or Scripting.TextStram
-    Dim CharSet As String
-    Dim HasBOM As Boolean
     Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     Dim SysDecimalSeparator As String
@@ -298,10 +302,11 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     If InStr(Comment, DQ) > 0 Or InStr(Comment, vbLf) > 0 Or InStr(Comment, vbCrLf) > 0 Then Throw Err_Comment
     'End of input validation
     
-    If SourceType = st_File Then
-        If FunctionWizardActive() Then
-            Set SF = m_FSO.GetFile(FileName)
-            If SF.Size > 1000000 Then
+    CallingFromWorksheet = TypeName(Application.Caller) = "Range"
+    
+    If CallingFromWorksheet Then
+        If SourceType = st_File Then
+            If FunctionWizardActive() Then
                 CSVRead = "#" & Err_FunctionWizard & "!"
                 Exit Function
             End If
@@ -309,7 +314,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     End If
     
     If NotDelimited Then
-        CSVRead = ParseTextFile(FileName, SourceType <> st_String, useADODB, CharSet, TriState, SkipToRow, NumRows)
+        CSVRead = ParseTextFile(FileName, SourceType <> st_String, useADODB, CharSet, TriState, SkipToRow, NumRows, CallingFromWorksheet)
         Exit Function
     End If
           
@@ -368,11 +373,27 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         
     Adj = m_LBound - 1
     ReDim ReturnArray(1 + Adj To NumRowsInReturn + Adj, 1 + Adj To NumColsInReturn + Adj)
+    MSLIA = MaxStringLengthInArray()
         
     For k = 1 To NumFields
         i = RowIndexes(k)
         j = ColIndexes(k) - SkipToCol + 1
         If j >= 1 And j <= NumColsInReturn Then
+            If CallingFromWorksheet Then
+                If Lengths(k) > MSLIA Then
+                    Err_StringTooLong = "The file has a field (row " + CStr(i + SkipToRow - 1) & _
+                        ", column " & CStr(j + SkipToCol - 1) & ") of length " + Format(Lengths(k), "###,###")
+                    If MSLIA >= 32767 Then
+                        Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format(MSLIA, "####,####")
+                    Else
+                        Err_StringTooLong = Err_StringTooLong & _
+                            ". An array containing a string longer than " + Format(MSLIA, "###,###") + _
+                            " cannot be returned from VBA to an Excel worksheet"
+                    End If
+                    Throw Err_StringTooLong
+                End If
+            End If
+        
             If ColByColFormatting Then
                 ReturnArray(i + Adj, j + Adj) = Mid$(CSVContents, Starts(k), Lengths(k))
             Else
@@ -612,6 +633,30 @@ Private Function InferSourceType(FileName As String) As enmSourceType
     Exit Function
 ErrHandler:
     Throw "#InferSourceType: " & Err.Description & "!"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : MaxStringLengthInArray
+' Purpose    : Different versions of Excel have different limits for the longest string that can be an element of an
+'              array passed from a VBA UDF back to Excel. I know the limit is 255 for Excel 2010 and earlier, and is
+'              32,767 for Excel 365 (as of Sep 2021). But don't yet know the limit for Excel 2013, 2016 and 2019.
+' Tried to get info from StackOverflow, without much joy:
+' https://stackoverflow.com/questions/69303804/excel-versions-and-limits-on-the-length-of-string-elements-in-arrays-returned-by
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function MaxStringLengthInArray()
+    Static Res As Long
+    If Res = 0 Then
+        Select Case Val(Application.Version)
+            Case Is <= 14 'Excel 2010
+                Res = 255
+            Case 15
+                Res = 32767 'Don't yet know if this is correct for Excel 2013
+            Case Else
+                Res = 32767 'Excel 2016, 2019, 365. Hopefully these versions (which all _
+                             return 16 as Application.Version) have the same limit.
+        End Select
+    End If
+    MaxStringLengthInArray = Res
 End Function
 
 '----------------------------------------------------------------------------------------------------------------------
@@ -3565,11 +3610,12 @@ End Function
 '  NumLinesToReturn   : This many lines are returned. Pass zero for all lines from SkipToLine.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, useADODB As Boolean, _
-    CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long)
+    CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long, CallingFromWorksheet As Boolean)
 
     Const Err_FileEmpty = "File is empty"
     Dim Buffer As String
     Dim BufferUpdatedTo As Long
+    Dim CallingFromExcel As Boolean
     Dim FoundCR As Boolean
     Dim HaveReachedSkipToLine As Boolean
     Dim i As Long 'Index to read from Buffer
@@ -3586,6 +3632,8 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     Dim Streaming As Boolean
     Dim tmp As Long
     Dim Which As Long
+    Dim MSLIA As Long
+    Dim Err_StringTooLong As String
 
     On Error GoTo ErrHandler
     
@@ -3704,8 +3752,21 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     If NumLinesToReturn = 0 Then NumLinesToReturn = NumLinesFound
 
     ReDim ReturnArray(1 To NumLinesToReturn, 1 To 1)
-
+    MSLIA = MaxStringLengthInArray()
     For i = 1 To MinLngs(NumLinesToReturn, NumLinesFound)
+        If CallingFromWorksheet Then
+            If Lengths(i) > MSLIA Then
+                Err_StringTooLong = "Line " & Format(i, "#,###") & " of the file is of length " + Format(Lengths(i), "###,###")
+                If MSLIA >= 32767 Then
+                    Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format(MSLIA, "####,####")
+                Else
+                    Err_StringTooLong = Err_StringTooLong & _
+                        ". An array containing a string longer than " + Format(MSLIA, "###,###") + _
+                        " cannot be returned from VBA to an Excel worksheet"
+                End If
+                Throw Err_StringTooLong
+            End If
+        End If
         ReturnArray(i, 1) = Mid$(Buffer, Starts(i), Lengths(i))
     Next i
 
@@ -3900,7 +3961,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
             Lines(i) = VBA.Join(OneLine, Delimiter)
         Next i
         CSVWrite = VBA.Join(Lines, EOL)
-        If Len(CSVWrite) >= 32768 Then
+        If Len(CSVWrite) > 32767 Then
             If TypeName(Application.Caller) = "Range" Then
                 Throw "Cannot return string of length " & Format(CStr(Len(CSVWrite)), "#,###") & _
                     " to a cell of an Excel worksheet"
