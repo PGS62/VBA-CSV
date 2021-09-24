@@ -43,7 +43,7 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
 `=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
-![example2](screenshots/example2.JPG)
+![example2](screenshots/CSVReadTitanic.gif)
 
 To load the data into an array in VBA:
 ```vba
