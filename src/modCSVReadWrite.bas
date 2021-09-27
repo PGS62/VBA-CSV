@@ -88,8 +88,8 @@ End Enum
 ' IgnoreRepeated: Whether delimiters which appear at the start of a line, the end of a line or immediately
 '             after another delimiter should be ignored while parsing; useful for fixed-width files with
 '             delimiter padding between fields.
-' DateFormat: The format of dates in the file such as `Y-M-D`, `M-D-Y` or `Y/M/D`. Also supports `ISO` for
-'             ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g.
+' DateFormat: The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO`
+'             for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g.
 '             2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time.
 ' Comment   : Rows that start with this string will be skipped while parsing.
 ' IgnoreEmptyLines: Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each
@@ -142,7 +142,7 @@ End Enum
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-    Optional DateFormat As String, Optional Comment As String, _
+    Optional DateFormat As String = "Y-M-D", Optional Comment As String, _
     Optional IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
     Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
     Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
@@ -561,9 +561,9 @@ Sub RegisterCSVRead()
     ArgDescs(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after " & _
                   "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
                   "padding between fields."
-    ArgDescs(5) = "The format of dates in the file such as `Y-M-D`, `M-D-Y` or `Y/M/D`. Also supports `ISO` for " & _
-                  "ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. 2021-08-26T13:11:30+05:00), " & _
-                  "in which case dates-with-time are returned in UTC time."
+    ArgDescs(5) = "The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO` " & _
+                  "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
+                  "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
     ArgDescs(6) = "Rows that start with this string will be skipped while parsing."
     ArgDescs(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column " & _
                   "will be assigned ShowMissingsAs for that empty row)."
@@ -1404,8 +1404,7 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
     End If
     
     Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " & _
-        "'M/D/Y', 'D/M/Y' or 'Y/M/D'" & ". Omit to use the default date format on this PC which is """ & _
-        WindowsDateFormat() & """"
+        "'M/D/Y', 'D/M/Y' or 'Y/M/D'" & ". Omit to use the default date format of 'Y-M-D'"
      
     'Replace repeated D's with a single D, etc since CastToDate only needs _
      to know the order in which the three parts of the date appear.
@@ -1416,9 +1415,9 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
         ReplaceRepeats DateFormat, "Y"
     End If
        
-    If Len(DateFormat) = 0 Then
-        DateOrder = Application.International(xlDateOrder)
-        DateSeparator = Application.International(xlDateSeparator)
+    If Len(DateFormat) = 0 Then 'use "Y-M-D"
+        DateOrder = 2
+        DateSeparator = "-"
     ElseIf Len(DateFormat) <> 5 Then
         Throw Err_DateFormat
     ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
@@ -3849,7 +3848,7 @@ End Sub
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
-    Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
+    Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "YYYY-MM-DD", _
     Optional ByVal DateTimeFormat As String = "ISO", _
     Optional Delimiter As String = ",", Optional Encoding As String = "ANSI", _
     Optional ByVal EOL As String = "")
