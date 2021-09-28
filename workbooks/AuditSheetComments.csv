@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+114,28-Sep-2021,10:10:24,"Philip Swannell","Merged src and dev folders. Deleted variable HasBOM as no longer needed."
 113,27-Sep-2021,19:16:23,"Philip Swannell","Arg DateFormat to CSVRead now defaults to Y-M-D."
 112,27-Sep-2021,18:54:48,"Philip Swannell","Changes to sheet GIF."
 111,27-Sep-2021,18:27:39,"Philip Swannell","Changes to sheet GIF."

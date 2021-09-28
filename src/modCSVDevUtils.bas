@@ -22,7 +22,6 @@ Sub SaveWorkbookAndExportModules()
     Dim c As VBIDE.VBComponent
     Dim FileName As String
     Dim Folder As String
-    Dim Folder2 As String
     Dim i As Long
     Dim Prompt As String
     Dim wb As Workbook
@@ -31,7 +30,6 @@ Sub SaveWorkbookAndExportModules()
 
     Set wb = ThisWorkbook
     Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "src"
-    Folder2 = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "dev"
 
     Prompt = "Save the workbook and export modules to '" + Folder + "'?"
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
@@ -42,12 +40,9 @@ Sub SaveWorkbookAndExportModules()
     End If
 
     If Right$(Folder, 1) <> "\" Then Folder = Folder + "\"
-    If Right$(Folder2, 1) <> "\" Then Folder2 = Folder2 + "\"
     On Error Resume Next
     Kill Folder & "*.bas*"
     Kill Folder & "*.cls*"
-    Kill Folder2 & "*.bas*"
-    Kill Folder2 & "*.cls*"
     On Error GoTo ErrHandler
     
     For Each c In wb.VBProject.VBComponents
@@ -79,11 +74,7 @@ Sub SaveWorkbookAndExportModules()
         End If
 
         If bExport Then
-            If FileName = "modCSVReadWrite.bas" Then
-                c.Export Folder & FileName
-            Else
-                c.Export Folder2 & FileName
-            End If
+            c.Export Folder & FileName
         End If
     Next c
     

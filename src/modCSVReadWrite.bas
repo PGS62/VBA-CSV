@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.11
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.13
 
 Option Explicit
 
@@ -188,7 +188,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim DateSeparator As String
     Dim ErrRet As String
     Dim Err_StringTooLong As String
-    Dim HasBOM As Boolean
     Dim i As Long
     Dim ISO8601 As Boolean
     Dim j As Long
@@ -240,7 +239,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     'Parse and validate inputs...
     If SourceType <> st_String Then
-        ParseEncoding FileName, Encoding, TriState, CharSet, useADODB, HasBOM
+        ParseEncoding FileName, Encoding, TriState, CharSet, useADODB
     End If
 
     If VarType(Delimiter) = vbBoolean Then
@@ -793,50 +792,42 @@ End Function
 '  TriState: Set by reference. Needed only when we read files using Scripting.TextStream, i.e. when useADODB is False.
 '  CharSet : Set by reference. Needed only when we read files using ADODB.Stream, i.e. when useADODB is True.
 '  useADODB: Should file be read via ADODB.Stream, which is capable of reading UTF-8 files
-'  HasBOM  : Does the file have a byte option mark? UTF-8 files may or may not have a BOM, but ADODB.Stream handles
-'            ignoring the characters of the BOM so in fact this flag never gets used in the VBA code.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseEncoding(FileName As String, Encoding As Variant, ByRef TriState As Long, ByRef CharSet As String, _
-    ByRef useADODB As Boolean, ByRef HasBOM As Boolean)
+    ByRef useADODB As Boolean)
 
     Const Err_Encoding = "Encoding argument can usually be omitted, but otherwise Encoding be " & _
         "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM"""
     
     On Error GoTo ErrHandler
     If IsEmpty(Encoding) Or IsMissing(Encoding) Then
-        DetectEncoding FileName, TriState, CharSet, useADODB, HasBOM
+        DetectEncoding FileName, TriState, CharSet, useADODB
     ElseIf VarType(Encoding) = vbString Then
         Select Case UCase(Replace(Replace(Encoding, "-", ""), " ", ""))
             Case "ASCII"
                 CharSet = "ascii" 'not actually relevant, since we won't use ADODB
                 TriState = TristateFalse
                 useADODB = False
-                HasBOM = False
             Case "ANSI"
                 CharSet = "_autodetect_all" 'not actually relevant, since we won't use ADODB
                 TriState = TristateFalse
                 useADODB = False
-                HasBOM = False
             Case "UTF8"
                 CharSet = "utf-8"
                 TriState = TristateFalse
                 useADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
-                HasBOM = False
             Case "UTF8BOM"
                 CharSet = "utf-8"
                 TriState = TristateFalse
                 useADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
-                HasBOM = True
             Case "UTF16"
                 CharSet = "utf-16"
                 TriState = TristateTrue
                 useADODB = False
-                HasBOM = False
             Case "UTF16BOM"
                 CharSet = "utf-16"
                 TriState = TristateTrue
                 useADODB = False
-                HasBOM = True
             Case Else
                 Throw Err_Encoding
         End Select
@@ -1201,7 +1192,7 @@ End Function
 '              to "UTF-8".
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef CharSet As String, _
-    ByRef useADODB As Boolean, ByRef HasBOM As Boolean)
+    ByRef useADODB As Boolean)
 
     Dim intAsc1Chr As Long
     Dim intAsc2Chr As Long
@@ -1223,7 +1214,6 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef Cha
         TriState = TristateFalse
         CharSet = "_autodetect_all"
         useADODB = False
-        HasBOM = False
         Exit Sub
     End If
     intAsc1Chr = Asc(T.Read(1))
@@ -1232,7 +1222,6 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef Cha
         TriState = TristateFalse
         CharSet = "_autodetect_all"
         useADODB = False
-        HasBOM = False
         Exit Sub
     End If
     
@@ -1243,13 +1232,11 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef Cha
         TriState = TristateTrue
         CharSet = "utf-16"
         useADODB = False
-        HasBOM = True
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
         TriState = TristateTrue
         CharSet = "utf-16"
         useADODB = False
-        HasBOM = True
     Else
         If T.AtEndOfStream Then
             TriState = TristateFalse
@@ -1261,13 +1248,11 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef Cha
             CharSet = "utf-8"
             TriState = TristateFalse
             useADODB = True
-            HasBOM = True
         Else
             'We don't know, assume ANSI but that may be incorrect.
             CharSet = ""
             TriState = TristateFalse
             useADODB = False
-            HasBOM = False
         End If
     End If
 
