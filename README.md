@@ -216,5 +216,7 @@ VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available
 
 # About
 Author: Philip Swannell  
-Licence: MIT
+Licence: MIT  
+[![Github All Releases](https://img.shields.io/github/downloads/PGS62/VBA-CSV/total.svg)]()
+
 
