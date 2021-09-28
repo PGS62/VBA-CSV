@@ -23,7 +23,7 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
    * `Microsoft Scripting Runtime`
    * `Microsoft VBScript Regular Expressions 5.5` (or the latest version available)  
    &nbsp;&nbsp;
-   <img src="https://github.com/PGS62/VBA-CSV/blob/main/screenshots/VBAReferences2.png" width=50% height = 50%>
+   <img src="https://github.com/PGS62/VBA-CSV/blob/main/screenshots/VBAReferences.png" width=50% height = 50%>
    
 4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
@@ -43,7 +43,7 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
 `=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
-![example2](screenshots/CSVReadTitanic2.gif)
+![example2](screenshots/CSVReadTitanic.gif)
 
 To load the data into an array in VBA:
 ```vba
@@ -54,7 +54,7 @@ Sub Demo()
 End Sub
 ```
 A simple "round-tripping" demo (F5 to replay)
-![CSVReadWrite](screenshots/CSVReadWrite16.gif)
+![CSVReadWrite](screenshots/CSVReadWrite.gif)
 
 -----------------------------
 <a name="myfootnote1">Footnote 1</a>: Assumes you're using Excel 365 with its [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
