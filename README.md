@@ -28,8 +28,8 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
 Private Sub Workbook_Open()
-    RegisterCSVWrite
     RegisterCSVRead
+    RegisterCSVWrite
 End Sub
 ```
 # Acknowledgements
