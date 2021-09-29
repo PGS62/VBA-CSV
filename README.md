@@ -23,7 +23,7 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
    * `Microsoft Scripting Runtime`
    * `Microsoft VBScript Regular Expressions 5.5` (or the latest version available)  
    &nbsp;&nbsp;
-   <img src="https://github.com/PGS62/VBA-CSV/blob/main/screenshots/VBAReferences.png" width=50% height = 50%>
+   <img src="https://github.com/PGS62/VBA-CSV/blob/main/images/VBAReferences.png" width=50% height = 50%>
    
 4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
@@ -46,7 +46,7 @@ The documentation borrows freely from that of Julia's [CSV.jl](https://csv.julia
 To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
 `=CSVRead("https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv",TRUE,,,,,,,,,,,,,"NA",NA())`
 
-![example3](screenshots/CSVReadTitanic2.gif)
+![example3](images/CSVReadTitanic.gif)
 
 To load the data into an array in VBA:
 ```vba
@@ -61,7 +61,7 @@ End Sub
 
 In the GIF below, strings, numbers, dates and Booleans in the input `Data` range are written to file with the formula `=CSVWrite(A2:D8,"C:\Temp\Test.csv")` at cell F2, and the file is read back with the formula `=CSVRead(F2,TRUE)` at cell J2, so that the original types of the fields are recovered. The formula `=CSVRead(F2,,FALSE)` at H2 demonstrates how `CSVRead` can display the "raw" contents of a text file by passing `Delimiter` as `FALSE`. Refresh your browser (F5) to replay the GIF.
 
-![CSVReadWrite](screenshots/CSVReadWrite5.gif)
+![CSVReadWrite](images/CSVReadWrite.gif)
 
 -----------------------------
 <a name="myfootnote1">Footnote 1</a>: Assumes you're using Excel 365 with its [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
@@ -176,13 +176,13 @@ On a test machine<sup>[3](#myfootnote3)</sup> `CSVRead` parses files at speeds o
 The workbook VBA-CSV.xlsm in the workbooks folder includes [code](src/modCSVPerformance.bas) to benchmark `CSVRead` against the two alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/) (so not easily available from VBA). It generates plots of parse time as a function of number of rows, number of columns and field length.
 
 The first plot shows the influence of the number of rows on parsing time. The files examined all had a single column of twenty-character fields with embedded line breaks. Take care interpreting the plot – both axes are on log scale. For the largest file plotted, CSVRead was about 10 times faster than ws_garcia and about 16 times slower than CSV.jl. In this case the file had 1,048,576 rows and was 27.3Mb in size, parse times were: CSVRead 5.2 seconds; ws_garcia 55.8 seconds; and CSV.jl 0.32 seconds.
-![chart3](charts/Chart_3_Time_v_Rows.jpg)
+![chart3](images/Chart_3_Time_v_Rows.jpg)
 
 A second plot shows the influence of the number of columns on parsing time. The files examined all had eight rows and the number of columns varied from 1 to 8,192. All fields were an unquoted 16-character string. The code of ws_garcia can be seen to perform relatively badly on files with a very large number of columns. The largest file in the test had 8,192 columns and was 1.1Mb in size. parse times were: CSVRead 0.13 seconds; ws_garcia 64.4 seconds; and CSV.jl 0.08 seconds.
-![chart5](charts/Chart_5_Time_v_Cols.jpg)
+![chart5](images/Chart_5_Time_v_Cols.jpg)
 
 A third plot shows the influence of field length on parsing time. The files examined all had 1,024 rows and eight columns. In each file, all fields were identical and were the character "x" repeated some number `L` times. `L` varied fom 1 in the first file to 16,384 in the last. This test shows ws_garcia performing best of the three VBA parsers for `L` between 64 and 2,048.
-![chart6](charts/Chart_6_Time_v_FieldLength.jpg)
+![chart6](images/Chart_6_Time_v_FieldLength.jpg)
     
 The files used to generate the plots above each had every field identical. So, for a more realistic measure of comparative speed we studied the parse times for the 20 largest files provided in [Rdatasets](https://vincentarelbundock.github.io/Rdatasets/). The test code is in [modCSVTestRDatasets.bas](src/modCSVTestRDatasets.bas) of the workbook VBA-CSV.xlsm. Here are the results, which show `CSVRead` to have very similar speed to sdkn104, and to be about twice as fast as ws_garcia.
 
