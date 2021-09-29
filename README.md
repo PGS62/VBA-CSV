@@ -61,7 +61,7 @@ End Sub
 
 In the GIF below, strings, numbers, dates and Booleans in the input `Data` range are written to file with the formula `=CSVWrite(A2:D8,"C:\Temp\Test.csv")` at cell F2, and the file is read back with the formula `=CSVRead(F2,TRUE)` at cell J2, so that the original types of the fields are recovered. The formula `=CSVRead(F2,,FALSE)` at H2 demonstrates how `CSVRead` can display the "raw" contents of a text file by passing `Delimiter` as `FALSE`. Refresh your browser (F5) to replay the GIF.
 
-![CSVReadWrite](screenshots/CSVReadWrite.gif)
+![CSVReadWrite](screenshots/CSVReadWrite5.gif)
 
 -----------------------------
 <a name="myfootnote1">Footnote 1</a>: Assumes you're using Excel 365 with its [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
