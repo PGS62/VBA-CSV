@@ -117,8 +117,10 @@ Sub PrepareForRelease()
     For Each ws In ThisWorkbook.Worksheets
         If ws.Visible = xlSheetVisible Then
             Application.Goto ws.Cells(1, 1)
-            ActiveWindow.DisplayGridlines = False
-            ActiveWindow.DisplayHeadings = False
+            If InStr(ws.Name, "GIF") = 0 Then
+                ActiveWindow.DisplayGridlines = False
+                ActiveWindow.DisplayHeadings = False
+            End If
         End If
         ws.Protect , True, True
     Next
