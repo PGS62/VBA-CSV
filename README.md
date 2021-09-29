@@ -160,7 +160,7 @@ There is a [limit](https://support.microsoft.com/en-us/office/excel-specificatio
 Certain<sup>[2](#myfootnote2)</sup> versions of Excel had a much lower limit of 255 on the length of string elements within arrays returned to a worksheet by a VBA UDF.
 
 --------------------------------
-<a name="myfootnote2">Footnote 2</a>: Excel 2010 had this 255 character limit, Excel 365 does not. I don't yet know whether the limit applied to Excel 2013, 2016 and 2019.
+<a name="myfootnote2">Footnote 2</a>: Excel 2010 had this 255 character limit, Excel 365 does not. I don't yet know whether the limit applied to Excel 2013, 2016 and 2019. If you are using one of those Excel versions, please help by answering [this](https://stackoverflow.com/questions/69303804/excel-versions-and-limits-on-the-length-of-string-elements-in-arrays-returned-by) StackOverflow question.
 
 # Performance
 On a test machine<sup>[3](#myfootnote3)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
