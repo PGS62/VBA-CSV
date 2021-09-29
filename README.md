@@ -38,6 +38,9 @@ I re-worked the parsing code of `CSVRead` after examining [sdkn104](https://gith
 The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance [here](#performance). For testing `CSVRead`, I also use many of the test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
 # Examples
+
+### Read from URL
+
 [Rdatasets](https://vincentarelbundock.github.io/Rdatasets/) provides 1,752 csv files including one containing names of passengers on the Titanic, their sex, age and passenger class, and whether or not they survived the sinking. In this file, missing data is indicated by the two characters `NA`.
 
 To see the data in a worksheet, enter this formula<sup>[1](#myfootnote1)</sup>:
@@ -49,11 +52,15 @@ To load the data into an array in VBA:
 ```vba
 Sub Demo()
     Dim TitanicData
-    TitanicData = CSVRead(FileName:="https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv", _
-        ConvertTypes:=True, MissingStrings:="NA")
+    TitanicData = CSVRead(FileName:="https://vincentarelbundock.github.io" & _
+                  "/Rdatasets/csv/carData/TitanicSurvival.csv", _
+                  ConvertTypes:=True, MissingStrings:="NA")
 End Sub
 ```
-A simple "round-tripping" demo (F5 to replay)
+### Write and Read "round-tripping"
+
+In the GIF below, strings, numbers, dates and Booleans in the input `Data` range are written to file with the formula `=CSVWrite(A2:D8,"C:\Temp\Test.csv")` at cell F2, and the file is read back with the formula `=CSVRead(F2,TRUE)` at cell J2, so that the original types of the fields are recovered. The formula `=CSVRead(F2,,FALSE)` at H2 demonstrates how `CSVRead` can display the "raw" contents of a text file by passing `Delimiter` as `FALSE`. Refresh your browser (F5) to replay the GIF.
+
 ![CSVReadWrite](screenshots/CSVReadWrite.gif)
 
 -----------------------------
