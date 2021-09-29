@@ -1,5 +1,5 @@
 # VBA-CSV
-Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, inspired by R's [fread](https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread), and Julia's [CSV.jl](https://csv.juliadata.org/stable/).
+Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, inspired by [R](https://www.r-project.org/)'s [fread](https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread), and [Julia](https://julialang.org/)'s [CSV.jl](https://csv.juliadata.org/stable/).
 
 # Contents  
 [Installation](#installation)  
