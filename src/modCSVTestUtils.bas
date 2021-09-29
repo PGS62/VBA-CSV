@@ -14,22 +14,24 @@ Option Explicit
 ' Purpose    : Metaprogramming - generate the VBA code for a given test, used on worksheet Test to genenerate a single
 '              method to be called from RunTests.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, ConvertTypes As Variant, Delimiter As Variant, IgnoreRepeated As Boolean, DateFormat As String, _
-    Comment As String, IgnoreEmptyLines As Boolean, HeaderRowNum As Long, SkipToRow As Long, SkipToCol As Long, NumRows As Long, NumCols As Long, TrueStrings As String, _
-    FalseStrings As String, MissingStrings As String, Encoding As Variant, DecimalSeparator As String, ExpectedHeaderRow As Variant)
+Function GenerateTestCode(TestNo As Long, FileName As String, ExpectedReturn As Variant, ConvertTypes As Variant, _
+    Delimiter As Variant, IgnoreRepeated As Boolean, DateFormat As String, Comment As String, _
+    IgnoreEmptyLines As Boolean, HeaderRowNum As Long, SkipToRow As Long, SkipToCol As Long, NumRows As Long, _
+    NumCols As Long, TrueStrings As String, FalseStrings As String, MissingStrings As String, Encoding As Variant, _
+    DecimalSeparator As String, ExpectedHeaderRow As Variant) As Variant
 
-    Dim LitteralExpected
+    Dim LitteralExpected As String
     Dim Res As String
     
-    Const Indent = "    "
-    Const Indent2 = "        "
+    Const Indent As String = "    "
+    Const Indent2 As String = "        "
     
     On Error GoTo ErrHandler
     
-    Res = "Sub Test" & TestNo & "(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
-    Res = Res & vbLf & Indent & "Dim Expected"
+    Res = "Private Sub Test" & TestNo & "(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
+    Res = Res & vbLf & Indent & "Dim Expected as Variant"
     Res = Res & vbLf & Indent & "Dim FileName As String"
-    Res = Res & vbLf & Indent & "Dim Observed"
+    Res = Res & vbLf & Indent & "Dim Observed As Variant"
     Res = Res & vbLf & Indent & "Dim TestDescription As String"
     Res = Res & vbLf & Indent & "Dim TestRes As Boolean"
     Res = Res & vbLf & Indent & "Dim WhatDiffers As String"
@@ -37,7 +39,7 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     Res = Res & vbLf & Indent & "On Error GoTo ErrHandler"
     
     Res = Res & vbLf & _
-        Indent + "TestDescription = """ & Replace(Replace(Replace(Replace(FileName, vbLf, ""), vbCr, ""), "_", " "), ".csv", "") & """"
+        Indent + "TestDescription = """ & Replace(Replace(Replace(Replace(FileName, vbLf, vbNullString), vbCr, vbNullString), "_", " "), ".csv", vbNullString) & """"
     
     If Not IsArray(ExpectedReturn) Then
         LitteralExpected = ElementToVBALitteral(ExpectedReturn)
@@ -69,20 +71,20 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
 
     If IsArray(ConvertTypes) Then
         Res = Res + ", _" + vbLf + Indent2 + "ConvertTypes := " & ArrayToVBALitteral(ConvertTypes)
-    ElseIf ConvertTypes <> False And ConvertTypes <> "" Then
+    ElseIf ConvertTypes <> False And ConvertTypes <> vbNullString Then
         Res = Res + ", _" + vbLf + Indent2 + "ConvertTypes := " & ElementToVBALitteral(ConvertTypes)
     End If
 
-    If Delimiter <> "" Then
+    If Delimiter <> vbNullString Then
         Res = Res + ", _" + vbLf + Indent2 + "Delimiter := " & ElementToVBALitteral(Delimiter)
     End If
     If IgnoreRepeated = True Then
         Res = Res + ", _" + vbLf + Indent2 + "IgnoreRepeated := True"
     End If
-    If DateFormat <> "" Then
+    If DateFormat <> vbNullString Then
         Res = Res + ", _" + vbLf + Indent2 + "DateFormat := " & ElementToVBALitteral(DateFormat)
     End If
-    If Comment <> "" Then
+    If Comment <> vbNullString Then
         Res = Res + ", _" + vbLf + Indent2 + "Comment := " & ElementToVBALitteral(Comment)
     End If
     If IgnoreEmptyLines <> False Then
@@ -100,21 +102,21 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     If NumCols <> 0 Then
         Res = Res + ", _" + vbLf + Indent2 + "NumCols := " & CStr(NumCols)
     End If
-    If TrueStrings <> "" Then
+    If TrueStrings <> vbNullString Then
         If InStr(TrueStrings, ",") = 0 Then
             Res = Res + ", _" + vbLf + Indent2 + "TrueStrings := " & ElementToVBALitteral(TrueStrings)
         Else
             Res = Res + ", _" + vbLf + Indent2 + "TrueStrings := " & ArrayToVBALitteral(VBA.Split(TrueStrings, ","))
         End If
     End If
-    If FalseStrings <> "" Then
+    If FalseStrings <> vbNullString Then
         If InStr(FalseStrings, ",") = 0 Then
             Res = Res + ", _" + vbLf + Indent2 + "FalseStrings := " & ElementToVBALitteral(FalseStrings)
         Else
             Res = Res + ", _" + vbLf + Indent2 + "FalseStrings := " & ArrayToVBALitteral(VBA.Split(FalseStrings, ","))
         End If
     End If
-    If MissingStrings <> "" Then
+    If MissingStrings <> vbNullString Then
         If InStr(MissingStrings, ",") = 0 Then
             Res = Res + ", _" + vbLf + Indent2 + "MissingStrings := " & ElementToVBALitteral(MissingStrings)
         Else
@@ -123,10 +125,10 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     End If
     
     Res = Res + ", _" + vbLf + Indent2 + "ShowMissingsAs := Empty"
-    If Encoding <> "" And Not IsEmpty(Encoding) Then
+    If Encoding <> vbNullString And Not IsEmpty(Encoding) Then
         Res = Res + ", _" + vbLf + Indent2 + "Encoding := " & ElementToVBALitteral(Encoding)
     End If
-    If DecimalSeparator <> "." And DecimalSeparator <> "" Then
+    If DecimalSeparator <> "." And DecimalSeparator <> vbNullString Then
         Res = Res + ", _" + vbLf + Indent2 + "DecimalSeparator := " & ElementToVBALitteral(DecimalSeparator)
     End If
     If HeaderRowNum <> 0 Then
@@ -141,7 +143,7 @@ Function GenerateTestCode(TestNo As Long, FileName, ExpectedReturn As Variant, C
     
     Res = Res & vbLf & Indent + "AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures"
     
-    Res = Res & vbLf & ""
+    Res = Res & vbLf
     Res = Res & vbLf & "    Exit Sub"
     Res = Res & vbLf & "ErrHandler:"
     Res = Res & vbLf & "    Throw ""#Test" & TestNo & " (line "" & CStr(Erl) + ""): "" & Err.Description & ""!"""
@@ -154,16 +156,16 @@ ErrHandler:
     GenerateTestCode = "#GenerateTestCode (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function ElementToVBALitteral(x)
+Function ElementToVBALitteral(x As Variant) As String
 
     On Error GoTo ErrHandler
     If VarType(x) = vbDate Then
         If x <= 1 Then
-            ElementToVBALitteral = "CDate(""" + Format(x, "hh:mm:ss") + """)"
+            ElementToVBALitteral = "CDate(""" + Format$(x, "hh:mm:ss") + """)"
         ElseIf x = CLng(x) Then
-            ElementToVBALitteral = "CDate(""" + Format(x, "yyyy-mmm-dd") + """)"
+            ElementToVBALitteral = "CDate(""" + Format$(x, "yyyy-mmm-dd") + """)"
         Else
-            ElementToVBALitteral = "CDate(""" + Format(x, "yyyy-mmm-dd hh:mm:ss") + """)"
+            ElementToVBALitteral = "CDate(""" + Format$(x, "yyyy-mmm-dd hh:mm:ss") + """)"
         End If
 
     ElseIf IsNumberOrDate(x) Then
@@ -171,8 +173,9 @@ Function ElementToVBALitteral(x)
     ElseIf VarType(x) = vbString Then
         If x = vbTab Then
             ElementToVBALitteral = "vbTab"
-
-        ElseIf x = "I'm missing!" Then 'Hack
+        ElseIf x = vbNullString Then
+            ElementToVBALitteral = "vbNullString"
+        ElseIf x = "I'm missing!" Then 'Hack!!!!!!!!!!
             ElementToVBALitteral = "Empty"
         Else
             If IsWideString(CStr(x)) Then
@@ -219,7 +222,7 @@ Function ArrayToVBALitteral(TheData As Variant, Optional AssignTo As String, Opt
 
     Force2DArray TheData, NR, NC
 
-    If AssignTo <> "" Then
+    If AssignTo <> vbNullString Then
         Res = AssignTo & " = "
     End If
 
@@ -247,7 +250,7 @@ Function ArrayToVBALitteral(TheData As Variant, Optional AssignTo As String, Opt
     Res = Res + ")"
 
     If Len(Res) < 130 Then
-        ArrayToVBALitteral = Replace(Res, " _" & vbLf, "")
+        ArrayToVBALitteral = Replace(Res, " _" & vbLf, vbNullString)
     Else
         ArrayToVBALitteral = Res
     End If
@@ -257,7 +260,7 @@ ErrHandler:
     ArrayToVBALitteral = "#ArrayToVBALitteral (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function HandleWideString(TheStr As String)
+Private Function HandleWideString(TheStr As String) As String
 
     Dim i As Long
     Dim Res As String
@@ -276,7 +279,7 @@ ErrHandler:
     Throw "#HandleWideString (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Function IsWideString(TheStr As String) As Boolean
+Private Function IsWideString(TheStr As String) As Boolean
     Dim i As Long
 
     On Error GoTo ErrHandler
@@ -296,7 +299,7 @@ End Function
 ' Procedure  : UnPack
 ' Purpose    : Allow saving of arrays into cells of the Test sheet
 ' -----------------------------------------------------------------------------------------------------------------------
-Function UnPack(Str As Variant)
+Public Function UnPack(Str As Variant)
     UnPack = Str
     If VarType(Str) = vbString Then
         If InStr(Str, vbLf) > 0 Then

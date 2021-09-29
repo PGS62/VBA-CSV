@@ -10,73 +10,12 @@ Option Explicit
 'Functions that, in addition to CSVRead and CSVWrite, are called from the worksheets of this workbook _
  see also mod
 
-Function TempFolder()
-    TempFolder = Environ("Temp")
+Function TempFolder() As String
+    TempFolder = Environ$("Temp")
 End Function
 
 Function TestFolder()
     TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure : ArrayEquals
-' Purpose   : Element-wise testing for equality of two arrays - the array version of Equals. Like the =
-'             operator in Excel array formulas, but capable of comparing error values, so
-'             always returns an array of logicals. See also ArraysIdentical.
-' Arguments
-' Array1    : The first array to compare, with arbitrary values - numbers, text, errors, logicals etc.
-' Array2    : The second array to compare, with arbitrary values - numbers, text, errors, logicals etc.
-' CaseSensitive: Determines if comparison of strings is done in a case sensitive manner. If omitted
-'             defaults to FALSE (case insensitive matching).
-' -----------------------------------------------------------------------------------------------------------------------
-Function ArrayEquals(Array1 As Variant, Array2 As Variant, Optional CaseSensitive As Variant = False)
-    On Error GoTo ErrHandler
-    Dim i As Long
-    Dim j As Long
-    Dim NC1 As Long
-    Dim NC2 As Long
-    Dim NCMax As Long
-    Dim NCMin As Long
-    Dim NR1 As Long
-    Dim NR2 As Long
-    Dim NRMax As Long
-    Dim NRMin As Long
-    Dim Ret() As Variant
-
-    If VarType(Array1) < vbArray And VarType(Array2) < vbArray And VarType(CaseSensitive) = vbBoolean Then
-        ArrayEquals = Equals(Array1, Array2, CBool(CaseSensitive))
-    Else
-
-        Force2DArrayR Array1, NR1, NC1
-        Force2DArrayR Array2, NR2, NC2
-
-        If NR1 < NR2 Then
-            NRMax = NR2
-            NRMin = NR1
-        Else
-            NRMax = NR1
-            NRMin = NR2
-        End If
-        If NC1 < NC2 Then
-            NCMax = NC2
-            NCMin = NC1
-        Else
-            NCMax = NC1
-            NCMin = NC2
-        End If
-        Ret = Fill(CVErr(xlErrNA), NRMax, NCMax)
-        For i = 1 To NRMin
-            For j = 1 To NCMin
-                Ret(i, j) = Equals(Array1(i, j), Array2(i, j))
-            Next j
-        Next i
-  
-        ArrayEquals = Ret
-
-    End If
-    Exit Function
-ErrHandler:
-    ArrayEquals = "#ArrayEquals (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -111,7 +50,7 @@ End Function
 ' Procedure  : FileReadAll
 ' Purpose    : Returns the contents of a file as a string
 ' -----------------------------------------------------------------------------------------------------------------------
-Function FileReadAll(FileName As String)
+Function FileReadAll(FileName As String) As String
     Dim F As Scripting.File
     Dim FSO As New FileSystemObject
     Dim T As Scripting.TextStream
@@ -134,7 +73,7 @@ End Function
 '          2) output array has lower bound 1, whatever the lower bounds of the inputs.
 '          3) input arrays of 1 dimension are treated as if they were rows, same as SAI equivalent fn.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function VStack(ParamArray Arrays())
+Function VStack(ParamArray Arrays()) As Variant
     Dim AllC As Long
     Dim AllR As Long
     Dim c As Long
@@ -143,7 +82,7 @@ Function VStack(ParamArray Arrays())
     Dim k As Long
     Dim r As Long
     Dim R0 As Long
-    Dim ReturnArray()
+    Dim ReturnArray() As Variant
     On Error GoTo ErrHandler
 
     Static NA As Variant
@@ -262,51 +201,12 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure : SplitString
-' Purpose   : Breaks up TheString into sub-strings with breaks at the positions at which the Delimiter
-'             character appears, and returns the sub-strings as a two-dimensional, 1-based, 1 column array.
-' Arguments
-' TheString : The string to be split.
-' Delimiter : The delimiter string, can be multiple characters. The search for the delimiter
-'             is case insensitive.
-' -----------------------------------------------------------------------------------------------------------------------
-Function SplitString(TheString As String, Optional Delimiter As String = ",")
-
-    Dim i As Long
-    Dim LB As Long
-    Dim N As Long
-    Dim OneDArray
-    Dim Res()
-    Dim UB As Long
-    
-    On Error GoTo ErrHandler
-    If Len(TheString) = 0 Then
-        ReDim Res(1 To 1, 1 To 1)
-        Res(1, 1) = ""
-        SplitString = Res
-        Exit Function
-    End If
-    
-    OneDArray = VBA.Split(TheString, Delimiter, -1, vbTextCompare)
-    LB = LBound(OneDArray): UB = UBound(OneDArray)
-    N = UB - LB + 1
-    ReDim Res(1 To N, 1 To 1)
-    For i = 1 To N
-        Res(i, 1) = OneDArray(i - 1)
-    Next
-    SplitString = Res
-    Exit Function
-ErrHandler:
-    SplitString = "#SplitString (line " & CStr(Erl) + "): " & Err.Description & "!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : AllCombinations
 ' Purpose    : Iterate over all combinations of the elements of the (up to) 4 input arrays, producing an output vector
 '              of those elements concatenated with given delimiter.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
-    Optional Arg4, Optional Delimiter As String)
+Function AllCombinations(Arg1 As Variant, Optional Arg2 As Variant, Optional Arg3 As Variant, _
+    Optional Arg4 As Variant, Optional Delimiter As String)
     Dim k As Long
     Dim Part1 As Variant
     Dim Part2 As Variant
@@ -315,9 +215,9 @@ Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
     Dim Res() As String
 
     On Error GoTo ErrHandler
-    If IsMissing(Arg2) Then Arg2 = ""
-    If IsMissing(Arg3) Then Arg3 = ""
-    If IsMissing(Arg4) Then Arg4 = ""
+    If IsMissing(Arg2) Then Arg2 = vbNullString
+    If IsMissing(Arg3) Then Arg3 = vbNullString
+    If IsMissing(Arg4) Then Arg4 = vbNullString
 
     Force2DArrayR Arg1
     Force2DArrayR Arg2
@@ -334,9 +234,9 @@ Function AllCombinations(Arg1, Optional Arg2, Optional Arg3, _
                 For Each Part4 In Arg4
                     Part4 = CStr(Part4)
                     k = k + 1
-                    Res(k, 1) = Part1 & IIf(Len(Part2) > 0, Delimiter, "") & Part2 & _
-                        IIf(Len(Part3) > 0, Delimiter, "") & Part3 & _
-                        IIf(Len(Part4) > 0, Delimiter, "") & Part4
+                    Res(k, 1) = Part1 & IIf(Len(Part2) > 0, Delimiter, vbNullString) & Part2 & _
+                        IIf(Len(Part3) > 0, Delimiter, vbNullString) & Part3 & _
+                        IIf(Len(Part4) > 0, Delimiter, vbNullString) & Part4
                 Next
             Next
         Next
@@ -356,7 +256,7 @@ End Function
 ' Parameters :
 '  GoodStrings: Array (1 col) of strings.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function MakeGoodStringsBad(GoodStrings, Optional InsertThis As String = "x")
+Function MakeGoodStringsBad(GoodStrings As Variant, Optional InsertThis As String = "x")
 
     Dim Res1D() As String
 
@@ -456,7 +356,7 @@ End Function
 '             http://www.regular-expressions.info/
 '             https://en.wikipedia.org/wiki/Regular_expression
 ' -----------------------------------------------------------------------------------------------------------------------
-Function IsRegMatch(RegularExpression As String, ByVal StringToSearch As Variant, Optional CaseSensitive As Boolean = False)
+Function IsRegMatch(RegularExpression As String, ByVal StringToSearch As Variant, Optional CaseSensitive As Boolean = False) As Variant
     Dim i As Long
     Dim j As Long
     Dim Result() As Variant
@@ -539,97 +439,5 @@ Function RegExSyntaxValid(RegularExpression As String) As Boolean
     Exit Function
 ErrHandler:
     RegExSyntaxValid = False
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure : RegExReplace
-' Purpose   : Uses regular expressions to make replacement in a set of input strings.
-'
-'             The function replaces every instance of the regular expression match with the
-'             replacement.
-' Arguments
-' InputString: Input string to be transformed. Can be an array. Non-string elements will be left
-'             unchanged.
-' RegularExpression: A standard regular expression string.
-' Replacement: A replacement template for each match of the regular expression in the input string.
-' CaseSensitive: Whether matching should be case-sensitive (TRUE) or not (FALSE).
-'
-' Notes     : Details of regular expressions are given under sIsRegMatch. The replacement string can be
-'             an explicit string, and it can also contain special escape sequences that are
-'             replaced by the characters they represent. The options available are:
-'
-'             Characters Replacement
-'             $n        n-th backreference. That is, a copy of the n-th matched group
-'             specified with parentheses in the regular expression. n must be an integer
-'             value designating a valid backreference, greater than zero, and of two digits
-'             at most.
-'             $&       A copy of the entire match
-'             $`        The prefix, that is, the part of the target sequence that precedes
-'             the match.
-'             $´        The suffix, that is, the part of the target sequence that follows
-'             the match.
-'             $$        A single $ character.
-' -----------------------------------------------------------------------------------------------------------------------
-Function RegExReplace(InputString As Variant, RegularExpression As String, Replacement As String, Optional CaseSensitive As Boolean)
-    Dim i As Long
-    Dim j As Long
-    Dim Result() As String
-    Dim rx As VBScript_RegExp_55.RegExp
-    On Error GoTo ErrHandler
-
-    If Not RegExSyntaxValid(RegularExpression) Then
-        RegExReplace = "#Invalid syntax for RegularExpression!"
-        Exit Function
-    End If
-
-    Set rx = New RegExp
-
-    With rx
-        .IgnoreCase = Not (CaseSensitive)
-        .Pattern = RegularExpression
-        .Global = True
-    End With
-
-    If VarType(InputString) = vbString Then
-        RegExReplace = rx.Replace(InputString, Replacement)
-        GoTo Cleanup
-    ElseIf VarType(InputString) < vbArray Then
-        RegExReplace = InputString
-        GoTo Cleanup
-    End If
-    If TypeName(InputString) = "Range" Then InputString = InputString.Value2
-
-    Select Case NumDimensions(InputString)
-        Case 2
-            ReDim Result(LBound(InputString, 1) To UBound(InputString, 1), LBound(InputString, 2) To UBound(InputString, 2))
-            For i = LBound(InputString, 1) To UBound(InputString, 1)
-                For j = LBound(InputString, 2) To UBound(InputString, 2)
-                    If VarType(InputString(i, j)) = vbString Then
-                        Result(i, j) = rx.Replace(InputString(i, j), Replacement)
-                    Else
-                        Result(i, j) = InputString(i, j)
-                    End If
-                Next j
-            Next i
-        Case 1
-            ReDim Result(LBound(InputString, 1) To UBound(InputString, 1))
-            For i = LBound(InputString, 1) To UBound(InputString, 1)
-                If VarType(InputString(i)) = vbString Then
-                    Result(i) = rx.Replace(InputString(i), Replacement)
-                Else
-                    Result(i) = InputString(i)
-                End If
-            Next i
-        Case Else
-            Throw "InputString must be a String or an array with 1 or 2 dimensions"
-    End Select
-    RegExReplace = Result
-
-Cleanup:
-    Set rx = Nothing
-    Exit Function
-ErrHandler:
-    RegExReplace = "#RegExReplace (line " & CStr(Erl) + "): " & Err.Description & "!"
-    Set rx = Nothing
 End Function
 

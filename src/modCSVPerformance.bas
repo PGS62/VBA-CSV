@@ -15,7 +15,7 @@ Option Explicit
 ' Purpose    : Wrap to https://github.com/ws-garcia/VBA-CSV-interface
 '              Wraps version 3.1.5, (the four class module CSVInterface, ECPArrayList, ECPTextStream, parserConfig)
 ' -----------------------------------------------------------------------------------------------------------------------
-Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As String)
+Public Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As String) As Variant
 
     Dim CSVint As CSVinterface
     Dim oArray() As Variant
@@ -47,11 +47,11 @@ End Function
 ' Purpose    : Wrapper to https://github.com/sdkn104/VBA-CSV
 '              Wraps version 1.9 - module CSVUtils imported as sdkn104_CSVUtils
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function Wrap_sdkn104(FileName As String, Unicode As Boolean)
+Public Function Wrap_sdkn104(FileName As String, Unicode As Boolean) As Variant
     Dim Contents As String
     Dim FSO As New FileSystemObject
     Dim T As Scripting.TextStream
-    
+
     On Error GoTo ErrHandler
 
     Set T = FSO.GetFile(FileName).OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
@@ -70,10 +70,10 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub RunSpeedTests()
 
-    Const NumColsInTFPRet = 10
+    Const NumColsInTFPRet As Long = 10
     Const ReadFiles  As Boolean = True
-    Const Timeout = 5
-    Const Title = "VBA-CSV Speed Tests"
+    Const Timeout As Long = 5
+    Const Title As String = "VBA-CSV Speed Tests"
     Const WriteFiles As Boolean = True
     Dim c As Range
     Dim JuliaResultsFile As String
@@ -88,13 +88,13 @@ Private Sub RunSpeedTests()
     
     Prompt = "Run Speed tests?" + vbLf + vbLf + _
         "Note this will generate approx 227MB of files in folder" + vbLf + _
-        Environ("Temp") & "\VBA-CSV\Performance"
+        Environ$("Temp") & "\VBA-CSV\Performance"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
     
     ws.Protect , , False
     
-    ws.Range("TimeStamp").value = "This data generated " & Format(Now, "dd-mmmm-yyyy hh:mm:ss")
+    ws.Range("TimeStamp").value = "This data generated " & Format$(Now, "dd-mmmm-yyyy hh:mm:ss")
     
     'Julia results file created by function benchmark. See julia/benchmarkCSV.jl, function benchmark
     
@@ -105,7 +105,7 @@ Private Sub RunSpeedTests()
     
     For Each N In ws.Names
         If InStr(N.Name, "PasteResultsHere") > 1 Then
-            Application.Goto N.RefersToRange
+            Application.GoTo N.RefersToRange
 
             For Each c In N.RefersToRange.Cells
                 c.Resize(1, NumColsInTFPRet).ClearContents
@@ -136,15 +136,15 @@ End Sub
 ' Purpose    : Core of the method RunSpeedTests. Note the functions being timed are called many times in a loop that exits
 '              after TimeOut seconds have elapsed. Leads to much more reliable timings than timing a single call.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldContains As Variant, NumRows As Long, _
-    NumCols As Long, Timeout As Double, WithHeaders As Boolean, JuliaResultsFile As String)
+Private Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldContains As Variant, NumRows As Long, _
+    NumCols As Long, Timeout As Double, WithHeaders As Boolean, JuliaResultsFile As String) As Variant
 
-    Const Unicode = False
+    Const Unicode As Boolean = False
     Dim Data As Variant
-    Dim DataReread1
-    Dim DataReread2
-    Dim DataReread3
-    Dim DataReread4
+    Dim DataReread1 As Variant
+    Dim DataReread2 As Variant
+    Dim DataReread3 As Variant
+    Dim DataReread4 As Variant
     Dim DataRow As Long
     Dim ExtraInfo As String
     Dim FileName As String
@@ -173,7 +173,7 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
     
     JuliaResults = ThrowIfError(CSVRead(JuliaResultsFile, True))
     
-    OS = ""
+    OS = vbNullString
     
     If VarType(EachFieldContains) = vbDouble Then
         ExtraInfo = "Doubles"
@@ -195,7 +195,7 @@ Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldC
         ExtraInfo = "Unknown"
     End If
 
-    Folder = Environ("Temp") & "\VBA-CSV\Performance"
+    Folder = Environ$("Temp") & "\VBA-CSV\Performance"
 
     ThrowIfError CreatePath(Folder)
 
@@ -318,7 +318,7 @@ Sub AddCharts(Optional Export As Boolean = True)
         End If
     Next N
 
-    Application.Goto ws.Cells(1, 1)
+    Application.GoTo ws.Cells(1, 1)
     ws.Protect , , prot
 
     Exit Sub
@@ -343,13 +343,13 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export As Boolean)
 
-    Const ChartsInCol = "P"
-    Const Err_BadSelection = "That selection does not look correct." + vbLf + vbLf + _
+    Const ChartsInCol As String = "P"
+    Const Err_BadSelection As String = "That selection does not look correct." + vbLf + vbLf + _
         "Select two areas to define the data to plot. The first area should contain " + _
         "the independent data and have a single column with top cell giving the x axis " + _
         "label. The second area should contain the dependent data with one column per data " + _
         "series and top row giving the series names. Both areas should have the same number of rows"
-    Const TitlesInCol = "M"
+    Const TitlesInCol As String = "M"
     Dim ch As Chart
     Dim shp As Shape
     Dim SourceData As Range
@@ -375,7 +375,7 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
         'Actually selecting the ranges seems to be necessary to get the legends to appear in the generated charts...
         Set wsh = xData.Parent
         wsh.Activate
-        Range(xData.Address & "," & yData.Address).Select
+        wsh.Range(xData.Address & "," & yData.Address).Select
     End If
     
     Set shp = wsh.Shapes.AddChart2(240, xlXYScatterLines)

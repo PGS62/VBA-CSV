@@ -39,15 +39,15 @@ Public Sub RoundTripTest()
     Dim Prompt As String
     Dim Encoding As Variant
     Dim WhatDiffers As String
-    Const Title = "VBA-CSV Round Trip Tests"
+    Const Title As String = "VBA-CSV Round Trip Tests"
     
     On Error GoTo ErrHandler
     
-    Folder = Environ("Temp") & "\VBA-CSV\RoundTripTests"
+    Folder = Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     Prompt = "Run Round Trip Tests?" + vbLf + vbLf + _
         "Note this will generate 2,430 files in folder" + vbLf + _
-        Environ("Temp") & "\VBA-CSV\RoundTripTests"
+        Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
 
@@ -66,7 +66,7 @@ Public Sub RoundTripTest()
                             For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
                                 Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CStr(Encoding), EOL)
                                 NumTests = NumTests + 1
-                                ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", "")
+                                ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", vbNullString)
                                 RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CStr(Encoding), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
                             Next DateFormat
                         Next AllowLineFeed
@@ -111,12 +111,12 @@ Public Sub RoundTripTest()
             Next Delimiter
         Next Encoding
     Next OS
-    Debug.Print "Finished. NumPassed = " + Format(NumPassed, "###,##0") & " NumFailed = " & Format(NumFailed, "###,##0")
+    Debug.Print "Finished. NumPassed = " + Format$(NumPassed, "###,##0") & " NumFailed = " & Format$(NumFailed, "###,##0")
     If NumFailed = 0 Then
-        Prompt = "Finished, all " + Format(NumPassed, "###,##0") + " tests passed"
+        Prompt = "Finished, all " + Format$(NumPassed, "###,##0") + " tests passed"
         MsgBox Prompt, vbOKOnly + vbInformation, Title
     Else
-        Prompt = "Finished, " + Format(NumPassed, "###,##0") + " tests passed, and " & Format(NumFailed, "###,##0") + " tests failed. See VBA immediate window for details."
+        Prompt = "Finished, " + Format$(NumPassed, "###,##0") + " tests passed, and " & Format$(NumFailed, "###,##0") + " tests failed. See VBA immediate window for details."
         MsgBox Prompt, vbOKOnly + vbCritical, Title
     End If
 
@@ -137,9 +137,9 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     Encoding As String, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String, _
     ByRef NumPassed As Long, ByRef NumFailed As Long)
 
-    Const ConvertTypes = "NDBE" 'must use this for round-tripping to work.
-    Const PermitBaseDifference = True
-    Dim DataReadBack
+    Const ConvertTypes As String = "NDBE" 'must use this for round-tripping to work.
+    Const PermitBaseDifference As Boolean = True
+    Dim DataReadBack As Variant
     Dim FileName As String
     Dim NC As Long
     Dim NR As Long
@@ -147,7 +147,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     
     On Error GoTo ErrHandler
     
-    WhatDiffers = ""
+    WhatDiffers = vbNullString
 
     NR = NRows(Data)
     NC = NCols(Data)
@@ -169,16 +169,16 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     End If
 
     NumDone = NumPassed + NumFailed
-    If NumDone Mod 50 = 0 Then Debug.Print Format(NumDone, "###,##0")
+    If NumDone Mod 50 = 0 Then Debug.Print Format$(NumDone, "###,##0")
     
     Exit Sub
 ErrHandler:
     Throw "#RoundTripTestCore: " & Err.Description & "!"
 End Sub
 
-Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL As String)
+Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL As String) As String
 
-    Const maxlen = 20
+    Const maxlen As Long = 20
     Dim i As Long
     Dim Length As Long
     Dim Res As String
@@ -188,13 +188,13 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
     
     Length = CLng(1 + Rnd() * maxlen)
     Res = String(Length, " ")
-    ansi = UCase(Encoding) = "ANSI"
+    ansi = UCase$(Encoding) = "ANSI"
 
     For i = 1 To Length
         If ansi Then
-            Mid$(Res, i, 1) = Chr(34 + Rnd() * 88)
+            Mid$(Res, i, 1) = Chr$(34 + Rnd() * 88)
         Else
-            Mid$(Res, i, 1) = ChrW(33 + Rnd() * 370)
+            Mid$(Res, i, 1) = ChrW$(33 + Rnd() * 370)
         End If
 
         If Not AllowLineFeed Then
@@ -323,7 +323,7 @@ ErrHandler:
     Throw "#RandomBooleans: " & Err.Description & "!"
 End Function
 
-Private Function RandomDate()
+Private Function RandomDate() As Date
     On Error GoTo ErrHandler
     RandomDate = CDate(CLng(25569 + Rnd() * 36525)) 'Date in range 1 Jan 1970 to 1 Jan 2070
     Exit Function
@@ -386,7 +386,7 @@ End Function
 Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Encoding As String, EOL As String)
 
     Dim N As Long
-    Const NUMTYPES = 11
+    Const NUMTYPES As Long = 11
 
     On Error GoTo ErrHandler
     N = CLng(0.5 + NUMTYPES * Rnd())
@@ -409,10 +409,10 @@ Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, E
             RandomVariant = CStr(RandomDouble())
         Case 8
             'String that looks like a date
-            RandomVariant = Format(CLng(RandomDate()), DateFormat)
+            RandomVariant = Format$(CLng(RandomDate()), DateFormat)
         Case 9
             'String that looks like Boolean
-            RandomVariant = UCase(CStr(RandomBoolean()))
+            RandomVariant = UCase$(CStr(RandomBoolean()))
         Case 10
             RandomVariant = Empty
         Case 11
@@ -427,10 +427,10 @@ End Function
 'Copy of identical function in modCSVReadWrite so that copy there can be Private
 Private Function OStoEOL(OS As String, ArgName As String) As String
 
-    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
+    Const Err_Invalid As String = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
 
     On Error GoTo ErrHandler
-    Select Case LCase(OS)
+    Select Case LCase$(OS)
         Case "windows", vbCrLf, "crlf"
             OStoEOL = vbCrLf
         Case "unix", "linux", vbLf, "lf"
@@ -451,7 +451,7 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
 
     Application.Volatile
 
-    Const DateFormat = "yyyy-mmm-dd"
+    Const DateFormat As String = "yyyy-mmm-dd"
     Dim i As Long
     Dim j As Long
     Dim Res() As Variant

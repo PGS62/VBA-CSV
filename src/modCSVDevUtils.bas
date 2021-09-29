@@ -13,10 +13,10 @@ Option Explicit
 ' Purpose    : Export the modules of this workbook to the src folder, also save the workbook in its current location,
 '              and save a backup of the workbook to my OneDrive folder.
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub SaveWorkbookAndExportModules()
+Public Sub SaveWorkbookAndExportModules()
 
-    Const Title = "VBA-CSV"
-    Dim AuditData
+    Const Title As String = "VBA-CSV"
+    Dim AuditData As Variant
     Dim BackUpBookName As String
     Dim bExport As Boolean
     Dim c As VBIDE.VBComponent
@@ -82,7 +82,7 @@ Sub SaveWorkbookAndExportModules()
     Kill Folder & "*.frx"        'These are binary files that we don't want to check in to Git
     On Error GoTo ErrHandler
     
-    AuditData = Range(shAudit.Range("Headers").Cells(1, 1), shAudit.Range("Headers").Cells(1, 1).End(xlToRight).End(xlDown))
+    AuditData = shAudit.Range(shAudit.Range("Headers").Cells(1, 1), shAudit.Range("Headers").Cells(1, 1).End(xlToRight).End(xlDown)).value
     For i = LBound(AuditData, 1) + 1 To UBound(AuditData, 1)
         AuditData(i, 3) = CDate(AuditData(i, 3))
     Next
@@ -92,7 +92,7 @@ Sub SaveWorkbookAndExportModules()
     PrepareForRelease
     ThisWorkbook.Save
     
-    BackUpBookName = Environ("OneDriveConsumer") + "\Excel Sheets\VBA-CSV_Backups\" + Replace(ThisWorkbook.Name, ".", "_v" & shAudit.Range("B6") & ".")
+    BackUpBookName = Environ$("OneDriveConsumer") + "\Excel Sheets\VBA-CSV_Backups\" + Replace(ThisWorkbook.Name, ".", "_v" & shAudit.Range("B6") & ".")
     
     FileCopy ThisWorkbook.FullName, BackUpBookName
 
@@ -105,7 +105,7 @@ End Sub
 ' Procedure  : PrepareForRelease
 ' Purpose    : Tidy up the worksheets of this workbook.
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub PrepareForRelease()
+Private Sub PrepareForRelease()
 
     Dim i As Long
     Dim ws As Worksheet
@@ -116,7 +116,7 @@ Sub PrepareForRelease()
 
     For Each ws In ThisWorkbook.Worksheets
         If ws.Visible = xlSheetVisible Then
-            Application.Goto ws.Cells(1, 1)
+            Application.GoTo ws.Cells(1, 1)
             If InStr(ws.Name, "GIF") = 0 Then
                 ActiveWindow.DisplayGridlines = False
                 ActiveWindow.DisplayHeadings = False
@@ -126,7 +126,7 @@ Sub PrepareForRelease()
     Next
     For i = 1 To ThisWorkbook.Worksheets.Count
         If ThisWorkbook.Worksheets(i).Visible Then
-            Application.Goto ThisWorkbook.Worksheets(i).Cells(1, 1)
+            Application.GoTo ThisWorkbook.Worksheets(i).Cells(1, 1)
             Exit For
         End If
     Next i

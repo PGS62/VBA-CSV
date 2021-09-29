@@ -8,24 +8,24 @@ Option Explicit
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub TestAgainstRDatasets()
 
-    Const DatasetsFolder = "C:\Projects\RDatasets\"
+    Const DatasetsFolder As String = "C:\Projects\RDatasets\"
     
     Dim ResultsFile As String
     
     ResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + _
         "testresults\SpeedTestRDatasets.csv"
     
-    Dim CSVResult
+    Dim CSVResult As Variant
     Dim FileName As String
-    Dim Files
+    Dim Files As Variant
     Dim i As Long
-    Dim Result
-    Dim sdkn104Result
+    Dim Result As Variant
+    Dim sdkn104Result As Variant
     Dim t1 As Double
     Dim t2 As Double
     Dim t3 As Double
     Dim t4 As Double
-    Dim ws_garciaResult
+    Dim ws_garciaResult As Variant
 
     On Error GoTo ErrHandler
     Files = Array("csv\openintro\military.csv", "csv\mosaicData\Birthdays.csv", _
@@ -39,7 +39,7 @@ Sub TestAgainstRDatasets()
         "csv\ggplot2movies\movies.csv", "csv\ggplot2\diamonds.csv", _
         "csv\causaldata\gov_transfers_density.csv", "csv\openintro\seattlepets.csv")
 
-    Result = Fill("", UBound(Files) - LBound(Files) + 2, 5)
+    Result = Fill(vbNullString, UBound(Files) - LBound(Files) + 2, 5)
     Result(1, 1) = "File Name"
     Result(1, 2) = "Size"
     Result(1, 3) = "CSVRead time"

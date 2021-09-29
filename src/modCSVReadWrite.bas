@@ -27,10 +27,10 @@ Private Enum enmErrorStyle
     es_RaiseError = 1
 End Enum
 
-Private Const m_ErrorStyle = es_ReturnString
+Private Const m_ErrorStyle As Long = es_ReturnString
 
-Private Const m_LBound = 1 'Sets the array lower bounds of the return from CSVRead.
-                           'To return zero-based arrays, change the value of this constant to 0.
+Private Const m_LBound As Long = 1 'Sets the array lower bounds of the return from CSVRead.
+                                   'To return zero-based arrays, change the value of this constant to 0.
 
 Private Enum enmSourceType
     st_File = 0
@@ -140,37 +140,37 @@ End Enum
 '             For discussion of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-    Optional DateFormat As String = "Y-M-D", Optional Comment As String, _
-    Optional IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
+    Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
+    Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
+    Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
     Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
     Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
-    Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
-    Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String, _
-    Optional ByRef HeaderRow)
+    Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
+    Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+    Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
+    Optional ByRef HeaderRow As Variant) As Variant
 Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
 Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
-    Const DQ = """"
-    Const Err_Delimiter = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
+    Const DQ As String = """"
+    Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
         "Omit to guess from file contents"
-    Const Err_Delimiter2 = "Delimiter must have at least one character and cannot start with a double " & _
+    Const Err_Delimiter2 As String = "Delimiter must have at least one character and cannot start with a double " & _
         "quote, line feed or carriage return"
-    Const Err_FileEmpty = "File is empty"
-    Const Err_FunctionWizard = "Disabled in Function Wizard"
-    Const Err_NumCols = "NumCols must be positive to read a given number of columns, or zero or omitted " & _
+    Const Err_FileEmpty As String = "File is empty"
+    Const Err_FunctionWizard  As String = "Disabled in Function Wizard"
+    Const Err_NumCols As String = "NumCols must be positive to read a given number of columns, or zero or omitted " & _
         "to read all columns from SkipToCol to the maximum column encountered."
-    Const Err_NumRows = "NumRows must be positive to read a given number of rows, or zero or omitted to read" & _
+    Const Err_NumRows As String = "NumRows must be positive to read a given number of rows, or zero or omitted to read" & _
         " all rows from SkipToRow to the end of the file."
-    Const Err_Seps1 = "DecimalSeparator must be a single character"
-    Const Err_Seps2 = "DecimalSeparator must not be equal to the first character of Delimiter or to a " & _
+    Const Err_Seps1 As String = "DecimalSeparator must be a single character"
+    Const Err_Seps2 As String = "DecimalSeparator must not be equal to the first character of Delimiter or to a " & _
         "line-feed or carriage-return"
-    Const Err_SkipToCol = "SkipToCol must be at least 1."
-    Const Err_SkipToRow = "SkipToRow must be at least 1."
-    Const Err_Comment = "Comment must not contain double-quote, line feed or carriage return"
-    Const Err_HeaderRowNum = "HeaderRowNum must be greater than or equal to zero and less than or equal to SkipToRow"
+    Const Err_SkipToCol As String = "SkipToCol must be at least 1."
+    Const Err_SkipToRow As String = "SkipToRow must be at least 1."
+    Const Err_Comment As String = "Comment must not contain double-quote, line feed or carriage return"
+    Const Err_HeaderRowNum As String = "HeaderRowNum must be greater than or equal to zero and less than or equal to SkipToRow"
     
     Dim AcceptWithoutTimeZone As Boolean
     Dim AcceptWithTimeZone As Boolean
@@ -232,7 +232,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     'Download file from internet to local temp folder
     If SourceType = st_URL Then
-        TempFile = Environ("Temp") & "\VBA-CSV\Downloads\DownloadedFile.csv"
+        TempFile = Environ$("Temp") & "\VBA-CSV\Downloads\DownloadedFile.csv"
         FileName = Download(FileName, TempFile)
         SourceType = st_File
     End If
@@ -318,9 +318,9 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     If SourceType = st_String Then
         CSVContents = FileName
         
-        Call ParseCSVContents(CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+        ParseCSVContents CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
             IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, _
-            NumFields, Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow)
+            NumFields, Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
     Else
         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             
@@ -339,9 +339,9 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             CSVContents = ReadAllFromStream(Stream)
             Stream.Close
             
-            Call ParseCSVContents(CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+            ParseCSVContents CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                 IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
-                Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow)
+                Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
         Else
             CSVContents = ParseCSVContents(Stream, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                 IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
@@ -371,6 +371,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Adj = m_LBound - 1
     ReDim ReturnArray(1 + Adj To NumRowsInReturn + Adj, 1 + Adj To NumColsInReturn + Adj)
     MSLIA = MaxStringLengthInArray()
+    ShowMissingsAsEmpty = IsEmpty(ShowMissingsAs)
         
     For k = 1 To NumFields
         i = RowIndexes(k)
@@ -379,12 +380,12 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             If CallingFromWorksheet Then
                 If Lengths(k) > MSLIA Then
                     Err_StringTooLong = "The file has a field (row " + CStr(i + SkipToRow - 1) & _
-                        ", column " & CStr(j + SkipToCol - 1) & ") of length " + Format(Lengths(k), "###,###")
+                        ", column " & CStr(j + SkipToCol - 1) & ") of length " + Format$(Lengths(k), "###,###")
                     If MSLIA >= 32767 Then
-                        Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format(MSLIA, "####,####")
+                        Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format$(MSLIA, "####,####")
                     Else
                         Err_StringTooLong = Err_StringTooLong & _
-                            ". An array containing a string longer than " + Format(MSLIA, "###,###") + _
+                            ". An array containing a string longer than " + Format$(MSLIA, "###,###") + _
                             " cannot be returned from VBA to an Excel worksheet"
                     End If
                     Throw Err_StringTooLong
@@ -542,8 +543,8 @@ End Function
 ' Purpose    : Register the function CSVRead with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub RegisterCSVRead()
-    Const Description = "Returns the contents of a comma-separated file on disk as an array."
+Public Sub RegisterCSVRead()
+    Const Description As String = "Returns the contents of a comma-separated file on disk as an array."
     Dim ArgDescs() As String
 
     On Error GoTo ErrHandler
@@ -602,7 +603,7 @@ End Sub
 ' Procedure  : InferSourceType
 ' Purpose    : Guess whether FileName is in fact a file, a URL or a string in CSV format
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function InferSourceType(FileName As String) As enmSourceType
+Private Function InferSourceType(ByVal FileName As String) As enmSourceType
 
     On Error GoTo ErrHandler
     If InStr(FileName, vbLf) > 0 Then 'vbLf and vbCr are not permitted characters in file names or urls
@@ -640,7 +641,7 @@ End Function
 ' Tried to get info from StackOverflow, without much joy:
 ' https://stackoverflow.com/questions/69303804/excel-versions-and-limits-on-the-length-of-string-elements-in-arrays-returned-by
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function MaxStringLengthInArray()
+Private Function MaxStringLengthInArray() As Long
     Static Res As Long
     If Res = 0 Then
         Select Case Val(Application.Version)
@@ -661,9 +662,9 @@ End Function
 ' Purpose   : Downloads bits from the Internet and saves them to a file.
 '             See https://msdn.microsoft.com/en-us/library/ms775123(v=vs.85).aspx
 '----------------------------------------------------------------------------------------------------------------------
-Private Function Download(URLAddress As String, ByVal FileName As String)
+Private Function Download(URLAddress As String, ByVal FileName As String) As String
     Dim ErrString As String
-    Dim Res
+    Dim Res As Long
     Dim TargetFolder As String
 
     On Error GoTo ErrHandler
@@ -679,6 +680,7 @@ Private Function Download(URLAddress As String, ByVal FileName As String)
     End If
     If Not FileExists(FileName) Then Throw "Windows API function URLDownloadToFile did not report an error, " & _
         "but appears to have not successfuly downloaded a file from " & URLAddress & " to " & FileName
+        
     Download = FileName
 
     Exit Function
@@ -690,8 +692,8 @@ End Function
 ' Procedure  : ParseDownloadError, sub of Download
 '              https://www.vbforums.com/showthread.php?882757-URLDownloadToFile-error-codes
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseDownloadError(ErrNum As Long)
-    Dim ErrString
+Private Function ParseDownloadError(ErrNum As Long) As String
+    Dim ErrString As String
     Select Case ErrNum
         Case &H80004004
             ErrString = "Aborted"
@@ -750,14 +752,14 @@ Private Function ReadAllFromStream(Stream As Object) As String
     Dim Chunk As String
     Dim Contents As String
     Dim i As Long
-    Const ChunkSize = 10000
+    Const ChunkSize As Long = 10000
 
     On Error GoTo ErrHandler
     If TypeName(Stream) = "Stream" Then
         Contents = String(ChunkSize, " ")
 
         i = 1
-        While Not Stream.EOS
+        Do While Not Stream.EOS
             Chunk = Stream.ReadText(ChunkSize)
             If i - 1 + Len(Chunk) > Len(Contents) Then
                 Contents = Contents & String(i - 1 + Len(Chunk), " ")
@@ -765,7 +767,7 @@ Private Function ReadAllFromStream(Stream As Object) As String
 
             Mid$(Contents, i, Len(Chunk)) = Chunk
             i = i + Len(Chunk)
-        Wend
+        Loop
 
         If (i - 1) < Len(Contents) Then
             Contents = Left$(Contents, i - 1)
@@ -796,14 +798,14 @@ End Function
 Private Sub ParseEncoding(FileName As String, Encoding As Variant, ByRef TriState As Long, ByRef CharSet As String, _
     ByRef useADODB As Boolean)
 
-    Const Err_Encoding = "Encoding argument can usually be omitted, but otherwise Encoding be " & _
+    Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding be " & _
         "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM"""
     
     On Error GoTo ErrHandler
     If IsEmpty(Encoding) Or IsMissing(Encoding) Then
         DetectEncoding FileName, TriState, CharSet, useADODB
     ElseIf VarType(Encoding) = vbString Then
-        Select Case UCase(Replace(Replace(Encoding, "-", ""), " ", ""))
+        Select Case UCase$(Replace(Replace(Encoding, "-", vbNullString), " ", vbNullString))
             Case "ASCII"
                 CharSet = "ascii" 'not actually relevant, since we won't use ADODB
                 TriState = TristateFalse
@@ -875,7 +877,7 @@ End Function
 ' Procedure  : CTsEqual
 ' Purpose    : Test if two CT strings (strings to define type conversion) are equal, i.e. will have the same effect
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CTsEqual(CT1, CT2) As Boolean
+Private Function CTsEqual(CT1 As Variant, CT2 As Variant) As Boolean
     On Error GoTo ErrHandler
     If VarType(CT1) = VarType(CT2) Then
         If CT1 = CT2 Then
@@ -899,16 +901,16 @@ Private Function StandardiseCT(CT As Variant) As String
         If CT Then
             StandardiseCT = "BDN"
         Else
-            StandardiseCT = ""
+            StandardiseCT = vbNullString
         End If
         Exit Function
     ElseIf VarType(CT) = vbString Then
-        StandardiseCT = IIf(InStr(1, CT, "B", vbTextCompare), "B", "") & _
-            IIf(InStr(1, CT, "D", vbTextCompare), "D", "") & _
-            IIf(InStr(1, CT, "E", vbTextCompare), "E", "") & _
-            IIf(InStr(1, CT, "N", vbTextCompare), "N", "") & _
-            IIf(InStr(1, CT, "Q", vbTextCompare), "Q", "") & _
-            IIf(InStr(1, CT, "T", vbTextCompare), "T", "")
+        StandardiseCT = IIf(InStr(1, CT, "B", vbTextCompare), "B", vbNullString) & _
+            IIf(InStr(1, CT, "D", vbTextCompare), "D", vbNullString) & _
+            IIf(InStr(1, CT, "E", vbTextCompare), "E", vbNullString) & _
+            IIf(InStr(1, CT, "N", vbTextCompare), "N", vbNullString) & _
+            IIf(InStr(1, CT, "Q", vbTextCompare), "Q", vbNullString) & _
+            IIf(InStr(1, CT, "T", vbTextCompare), "T", vbNullString)
     End If
 
     Exit Function
@@ -920,13 +922,13 @@ End Function
 ' Procedure  : OneDArrayToTwoDArray
 ' Purpose    : Convert 1-d array of 2-element 1-d arrays into a 1-based, two-column, 2-d array.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function OneDArrayToTwoDArray(x As Variant)
-    Const Err_1DArray = "If ConvertTypes is given as a 1-dimensional array, each element must " & _
+Private Function OneDArrayToTwoDArray(x As Variant) As Variant
+    Const Err_1DArray As String = "If ConvertTypes is given as a 1-dimensional array, each element must " & _
         "be a 1-dimensional array with two elements"
 
     Dim i As Long
     Dim k As Long
-    Dim TwoDArray()
+    Dim TwoDArray() As Variant
     On Error GoTo ErrHandler
     ReDim TwoDArray(1 To UBound(x) - LBound(x) + 1, 1 To 2)
     For i = LBound(x) To UBound(x)
@@ -972,15 +974,15 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
     ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean, _
     ByRef ColByColFormatting As Boolean, HeaderRowNum As Long, ByRef CTDict As Scripting.Dictionary)
     
-    Const Err_2D = "If ConvertTypes is given as a two dimensional array then the " & _
+    Const Err_2D As String = "If ConvertTypes is given as a two dimensional array then the " & _
         " lower bounds in each dimension must be 1"
-    Const Err_Ambiguous = "ConvertTypes is ambiguous, it can be interpreted as two rows, or as two columns"
-    Const Err_BadColumnIdentifier = "Column identifiers in the left column (or top row) of " & _
+    Const Err_Ambiguous As String = "ConvertTypes is ambiguous, it can be interpreted as two rows, or as two columns"
+    Const Err_BadColumnIdentifier As String = "Column identifiers in the left column (or top row) of " & _
         "ConvertTypes must be strings or non-negative whole numbers"
-    Const Err_BadCT = "Type Conversion given in bottom row (or right column) of ConvertTypes must be " & _
+    Const Err_BadCT As String = "Type Conversion given in bottom row (or right column) of ConvertTypes must be " & _
         "Booleans or strings containing letters NDBETQ"
-    Const Err_ConvertTypes = "ConvertTypes must be a Boolean, a string with allowed letters ""NDBETQ"" or an array"
-    Const Err_HeaderRowNum = "ConvertTypes specifies columns by their header (instead of by number), " & _
+    Const Err_ConvertTypes As String = "ConvertTypes must be a Boolean, a string with allowed letters ""NDBETQ"" or an array"
+    Const Err_HeaderRowNum As String = "ConvertTypes specifies columns by their header (instead of by number), " & _
         "but HeaderRowNum has not been specified"
     
     Dim ColIdentifier As Variant
@@ -1102,12 +1104,12 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
     ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
     ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean)
 
-    Const Err_ConvertTypes = "ConvertTypes must be Boolean or string with allowed letters NDBETQ. " & _
+    Const Err_ConvertTypes As String = "ConvertTypes must be Boolean or string with allowed letters NDBETQ. " & _
         """N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans " & _
         "as Booleans, ""E"" show Excel errors as errors, ""T"" to trim leading and trailing " & _
         "spaces from fields, ""Q"" rules NDBE apply even to quoted fields, TRUE = ""NDB"" " & _
         "(convert unquoted numbers, dates and Booleans), FALSE = no conversion"
-    Const Err_Quoted = "ConvertTypes is incorrect, ""Q"" indicates that conversion should apply even to " & _
+    Const Err_Quoted As String = "ConvertTypes is incorrect, ""Q"" indicates that conversion should apply even to " & _
         "quoted fields, but none of ""N"", ""D"", ""B"" or ""E"" are present to indicate which type conversion to apply"
     Dim i As Long
 
@@ -1124,7 +1126,7 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
     ConvertQuoted = False
     For i = 1 To Len(ConvertTypes)
         'Adding another letter? Also change method IsCTValid!
-        Select Case UCase(Mid$(ConvertTypes, i, 1))
+        Select Case UCase$(Mid$(ConvertTypes, i, 1))
             Case "N"
                 ShowNumbersAsNumbers = True
             Case "D"
@@ -1250,7 +1252,7 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, ByRef Cha
             useADODB = True
         Else
             'We don't know, assume ANSI but that may be incorrect.
-            CharSet = ""
+            CharSet = vbNullString
             TriState = TristateFalse
             useADODB = False
         End If
@@ -1269,11 +1271,11 @@ End Sub
 '              10 lines, but that presents a problem for files with Mac line endings as T.ReadLine doesn't work for them.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As String, _
-    TriState As Long, DecimalSeparator As String)
+    TriState As Long, DecimalSeparator As String) As String
     
-    Const CHUNK_SIZE = 1000
-    Const Err_SourceType = "Cannot infer delimiter directly from URL"
-    Const MAX_CHUNKS = 10
+    Const CHUNK_SIZE As Long = 1000
+    Const Err_SourceType As String = "Cannot infer delimiter directly from URL"
+    Const MAX_CHUNKS As Long = 10
     Const QuoteChar As String = """"
     Dim Contents As String
     Dim CopyOfErr As String
@@ -1281,7 +1283,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
     Dim F As Scripting.File
     Dim i As Long
     Dim j As Long
-    Dim MaxChars
+    Dim MaxChars As Long
     Dim T As TextStream
 
     On Error GoTo ErrHandler
@@ -1370,18 +1372,18 @@ End Function
 '  DateSeparator: ByRef argument is set to the DateSeparator, typically "-" or "/"
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, _
-    ByRef ISO8601, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
+    ByRef ISO8601 As Boolean, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
 
     Dim Err_DateFormat As String
 
     On Error GoTo ErrHandler
     
-    If UCase(DateFormat) = "ISO" Then
+    If UCase$(DateFormat) = "ISO" Then
         ISO8601 = True
         AcceptWithoutTimeZone = True
         AcceptWithTimeZone = False
         Exit Sub
-    ElseIf UCase(DateFormat) = "ISOZ" Then
+    ElseIf UCase$(DateFormat) = "ISOZ" Then
         ISO8601 = True
         AcceptWithoutTimeZone = False
         AcceptWithTimeZone = True
@@ -1394,7 +1396,7 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
     'Replace repeated D's with a single D, etc since CastToDate only needs _
      to know the order in which the three parts of the date appear.
     If Len(DateFormat) > 5 Then
-        DateFormat = UCase(DateFormat)
+        DateFormat = UCase$(DateFormat)
         ReplaceRepeats DateFormat, "D"
         ReplaceRepeats DateFormat, "M"
         ReplaceRepeats DateFormat, "Y"
@@ -1440,28 +1442,6 @@ Private Sub ReplaceRepeats(ByRef TheString As String, TheChar As String)
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : WindowsDateFormat
-' Purpose    : Returns a description of the system date format, used only for error string generation.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function WindowsDateFormat() As String
-    Dim DS As String
-    On Error GoTo ErrHandler
-    DS = Application.International(xlDateSeparator)
-    Select Case Application.International(xlDateOrder)
-        Case 0
-            WindowsDateFormat = "M" & DS & "D" & DS & "Y"
-        Case 1
-            WindowsDateFormat = "D" & DS & "M" & DS & "Y"
-        Case 2
-            WindowsDateFormat = "Y" & DS & "M" & DS & "D"
-    End Select
-
-    Exit Function
-ErrHandler:
-    WindowsDateFormat = "Cannot determine!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseCSVContents
 ' Purpose    : Parse the contents of a CSV file. Returns a string Buffer together with arrays which assist splitting
 '              Buffer into a two-dimensional array.
@@ -1501,9 +1481,9 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
     Delimiter As String, Comment As String, IgnoreEmptyLines As Boolean, IgnoreRepeated As Boolean, SkipToRow As Long, _
     HeaderRowNum As Long, NumRows As Long, ByRef NumRowsFound As Long, ByRef NumColsFound As Long, _
     ByRef NumFields As Long, ByRef Ragged As Boolean, ByRef Starts() As Long, ByRef Lengths() As Long, _
-    RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long, ByRef HeaderRow) As String
+    RowIndexes() As Long, ColIndexes() As Long, QuoteCounts() As Long, ByRef HeaderRow As Variant) As String
 
-    Const Err_Delimiter = "Delimiter must not be the null string"
+    Const Err_Delimiter As String = "Delimiter must not be the null string"
     Dim Buffer As String
     Dim BufferUpdatedTo As Long
     Dim ColNum As Long
@@ -1542,7 +1522,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
             Buffer = ReadAllFromStream(Stream)
             Streaming = False
         Else
-            Call GetMoreFromStream(Stream, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
+            GetMoreFromStream Stream, Delimiter, QuoteChar, Buffer, BufferUpdatedTo
             Streaming = True
         End If
     End If
@@ -1686,14 +1666,14 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
                         If SkipToRow = 1 Then
                             If HeaderRowNum = 1 Then
                                 HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
-                                    RowIndexes, ColIndexes, QuoteCounts, j)
+                                     ColIndexes, QuoteCounts, j)
                             End If
                         End If
                     End If
                     If Not HaveReachedSkipToRow Then
                         If RowNum = HeaderRowNum Then
                             HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
-                                RowIndexes, ColIndexes, QuoteCounts, j)
+                                 ColIndexes, QuoteCounts, j)
                         End If
                     End If
                     
@@ -1790,24 +1770,21 @@ End Function
 '              function return). The argument j should point into the Starts, Lengths etc arrays, pointing to the last
 '              field in the header row
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() As Long, RowIndexes() As Long, _
-    ColIndexes() As Long, QuoteCounts() As Long, j As Long)
+Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() As Long, _
+    ColIndexes() As Long, QuoteCounts() As Long, j As Long) As Variant
     Dim NC As Long
 
     Dim Field As String
     Dim i As Long
-    Dim RowNum As Long
-
     Dim Res() As String
 
     On Error GoTo ErrHandler
-    RowNum = RowIndexes(j)
     NC = ColIndexes(j)
 
     ReDim Res(1 To 1, 1 To NC)
     For i = j To j - NC + 1 Step -1
         Field = Mid$(Buffer, Starts(i), Lengths(i))
-        Res(1, NC + i - j) = Unquote(Trim(Field), """", QuoteCounts(i))
+        Res(1, NC + i - j) = Unquote(Trim$(Field), """", QuoteCounts(i))
     Next i
     GetLastParsedRow = Res
 
@@ -1839,7 +1816,7 @@ Private Sub SkipLines(Streaming As Boolean, useADODB As Boolean, Comment As Stri
                     AtEndOfStream = Stream.AtEndOfStream
                 End If
                 If Not AtEndOfStream Then
-                    Call GetMoreFromStream(Stream, Delimiter, QuoteChar, Buffer, BufferUpdatedTo)
+                    GetMoreFromStream Stream, Delimiter, QuoteChar, Buffer, BufferUpdatedTo
                 End If
             End If
         End If
@@ -1887,7 +1864,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Stream As Object, useADODB As Boolean, _
           Delimiter As String, QuoteChar As String, ByRef Which As Long, ByRef Buffer As String, _
-          ByRef BufferUpdatedTo As Long)
+          ByRef BufferUpdatedTo As Long) As Long
 
     Dim AtEndOfStream As Boolean
     Dim InstrRes As Long
@@ -1938,9 +1915,9 @@ End Function
 '              index identifying which was the first of the strings to be found.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InStrMulti(SearchFor() As String, SearchWithin As String, StartingAt As Long, EndingAt As Long, _
-    ByRef Which As Long)
+    ByRef Which As Long) As Long
 
-    Const Inf = 2147483647
+    Const Inf As Long = 2147483647
     Dim i As Long
     Dim InstrRes() As Long
     Dim LB As Long
@@ -1984,7 +1961,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As String, ByRef Buffer As String, _
     ByRef BufferUpdatedTo As Long)
-    Const ChunkSize = 5000  ' The number of characters to read from the stream on each call. _
+    Const ChunkSize As Long = 5000  ' The number of characters to read from the stream on each call. _
                               Set to a small number for testing logic and a bigger number for _
                               performance, but not too high since a common use case is reading _
                               just the first line of a file. Suggest 5000? Note that when reading _
@@ -1996,8 +1973,8 @@ Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As St
     Dim i As Long
     Dim IsScripting As Boolean
     Dim NCharsToWriteToBuffer As Long
-    Dim NewChars
-    Dim OKToExit
+    Dim NewChars As String
+    Dim OKToExit As Boolean
 
     On Error GoTo ErrHandler
     
@@ -2073,7 +2050,7 @@ End Sub
 ' Purpose    : Count the quotes in a string, only used when applying column-by-column type conversion, because in that
 '              case it's not possible to use the count of quotes made at parsing time which is organised row-by-row.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CountQuotes(Str As String, QuoteChar As String)
+Private Function CountQuotes(Str As String, QuoteChar As String) As Long
     Dim N As Long
     Dim pos As Long
 
@@ -2136,12 +2113,11 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
     ShowDatesAsDates As Boolean, ISO8601 As Boolean, AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, _
     DateOrder As Long, DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
     AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
-    ShowMissingsAs As Variant)
+    ShowMissingsAs As Variant) As Variant
 
     Dim Converted As Boolean
     Dim dblResult As Double
     Dim dtResult As Date
-    Dim isQuoted As Boolean
 
     If TrimFields Then
         If Left$(Field, 1) = " " Then
@@ -2168,7 +2144,6 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
     If QuoteCount > 0 Then
         If Left$(Field, 1) = QuoteChar Then
             If Right$(QuoteChar, 1) = QuoteChar Then
-                isQuoted = True
                 Field = Mid$(Field, 2, FieldLength - 2)
                 If QuoteCount > 2 Then
                     Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
@@ -2234,7 +2209,7 @@ End Function
 ' Procedure  : Unquote
 ' Purpose    : Unquote a field.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Unquote(ByVal Field As String, QuoteChar As String, QuoteCount As Long)
+Private Function Unquote(ByVal Field As String, QuoteChar As String, QuoteCount As Long) As String
 
     On Error GoTo ErrHandler
     If QuoteCount > 0 Then
@@ -2295,7 +2270,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastToDate()
 
-    Const N = 1000000
+    Const N As Long = 1000000
     Dim Converted As Boolean
     Dim DateOrder As Long
     Dim DateSeparator As String
@@ -2315,10 +2290,10 @@ Private Sub SpeedTest_CastToDate()
     SysDateSeparator = Application.International(xlDateSeparator)
 
     Debug.Print String(100, "=")
-    Debug.Print "Running SpeedTest_CastToDate " & Format(Now(), "yyyy-mmm-dd hh:mm:ss")
+    Debug.Print "Running SpeedTest_CastToDate " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
     Debug.Print "SysDateOrder = " & SysDateOrder
     Debug.Print "SysDateSeparator = " & SysDateSeparator
-    Debug.Print "N = " & Format(N, "###,###")
+    Debug.Print "N = " & Format$(N, "###,###")
     
     For k = 1 To 12
         For j = 1 To 1 'Maybe do multiple times to test for variability or results.
@@ -2389,11 +2364,11 @@ Private Sub SpeedTest_CastToDate()
 
             t1 = ElapsedTime()
             For i = 1 To N
-                Call CastToDate(strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted)
+                CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
             Next i
             t2 = ElapsedTime()
             Dim PrintThis As String
-            PrintThis = "Calls per second = " & Format(N / (t2 - t1), "###,###")
+            PrintThis = "Calls per second = " & Format$(N / (t2 - t1), "###,###")
             If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
             PrintThis = PrintThis & "strIn = """ & strIn & """"
             If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
@@ -2585,16 +2560,16 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ByRef MaxLeng
     ByRef ShowMissingsAs As Variant, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
     Optional MissingStrings As Variant)
 
-    Const Err_FalseStrings = "FalseStrings must be omitted or provided as a string or an array of strings " & _
+    Const Err_FalseStrings As String = "FalseStrings must be omitted or provided as a string or an array of strings " & _
         "that represent Boolean value False"
-    Const Err_MissingStrings = "MissingStrings must be omitted or provided a string or an array of strings that " & _
+    Const Err_MissingStrings As String = "MissingStrings must be omitted or provided a string or an array of strings that " & _
         "represent missing values"
-    Const Err_ShowMissings = "ShowMissingsAs has an illegal value, such as an array or an object"
-    Const Err_TrueStrings = "TrueStrings must be omitted or provided as string or an array of strings that " & _
+    Const Err_ShowMissings As String = "ShowMissingsAs has an illegal value, such as an array or an object"
+    Const Err_TrueStrings As String = "TrueStrings must be omitted or provided as string or an array of strings that " & _
         "represent Boolean value True"
-    Const Err_TrueStrings2 = "TrueStrings has been provided, but type conversion for Booleans is not switched on" & _
+    Const Err_TrueStrings2 As String = "TrueStrings has been provided, but type conversion for Booleans is not switched on" & _
         " for any column"
-    Const Err_FalseStrings2 = "FalseStrings has been provided, but type conversion for Booleans is not switched" & _
+    Const Err_FalseStrings2 As String = "FalseStrings has been provided, but type conversion for Booleans is not switched" & _
         " on for any column"
 
     On Error GoTo ErrHandler
@@ -2758,13 +2733,14 @@ Private Sub SpeedTest_Sentinels()
     Dim j As Long
     Dim t1 As Double
     Dim t2 As Double
-    Const N = 10000000
+    Const N As Long = 10000000
     Dim AnySentinels As Boolean
     Dim Comment As String
     Dim MaxLength As Long
     Dim Res As Variant
 
-    MakeSentinels Sentinels, MaxLength, AnySentinels, _
+    On Error GoTo ErrHandler
+        MakeSentinels Sentinels, MaxLength, AnySentinels, _
         ShowBooleansAsBooleans:=True, _
         ShowErrorsAsErrors:=True, _
         ShowMissingsAs:=Empty, _
@@ -2774,7 +2750,7 @@ Private Sub SpeedTest_Sentinels()
     
     Dim Converted As Boolean
     
-    Debug.Print "Running SpeedTest_Sentinels " & Format(Now(), "yyyy-mm-ddThh:mm:ss")
+    Debug.Print "Running SpeedTest_Sentinels " & Format$(Now(), "yyyy-mm-ddThh:mm:ss")
     
     For j = 1 To 3
     
@@ -2800,21 +2776,22 @@ Private Sub SpeedTest_Sentinels()
         Next i
         t2 = ElapsedTime()
 
-        Debug.Print "Conversions per second = " & Format(N / (t2 - t1), "###,###"), _
-            "Field = """ & Field & """" & IIf(Comment = "", "", " (" & Comment & ")")
+        Debug.Print "Conversions per second = " & Format$(N / (t2 - t1), "###,###"), _
+            "Field = """ & Field & """" & IIf(Comment = vbNullString, vbNullString, " (" & Comment & ")")
 
     Next j
 
     Exit Sub
 ErrHandler:
     MsgBox "#SpeedTest_Sentinels: " & Err.Description & "!"
+
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseISO8601
 ' Purpose    : Test harness for calling from spreadsheets
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function ParseISO8601(strIn As String)
+Public Function ParseISO8601(strIn As String) As Variant
     Dim Converted As Boolean
     Dim dtOut As Date
 
@@ -2858,7 +2835,7 @@ Private Sub CastToTimeB(strIn As String, ByRef dtOut As Date, ByRef Converted As
     Static rx As VBScript_RegExp_55.RegExp
     Dim DecPointAt As Long
     Dim FractionalSecond As Double
-    Dim SpaceAt
+    Dim SpaceAt As Long
     
     On Error GoTo ErrHandler
     If rx Is Nothing Then
@@ -2920,7 +2897,7 @@ Private Sub CastISO8601(ByVal strIn As String, dtOut As Date, ByRef Converted As
     Dim MilliPart As Double
     Dim MinusPos As Long
     Dim PlusPos As Long
-    Dim Sign
+    Dim Sign As Long
     Dim ZAtEnd As Boolean
     
     Static rxNoNo As VBScript_RegExp_55.RegExp
@@ -3083,7 +3060,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastISO8601()
 
-    Const N = 5000000
+    Const N As Long = 5000000
     Dim Converted As Boolean
     Dim dtOut As Date
     Dim Expected As Date
@@ -3092,14 +3069,12 @@ Private Sub SpeedTest_CastISO8601()
     Dim k As Long
     Dim PrintThis As String
     Dim strIn As String
-    Dim SysDateOrder As Long
     Dim t1 As Double
     Dim t2 As Double
 
-    SysDateOrder = Application.International(xlDateOrder)
     Debug.Print String(100, "=")
-    Debug.Print "Running SpeedTest_CastISO8601 " & Format(Now(), "yyyy-mmm-dd hh:mm:ss")
-    Debug.Print "N = " & Format(N, "###,###")
+    Debug.Print "Running SpeedTest_CastISO8601 " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
+    Debug.Print "N = " & Format$(N, "###,###")
     For k = 0 To 9
         For j = 1 To 1
             dtOut = 0
@@ -3138,11 +3113,11 @@ Private Sub SpeedTest_CastISO8601()
 
             t1 = ElapsedTime()
             For i = 1 To N
-                Call CastISO8601(strIn, dtOut, Converted, True, True)
+                CastISO8601 strIn, dtOut, Converted, True, True
             Next i
             t2 = ElapsedTime()
             
-            PrintThis = "Calls per second = " & Format(N / (t2 - t1), "###,###")
+            PrintThis = "Calls per second = " & Format$(N / (t2 - t1), "###,###")
             If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
             If Len(strIn) > 30 Then
                 PrintThis = PrintThis & "strIn = """ & Left$(strIn, 27) & "..."""
@@ -3166,7 +3141,7 @@ https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-u
 ' Procedure  : GetLocalOffsetToUTC
 ' Purpose    : Get the PC's offset to UTC.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function GetLocalOffsetToUTC()
+Private Function GetLocalOffsetToUTC() As Double
     Dim dt As Object
     Dim TimeNow As Date
     Dim UTC As Date
@@ -3189,9 +3164,9 @@ End Function
 '              UTC is the same as the curent offset on this PC - use with care, Daylight saving may mean that that's not
 '              a correct assumption for all the dates in a set of data...
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ISOZFormatString()
-    Dim RightChars
-    Dim TimeZone
+Private Function ISOZFormatString() As String
+    Dim RightChars As String
+    Dim TimeZone As String
 
     On Error GoTo ErrHandler
     TimeZone = GetLocalOffsetToUTC()
@@ -3199,9 +3174,9 @@ Private Function ISOZFormatString()
     If TimeZone = 0 Then
         RightChars = "Z"
     ElseIf TimeZone > 0 Then
-        RightChars = "+" & Format(TimeZone, "hh:mm")
+        RightChars = "+" & Format$(TimeZone, "hh:mm")
     Else
-        RightChars = "-" & Format(Abs(TimeZone), "hh:mm")
+        RightChars = "-" & Format$(Abs(TimeZone), "hh:mm")
     End If
     ISOZFormatString = "yyyy-mm-ddT:hh:mm:ss" & RightChars
 
@@ -3225,9 +3200,10 @@ End Function
 '  NumLinesToReturn   : This many lines are returned. Pass zero for all lines from SkipToLine.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, useADODB As Boolean, _
-    CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long, CallingFromWorksheet As Boolean)
+    CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long, _
+    CallingFromWorksheet As Boolean) As Variant
 
-    Const Err_FileEmpty = "File is empty"
+    Const Err_FileEmpty As String = "File is empty"
     Dim Buffer As String
     Dim BufferUpdatedTo As Long
     Dim FoundCR As Boolean
@@ -3267,7 +3243,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
             Buffer = ReadAllFromStream(Stream)
             Streaming = False
         Else
-            Call GetMoreFromStream(Stream, "", "", Buffer, BufferUpdatedTo)
+            GetMoreFromStream Stream, vbNullString, vbNullString, Buffer, BufferUpdatedTo
             Streaming = True
         End If
     Else
@@ -3311,7 +3287,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
                 i = PosLF
             End If
         Else
-            i = SearchInBuffer(SearchFor, i + 1, Stream, useADODB, "", "", Which, Buffer, BufferUpdatedTo)
+            i = SearchInBuffer(SearchFor, i + 1, Stream, useADODB, vbNullString, vbNullString, Which, Buffer, BufferUpdatedTo)
             FoundCR = (Which = 2)
         End If
 
@@ -3369,12 +3345,12 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     For i = 1 To MinLngs(NumLinesToReturn, NumLinesFound)
         If CallingFromWorksheet Then
             If Lengths(i) > MSLIA Then
-                Err_StringTooLong = "Line " & Format(i, "#,###") & " of the file is of length " + Format(Lengths(i), "###,###")
+                Err_StringTooLong = "Line " & Format$(i, "#,###") & " of the file is of length " + Format$(Lengths(i), "###,###")
                 If MSLIA >= 32767 Then
-                    Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format(MSLIA, "####,####")
+                    Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format$(MSLIA, "####,####")
                 Else
                     Err_StringTooLong = Err_StringTooLong & _
-                        ". An array containing a string longer than " + Format(MSLIA, "###,###") + _
+                        ". An array containing a string longer than " + Format$(MSLIA, "###,###") + _
                         " cannot be returned from VBA to an Excel worksheet"
                 End If
                 Throw Err_StringTooLong
@@ -3443,7 +3419,7 @@ End Sub
 '             methods to be used from VBA code while keeping error handling robust
 '             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
 '----------------------------------------------------------------------------------------------------------------------
-Public Function ThrowIfError(Data As Variant)
+Public Function ThrowIfError(Data As Variant) As Variant
     ThrowIfError = Data
     If VarType(Data) = vbString Then
         If Left$(Data, 1) = "#" Then
@@ -3473,7 +3449,7 @@ End Function
 ' Procedure : FolderExists
 ' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
 '----------------------------------------------------------------------------------------------------------------------
-Private Function FolderExists(ByVal FolderPath As String)
+Private Function FolderExists(ByVal FolderPath As String) As Boolean
     Dim F As Scripting.Folder
     
     On Error GoTo ErrHandler
@@ -3490,19 +3466,18 @@ End Function
 ' Procedure  : FileDelete
 ' Purpose    : Delete a file, returns True or error string.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function FileDelete(FileName As String) As Boolean
+Private Sub FileDelete(FileName As String)
     Dim F As Scripting.File
     On Error GoTo ErrHandler
 
     If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
     Set F = m_FSO.GetFile(FileName)
     F.Delete
-    FileDelete = True
 
-    Exit Function
+    Exit Sub
 ErrHandler:
     Throw "#FileDelete: " & Err.Description & "!"
-End Function
+End Sub
 
 '----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CreatePath
@@ -3513,12 +3488,12 @@ End Function
 ' FolderPath: Path of the folder to be created. For example C:\temp\My_New_Folder. It does not matter if
 '             this path has a terminating backslash or not.
 '----------------------------------------------------------------------------------------------------------------------
-Private Function CreatePath(ByVal FolderPath As String)
+Private Sub CreatePath(ByVal FolderPath As String)
 
     Dim F As Scripting.Folder
     Dim i As Long
     Dim isUNC As Boolean
-    Dim ParentFolderName
+    Dim ParentFolderName As String
     Dim ThisFolderName As String
 
     On Error GoTo ErrHandler
@@ -3570,13 +3545,12 @@ Private Function CreatePath(ByVal FolderPath As String)
 
 EarlyExit:
     Set F = m_FSO.GetFolder(FolderPath)
-    CreatePath = F.path
     Set F = Nothing
 
-    Exit Function
+    Exit Sub
 ErrHandler:
     Throw "#CreatePath: " & Err.Description & "!"
-End Function
+End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : FileFromPath
@@ -3620,7 +3594,7 @@ End Function
 ' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
 '             have one row and the number of columns returned by this function.
 '----------------------------------------------------------------------------------------------------------------------
-Private Function NCols(Optional TheArray) As Long
+Private Function NCols(Optional TheArray As Variant) As Long
     If TypeName(TheArray) = "Range" Then
         NCols = TheArray.Columns.Count
     ElseIf IsMissing(TheArray) Then
@@ -3641,7 +3615,7 @@ End Function
 ' Procedure : NRows
 ' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
 '----------------------------------------------------------------------------------------------------------------------
-Private Function NRows(Optional TheArray) As Long
+Private Function NRows(Optional TheArray As Variant) As Long
     If TypeName(TheArray) = "Range" Then
         NRows = TheArray.Rows.Count
     ElseIf IsMissing(TheArray) Then
@@ -3665,7 +3639,7 @@ End Function
 ' TheArray  : An array of arbitrary values.
 '             Return is always 1-based, even when input is zero-based.
 '----------------------------------------------------------------------------------------------------------------------
-Private Function Transpose(ByVal TheArray As Variant)
+Private Function Transpose(ByVal TheArray As Variant) As Variant
     Dim Co As Long
     Dim i As Long
     Dim j As Long
@@ -3762,8 +3736,8 @@ End Function
 ' Purpose    : Register the function CSVWrite with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub RegisterCSVWrite()
-    Const Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same " & _
+Public Sub RegisterCSVWrite()
+    Const Description As String = "Creates a comma-separated file on disk containing Data. Any existing file of the same " & _
                         "name is overwritten. If successful, the function returns FileName, otherwise an ""error " & _
                         "string"" (starts with `#`, ends with `!`) describing what went wrong."
     Dim ArgDescs() As String
@@ -3836,15 +3810,15 @@ Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
     Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "YYYY-MM-DD", _
     Optional ByVal DateTimeFormat As String = "ISO", _
     Optional Delimiter As String = ",", Optional Encoding As String = "ANSI", _
-    Optional ByVal EOL As String = "")
+    Optional ByVal EOL As String = vbNullString) As String
 Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
 Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
-    Const DQ = """"
-    Const Err_Delimiter = "Delimiter must have at least one character and cannot start with a " & _
+    Const DQ As String = """"
+    Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
         "double  quote, line feed or carriage return"
-    Const Err_Dimensions = "Data must be a range or a 2-dimensional array"
-    Const Err_Encoding = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
+    Const Err_Dimensions As String = "Data must be a range or a 2-dimensional array"
+    Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
     
     Dim EOLIsWindows As Boolean
     Dim ErrRet As String
@@ -3859,7 +3833,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     On Error GoTo ErrHandler
     
-    Select Case UCase(Encoding)
+    Select Case UCase$(Encoding)
         Case "ANSI", "UTF-8", "UTF-16"
         Case Else
             Throw Err_Encoding
@@ -3867,7 +3841,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     WriteToFile = Len(FileName) > 0
 
-    If EOL = "" Then
+    If EOL = vbNullString Then
         If WriteToFile Then
             EOL = vbCrLf
         Else
@@ -3882,7 +3856,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         Throw Err_Delimiter
     End If
     
-    Select Case UCase(DateTimeFormat)
+    Select Case UCase$(DateTimeFormat)
         Case "ISO"
             DateTimeFormat = "yyyy-mm-ddThh:mm:ss"
         Case "ISOZ"
@@ -3898,7 +3872,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
     
     If WriteToFile Then
-        If UCase(Encoding) = "UTF-8" Then
+        If UCase$(Encoding) = "UTF-8" Then
             Set Stream = CreateObject("ADODB.Stream")
             Stream.Open
             Stream.Type = 2 'Text
@@ -3915,7 +3889,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
             CSVWrite = FileName
         Else
-            Unicode = UCase(Encoding) = "UTF-16"
+            Unicode = UCase$(Encoding) = "UTF-16"
             If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             Set Stream = m_FSO.CreateTextFile(FileName, True, Unicode)
   
@@ -3943,7 +3917,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         CSVWrite = VBA.Join(Lines, EOL)
         If Len(CSVWrite) > 32767 Then
             If TypeName(Application.Caller) = "Range" Then
-                Throw "Cannot return string of length " & Format(CStr(Len(CSVWrite)), "#,###") & _
+                Throw "Cannot return string of length " & Format$(CStr(Len(CSVWrite)), "#,###") & _
                     " to a cell of an Excel worksheet"
             End If
         End If
@@ -3970,10 +3944,10 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function OStoEOL(OS As String, ArgName As String) As String
 
-    Const Err_Invalid = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
+    Const Err_Invalid As String = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
 
     On Error GoTo ErrHandler
-    Select Case LCase(OS)
+    Select Case LCase$(OS)
         Case "windows", vbCrLf, "crlf"
             OStoEOL = vbCrLf
         Case "unix", "linux", vbLf, "lf"
@@ -3996,8 +3970,8 @@ End Function
 Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As String, DateTimeFormat As String, _
     Delim As String) As String
     
-    Const DQ = """"
-    Const DQ2 = """"""
+    Const DQ As String = """"
+    Const DQ2 As String = """"""
 
     On Error GoTo ErrHandler
     Select Case VarType(x)
@@ -4119,7 +4093,6 @@ Private Function CanWriteCharToAscii(c As String) As Boolean
     If code > 255 Or code < 0 Then
         CanWriteCharToAscii = False
     Else
-        CanWriteCharToAscii = Chr(AscW(c)) = c
+        CanWriteCharToAscii = Chr$(AscW(c)) = c
     End If
 End Function
-

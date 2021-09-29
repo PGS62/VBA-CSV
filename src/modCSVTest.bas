@@ -246,7 +246,7 @@ End Sub
 ' Procedure  : RunTestsFromButton
 ' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub RunTestsFromButton()
+Public Sub RunTestsFromButton()
     Dim Failures() As String
     Dim IncludeLargeFiles As Boolean
     Dim NumFailed As Long
@@ -258,7 +258,7 @@ Sub RunTestsFromButton()
 
     IncludeLargeFiles = shTest.Range("IncludeLargeFiles").value
 
-    Failures = VBA.Split("") 'Creates array of length zero!
+    Failures = VBA.Split(vbNullString) 'Creates array of length zero!
 
     RunTests IncludeLargeFiles, NumPassed, NumFailed, NumSkipped, Failures
 
@@ -277,7 +277,7 @@ ErrHandler:
     MsgBox "#RunTestsFromButton (line " & CStr(Erl) + "): " & Err.Description & "!", vbCritical
 End Sub
 
-Private Sub PasteFailures(NumFailures As Long, Optional Failures)
+Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
     On Error GoTo ErrHandler
     With shTestResults
         .Unprotect
@@ -307,7 +307,7 @@ End Sub
 ' Purpose   : Returns True or False. Does not matter whether FolderPath has a terminating
 '             backslash.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function FolderExists(ByVal FolderPath As String)
+Private Function FolderExists(ByVal FolderPath As String) As Boolean
     Dim F As Scripting.Folder
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler
@@ -319,7 +319,7 @@ ErrHandler:
     FolderExists = False
 End Function
 
-Function FileExists(ByVal FilePath As String)
+Function FileExists(ByVal FilePath As String) As Boolean
     Dim F As Scripting.File
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler
@@ -331,7 +331,8 @@ ErrHandler:
     FileExists = False
 End Function
 
-Private Sub AccumulateResults(TestRes As Boolean, ByRef NumPassed, ByRef NumFailed As Long, WhatDiffers As String, ByRef Failures() As String)
+Private Sub AccumulateResults(TestRes As Boolean, ByRef NumPassed As Long, ByRef NumFailed As Long, _
+    WhatDiffers As String, ByRef Failures() As String)
     If TestRes Then
         NumPassed = NumPassed + 1
     Else
@@ -359,10 +360,10 @@ Private Sub CastDoublesToDates(ByRef x As Variant)
     End If
 End Sub
 
-Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -381,10 +382,10 @@ ErrHandler:
     Throw "#Test1 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -401,10 +402,10 @@ ErrHandler:
     Throw "#Test2 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -423,10 +424,10 @@ ErrHandler:
     Throw "#Test3 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -443,10 +444,10 @@ ErrHandler:
     Throw "#Test4 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -467,10 +468,10 @@ ErrHandler:
     Throw "#Test5 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -487,10 +488,10 @@ ErrHandler:
     Throw "#Test6 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -513,10 +514,10 @@ ErrHandler:
     Throw "#Test7 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -533,10 +534,10 @@ ErrHandler:
     Throw "#Test8 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -553,10 +554,10 @@ ErrHandler:
     Throw "#Test9 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -578,10 +579,10 @@ ErrHandler:
     Throw "#Test10 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -604,10 +605,10 @@ ErrHandler:
     Throw "#Test11 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -629,10 +630,10 @@ ErrHandler:
     Throw "#Test12 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -649,10 +650,10 @@ ErrHandler:
     Throw "#Test13 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -669,10 +670,10 @@ ErrHandler:
     Throw "#Test14 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -689,10 +690,10 @@ ErrHandler:
     Throw "#Test15 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -709,10 +710,10 @@ ErrHandler:
     Throw "#Test16 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -729,10 +730,10 @@ ErrHandler:
     Throw "#Test17 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -749,10 +750,10 @@ ErrHandler:
     Throw "#Test18 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -777,10 +778,10 @@ ErrHandler:
     Throw "#Test19 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -797,10 +798,10 @@ ErrHandler:
     Throw "#Test20 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -821,10 +822,10 @@ ErrHandler:
     Throw "#Test21 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -841,10 +842,10 @@ ErrHandler:
     Throw "#Test22 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -861,10 +862,10 @@ ErrHandler:
     Throw "#Test23 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -882,10 +883,10 @@ ErrHandler:
     Throw "#Test24 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -902,10 +903,10 @@ ErrHandler:
     Throw "#Test25 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -928,10 +929,10 @@ ErrHandler:
     Throw "#Test26 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -948,10 +949,10 @@ ErrHandler:
     Throw "#Test27 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -972,10 +973,10 @@ ErrHandler:
     Throw "#Test28 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -993,10 +994,10 @@ ErrHandler:
     Throw "#Test29 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1013,10 +1014,10 @@ ErrHandler:
     Throw "#Test30 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1040,10 +1041,10 @@ ErrHandler:
     Throw "#Test31 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1060,10 +1061,10 @@ ErrHandler:
     Throw "#Test32 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1080,10 +1081,10 @@ ErrHandler:
     Throw "#Test33 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1100,10 +1101,10 @@ ErrHandler:
     Throw "#Test34 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1123,10 +1124,10 @@ ErrHandler:
     Throw "#Test35 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1148,10 +1149,10 @@ ErrHandler:
     Throw "#Test36 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1176,10 +1177,10 @@ ErrHandler:
     Throw "#Test37 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1196,10 +1197,10 @@ ErrHandler:
     Throw "#Test38 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1223,10 +1224,10 @@ ErrHandler:
     Throw "#Test39 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1252,10 +1253,10 @@ ErrHandler:
     Throw "#Test40 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1274,10 +1275,10 @@ ErrHandler:
     Throw "#Test41 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1301,10 +1302,10 @@ ErrHandler:
     Throw "#Test42 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1326,10 +1327,10 @@ ErrHandler:
     Throw "#Test43 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1350,10 +1351,10 @@ ErrHandler:
     Throw "#Test44 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1374,10 +1375,10 @@ ErrHandler:
     Throw "#Test45 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1394,10 +1395,10 @@ ErrHandler:
     Throw "#Test46 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1422,10 +1423,10 @@ ErrHandler:
     Throw "#Test47 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1446,10 +1447,10 @@ ErrHandler:
     Throw "#Test48 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1467,10 +1468,10 @@ ErrHandler:
     Throw "#Test49 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1488,10 +1489,10 @@ ErrHandler:
     Throw "#Test50 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1520,10 +1521,10 @@ ErrHandler:
     Throw "#Test51 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1543,10 +1544,10 @@ ErrHandler:
     Throw "#Test52 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1576,10 +1577,10 @@ ErrHandler:
     Throw "#Test53 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1601,10 +1602,10 @@ ErrHandler:
     Throw "#Test54 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1631,10 +1632,10 @@ ErrHandler:
     Throw "#Test55 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1663,10 +1664,10 @@ ErrHandler:
     Throw "#Test56 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1690,10 +1691,10 @@ ErrHandler:
     Throw "#Test57 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1716,10 +1717,10 @@ ErrHandler:
     Throw "#Test58 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1750,10 +1751,10 @@ ErrHandler:
     Throw "#Test59 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1791,10 +1792,10 @@ ErrHandler:
     Throw "#Test60 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1822,10 +1823,10 @@ ErrHandler:
     Throw "#Test61 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1848,10 +1849,10 @@ ErrHandler:
     Throw "#Test62 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1884,10 +1885,10 @@ ErrHandler:
     Throw "#Test63 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1910,10 +1911,10 @@ ErrHandler:
     Throw "#Test64 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1933,10 +1934,10 @@ ErrHandler:
     Throw "#Test65 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1956,10 +1957,10 @@ ErrHandler:
     Throw "#Test66 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -1979,10 +1980,10 @@ ErrHandler:
     Throw "#Test67 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2002,10 +2003,10 @@ ErrHandler:
     Throw "#Test68 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2025,10 +2026,10 @@ ErrHandler:
     Throw "#Test69 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2048,10 +2049,10 @@ ErrHandler:
     Throw "#Test70 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2074,10 +2075,10 @@ ErrHandler:
     Throw "#Test71 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2097,10 +2098,10 @@ ErrHandler:
     Throw "#Test72 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2120,10 +2121,10 @@ ErrHandler:
     Throw "#Test73 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2143,10 +2144,10 @@ ErrHandler:
     Throw "#Test74 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2169,10 +2170,10 @@ ErrHandler:
     Throw "#Test75 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2201,10 +2202,10 @@ ErrHandler:
     Throw "#Test76 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2224,10 +2225,10 @@ ErrHandler:
     Throw "#Test77 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2266,10 +2267,10 @@ ErrHandler:
     Throw "#Test78 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2290,10 +2291,10 @@ ErrHandler:
     Throw "#Test79 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2312,10 +2313,10 @@ ErrHandler:
     Throw "#Test80 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2332,10 +2333,10 @@ ErrHandler:
     Throw "#Test81 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2352,10 +2353,10 @@ ErrHandler:
     Throw "#Test82 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2377,10 +2378,10 @@ ErrHandler:
     Throw "#Test83 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2397,10 +2398,10 @@ ErrHandler:
     Throw "#Test84 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2417,10 +2418,10 @@ ErrHandler:
     Throw "#Test85 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2442,10 +2443,10 @@ ErrHandler:
     Throw "#Test86 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2475,10 +2476,10 @@ ErrHandler:
     Throw "#Test87 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2504,10 +2505,10 @@ ErrHandler:
     Throw "#Test88 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2534,10 +2535,10 @@ ErrHandler:
     Throw "#Test89 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2555,10 +2556,10 @@ ErrHandler:
     Throw "#Test90 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2600,12 +2601,12 @@ ErrHandler:
     Throw "#Test91 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
     Dim k As Long
     Dim m As Long
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2630,7 +2631,7 @@ Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
         Next
         If Total <> 2499772 Then
             TestRes = False
-            WhatDiffers = "Test 92 pandas zeros FAILED, Test was that sum of elements be 2,499,772, but instead its " + Format(Total, "###,###")
+            WhatDiffers = "Test 92 pandas zeros FAILED, Test was that sum of elements be 2,499,772, but instead its " + Format$(Total, "###,###")
         End If
     End If
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
@@ -2639,10 +2640,10 @@ Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, B
 ErrHandler:
     Throw "#Test92 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
-Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2667,10 +2668,10 @@ ErrHandler:
     Throw "#Test93 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2713,10 +2714,10 @@ ErrHandler:
     Throw "#Test94 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2740,10 +2741,10 @@ ErrHandler:
     Throw "#Test95 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2767,10 +2768,10 @@ ErrHandler:
     Throw "#Test96 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2794,10 +2795,10 @@ ErrHandler:
     Throw "#Test97 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2823,10 +2824,10 @@ ErrHandler:
     Throw "#Test98 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2853,10 +2854,10 @@ ErrHandler:
     Throw "#Test99 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2883,10 +2884,10 @@ ErrHandler:
     Throw "#Test100 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2910,10 +2911,10 @@ ErrHandler:
     Throw "#Test101 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2940,10 +2941,10 @@ ErrHandler:
     Throw "#Test102 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2967,10 +2968,10 @@ ErrHandler:
     Throw "#Test103 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -2997,10 +2998,10 @@ ErrHandler:
     Throw "#Test104 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3024,10 +3025,10 @@ ErrHandler:
     Throw "#Test105 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3054,10 +3055,10 @@ ErrHandler:
     Throw "#Test106 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3081,10 +3082,10 @@ ErrHandler:
     Throw "#Test107 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3121,10 +3122,10 @@ ErrHandler:
     Throw "#Test108 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3143,10 +3144,10 @@ ErrHandler:
     Throw "#Test109 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3168,10 +3169,10 @@ ErrHandler:
     Throw "#Test110 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3191,10 +3192,10 @@ ErrHandler:
     Throw "#Test111 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3215,10 +3216,10 @@ ErrHandler:
     Throw "#Test112 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3237,10 +3238,10 @@ ErrHandler:
     Throw "#Test113 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3260,10 +3261,10 @@ ErrHandler:
     Throw "#Test114 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3282,10 +3283,10 @@ ErrHandler:
     Throw "#Test115 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3309,10 +3310,10 @@ ErrHandler:
     Throw "#Test116 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3341,10 +3342,10 @@ ErrHandler:
     Throw "#Test117 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3366,10 +3367,10 @@ ErrHandler:
     Throw "#Test118 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3390,10 +3391,10 @@ ErrHandler:
     Throw "#Test119 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3413,10 +3414,10 @@ ErrHandler:
     Throw "#Test120 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3450,10 +3451,10 @@ ErrHandler:
     Throw "#Test121 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3474,10 +3475,10 @@ ErrHandler:
     Throw "#Test122 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3508,10 +3509,10 @@ ErrHandler:
     Throw "#Test123 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3529,10 +3530,10 @@ ErrHandler:
     Throw "#Test124 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3558,10 +3559,10 @@ ErrHandler:
     Throw "#Test125 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3580,10 +3581,10 @@ ErrHandler:
     Throw "#Test126 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3605,10 +3606,10 @@ ErrHandler:
     Throw "#Test127 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3629,10 +3630,10 @@ ErrHandler:
     Throw "#Test128 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3662,10 +3663,10 @@ ErrHandler:
     Throw "#Test129 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3687,10 +3688,10 @@ ErrHandler:
     Throw "#Test130 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3716,10 +3717,10 @@ ErrHandler:
     Throw "#Test131 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3745,10 +3746,10 @@ ErrHandler:
     Throw "#Test132 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3783,10 +3784,10 @@ ErrHandler:
     Throw "#Test133 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3808,10 +3809,10 @@ ErrHandler:
     Throw "#Test134 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3831,10 +3832,10 @@ ErrHandler:
     Throw "#Test135 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3854,10 +3855,10 @@ ErrHandler:
     Throw "#Test136 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3877,10 +3878,10 @@ ErrHandler:
     Throw "#Test137 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3900,10 +3901,10 @@ ErrHandler:
     Throw "#Test138 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3923,10 +3924,10 @@ ErrHandler:
     Throw "#Test139 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3948,10 +3949,10 @@ ErrHandler:
     Throw "#Test140 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3971,10 +3972,10 @@ ErrHandler:
     Throw "#Test141 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -3994,10 +3995,10 @@ ErrHandler:
     Throw "#Test142 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4017,10 +4018,10 @@ ErrHandler:
     Throw "#Test143 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4040,10 +4041,10 @@ ErrHandler:
     Throw "#Test144 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4063,10 +4064,10 @@ ErrHandler:
     Throw "#Test145 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4086,10 +4087,10 @@ ErrHandler:
     Throw "#Test146 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4109,10 +4110,10 @@ ErrHandler:
     Throw "#Test147 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4132,10 +4133,10 @@ ErrHandler:
     Throw "#Test148 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4155,10 +4156,10 @@ ErrHandler:
     Throw "#Test149 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4178,10 +4179,10 @@ ErrHandler:
     Throw "#Test150 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4202,10 +4203,10 @@ ErrHandler:
     Throw "#Test151 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4225,10 +4226,10 @@ ErrHandler:
     Throw "#Test152 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4248,10 +4249,10 @@ ErrHandler:
     Throw "#Test153 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4276,10 +4277,10 @@ ErrHandler:
     Throw "#Test154 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4312,10 +4313,10 @@ ErrHandler:
     Throw "#Test155 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4324,11 +4325,11 @@ Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "test not delimited.txt"
     FileName = "test_not_delimited.txt"
     Expected = VStack( _
-        VStack("using CSV#= as of 29 Aug 2021 one needs the main version of CSV, latest released version", "0.8.5 fails to load some of the files. See https://github.com/JuliaData/CSV.jl/issues/879", "Use:", "]add CSV#main", "=#", "using DataFrames", "", "function benchmark()", "    benchmark_csvs_in_folder(""C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance"", ", "    ""C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance/JuliaResults.txt"")"), _
-        VStack("end", "", """""""", "   benchmark_csvs_in_folder(foldername::String, outputfile::String)", "Benchmark all .csv files in `foldername`, writing results to `outputfile`.", """""""", "function benchmark_csvs_in_folder(foldername::String, outputfile::String)", "    files = readdir(foldername, join=true)", "    files = filter(x -> x[end - 3:end] == "".csv"", files)# only .csv files", ""), _
-        VStack("    n = length(files)", "    times = fill(0.0, n)", "    numcalls = fill(0, n)", "    statuses = fill(""OK"", n)", "", "    foo = benchmarkonefile(files[1], 1)# for compilation ""warmup""", "    for (f, i) in zip(files, 1:n)", "        println(i, f)", "        try", "            times[i], numcalls[i] = benchmarkonefile(f, 5)"), _
-        VStack("        catch e", "            statuses[i] = ""$e""", "        end", "    end", "    times", "", "    result = DataFrame(filename=replace.(files, ""/"" => ""\\""), time=times, ", "                        status=statuses, numcalls=numcalls)", "    CSV.write(outputfile, result)", "end"), _
-        VStack("", """""""", "    benchmarkonefile(filename::String, timeout::Int)", "Average time (over sufficient trials to take `timeout` seconds) to load file `filename` to", "a DataFrame, using CSV.File.", """""""", "function benchmarkonefile(filename::String, timeout::Int)", "    i = 0", "    time2 = time() # needed to give time2 scope outside the loop.", "    time1 = time()"), _
+        VStack("using CSV#= as of 29 Aug 2021 one needs the main version of CSV, latest released version", "0.8.5 fails to load some of the files. See https://github.com/JuliaData/CSV.jl/issues/879", "Use:", "]add CSV#main", "=#", "using DataFrames", vbNullString, "function benchmark()", "    benchmark_csvs_in_folder(""C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance"", ", "    ""C:/Users/phili/AppData/Local/Temp/VBA-CSV/Performance/JuliaResults.txt"")"), _
+        VStack("end", vbNullString, """""""", "   benchmark_csvs_in_folder(foldername::String, outputfile::String)", "Benchmark all .csv files in `foldername`, writing results to `outputfile`.", """""""", "function benchmark_csvs_in_folder(foldername::String, outputfile::String)", "    files = readdir(foldername, join=true)", "    files = filter(x -> x[end - 3:end] == "".csv"", files)# only .csv files", vbNullString), _
+        VStack("    n = length(files)", "    times = fill(0.0, n)", "    numcalls = fill(0, n)", "    statuses = fill(""OK"", n)", vbNullString, "    foo = benchmarkonefile(files[1], 1)# for compilation ""warmup""", "    for (f, i) in zip(files, 1:n)", "        println(i, f)", "        try", "            times[i], numcalls[i] = benchmarkonefile(f, 5)"), _
+        VStack("        catch e", "            statuses[i] = ""$e""", "        end", "    end", "    times", vbNullString, "    result = DataFrame(filename=replace.(files, ""/"" => ""\\""), time=times, ", "                        status=statuses, numcalls=numcalls)", "    CSV.write(outputfile, result)", "end"), _
+        VStack(vbNullString, """""""", "    benchmarkonefile(filename::String, timeout::Int)", "Average time (over sufficient trials to take `timeout` seconds) to load file `filename` to", "a DataFrame, using CSV.File.", """""""", "function benchmarkonefile(filename::String, timeout::Int)", "    i = 0", "    time2 = time() # needed to give time2 scope outside the loop.", "    time1 = time()"), _
         VStack("    while true", "        i = i + 1", "        res = CSV.File(filename, header=false, type=String) |> DataFrame", "        time2 = time()", "        time2 - time1 < timeout || break", "    end", "    (time2 - time1) / i, i", "end"))
 
     TestRes = TestCSVRead(156, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
@@ -4342,10 +4343,10 @@ ErrHandler:
     Throw "#Test156 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4365,10 +4366,10 @@ ErrHandler:
     Throw "#Test157 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4389,10 +4390,10 @@ ErrHandler:
     Throw "#Test158 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4406,11 +4407,11 @@ Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         Array("Col3", 3#, 13#, 23#, 33#, 43#, 53#, 63#, 73#, 83#, 93#), _
         Array("Col4", 4#, 14#, 24#, 34#, 44#, 54#, 64#, 74#, 84#, 94#), _
         Array("Col5", 5#, 15#, 25#, 35#, 45#, 55#, 65#, 75#, 85#, 95#), _
-        Array("", 6#, 16#, 26#, 36#, 46#, 56#, 66#, 76#, 86#, 96#), _
-        Array("", 7#, 17#, 27#, 37#, 47#, 57#, 67#, 77#, 87#, 97#), _
-        Array("", 8#, 18#, 28#, 38#, 48#, 58#, 68#, 78#, 88#, 98#), _
-        Array("", 9#, 19#, 29#, 39#, 49#, 59#, 69#, 79#, 89#, 99#), _
-        Array("", 10#, 20#, 30#, 40#, 50#, 60#, 70#, 80#, 90#, 100#))
+        Array(vbNullString, 6#, 16#, 26#, 36#, 46#, 56#, 66#, 76#, 86#, 96#), _
+        Array(vbNullString, 7#, 17#, 27#, 37#, 47#, 57#, 67#, 77#, 87#, 97#), _
+        Array(vbNullString, 8#, 18#, 28#, 38#, 48#, 58#, 68#, 78#, 88#, 98#), _
+        Array(vbNullString, 9#, 19#, 29#, 39#, 49#, 59#, 69#, 79#, 89#, 99#), _
+        Array(vbNullString, 10#, 20#, 30#, 40#, 50#, 60#, 70#, 80#, 90#, 100#))
 
     TestRes = TestCSVRead(159, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -4418,7 +4419,7 @@ Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         SkipToRow:=1, _
-        ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "", "", "", "", ""))
+        ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", vbNullString, vbNullString, vbNullString, vbNullString, vbNullString))
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
@@ -4426,10 +4427,10 @@ ErrHandler:
     Throw "#Test159 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4449,10 +4450,10 @@ ErrHandler:
     Throw "#Test160 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4486,10 +4487,10 @@ ErrHandler:
     Throw "#Test161 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4512,10 +4513,10 @@ ErrHandler:
     Throw "#Test162 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4538,10 +4539,10 @@ ErrHandler:
     Throw "#Test163 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4561,10 +4562,10 @@ ErrHandler:
     Throw "#Test164 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4584,10 +4585,10 @@ ErrHandler:
     Throw "#Test165 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4609,10 +4610,10 @@ ErrHandler:
     Throw "#Test166 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4636,10 +4637,10 @@ ErrHandler:
     Throw "#Test167 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4659,10 +4660,10 @@ ErrHandler:
     Throw "#Test168 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4682,10 +4683,10 @@ ErrHandler:
     Throw "#Test169 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4725,10 +4726,10 @@ ErrHandler:
     Throw "#Test170 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4766,10 +4767,10 @@ ErrHandler:
     Throw "#Test171 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4797,10 +4798,10 @@ ErrHandler:
     Throw "#Test172 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4820,10 +4821,10 @@ ErrHandler:
     Throw "#Test173 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4843,10 +4844,10 @@ ErrHandler:
     Throw "#Test174 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4866,10 +4867,10 @@ ErrHandler:
     Throw "#Test175 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4895,10 +4896,10 @@ ErrHandler:
     Throw "#Test176 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4924,10 +4925,10 @@ ErrHandler:
     Throw "#Test177 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4936,7 +4937,7 @@ Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     TestDescription = "Used as example in README.md"
     FileName = "https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv"
     Expected = HStack( _
-        Array("", "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine", "Allison, Mr. Hudson Joshua Crei", "Allison, Mrs. Hudson J C (Bessi", "Anderson, Mr. Harry", "Andrews, Miss. Kornelia Theodos", "Andrews, Mr. Thomas Jr", "Appleton, Mrs. Edward Dale (Cha", "Artagaveytia, Mr. Ramon", "Astor, Col. John Jacob", "Astor, Mrs. John Jacob (Madelei", "Aubart, Mme. Leontine Pauline", "Barber, Miss. Ellen Nellie", "Barkworth, Mr. Algernon Henry W", "Baumann, Mr. John D"), _
+        Array(vbNullString, "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine", "Allison, Mr. Hudson Joshua Crei", "Allison, Mrs. Hudson J C (Bessi", "Anderson, Mr. Harry", "Andrews, Miss. Kornelia Theodos", "Andrews, Mr. Thomas Jr", "Appleton, Mrs. Edward Dale (Cha", "Artagaveytia, Mr. Ramon", "Astor, Col. John Jacob", "Astor, Mrs. John Jacob (Madelei", "Aubart, Mme. Leontine Pauline", "Barber, Miss. Ellen Nellie", "Barkworth, Mr. Algernon Henry W", "Baumann, Mr. John D"), _
         Array("survived", "yes", "yes", "no", "no", "no", "yes", "yes", "no", "yes", "no", "no", "yes", "yes", "yes", "yes", "no"), _
         Array("sex", "female", "male", "female", "male", "female", "male", "female", "male", "female", "male", "male", "female", "female", "female", "male", "male"), _
         Array("age", 29#, 0.916700006, 2#, 30#, 25#, 48#, 63#, 39#, 53#, 71#, 47#, 18#, 24#, 26#, 80#, Empty), _
@@ -4949,7 +4950,7 @@ Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         SkipToRow:=1, _
-        ExpectedHeaderRow:=HStack("", "survived", "sex", "age", "passengerClass"))
+        ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
@@ -4957,10 +4958,10 @@ ErrHandler:
     Throw "#Test178 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -4993,10 +4994,10 @@ ErrHandler:
     Throw "#Test179 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5024,10 +5025,10 @@ ErrHandler:
     Throw "#Test180 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5052,17 +5053,17 @@ End Sub
 ' Purpose    : Returns the contents of files 255_characters-ANSI.csv, 255_characters-UTF-8.csv,
 '              255_characters-UTF-8-BOM.csv, 255_characters-UTF-16-BE-BOM.csv, 255_characters-UTF-16-LE-BOM.csv
 ' -----------------------------------------------------------------------------------------------------------------------
-Function TwoFiveFiveChars()
+Function TwoFiveFiveChars() As Variant
     Dim i As Long
-    Dim Res
+    Dim Res As Variant
 
     On Error GoTo ErrHandler
-    Res = Fill("", 256, 2)
+    Res = Fill(vbNullString, 256, 2)
     Res(1, 1) = "N"
     Res(1, 2) = "Char"
     For i = 2 To 256
         Res(i, 1) = CStr(i - 1)
-        Res(i, 2) = Chr(i - 1)
+        Res(i, 2) = Chr$(i - 1)
     Next
     Res(11, 2) = vbCrLf 'Have CRLF here to counteract git's annoying habit of "correcting" mixed line endings when pushing and pulling from remote
     Res(14, 2) = vbCrLf
@@ -5074,10 +5075,10 @@ ErrHandler:
     Throw "#TwoFiveFiveChars (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5097,10 +5098,10 @@ ErrHandler:
     Throw "#Test182 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5119,10 +5120,10 @@ ErrHandler:
     Throw "#Test183 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5141,10 +5142,10 @@ ErrHandler:
     Throw "#Test184 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5162,10 +5163,10 @@ ErrHandler:
     Throw "#Test185 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5183,10 +5184,10 @@ ErrHandler:
     Throw "#Test186 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5208,10 +5209,10 @@ ErrHandler:
     Throw "#Test187 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5219,7 +5220,7 @@ Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     On Error GoTo ErrHandler
     TestDescription = "FileName passed as CSV Contents, parse as not delimited"
     Expected = HStack(Array("2", "3", "4", "5", "6"))
-    FileName = "1" + vbCrLf + "2" + vbCrLf + "3" + vbCrLf + "4" + vbCrLf + "5" + vbCrLf + "6" + vbCrLf + "7" + vbCrLf + "8" + vbCrLf + "9" + vbCrLf + "10" + vbCrLf + ""
+    FileName = "1" + vbCrLf + "2" + vbCrLf + "3" + vbCrLf + "4" + vbCrLf + "5" + vbCrLf + "6" + vbCrLf + "7" + vbCrLf + "8" + vbCrLf + "9" + vbCrLf + "10" + vbCrLf + vbNullString
     TestRes = TestCSVRead(188, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
         Delimiter:=False, _
         IgnoreEmptyLines:=False, _
@@ -5233,10 +5234,10 @@ ErrHandler:
     Throw "#Test188 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5244,7 +5245,7 @@ Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, 
     On Error GoTo ErrHandler
     TestDescription = "FileName passed as CSV Contents, parse as delimited"
     Expected = HStack(Array(5#, 8#), Array(6#, 9#))
-    FileName = "1,2,3" + vbCrLf + "4,5,6" + vbCrLf + "7,8,9" + vbCrLf + "10,11,12" + vbCrLf + "13,14,15" + vbCrLf + "16,17,18" + vbCrLf + ""
+    FileName = "1,2,3" + vbCrLf + "4,5,6" + vbCrLf + "7,8,9" + vbCrLf + "10,11,12" + vbCrLf + "13,14,15" + vbCrLf + "16,17,18" + vbCrLf + vbNullString
     TestRes = TestCSVRead(189, TestDescription, Expected, FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
@@ -5260,10 +5261,10 @@ ErrHandler:
     Throw "#Test189 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5299,10 +5300,10 @@ ErrHandler:
     Throw "#Test190 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5326,10 +5327,10 @@ ErrHandler:
     Throw "#Test191 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5351,10 +5352,10 @@ ErrHandler:
     Throw "#Test192 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5411,10 +5412,10 @@ ErrHandler:
     Throw "#Test193 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5433,10 +5434,10 @@ ErrHandler:
     Throw "#Test194 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5458,10 +5459,10 @@ ErrHandler:
     Throw "#Test195 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5483,10 +5484,10 @@ ErrHandler:
     Throw "#Test196 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5508,10 +5509,10 @@ ErrHandler:
     Throw "#Test197 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5536,10 +5537,10 @@ ErrHandler:
     Throw "#Test198 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5564,10 +5565,10 @@ ErrHandler:
     Throw "#Test199 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5592,16 +5593,17 @@ ErrHandler:
     Throw "#Test200 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
-Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Formula As String
+    Dim Observed As Variant
+    Dim r As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
+    Dim wb As Workbook
     Dim WhatDiffers As String
-    Dim Formula As String, wb As Workbook, r As Range
 
     On Error GoTo ErrHandler
     TestDescription = "test 32K limit"
@@ -5626,14 +5628,16 @@ ErrHandler:
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
-Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
-    Dim Expected
+Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
     Dim FileName As String
-    Dim Observed
+    Dim Formula As String
+    Dim Observed As Variant
+    Dim r As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
+    Dim wb As Workbook
     Dim WhatDiffers As String
-    Dim Formula As String, wb As Workbook, r As Range
 
     On Error GoTo ErrHandler
     TestDescription = "test 32K limit"
