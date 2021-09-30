@@ -70,16 +70,16 @@ In the GIF below, strings, numbers, dates and Booleans in the input `Data` range
 #### _CSVRead_
 Returns the contents of a comma-separated file on disk as an array.
 ```vba
-Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
-    Optional DateFormat As String = "Y-M-D", Optional Comment As String, _
-    Optional IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
+    Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
+    Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
+    Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
     Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
     Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
-    Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
-    Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional DecimalSeparator As String, _
-    Optional ByRef HeaderRow)
+    Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
+    Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+    Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
+    Optional ByRef HeaderRow As Variant) As Variant
 ```
 
 |Argument|Description|
@@ -105,16 +105,16 @@ Public Function CSVRead(FileName As String, Optional ConvertTypes As Variant = F
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
 
+
 [source](https://github.com/PGS62/VBA-CSV/blob/ae669687c5ccb718fdd139648d1c35e83cd6f891/src/modCSVReadWrite.bas#L41-L537)
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
 ```vba
-Public Function CSVWrite(ByVal Data As Variant, Optional FileName As String, _
-    Optional QuoteAllStrings As Boolean = True, Optional DateFormat As String = "yyyy-mm-dd", _
-    Optional ByVal DateTimeFormat As String = "ISO", _
-    Optional Delimiter As String = ",", Optional Encoding As String = "ANSI", _
-    Optional ByVal EOL As String = "")
+Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
+    Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
+    Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
+    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString) As String
 ```
 
 |Argument|Description|

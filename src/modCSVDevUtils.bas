@@ -124,7 +124,7 @@ Private Sub PrepareForRelease()
         End If
         ws.Protect , True, True
     Next
-    For i = 1 To ThisWorkbook.Worksheets.Count
+    For i = 1 To ThisWorkbook.Worksheets.count
         If ThisWorkbook.Worksheets(i).Visible Then
             Application.GoTo ThisWorkbook.Worksheets(i).Cells(1, 1)
             Exit For

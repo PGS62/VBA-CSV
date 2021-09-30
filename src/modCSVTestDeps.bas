@@ -111,7 +111,10 @@ ErrHandler:
 End Function
 
 Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, _
-NumCols As Long, ExtraInfo As String, Encoding As String, Ragged As Boolean) As String
+NumCols As Long, ExtraInfo As String, ByVal Encoding As String, Ragged As Boolean) As String
+If Encoding = "False" Then Encoding = "Ascii" 'backward-compatibility hack
+
+
     NameThatFile = (Folder & "\" & IIf(ExtraInfo = vbNullString, vbNullString, ExtraInfo & "_") & _
         IIf(OS = vbNullString, vbNullString, OS & "_") & Format$(NumRows, "0000") & "_x_" & Format$(NumCols, "000") & _
         "_" & Encoding & IIf(Ragged, "_Ragged", vbNullString) & ".csv")
@@ -124,7 +127,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Function NCols(Optional TheArray As Variant) As Long
     If TypeName(TheArray) = "Range" Then
-        NCols = TheArray.Columns.Count
+        NCols = TheArray.Columns.count
     ElseIf IsMissing(TheArray) Then
         NCols = 0
     ElseIf VarType(TheArray) < vbArray Then
@@ -144,7 +147,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Function NRows(Optional TheArray As Variant) As Long
     If TypeName(TheArray) = "Range" Then
-        NRows = TheArray.Rows.Count
+        NRows = TheArray.Rows.count
     ElseIf IsMissing(TheArray) Then
         NRows = 0
     ElseIf VarType(TheArray) < vbArray Then
