@@ -150,8 +150,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
     Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
     Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -352,6 +350,22 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             Stream.Close
         End If
     End If
+           
+'    'Useful for debugging method ParseCSVContents - return an array displaying the variables set by that method
+'    Dim Chars() As String, Numbers() As Long, Ascs() As Long
+'    ReDim Numbers(1 To Len(CSVContents), 1 To 1)
+'    ReDim Chars(1 To Len(CSVContents), 1 To 1)
+'    ReDim Ascs(1 To Len(CSVContents), 1 To 1)
+'    For i = 1 To Len(CSVContents)
+'        Chars(i, 1) = Mid$(CSVContents, i, 1)
+'        Numbers(i, 1) = i
+'        Ascs(i, 1) = AscW(Chars(i, 1))
+'    Next i
+'    Dim Headers
+'    Headers = HStack("NRF,NCF,NF,Dlm", "Starts", "Lengths", "RowIndexes", "ColIndexes", "QuoteCounts", "i", "Char(i)", "AscW(Char(i))")
+'    CSVRead = VStack(Headers, HStack(VStack(NumRowsFound, NumColsFound, NumFields, strDelimiter), Transpose(Starts), _
+'        Transpose(Lengths), Transpose(RowIndexes), Transpose(ColIndexes), Transpose(QuoteCounts), Numbers, Chars, Ascs))
+'    Exit Function
            
     If NumCols = 0 Then
         NumColsInReturn = NumColsFound - SkipToCol + 1
@@ -2151,7 +2165,7 @@ Private Function ConvertField(ByVal Field As String, ByVal AnyConversion As Bool
 
     If quoteCount > 0 Then
         If Left$(Field, 1) = QuoteChar Then
-            If Right$(QuoteChar, 1) = QuoteChar Then
+            If Right$(Field, 1) = QuoteChar Then
                 Field = Mid$(Field, 2, FieldLength - 2)
                 If quoteCount > 2 Then
                     Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
