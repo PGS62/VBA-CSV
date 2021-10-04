@@ -15,7 +15,7 @@ Option Explicit
 ' Purpose    : Wrap to https://github.com/ws-garcia/VBA-CSV-interface
 '              Wraps version 3.1.5, (the four class module CSVInterface, ECPArrayList, ECPTextStream, parserConfig)
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As String, Optional SkipEmptyLines As Boolean) As Variant
+Public Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EOL As String, Optional SkipEmptyLines As Boolean, Optional supportMixedLineEndings As Boolean) As Variant
 
     Dim CSVint As CSVinterface
     Dim oArray()
@@ -29,6 +29,9 @@ Public Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EO
         .recordsDelimiter = EOL     ' Rows delimiter
         .skipCommentLines = False  'I think code runs faster if not testing for skipping comment lines or empty lines
         .SkipEmptyLines = SkipEmptyLines
+        If supportMixedLineEndings Then
+        .turnStreamRecDelimiterToLF = True
+        End If
     End With
     With CSVint
         .ImportFromCSV .parseConfig    ' Import the CSV to internal object

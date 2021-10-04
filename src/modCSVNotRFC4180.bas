@@ -4,7 +4,7 @@ Option Explicit
 'Convenience function to compare parser's handling of non-RFC4180 compliant input, with those of _
 the Java library FastCSV (and other Java libraries). See notation used at https://github.com/osiegmar/JavaCsvComparison
 
-Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As Boolean, Optional ParserName As String = "CSVRead")
+Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As Boolean, ParserName As String, ExpectedResult As String)
 
           Dim i As Long
           Dim j As Long
@@ -21,65 +21,83 @@ Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As B
 5         Dim NewColumnSymbol As String: NewColumnSymbol = ChrW(8631)
 6         Dim EmptyFieldSymbol As String: EmptyFieldSymbol = ChrW(9711)
 7         Dim SpaceSymbol As String: SpaceSymbol = ChrW(9251)
+8         Dim NotSupportedSymbol As String: NotSupportedSymbol = ChrW(10134)
+9         Dim CorrectResultSymbol As String: CorrectResultSymbol = ChrW(9989)
+10        Dim CrashesSymbol As String: CrashesSymbol = ThisWorkbook.Worksheets("notrfc4180").Range("CrashSymbol").value 'Hacky but cant find another way...
 
-8         InputString = Replace(InputString, LFSymbol, vbLf)
-9         InputString = Replace(InputString, CRSymbol, vbCr)
-10        InputString = Replace(InputString, SpaceSymbol, " ")
+11        InputString = Replace(InputString, LFSymbol, vbLf)
+12        InputString = Replace(InputString, CRSymbol, vbCr)
+13        InputString = Replace(InputString, SpaceSymbol, " ")
 
-11        If ParserName = "CSVRead" Then
-12            ParserRes = CSVRead(InputString, IgnoreEmptyLines:=IgnoreEmptyLines, ShowMissingsAs:=EmptyFieldSymbol, Delimiter:=",")
-13        ElseIf ParserName = "sdkn104" Then
-14            If IgnoreEmptyLines Then Throw "sdkn104 does not support IgnoreEmptyLines"
-15            ParserRes = ParseCSVToArray(InputString, True)
-16            For i = LBound(ParserRes, 1) To UBound(ParserRes, 1)
-17                For j = LBound(ParserRes, 2) To UBound(ParserRes, 2)
-18                    If ParserRes(i, j) = "" Then
-19                        ParserRes(i, j) = EmptyFieldSymbol
-20                    End If
-21                Next
-22            Next
-23        ElseIf ParserName = "ws_garcia" Then
-          Dim FSO As New Scripting.FileSystemObject
-          Dim T As Scripting.TextStream
-24        Set T = FSO.OpenTextFile("c:\Temp\temp.txt", ForWriting, True)
-25        T.Write InputString
-26        T.Close
+14        If ParserName = "CSVRead" Then
+15            ParserRes = CSVRead(InputString, IgnoreEmptyLines:=IgnoreEmptyLines, ShowMissingsAs:=EmptyFieldSymbol, Delimiter:=",")
+16        ElseIf ParserName = "sdkn104" Then
+17            If IgnoreEmptyLines Then
+18                TestNonStandardInput = NotSupportedSymbol
+19                Exit Function
+20            End If
+
+21            ParserRes = ParseCSVToArray(InputString, True)
+22            If IsNull(ParserRes) Then
+                 ' Debug.Print Err.Description
+23                TestNonStandardInput = CrashesSymbol
+24                Exit Function
+25            End If
+
+26            For i = LBound(ParserRes, 1) To UBound(ParserRes, 1)
+27                For j = LBound(ParserRes, 2) To UBound(ParserRes, 2)
+28                    If ParserRes(i, j) = "" Then
+29                        ParserRes(i, j) = EmptyFieldSymbol
+30                    End If
+31                Next
+32            Next
+33        ElseIf ParserName = "ws_garcia" Then
+              Dim FSO As New Scripting.FileSystemObject
+              Dim T As Scripting.TextStream
+34            Set T = FSO.OpenTextFile("c:\Temp\temp.txt", ForWriting, True)
+35            T.Write InputString
+36            T.Close
           
-27        ParserRes = Wrap_ws_garcia("c:\temp\temp.txt", ",", vbLf, IgnoreEmptyLines)
+37            ParserRes = Wrap_ws_garcia("c:\temp\temp.txt", ",", vbLf, IgnoreEmptyLines, True)
+38            If NumDimensions(ParserRes) = 0 Then
+39                TestNonStandardInput = CrashesSymbol
+40                Exit Function
+41            End If
           
-28            For i = LBound(ParserRes, 1) To UBound(ParserRes, 1)
-29                For j = LBound(ParserRes, 2) To UBound(ParserRes, 2)
-30                    If ParserRes(i, j) = "" Then
-31                        ParserRes(i, j) = EmptyFieldSymbol
-32                    End If
-33                Next
-34            Next
+42            For i = LBound(ParserRes, 1) To UBound(ParserRes, 1)
+43                For j = LBound(ParserRes, 2) To UBound(ParserRes, 2)
+44                    If ParserRes(i, j) = "" Then
+45                        ParserRes(i, j) = EmptyFieldSymbol
+46                    End If
+47                Next
+48            Next
 
 
-35        Else
-36            Throw "ParserName not recognised"
-37        End If
+49        Else
+50            Throw "ParserName not recognised"
+51        End If
 
-38        NR = NRows(ParserRes)
-39        NC = NCols(ParserRes)
-40        ReDim OneDArray(LBound(ParserRes, 1) To UBound(ParserRes, 1))
+52        NR = NRows(ParserRes)
+53        NC = NCols(ParserRes)
+54        ReDim OneDArray(LBound(ParserRes, 1) To UBound(ParserRes, 1))
 
-41        For i = LBound(ParserRes, 1) To UBound(ParserRes, 1)
-42            OneDArray(i) = ParserRes(i, LBound(ParserRes, 1))
-43            For j = LBound(ParserRes, 2) + 1 To UBound(ParserRes, 2)
-44                OneDArray(i) = OneDArray(i) & NewColumnSymbol & ParserRes(i, j)
-45            Next j
-46        Next i
+55        For i = LBound(ParserRes, 1) To UBound(ParserRes, 1)
+56            OneDArray(i) = ParserRes(i, LBound(ParserRes, 1))
+57            For j = LBound(ParserRes, 2) + 1 To UBound(ParserRes, 2)
+58                OneDArray(i) = OneDArray(i) & NewColumnSymbol & ParserRes(i, j)
+59            Next j
+60        Next i
 
-47        Out = VBA.Join(OneDArray, NewRowSymbol)
-48        Out = Replace(Out, vbLf, LFSymbol)
-49        Out = Replace(Out, vbCr, CRSymbol)
-50        Out = Replace(Out, " ", SpaceSymbol)
-51        TestNonStandardInput = Out
+61        Out = VBA.Join(OneDArray, NewRowSymbol)
+62        Out = Replace(Out, vbLf, LFSymbol)
+63        Out = Replace(Out, vbCr, CRSymbol)
+64        Out = Replace(Out, " ", SpaceSymbol)
+65        If Out = ExpectedResult Then Out = CorrectResultSymbol
+66        TestNonStandardInput = Out
 
-52        Exit Function
+67        Exit Function
 ErrHandler:
-53        TestNonStandardInput = "#TestNonStandardInput (line " & CStr(Erl) + "): " & Err.Description & "!"
+68        TestNonStandardInput = "#TestNonStandardInput (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
 

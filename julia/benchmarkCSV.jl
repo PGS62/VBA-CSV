@@ -60,3 +60,9 @@ function benchmarkonefile(filename::String, timeout::Int)
     end
     (time2 - time1) / i, i
 end
+
+function shownotcompliantfile(filenum::String)
+filename = "C:/Projects/VBA-CSV/testfiles/Not_RFC_4180_Compliant_" * filenum * ".csv"
+res = CSV.File(filename, header=false, delim = ",",type=String) |>DataFrame
+Matrix(res)
+end
