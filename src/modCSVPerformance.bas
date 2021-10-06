@@ -74,10 +74,8 @@ End Function
 Private Sub RunSpeedTests()
 
     Const NumColsInTFPRet As Long = 10
-    Const ReadFiles  As Boolean = True
     Const Timeout As Long = 5
     Const Title As String = "VBA-CSV Speed Tests"
-    Const WriteFiles As Boolean = True
     Dim c As Range
     Dim JuliaResultsFile As String
     Dim N As Name
@@ -99,7 +97,7 @@ Private Sub RunSpeedTests()
     
     ws.Range("TimeStamp").value = "This data generated " & Format$(Now, "dd-mmmm-yyyy hh:mm:ss")
     
-    'Julia results file created by function benchmark. See julia/benchmarkCSV.jl, function benchmark
+    'Julia results file created by Julia function benchmark. See julia/benchmarkCSV.jl
     
     JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "julia\juliaparsetimes.csv"
     If Not FileExists(JuliaResultsFile) Then
@@ -108,12 +106,12 @@ Private Sub RunSpeedTests()
     
     For Each N In ws.Names
         If InStr(N.Name, "PasteResultsHere") > 1 Then
-            Application.GoTo N.RefersToRange
+            Application.Goto N.RefersToRange
 
             For Each c In N.RefersToRange.Cells
                 c.Resize(1, NumColsInTFPRet).ClearContents
-                TestResults = TimeFourParsers(WriteFiles, ReadFiles, c.Offset(0, -3).value, c.Offset(0, -2).value, _
-                    c.Offset(0, -1).value, Timeout, False, JuliaResultsFile)
+                TestResults = ThrowIfError(TimeParsers(ws.Range("ParserNames").value, c.Offset(0, -3).value, c.Offset(0, -2).value, _
+                    c.Offset(0, -1).value, Timeout))
                 c.Resize(1, NumColsInTFPRet).value = TestResults
                 ws.Calculate
                 DoEvents
@@ -123,7 +121,7 @@ Private Sub RunSpeedTests()
         End If
     Next N
 
-    AddCharts
+    AddCharts False
 
     ws.Protect , , True
 
@@ -135,44 +133,33 @@ ErrHandler:
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : TimeFourParsers
+' Procedure  : TimeParsers
 ' Purpose    : Core of the method RunSpeedTests. Note the functions being timed are called many times in a loop that
 '              exits after TimeOut seconds have elapsed. Leads to much more reliable timings than timing a single call.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function TimeFourParsers(WriteFiles As Boolean, ReadFiles As Boolean, EachFieldContains As Variant, _
-NumRows As Long, NumCols As Long, Timeout As Double, WithHeaders As Boolean, JuliaResultsFile As String) As Variant
+Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As Variant, _
+    NumRows As Long, NumCols As Long, Timeout As Double) As Variant
 
     Const Unicode As Boolean = False
     Dim Data As Variant
-    Dim DataReread1 As Variant
-    Dim DataReread2 As Variant
-    Dim DataReread3 As Variant
-    Dim DataReread4 As Variant
-    Dim DataRow As Long
+    Dim DataReread As Variant
     Dim ExtraInfo As String
     Dim FileName As String
-    Dim FnName1 As String
-    Dim FnName2 As String
-    Dim FnName3 As String
-    Dim FnName4 As String
     Dim Folder As String
     Dim j As Long
     Dim JuliaResults As Variant
     Dim k As Double
-    Dim NumCalls1 As Long
-    Dim NumCalls2 As Long
-    Dim NumCalls3 As Long
-    Dim NumCalls4 As Variant
+    Dim NumCalls As Variant
     Dim OS As String
     Dim Ret As Variant
-    Dim t1 As Double
-    Dim t2 As Double
-    Dim t3 As Double
-    Dim t4 As Variant
-    Dim Tend As Double
+    Dim timeTaken As Variant
     Dim Tstart As Double
+    Dim NumFns As Long
+    Dim JuliaResultsFile As String
 
     On Error GoTo ErrHandler
+    
+    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "julia\juliaparsetimes.csv"
     
     JuliaResults = ThrowIfError(CSVRead(JuliaResultsFile, True))
     
@@ -204,81 +191,81 @@ NumRows As Long, NumCols As Long, Timeout As Double, WithHeaders As Boolean, Jul
 
     Data = Fill(EachFieldContains, NumRows, NumCols)
     FileName = NameThatFile(Folder, OS, NumRows, NumCols, Replace(ExtraInfo, " ", "-"), Unicode, False)
-    If WriteFiles Then
-        ThrowIfError CSVWrite(Data, FileName, False)
-    End If
+
+    ThrowIfError CSVWrite(Data, FileName, False)
+
+    Force2DArrayR ParserNames
+    NumFns = NCols(ParserNames)
+    
+    Ret = Fill("", 1, NumFns * 2 + 2)
+
+    For j = 1 To NumFns
+        k = 0
         
-    If ReadFiles Then
-        For j = 1 To 4
-            k = 0
+        If InStr(ParserNames(1, j), "CSVRead") > 0 Then
             Tstart = ElapsedTime()
             Do
+                DataReread = ThrowIfError(CSVRead(FileName, False, ",", , , , False, , , , , , , , , , "ANSI"))
                 k = k + 1
-                Select Case j
-                    Case 1
-                        FnName1 = "CSVRead" + vbLf + "v0.1"
-                        DataReread1 = ThrowIfError(CSVRead(FileName, False, ",", , , , False, , , , , , , , , , "ANSI"))
-                    Case 2
-                        FnName2 = "sdkn104" + vbLf + "v1.9"
-                        DataReread2 = ThrowIfError(Wrap_sdkn104(FileName, Unicode))
-                    Case 3
-                        FnName3 = "ws_garcia" + vbLf + "v3.1.5"
-
-                        DataReread3 = ThrowIfError(Wrap_ws_garcia(FileName, ",", vbCrLf))
-                    Case 4
-                        FnName4 = "CSV.jl" + vbLf + "v0.8.5+"
-                        DataReread4 = Empty
-                End Select
                 If ElapsedTime() - Tstart > Timeout Then Exit Do
             Loop
-
-            Tend = ElapsedTime()
-        
-            Select Case j
-                Case 1
-                    NumCalls1 = k
-                    t1 = (Tend - Tstart) / k
-                Case 2
-                    NumCalls2 = k
-                    t2 = (Tend - Tstart) / k
-                Case 3
-                    NumCalls3 = k
-                    t3 = (Tend - Tstart) / k
-                Case 4
-                    NumCalls4 = "Not found"
-                    t4 = "Not found"
-                    On Error Resume Next
-                    NumCalls4 = Application.WorksheetFunction.VLookup(FileName, JuliaResults, 4, False)
-                    t4 = Application.WorksheetFunction.VLookup(FileName, JuliaResults, 2, False)
-                    On Error GoTo ErrHandler
-            End Select
-        Next j
-    Else
-        t1 = Rnd(): t2 = Rnd(): t3 = Rnd(): t4 = Rnd()
-        NumCalls1 = 0: NumCalls2 = 0: NumCalls3 = 0: NumCalls4 = 0
-    End If
-
-    ReDim Ret(1 To IIf(WithHeaders, 2, 1), 1 To 10) As Variant
+            timeTaken = ElapsedTime - Tstart
+            NumCalls = k
+        ElseIf InStr(ParserNames(1, j), "sdkn104") > 0 Then
+            Tstart = ElapsedTime()
+            Do
+                DataReread = ThrowIfError(Wrap_sdkn104(FileName, Unicode))
+                k = k + 1
+                If ElapsedTime() - Tstart > Timeout Then Exit Do
+            Loop
+            timeTaken = ElapsedTime - Tstart
+            NumCalls = k
+        ElseIf InStr(ParserNames(1, j), "garcia") > 0 Then
+            Tstart = ElapsedTime()
+            Do
+                DataReread = ThrowIfError(Wrap_ws_garcia(FileName, ",", vbCrLf))
+                k = k + 1
+                If ElapsedTime() - Tstart > Timeout Then Exit Do
+            Loop
+            timeTaken = ElapsedTime - Tstart
+            NumCalls = k
+        ElseIf InStr(ParserNames(1, j), "ArrayFromCSV") > 0 Then
+            Tstart = ElapsedTime()
+            Do
+                DataReread = ThrowIfError(ArrayFromCSVfile(FileName))
+                k = k + 1
+                If ElapsedTime() - Tstart > Timeout Then Exit Do
+            Loop
+            timeTaken = ElapsedTime - Tstart
+            NumCalls = k
+        ElseIf InStr(ParserNames(1, j), "CSV.jl") > 0 Then
+            DataReread = Empty
+            NumCalls = "Not found"
+            timeTaken = "Not found"
+            On Error Resume Next
+            NumCalls = Application.WorksheetFunction.VLookup(FileName, JuliaResults, 4, False)
+            timeTaken = Application.WorksheetFunction.VLookup(FileName, JuliaResults, 2, False)
+            timeTaken = timeTaken * NumCalls
+            On Error GoTo ErrHandler
+        Else
+            Throw "Unrecognised element of ParserNames: " + CStr(ParserNames(1, j))
+        End If
+        On Error Resume Next
+        Ret(1, j) = timeTaken / NumCalls
+        On Error GoTo ErrHandler
+        Ret(1, NumFns + j) = NumCalls
+    Next j
     
-    DataRow = IIf(WithHeaders, 2, 1)
-    
-    Ret(DataRow, 1) = t1: If WithHeaders Then Ret(1, 1) = FnName1
-    Ret(DataRow, 2) = t2: If WithHeaders Then Ret(1, 2) = FnName2
-    Ret(DataRow, 3) = t3: If WithHeaders Then Ret(1, 3) = FnName3
-    Ret(DataRow, 4) = t4: If WithHeaders Then Ret(1, 4) = FnName4
-    Ret(DataRow, 5) = NumCalls1: If WithHeaders Then Ret(1, 5) = "NCalls" + vbLf + FnName1
-    Ret(DataRow, 6) = NumCalls2: If WithHeaders Then Ret(1, 6) = "NCalls" + vbLf + FnName2
-    Ret(DataRow, 7) = NumCalls3: If WithHeaders Then Ret(1, 7) = "NCalls" + vbLf + FnName3
-    Ret(DataRow, 8) = NumCalls4: If WithHeaders Then Ret(1, 8) = "NCalls" + vbLf + FnName3
-    Ret(DataRow, 9) = FileName: If WithHeaders Then Ret(1, 9) = "File"
-    Ret(DataRow, 10) = FileSize(FileName): If WithHeaders Then Ret(1, 10) = "Size"
+    Ret(1, 2 * NumFns + 1) = FileName
+    Ret(1, 2 * NumFns + 2) = FileSize(FileName)
 
-    TimeFourParsers = Ret
+    TimeParsers = Ret
 
     Exit Function
 ErrHandler:
-    TimeFourParsers = "#TimeFourParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
+    TimeParsers = "#TimeParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
+
 
 Sub AddChartsNoExport()
     On Error GoTo ErrHandler
@@ -297,12 +284,16 @@ Sub AddCharts(Optional Export As Boolean = True)
           Dim ws As Worksheet
           Dim xData As Range
           Dim yData As Range
+          Dim NumSeries As Long
 
 1         On Error GoTo ErrHandler
           
 2         Set ws = ActiveSheet
           
 3         prot = ws.ProtectContents
+
+          NumSeries = ws.Range("ParserNames").Columns.count
+
 4         ws.Unprotect
           
 5         For Each c In ws.ChartObjects
@@ -313,11 +304,7 @@ Sub AddCharts(Optional Export As Boolean = True)
 9             If InStr(N.Name, "PasteResultsHere") > 1 Then
 10                Set yData = N.RefersToRange
 11                With yData
-12                    Set yData = .Offset(-1).Resize(.Rows.count + 1, 4)
-                      'Hack for when we don't have data for Julia speed
-13                    If VarType(yData.Cells(2, 4).value) = vbString Then
-14                        Set yData = yData.Resize(, 3)
-15                    End If
+12                    Set yData = .Offset(-1).Resize(.Rows.count + 1, NumSeries)
 16                End With
 17                Set xData = yData.Offset(, -1).Resize(, 1)
 18                With xData
@@ -334,7 +321,7 @@ Sub AddCharts(Optional Export As Boolean = True)
 29            End If
 30        Next N
 
-31        Application.GoTo ws.Cells(1, 1)
+31        Application.Goto ws.Cells(1, 1)
 32        ws.Protect , , prot
 
 33        Exit Sub
@@ -359,79 +346,88 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export As Boolean)
 
-          Const ChartsInCol As String = "P"
+          Dim ChartsInCol As String
+          
           Const Err_BadSelection As String = "That selection does not look correct." + vbLf + vbLf + _
               "Select two areas to define the data to plot. The first area should contain " + _
               "the independent data and have a single column with top cell giving the x axis " + _
               "label. The second area should contain the dependent data with one column per data " + _
               "series and top row giving the series names. Both areas should have the same number of rows"
-          Const TitlesInCol As String = "M"
+              
           Dim ch As Chart
           Dim shp As Shape
           Dim SourceData As Range
           Dim Title As String
           Dim TitleCell As Range
+          Dim TitlesInCol As String
           Dim TopLeftCell As Range
           Dim wsh As Worksheet
 
 1         On Error GoTo ErrHandler
-2             On Error GoTo ErrHandler
 
-3         If xData Is Nothing Then
-4             Set SourceData = Selection
+2         If xData Is Nothing Then
+3             Set SourceData = Selection
 
-5             If SourceData.Areas.count <> 2 Then
-6                 Throw Err_BadSelection
-7             ElseIf SourceData.Areas(1).Rows.count <> SourceData.Areas(2).Rows.count Then
-8                 Throw Err_BadSelection
-9             End If
-10            Set xData = SourceData.Areas(1)
-11            Set yData = SourceData.Areas(2)
-12            Set wsh = xData.Parent
-13        Else
+4             If SourceData.Areas.count <> 2 Then
+5                 Throw Err_BadSelection
+6             ElseIf SourceData.Areas(1).Rows.count <> SourceData.Areas(2).Rows.count Then
+7                 Throw Err_BadSelection
+8             End If
+9             Set xData = SourceData.Areas(1)
+10            Set yData = SourceData.Areas(2)
+11            Set wsh = xData.Parent
+12        Else
               'Actually selecting the ranges seems to be necessary to get the legends to appear in the generated charts...
-14            Set wsh = xData.Parent
-15            wsh.Activate
-16            wsh.Range(xData.Address & "," & yData.Address).Select
-17        End If
+13            Set wsh = xData.Parent
+14            wsh.Activate
+15            wsh.Range(xData.Address & "," & yData.Address).Select
+16        End If
           
-18        Set shp = wsh.Shapes.AddChart2(240, xlXYScatterLines)
-19        Set ch = shp.Chart
-20        ch.SetSourceData Source:=Application.Union(xData, yData)
-21        Set TopLeftCell = Application.Intersect(xData.Cells(1, 1).EntireRow, wsh.Range(ChartsInCol & ":" & ChartsInCol))
-22        Set TitleCell = Application.Intersect(xData.Cells(0, 1).EntireRow, wsh.Range(TitlesInCol & ":" & TitlesInCol))
+17        With xData.Parent.Range("ParserNames")
 
-23        Title = "='" & wsh.Name & "'!R" & TitleCell.Row & "C" & TitleCell.Column
+18            ChartsInCol = .Offset(0, .Columns.count * 2 + 3).Resize(1, 1).Address
+19            ChartsInCol = Mid(ChartsInCol, 2, InStr(2, ChartsInCol, "$") - 2)
 
-24        ch.Axes(xlCategory).ScaleType = xlLogarithmic
-25        ch.Axes(xlValue).ScaleType = xlLogarithmic
-26        ch.Axes(xlValue, xlPrimary).HasTitle = True
-27        ch.Axes(xlValue, xlPrimary).AxisTitle.text = "Seconds to read. Log Scale"
-28        ch.Axes(xlCategory).HasTitle = True
-29        ch.Axes(xlCategory).AxisTitle.text = xData.Cells(1, 1).value + ". Log Scale"
-30        ch.ChartTitle.Caption = Title
-31        With xData
-32            ch.Axes(xlCategory).MinimumScale = .Cells(2, 1).value
-33            ch.Axes(xlCategory).MaximumScale = .Cells(.Rows.count, 1).value
-34        End With
-
-35        shp.Top = TopLeftCell.Top
-36        shp.Left = TopLeftCell.Left
-37        shp.Height = 394
-38        shp.Width = 561
-39        shp.Placement = xlMove
+20            TitlesInCol = .Offset(0, .Columns.count * 2).Resize(1, 1).Address
+21            TitlesInCol = Mid(TitlesInCol, 2, InStr(2, TitlesInCol, "$") - 2)
+22        End With
           
-40        If Export Then
+23        Set shp = wsh.Shapes.AddChart2(240, xlXYScatterLines)
+24        Set ch = shp.Chart
+25        ch.SetSourceData Source:=Application.Union(xData, yData)
+26        Set TopLeftCell = Application.Intersect(xData.Cells(1, 1).EntireRow, wsh.Range(ChartsInCol & ":" & ChartsInCol))
+27        Set TitleCell = Application.Intersect(xData.Cells(0, 1).EntireRow, wsh.Range(TitlesInCol & ":" & TitlesInCol))
+
+28        Title = "='" & wsh.Name & "'!R" & TitleCell.Row & "C" & TitleCell.Column
+
+29        ch.Axes(xlCategory).ScaleType = xlLogarithmic
+30        ch.Axes(xlValue).ScaleType = xlLogarithmic
+31        ch.Axes(xlValue, xlPrimary).HasTitle = True
+32        ch.Axes(xlValue, xlPrimary).AxisTitle.text = "Seconds to read. Log Scale"
+33        ch.Axes(xlCategory).HasTitle = True
+34        ch.Axes(xlCategory).AxisTitle.text = xData.Cells(1, 1).value + ". Log Scale"
+35        ch.ChartTitle.Caption = Title
+36        With xData
+37            ch.Axes(xlCategory).MinimumScale = .Cells(2, 1).value
+38            ch.Axes(xlCategory).MaximumScale = .Cells(.Rows.count, 1).value
+39        End With
+
+40        shp.Top = TopLeftCell.Top
+41        shp.Left = TopLeftCell.Left
+42        shp.Height = 394
+43        shp.Width = 561
+44        shp.Placement = xlMove
+          
+45        If Export Then
               Dim FileName As String
               Dim Folder As String
-41            FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
-42            Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "images\"
-43            ch.Export Folder + FileName
-44        End If
+46            FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
+47            Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "images\"
+48            ch.Export Folder + FileName
+49        End If
 
-45        Exit Sub
+50        Exit Sub
 ErrHandler:
-46        Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
+51        Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
 
 End Sub
-

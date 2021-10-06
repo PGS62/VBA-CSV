@@ -1,6 +1,50 @@
 Attribute VB_Name = "modCSVTestRDatasets"
 Option Explicit
 
+' returns largest 20 files in RDatasets
+Function RDatesetsFiles()
+
+RDatesetsFiles = Array("csv\openintro\military.csv", "csv\mosaicData\Birthdays.csv", _
+        "csv\stevedata\wvs_justifbribe.csv", "csv\nycflights13\flights.csv", _
+        "csv\stevedata\wvs_immig.csv", "csv\AER\Fertility.csv", _
+        "csv\openintro\avandia.csv", "csv\Stat2Data\AthleteGrad.csv", _
+        "csv\causaldata\mortgages.csv", "csv\openintro\mammogram.csv", _
+        "csv\lme4\InstEval.csv", "csv\stevedata\gss_abortion.csv", _
+        "csv\stevedata\TV16.csv", "csv\stevedata\gss_wages.csv", _
+        "csv\AER\CPSSW8.csv", "csv\stevedata\eq_passengercars.csv", _
+        "csv\ggplot2movies\movies.csv", "csv\ggplot2\diamonds.csv", _
+        "csv\causaldata\gov_transfers_density.csv", "csv\openintro\seattlepets.csv")
+
+End Function
+
+'Tested 5 Oct 2021:
+
+'With RemoveQuotes = True
+'CSVRead     23.285191300005            ArrayFromCSVfile             281.768168099996,          True
+'CSVRead     23.8145522999985           ArrayFromCSVfile             325.074338899998           True
+
+'With RemoveQuotes = True
+'CSVRead     24.9822067999921           ArrayFromCSVfile             18.9174217000109           False
+
+Sub TestAgainstLargestFileInRDatasets()
+
+          Const FileName As String = "C:\Projects\RDatasets\csv\openintro\military.csv"
+          Dim t1 As Double, t2 As Double, t3 As Double
+          Dim res1, res2
+          Const RemoveQuotes As Boolean = True
+          Dim WhatDiffers As String
+
+1         t1 = ElapsedTime
+2         res1 = CSVRead(FileName)
+3         t2 = ElapsedTime
+4         res2 = ArrayFromCSVfile(FileName, , , RemoveQuotes)
+5         t3 = ElapsedTime
+
+6         Debug.Print "CSVRead", t2 - t1, "ArrayFromCSVfile", t3 - t2, ArraysIdentical(res1, res2, , True, WhatDiffers)
+          Debug.Print WhatDiffers
+
+End Sub
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : TestAgainstRDatasets
 ' Purpose    : Test against the 20 largest files in Rdatasets https://github.com/vincentarelbundock/Rdatasets
@@ -28,16 +72,7 @@ Sub TestAgainstRDatasets()
     Dim ws_garciaResult As Variant
 
     On Error GoTo ErrHandler
-    Files = Array("csv\openintro\military.csv", "csv\mosaicData\Birthdays.csv", _
-        "csv\stevedata\wvs_justifbribe.csv", "csv\nycflights13\flights.csv", _
-        "csv\stevedata\wvs_immig.csv", "csv\AER\Fertility.csv", _
-        "csv\openintro\avandia.csv", "csv\Stat2Data\AthleteGrad.csv", _
-        "csv\causaldata\mortgages.csv", "csv\openintro\mammogram.csv", _
-        "csv\lme4\InstEval.csv", "csv\stevedata\gss_abortion.csv", _
-        "csv\stevedata\TV16.csv", "csv\stevedata\gss_wages.csv", _
-        "csv\AER\CPSSW8.csv", "csv\stevedata\eq_passengercars.csv", _
-        "csv\ggplot2movies\movies.csv", "csv\ggplot2\diamonds.csv", _
-        "csv\causaldata\gov_transfers_density.csv", "csv\openintro\seattlepets.csv")
+    Files = RDatesetsFiles()
 
     Result = Fill(vbNullString, UBound(Files) - LBound(Files) + 2, 5)
     Result(1, 1) = "File Name"

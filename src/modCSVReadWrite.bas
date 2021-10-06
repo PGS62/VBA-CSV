@@ -150,6 +150,8 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
     Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
     Optional ByRef HeaderRow As Variant) As Variant
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
