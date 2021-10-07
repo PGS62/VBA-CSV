@@ -277,56 +277,56 @@ ErrHandler:
 End Sub
 
 Sub AddCharts(Optional Export As Boolean = True)
-          
-          Dim c As ChartObject
-          Dim N As Name
-          Dim prot As Boolean
-          Dim ws As Worksheet
-          Dim xData As Range
-          Dim yData As Range
-          Dim NumSeries As Long
+    
+    Dim c As ChartObject
+    Dim N As Name
+    Dim prot As Boolean
+    Dim ws As Worksheet
+    Dim xData As Range
+    Dim yData As Range
+    Dim NumSeries As Long
 
-1         On Error GoTo ErrHandler
-          
-2         Set ws = ActiveSheet
-          
-3         prot = ws.ProtectContents
+    On Error GoTo ErrHandler
+    
+    Set ws = ActiveSheet
+    
+    prot = ws.ProtectContents
 
-          NumSeries = ws.Range("ParserNames").Columns.count
+    NumSeries = ws.Range("ParserNames").Columns.count
 
-4         ws.Unprotect
-          
-5         For Each c In ws.ChartObjects
-6             c.Delete
-7         Next
+    ws.Unprotect
+    
+    For Each c In ws.ChartObjects
+        c.Delete
+    Next
 
-8         For Each N In ws.Names
-9             If InStr(N.Name, "PasteResultsHere") > 1 Then
-10                Set yData = N.RefersToRange
-11                With yData
-12                    Set yData = .Offset(-1).Resize(.Rows.count + 1, NumSeries)
-16                End With
-17                Set xData = yData.Offset(, -1).Resize(, 1)
-18                With xData
-19                    If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
-20                        Set xData = xData.Offset(, -1)
-21                    End If
-22                End With
-23                With xData
-24                    If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
-25                        Set xData = xData.Offset(, -2)
-26                    End If
-27                End With
-28                AddChart xData, yData, Export
-29            End If
-30        Next N
+    For Each N In ws.Names
+        If InStr(N.Name, "PasteResultsHere") > 1 Then
+            Set yData = N.RefersToRange
+            With yData
+                Set yData = .Offset(-1).Resize(.Rows.count + 1, NumSeries)
+            End With
+            Set xData = yData.Offset(, -1).Resize(, 1)
+            With xData
+                If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
+                    Set xData = xData.Offset(, -1)
+                End If
+            End With
+            With xData
+                If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
+                    Set xData = xData.Offset(, -2)
+                End If
+            End With
+            AddChart xData, yData, Export
+        End If
+    Next N
 
-31        Application.Goto ws.Cells(1, 1)
-32        ws.Protect , , prot
+    Application.Goto ws.Cells(1, 1)
+    ws.Protect , , prot
 
-33        Exit Sub
+    Exit Sub
 ErrHandler:
-34        MsgBox "#AddCharts (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MsgBox "#AddCharts (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
 Sub AddChartAtSelection()
@@ -346,88 +346,89 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export As Boolean)
 
-          Dim ChartsInCol As String
-          
-          Const Err_BadSelection As String = "That selection does not look correct." + vbLf + vbLf + _
-              "Select two areas to define the data to plot. The first area should contain " + _
-              "the independent data and have a single column with top cell giving the x axis " + _
-              "label. The second area should contain the dependent data with one column per data " + _
-              "series and top row giving the series names. Both areas should have the same number of rows"
-              
-          Dim ch As Chart
-          Dim shp As Shape
-          Dim SourceData As Range
-          Dim Title As String
-          Dim TitleCell As Range
-          Dim TitlesInCol As String
-          Dim TopLeftCell As Range
-          Dim wsh As Worksheet
+    Dim ChartsInCol As String
+    
+    Const Err_BadSelection As String = "That selection does not look correct." + vbLf + vbLf + _
+        "Select two areas to define the data to plot. The first area should contain " + _
+        "the independent data and have a single column with top cell giving the x axis " + _
+        "label. The second area should contain the dependent data with one column per data " + _
+        "series and top row giving the series names. Both areas should have the same number of rows"
+        
+    Dim ch As Chart
+    Dim shp As Shape
+    Dim SourceData As Range
+    Dim Title As String
+    Dim TitleCell As Range
+    Dim TitlesInCol As String
+    Dim TopLeftCell As Range
+    Dim wsh As Worksheet
 
-1         On Error GoTo ErrHandler
+    On Error GoTo ErrHandler
 
-2         If xData Is Nothing Then
-3             Set SourceData = Selection
+    If xData Is Nothing Then
+        Set SourceData = Selection
 
-4             If SourceData.Areas.count <> 2 Then
-5                 Throw Err_BadSelection
-6             ElseIf SourceData.Areas(1).Rows.count <> SourceData.Areas(2).Rows.count Then
-7                 Throw Err_BadSelection
-8             End If
-9             Set xData = SourceData.Areas(1)
-10            Set yData = SourceData.Areas(2)
-11            Set wsh = xData.Parent
-12        Else
-              'Actually selecting the ranges seems to be necessary to get the legends to appear in the generated charts...
-13            Set wsh = xData.Parent
-14            wsh.Activate
-15            wsh.Range(xData.Address & "," & yData.Address).Select
-16        End If
-          
-17        With xData.Parent.Range("ParserNames")
+        If SourceData.Areas.count <> 2 Then
+            Throw Err_BadSelection
+        ElseIf SourceData.Areas(1).Rows.count <> SourceData.Areas(2).Rows.count Then
+            Throw Err_BadSelection
+        End If
+        Set xData = SourceData.Areas(1)
+        Set yData = SourceData.Areas(2)
+        Set wsh = xData.Parent
+    Else
+        'Actually selecting the ranges seems to be necessary to get the legends to appear in the generated charts...
+        Set wsh = xData.Parent
+        wsh.Activate
+        wsh.Range(xData.Address & "," & yData.Address).Select
+    End If
+    
+    With xData.Parent.Range("ParserNames")
 
-18            ChartsInCol = .Offset(0, .Columns.count * 2 + 3).Resize(1, 1).Address
-19            ChartsInCol = Mid(ChartsInCol, 2, InStr(2, ChartsInCol, "$") - 2)
+        ChartsInCol = .Offset(0, .Columns.count * 2 + 3).Resize(1, 1).Address
+        ChartsInCol = Mid(ChartsInCol, 2, InStr(2, ChartsInCol, "$") - 2)
 
-20            TitlesInCol = .Offset(0, .Columns.count * 2).Resize(1, 1).Address
-21            TitlesInCol = Mid(TitlesInCol, 2, InStr(2, TitlesInCol, "$") - 2)
-22        End With
-          
-23        Set shp = wsh.Shapes.AddChart2(240, xlXYScatterLines)
-24        Set ch = shp.Chart
-25        ch.SetSourceData Source:=Application.Union(xData, yData)
-26        Set TopLeftCell = Application.Intersect(xData.Cells(1, 1).EntireRow, wsh.Range(ChartsInCol & ":" & ChartsInCol))
-27        Set TitleCell = Application.Intersect(xData.Cells(0, 1).EntireRow, wsh.Range(TitlesInCol & ":" & TitlesInCol))
+        TitlesInCol = .Offset(0, .Columns.count * 2).Resize(1, 1).Address
+        TitlesInCol = Mid(TitlesInCol, 2, InStr(2, TitlesInCol, "$") - 2)
+    End With
+    
+    Set shp = wsh.Shapes.AddChart2(240, xlXYScatterLines)
+    Set ch = shp.Chart
+    ch.SetSourceData Source:=Application.Union(xData, yData)
+    Set TopLeftCell = Application.Intersect(xData.Cells(1, 1).EntireRow, wsh.Range(ChartsInCol & ":" & ChartsInCol))
+    Set TitleCell = Application.Intersect(xData.Cells(0, 1).EntireRow, wsh.Range(TitlesInCol & ":" & TitlesInCol))
 
-28        Title = "='" & wsh.Name & "'!R" & TitleCell.Row & "C" & TitleCell.Column
+    Title = "='" & wsh.Name & "'!R" & TitleCell.Row & "C" & TitleCell.Column
 
-29        ch.Axes(xlCategory).ScaleType = xlLogarithmic
-30        ch.Axes(xlValue).ScaleType = xlLogarithmic
-31        ch.Axes(xlValue, xlPrimary).HasTitle = True
-32        ch.Axes(xlValue, xlPrimary).AxisTitle.text = "Seconds to read. Log Scale"
-33        ch.Axes(xlCategory).HasTitle = True
-34        ch.Axes(xlCategory).AxisTitle.text = xData.Cells(1, 1).value + ". Log Scale"
-35        ch.ChartTitle.Caption = Title
-36        With xData
-37            ch.Axes(xlCategory).MinimumScale = .Cells(2, 1).value
-38            ch.Axes(xlCategory).MaximumScale = .Cells(.Rows.count, 1).value
-39        End With
+    ch.Axes(xlCategory).ScaleType = xlLogarithmic
+    ch.Axes(xlValue).ScaleType = xlLogarithmic
+    ch.Axes(xlValue, xlPrimary).HasTitle = True
+    ch.Axes(xlValue, xlPrimary).AxisTitle.text = "Seconds to read. Log Scale"
+    ch.Axes(xlCategory).HasTitle = True
+    ch.Axes(xlCategory).AxisTitle.text = xData.Cells(1, 1).value + ". Log Scale"
+    ch.ChartTitle.Caption = Title
+    With xData
+        ch.Axes(xlCategory).MinimumScale = .Cells(2, 1).value
+        ch.Axes(xlCategory).MaximumScale = .Cells(.Rows.count, 1).value
+    End With
 
-40        shp.Top = TopLeftCell.Top
-41        shp.Left = TopLeftCell.Left
-42        shp.Height = 394
-43        shp.Width = 561
-44        shp.Placement = xlMove
-          
-45        If Export Then
-              Dim FileName As String
-              Dim Folder As String
-46            FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
-47            Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "images\"
-48            ch.Export Folder + FileName
-49        End If
+    shp.Top = TopLeftCell.Top
+    shp.Left = TopLeftCell.Left
+    shp.Height = 394
+    shp.Width = 561
+    shp.Placement = xlMove
+    
+    If Export Then
+        Dim FileName As String
+        Dim Folder As String
+        FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
+        Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "images\"
+        ch.Export Folder + FileName
+    End If
 
-50        Exit Sub
+    Exit Sub
 ErrHandler:
-51        Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
 
 End Sub
+

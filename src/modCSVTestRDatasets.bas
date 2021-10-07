@@ -28,20 +28,20 @@ End Function
 
 Sub TestAgainstLargestFileInRDatasets()
 
-          Const FileName As String = "C:\Projects\RDatasets\csv\openintro\military.csv"
-          Dim t1 As Double, t2 As Double, t3 As Double
-          Dim res1, res2
-          Const RemoveQuotes As Boolean = True
-          Dim WhatDiffers As String
+    Const FileName As String = "C:\Projects\RDatasets\csv\openintro\military.csv"
+    Dim t1 As Double, t2 As Double, t3 As Double
+    Dim res1, res2
+    Const RemoveQuotes As Boolean = True
+    Dim WhatDiffers As String
 
-1         t1 = ElapsedTime
-2         res1 = CSVRead(FileName)
-3         t2 = ElapsedTime
-4         res2 = ArrayFromCSVfile(FileName, , , RemoveQuotes)
-5         t3 = ElapsedTime
+    t1 = ElapsedTime
+    res1 = CSVRead(FileName)
+    t2 = ElapsedTime
+    res2 = ArrayFromCSVfile(FileName, , , RemoveQuotes)
+    t3 = ElapsedTime
 
-6         Debug.Print "CSVRead", t2 - t1, "ArrayFromCSVfile", t3 - t2, ArraysIdentical(res1, res2, , True, WhatDiffers)
-          Debug.Print WhatDiffers
+    Debug.Print "CSVRead", t2 - t1, "ArrayFromCSVfile", t3 - t2, ArraysIdentical(res1, res2, , True, WhatDiffers)
+    Debug.Print WhatDiffers
 
 End Sub
 
