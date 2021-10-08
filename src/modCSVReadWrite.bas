@@ -685,12 +685,23 @@ Private Function Download(ByVal URLAddress As String, ByVal FileName As String) 
     Dim ErrString As String
     Dim Res As Long
     Dim TargetFolder As String
+    Dim EN As Long
 
     On Error GoTo ErrHandler
     
     TargetFolder = FileFromPath(FileName, False)
     CreatePath TargetFolder
-    If FileExists(FileName) Then FileDelete FileName
+    If FileExists(FileName) Then
+        On Error Resume Next
+        FileDelete FileName
+        EN = Err.Number
+        On Error GoTo ErrHandler
+        If EN <> 0 Then
+            Throw "Cannot download from URL '" + URLAddress + "' because target file '" + FileName + _
+                "' already exists and cannot be deleted. Is the target file open in a program such as Excel?"
+        End If
+    End If
+    
     Res = URLDownloadToFile(0, URLAddress, FileName, 0, 0)
     If Res <> 0 Then
         ErrString = ParseDownloadError(CLng(Res))
