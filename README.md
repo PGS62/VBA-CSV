@@ -148,7 +148,8 @@ An alternative approach is to change the constant `m_ErrorStyle` (at the top of 
 Other CSV parsers are available for VBA:  
 https://github.com/ws-garcia/VBA-CSV-interface  
 https://github.com/sdkn104/VBA-CSV  
-https://github.com/Senipah/VBA-Better-Array (method [FromCSVFile](https://senipah.github.io/VBA-Better-Array/api/methods/FromCSVFile.html))
+https://github.com/Senipah/VBA-Better-Array (method [FromCSVFile](https://senipah.github.io/VBA-Better-Array/api/methods/FromCSVFile.html))  
+https://github.com/pchemguy/CSVParser  
 
 # Notes
 ### Line endings
