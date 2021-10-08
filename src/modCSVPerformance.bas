@@ -138,7 +138,7 @@ End Sub
 '              exits after TimeOut seconds have elapsed. Leads to much more reliable timings than timing a single call.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As Variant, _
-    NumRows As Long, NumCols As Long, Timeout As Double) As Variant
+          NumRows As Long, NumCols As Long, Timeout As Double) As Variant
 
     Const Unicode As Boolean = False
     Dim Data As Variant
@@ -146,18 +146,32 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
     Dim ExtraInfo As String
     Dim FileName As String
     Dim Folder As String
+    Dim i As Long
     Dim j As Long
     Dim JuliaResults As Variant
+    Dim JuliaResultsFile As String
     Dim k As Double
     Dim NumCalls As Variant
+    Dim NumFns As Long
     Dim OS As String
     Dim Ret As Variant
+    Dim t1 As Double
+    Dim t2 As Double
     Dim timeTaken As Variant
     Dim Tstart As Double
-    Dim NumFns As Long
-    Dim JuliaResultsFile As String
+    Static Overhead As Double
 
     On Error GoTo ErrHandler
+    
+    'The timing loop has an inside-the-loop overhead of calling ElapsedTime (approx 6 microseconds),
+    'about 5% of the execution time for reading a one-character file from local disc.
+    If Overhead = 0 Then
+        t1 = ElapsedTime()
+        For i = 1 To 100000
+            t2 = ElapsedTime()
+        Next i
+        Overhead = (ElapsedTime() - t1) / 100000
+    End If
     
     JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "julia\juliaparsetimes.csv"
     
@@ -189,10 +203,11 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
 
     ThrowIfError CreatePath(Folder)
 
-    Data = Fill(EachFieldContains, NumRows, NumCols)
     FileName = NameThatFile(Folder, OS, NumRows, NumCols, Replace(ExtraInfo, " ", "-"), Unicode, False)
-
-    ThrowIfError CSVWrite(Data, FileName, False)
+    If Not FileExists(FileName) Then 'Assumes filename acts like a hash of the file!
+        Data = Fill(EachFieldContains, NumRows, NumCols)
+        ThrowIfError CSVWrite(Data, FileName, False)
+    End If
 
     Force2DArrayR ParserNames
     NumFns = NCols(ParserNames)
@@ -251,7 +266,7 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
             Throw "Unrecognised element of ParserNames: " + CStr(ParserNames(1, j))
         End If
         On Error Resume Next
-        Ret(1, j) = timeTaken / NumCalls
+        Ret(1, j) = (timeTaken / NumCalls) - Overhead
         On Error GoTo ErrHandler
         Ret(1, NumFns + j) = NumCalls
     Next j
