@@ -559,7 +559,7 @@ Public Function HStack(ParamArray Arrays()) As Variant
     Dim i As Long
     Dim j As Long
     Dim k As Long
-    Dim r As Long
+    Dim R As Long
     Dim ReturnArray() As Variant
     Dim Y0 As Long
 
@@ -574,20 +574,20 @@ Public Function HStack(ParamArray Arrays()) As Variant
         For i = LBound(Arrays) To UBound(Arrays)
             If TypeName(Arrays(i)) = "Range" Then Arrays(i) = Arrays(i).value
             If IsMissing(Arrays(i)) Then
-                r = 0: c = 0
+                R = 0: c = 0
             Else
                 Select Case NumDimensions(Arrays(i))
                     Case 0
-                        r = 1: c = 1
+                        R = 1: c = 1
                     Case 1
-                        r = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
+                        R = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
                         c = 1
                     Case 2
-                        r = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
+                        R = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
                         c = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
                 End Select
             End If
-            If r > AllR Then AllR = r
+            If R > AllR Then AllR = R
             AllC = AllC + c
         Next i
 
@@ -603,27 +603,27 @@ Public Function HStack(ParamArray Arrays()) As Variant
             If Not IsMissing(Arrays(i)) Then
                 Select Case NumDimensions(Arrays(i))
                     Case 0
-                        r = 1: c = 1
+                        R = 1: c = 1
                         ReturnArray(1, Y0) = Arrays(i)
                     Case 1
-                        r = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
+                        R = UBound(Arrays(i)) - LBound(Arrays(i)) + 1
                         c = 1
-                        For j = 1 To r
+                        For j = 1 To R
                             ReturnArray(j, Y0) = Arrays(i)(j + LBound(Arrays(i)) - 1)
                         Next j
                     Case 2
-                        r = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
+                        R = UBound(Arrays(i), 1) - LBound(Arrays(i), 1) + 1
                         c = UBound(Arrays(i), 2) - LBound(Arrays(i), 2) + 1
 
-                        For j = 1 To r
+                        For j = 1 To R
                             For k = 1 To c
                                 ReturnArray(j, Y0 + k - 1) = Arrays(i)(j + LBound(Arrays(i), 1) - 1, k + LBound(Arrays(i), 2) - 1)
                             Next k
                         Next j
 
                 End Select
-                If r < AllR Then        'Pad with #NA! values
-                    For j = r + 1 To AllR
+                If R < AllR Then        'Pad with #NA! values
+                    For j = R + 1 To AllR
                         For k = 1 To c
                             ReturnArray(j, Y0 + k - 1) = NA
                         Next k

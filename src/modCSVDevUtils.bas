@@ -1,5 +1,4 @@
 Attribute VB_Name = "modCSVDevUtils"
-
 ' VBA-CSV
 
 ' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
@@ -113,15 +112,18 @@ Private Sub PrepareForRelease()
     On Error GoTo ErrHandler
 
     If Application.DisplayFormulaBar Then Application.FormulaBarHeight = 1
+    Application.ScreenUpdating = False
 
     For Each ws In ThisWorkbook.Worksheets
         If ws.Visible = xlSheetVisible Then
             Application.Goto ws.Cells(1, 1)
+            ActiveWindow.Zoom = 100
             If InStr(ws.Name, "GIF") = 0 Then
                 ActiveWindow.DisplayGridlines = False
                 ActiveWindow.DisplayHeadings = False
             End If
         End If
+        ws.Calculate
         ws.Protect , True, True
     Next
     For i = 1 To ThisWorkbook.Worksheets.count

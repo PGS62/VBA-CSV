@@ -1538,7 +1538,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, ByVal useADODB As
     Dim SearchFor() As String
     Dim Stream As Object
     Dim Streaming As Boolean
-    Dim tmp As Long
+    Dim Tmp As Long
     Dim Which As Long
 
     On Error GoTo ErrHandler
@@ -1721,11 +1721,11 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, ByVal useADODB As
                     Else
                         If RowNum = SkipToRow Then
                             HaveReachedSkipToRow = True
-                            tmp = Starts(j)
+                            Tmp = Starts(j)
                             ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
                             ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
                             RowNum = 1: j = 1: NumFields = 0
-                            Starts(1) = tmp
+                            Starts(1) = Tmp
                         End If
                     End If
                 Case 4
@@ -3257,7 +3257,7 @@ Private Function ParseTextFile(FileNameOrContents As String, ByVal isFile As Boo
     Dim Starts() As Long
     Dim Stream As Object
     Dim Streaming As Boolean
-    Dim tmp As Long
+    Dim Tmp As Long
     Dim Which As Long
     Dim MSLIA As Long
     Dim Err_StringTooLong As String
@@ -3354,10 +3354,10 @@ Private Function ParseTextFile(FileNameOrContents As String, ByVal isFile As Boo
         If Not HaveReachedSkipToLine Then
             If NumLinesFound = SkipToLine - 1 Then
                 HaveReachedSkipToLine = True
-                tmp = Starts(j)
+                Tmp = Starts(j)
                 ReDim Starts(1 To 8): ReDim Lengths(1 To 8)
                 j = 1: NumLinesFound = 0
-                Starts(1) = tmp
+                Starts(1) = Tmp
             End If
         ElseIf NumLinesToReturn > 0 Then
             If NumLinesFound = NumLinesToReturn Then
@@ -3848,8 +3848,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
     Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString) As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3904,8 +3902,16 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         'Preserve elements of type Date by using .Value, not .Value2
         Data = Data.value
     End If
+    Select Case NumDimensions(Data)
+        Case 0
+            Dim Tmp() As Variant
+            ReDim Tmp(1 To 1, 1 To 1)
+            Tmp(1, 1) = Data
+            Data = Tmp
+        Case 1, Is > 2
+            Throw Err_Dimensions
+    End Select
     
-    If NumDimensions(Data) <> 2 Then Throw Err_Dimensions
     ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
     
     If WriteToFile Then

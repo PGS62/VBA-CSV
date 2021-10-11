@@ -73,8 +73,8 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub RunSpeedTests()
 
-    Const NumColsInTFPRet As Long = 10
-    Const Timeout As Long = 5
+    Dim NumColsInTFPRet As Long
+    Const Timeout As Long = 1
     Const Title As String = "VBA-CSV Speed Tests"
     Dim c As Range
     Dim JuliaResultsFile As String
@@ -99,6 +99,7 @@ Private Sub RunSpeedTests()
     
     'Julia results file created by Julia function benchmark. See julia/benchmarkCSV.jl
     
+    NumColsInTFPRet = ws.Range("ParserNames").Columns.count * 2 + 2
     JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "julia\juliaparsetimes.csv"
     If Not FileExists(JuliaResultsFile) Then
         Throw "Cannot find file '" + JuliaResultsFile + "'"
@@ -106,18 +107,19 @@ Private Sub RunSpeedTests()
     
     For Each N In ws.Names
         If InStr(N.Name, "PasteResultsHere") > 1 Then
-            Application.Goto N.RefersToRange
-
-            For Each c In N.RefersToRange.Cells
-                c.Resize(1, NumColsInTFPRet).ClearContents
-                TestResults = ThrowIfError(TimeParsers(ws.Range("ParserNames").value, c.Offset(0, -3).value, c.Offset(0, -2).value, _
-                    c.Offset(0, -1).value, Timeout))
-                c.Resize(1, NumColsInTFPRet).value = TestResults
-                ws.Calculate
-                DoEvents
-                Application.ScreenUpdating = True
-            Next
-            ThisWorkbook.Save
+            If NameRefersToRange(N) Then
+                Application.Goto N.RefersToRange
+                For Each c In N.RefersToRange.Cells
+                    c.Resize(1, NumColsInTFPRet).ClearContents
+                    TestResults = ThrowIfError(TimeParsers(ws.Range("ParserNames").value, c.Offset(0, -3).value, c.Offset(0, -2).value, _
+                        c.Offset(0, -1).value, Timeout))
+                    c.Resize(1, NumColsInTFPRet).value = TestResults
+                    ws.Calculate
+                    DoEvents
+                    Application.ScreenUpdating = True
+                Next
+                ThisWorkbook.Save
+            End If
         End If
     Next N
 
@@ -317,22 +319,24 @@ Sub AddCharts(Optional Export As Boolean = True)
 
     For Each N In ws.Names
         If InStr(N.Name, "PasteResultsHere") > 1 Then
-            Set yData = N.RefersToRange
-            With yData
-                Set yData = .Offset(-1).Resize(.Rows.count + 1, NumSeries)
-            End With
-            Set xData = yData.Offset(, -1).Resize(, 1)
-            With xData
-                If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
-                    Set xData = xData.Offset(, -1)
-                End If
-            End With
-            With xData
-                If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
-                    Set xData = xData.Offset(, -2)
-                End If
-            End With
-            AddChart xData, yData, Export
+            If NameRefersToRange(N) Then
+                Set yData = N.RefersToRange
+                With yData
+                    Set yData = .Offset(-1).Resize(.Rows.count + 1, NumSeries)
+                End With
+                Set xData = yData.Offset(, -1).Resize(, 1)
+                With xData
+                    If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
+                        Set xData = xData.Offset(, -1)
+                    End If
+                End With
+                With xData
+                    If .Cells(2, 1).value = .Cells(.Rows.count, 1).value Then
+                        Set xData = xData.Offset(, -2)
+                    End If
+                End With
+                AddChart xData, yData, Export
+            End If
         End If
     Next N
 
@@ -343,6 +347,20 @@ Sub AddCharts(Optional Export As Boolean = True)
 ErrHandler:
     MsgBox "#AddCharts (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
+Private Function NameRefersToRange(N As Name) As Boolean
+    Dim R As Range
+
+    On Error GoTo ErrHandler
+    Set R = N.RefersToRange
+    NameRefersToRange = True
+    
+    Exit Function
+ErrHandler:
+    NameRefersToRange = False
+End Function
+
+
 
 Sub AddChartAtSelection()
     On Error GoTo ErrHandler

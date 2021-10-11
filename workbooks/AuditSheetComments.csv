@@ -1,4 +1,7 @@
 "Version","Date","Time","Author","Comment"
+136,11-Oct-2021,19:11:11,"Philip Swannell","CSVWrite now accepts zero-dimensional Data."
+135,08-Oct-2021,19:29:27,"Philip Swannell","More performance testing"
+134,08-Oct-2021,16:24:55,"Philip Swannell","Tweaked method PrepareForRelease."
 133,08-Oct-2021,11:41:59,"Philip Swannell","Improved error handling in method Download."
 132,08-Oct-2021,10:55:27,"Philip Swannell","Method TimeParsers now adjusts for the overhead of calling ElapsedTime within the timing loop."
 131,07-Oct-2021,22:33:34,"Philip Swannell","Removed line numbers."

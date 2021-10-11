@@ -5599,7 +5599,7 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim r As Range
+    Dim R As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim wb As Workbook
@@ -5614,9 +5614,9 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     
     shHiddenSheet.Unprotect
     shHiddenSheet.UsedRange.Clear
-    Set r = shHiddenSheet.Cells(1, 1)
-    r.Formula2 = Formula
-    Observed = r.value
+    Set R = shHiddenSheet.Cells(1, 1)
+    R.Formula2 = Formula
+    Observed = R.value
     TestRes = Observed = Expected
     If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
@@ -5633,7 +5633,7 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim r As Range
+    Dim R As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim wb As Workbook
@@ -5648,9 +5648,9 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     
     shHiddenSheet.Unprotect
     shHiddenSheet.UsedRange.Clear
-    Set r = shHiddenSheet.Cells(1, 1)
-    r.Formula2 = Formula
-    Observed = r.value
+    Set R = shHiddenSheet.Cells(1, 1)
+    R.Formula2 = Formula
+    Observed = R.value
     TestRes = Observed = Expected
     If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
