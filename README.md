@@ -148,7 +148,8 @@ An alternative approach is to change the constant `m_ErrorStyle` (at the top of 
 Other CSV parsers are available for VBA:  
 https://github.com/ws-garcia/VBA-CSV-interface  
 https://github.com/sdkn104/VBA-CSV  
-https://github.com/Senipah/VBA-Better-Array (method [FromCSVFile](https://senipah.github.io/VBA-Better-Array/api/methods/FromCSVFile.html))
+https://github.com/Senipah/VBA-Better-Array (method [FromCSVFile](https://senipah.github.io/VBA-Better-Array/api/methods/FromCSVFile.html))  
+https://github.com/pchemguy/CSVParser  
 
 # Notes
 ### Line endings
@@ -173,7 +174,7 @@ Certain<sup>[2](#myfootnote2)</sup> versions of Excel had a much lower limit of 
 # Performance
 On a test machine<sup>[3](#myfootnote3)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
 
-The workbook VBA-CSV.xlsm in the workbooks folder includes [code](src/modCSVPerformance.bas) to benchmark `CSVRead` against the two alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/) (so not easily available from VBA). It generates plots of parse time as a function of number of rows, number of columns and field length.
+The workbook VBA-CSV.xlsm in the workbooks folder includes [code](src/modCSVPerformance.bas) to benchmark `CSVRead` against the first two of the alternative CSV parsers mentioned above and also against [CSV.jl](https://csv.juliadata.org/stable/), a high-performance multi-threaded CSV parser written in [Julia](https://julialang.org/) (so not easily available from VBA). It generates plots of parse time as a function of number of rows, number of columns and field length.
 
 The first plot shows the influence of the number of rows on parsing time. The files examined all had a single column of twenty-character fields with embedded line breaks. Take care interpreting the plot – both axes are on log scale. For the largest file plotted, CSVRead was about 10 times faster than ws_garcia and about 16 times slower than CSV.jl. In this case the file had 1,048,576 rows and was 27.3Mb in size, parse times were: CSVRead 5.2 seconds; ws_garcia 55.8 seconds; and CSV.jl 0.32 seconds.
 ![chart3](images/Chart_3_Time_v_Rows.jpg)
