@@ -3784,7 +3784,8 @@ Public Sub RegisterCSVWrite()
 
     ReDim ArgDescs(1 To 8)
     ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
-                  "Excel errors or null values."
+                  "Excel errors or null values. Data typically has two dimensions;  with one dimensional arrays " & _
+                  "treated as two-dimensional arrays with a single column."
     ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
                   "function returns Data converted CSV-style to a string."
     ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
@@ -3817,7 +3818,8 @@ End Sub
 '             string" (starts with `#`, ends with `!`) describing what went wrong.
 ' Arguments
 ' Data      : An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty,
-'             Excel errors or null values.
+'             Excel errors or null values. Data typically has two dimensions;  with one dimensional arrays
+'             treated as two-dimensional arrays with a single column.
 ' FileName  : The full name of the file, including the path. Alternatively, if FileName is omitted, then the
 '             function returns Data converted CSV-style to a string.
 ' QuoteAllStrings: If `TRUE` (the default) then elements of Data that are strings are quoted before being
@@ -3852,7 +3854,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
         "double  quote, line feed or carriage return"
-    Const Err_Dimensions As String = "Data must be a range or a 2-dimensional array"
+    Const Err_Dimensions As String = "Data has more than two dimensions, which is not supported"
     Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
     
     Dim EOLIsWindows As Boolean
@@ -3908,7 +3910,13 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
             ReDim Tmp(1 To 1, 1 To 1)
             Tmp(1, 1) = Data
             Data = Tmp
-        Case 1, Is > 2
+        Case 1
+            ReDim Tmp(LBound(Data) To UBound(Data), 1 To 1)
+            For i = LBound(Data) To UBound(Data)
+                Tmp(i, 1) = Data(i)
+            Next i
+            Data = Tmp
+        Case Is > 2
             Throw Err_Dimensions
     End Select
     

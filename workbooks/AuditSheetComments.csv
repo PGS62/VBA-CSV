@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+137,12-Oct-2021,12:37:20,"Philip Swannell","CSVWrite now accepts one-dimensional Data."
 136,11-Oct-2021,19:11:11,"Philip Swannell","CSVWrite now accepts zero-dimensional Data."
 135,08-Oct-2021,19:29:27,"Philip Swannell","More performance testing"
 134,08-Oct-2021,16:24:55,"Philip Swannell","Tweaked method PrepareForRelease."
