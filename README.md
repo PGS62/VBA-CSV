@@ -119,7 +119,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
 
 |Argument|Description|
 |:-------|:----------|
-|`Data`|An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values. `Data` typically has two dimensions;  with one dimensional arrays treated as two-dimensional arrays with a single column.|
+|`Data`|An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, Excel errors or null values. `Data` typically has two dimensions, but if `Data` has only one dimension then the output file has a single column, one field per row.|
 |`FileName`|The full name of the file, including the path. Alternatively, if `FileName` is omitted, then the function returns `Data` converted CSV-style to a string.|
 |`QuoteAllStrings`|If `TRUE` (the default) then elements of `Data` that are strings are quoted before being written to file, other elements (Numbers, Booleans, Errors) are not quoted. If `FALSE` then the only elements of `Data` that are quoted are strings containing `Delimiter`, line feed, carriage return or double quote. In all cases, double quotes are escaped by another double quote.|
 |`DateFormat`|A format string that determines how dates, including cells formatted as dates, appear in the file. If omitted, defaults to `yyyy-mm-dd`.|

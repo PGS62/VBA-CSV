@@ -3784,8 +3784,8 @@ Public Sub RegisterCSVWrite()
 
     ReDim ArgDescs(1 To 8)
     ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
-                  "Excel errors or null values. Data typically has two dimensions;  with one dimensional arrays " & _
-                  "treated as two-dimensional arrays with a single column."
+                  "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
+                  "dimension then the output file has a single column, one field per row."
     ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
                   "function returns Data converted CSV-style to a string."
     ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
@@ -3818,8 +3818,8 @@ End Sub
 '             string" (starts with `#`, ends with `!`) describing what went wrong.
 ' Arguments
 ' Data      : An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty,
-'             Excel errors or null values. Data typically has two dimensions;  with one dimensional arrays
-'             treated as two-dimensional arrays with a single column.
+'             Excel errors or null values. Data typically has two dimensions, but if Data has only one
+'             dimension then the output file has a single column, one field per row.
 ' FileName  : The full name of the file, including the path. Alternatively, if FileName is omitted, then the
 '             function returns Data converted CSV-style to a string.
 ' QuoteAllStrings: If `TRUE` (the default) then elements of Data that are strings are quoted before being
@@ -3850,6 +3850,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
     Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString) As String
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
