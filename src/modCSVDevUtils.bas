@@ -116,7 +116,7 @@ Private Sub PrepareForRelease()
 
     For Each ws In ThisWorkbook.Worksheets
         If ws.Visible = xlSheetVisible Then
-            Application.Goto ws.Cells(1, 1)
+            Application.GoTo ws.Cells(1, 1)
             ActiveWindow.Zoom = 100
             If InStr(ws.Name, "GIF") = 0 Then
                 ActiveWindow.DisplayGridlines = False
@@ -128,7 +128,7 @@ Private Sub PrepareForRelease()
     Next
     For i = 1 To ThisWorkbook.Worksheets.count
         If ThisWorkbook.Worksheets(i).Visible Then
-            Application.Goto ThisWorkbook.Worksheets(i).Cells(1, 1)
+            Application.GoTo ThisWorkbook.Worksheets(i).Cells(1, 1)
             Exit For
         End If
     Next i
