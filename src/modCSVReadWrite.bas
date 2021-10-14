@@ -622,7 +622,7 @@ End Sub
 ' Procedure  : InferSourceType
 ' Purpose    : Guess whether FileName is in fact a file, a URL or a string in CSV format
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function InferSourceType(ByVal FileName As String) As enmSourceType
+Private Function InferSourceType(FileName As String) As enmSourceType
 
     On Error GoTo ErrHandler
     If InStr(FileName, vbLf) > 0 Then 'vbLf and vbCr are not permitted characters in file names or urls
@@ -681,7 +681,7 @@ End Function
 ' Purpose   : Downloads bits from the Internet and saves them to a file.
 '             See https://msdn.microsoft.com/en-us/library/ms775123(v=vs.85).aspx
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Download(ByVal URLAddress As String, ByVal FileName As String) As String
+Private Function Download(URLAddress As String, ByVal FileName As String) As String
     Dim ErrString As String
     Dim Res As Long
     Dim TargetFolder As String
@@ -722,7 +722,7 @@ End Function
 ' Procedure  : ParseDownloadError, sub of Download
 '              https://www.vbforums.com/showthread.php?882757-URLDownloadToFile-error-codes
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseDownloadError(ByVal ErrNum As Long) As String
+Private Function ParseDownloadError(ErrNum As Long) As String
     Dim ErrString As String
     Select Case ErrNum
         Case &H80004004
@@ -825,7 +825,7 @@ End Function
 '  CharSet : Set by reference. Needed only when we read files using ADODB.Stream, i.e. when useADODB is True.
 '  useADODB: Should file be read via ADODB.Stream, which is capable of reading UTF-8 files
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub ParseEncoding(ByVal FileName As String, ByVal Encoding As Variant, ByRef TriState As Long, _
+Private Sub ParseEncoding(FileName As String, Encoding As Variant, ByRef TriState As Long, _
     ByRef CharSet As String, ByRef useADODB As Boolean)
 
     Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding be " & _
@@ -876,7 +876,7 @@ End Sub
 ' Procedure  : IsCTValid
 ' Purpose    : Is a "Convert Types string" (which can in fact be either a string or a Boolean) valid?
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function IsCTValid(ByVal CT As Variant) As Boolean
+Private Function IsCTValid(CT As Variant) As Boolean
 
     Static rx As VBScript_RegExp_55.RegExp
 
@@ -907,7 +907,7 @@ End Function
 ' Procedure  : CTsEqual
 ' Purpose    : Test if two CT strings (strings to define type conversion) are equal, i.e. will have the same effect
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CTsEqual(ByVal CT1 As Variant, ByVal CT2 As Variant) As Boolean
+Private Function CTsEqual(CT1 As Variant, CT2 As Variant) As Boolean
     On Error GoTo ErrHandler
     If VarType(CT1) = VarType(CT2) Then
         If CT1 = CT2 Then
@@ -925,7 +925,7 @@ End Function
 ' Procedure  : StandardiseCT
 ' Purpose    : Put a CT string into standard form so that two such can be compared.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function StandardiseCT(ByVal CT As Variant) As String
+Private Function StandardiseCT(CT As Variant) As String
     On Error GoTo ErrHandler
     If VarType(CT) = vbBoolean Then
         If CT Then
@@ -952,7 +952,7 @@ End Function
 ' Procedure  : OneDArrayToTwoDArray
 ' Purpose    : Convert 1-d array of 2-element 1-d arrays into a 1-based, two-column, 2-d array.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function OneDArrayToTwoDArray(ByVal x As Variant) As Variant
+Private Function OneDArrayToTwoDArray(x As Variant) As Variant
     Const Err_1DArray As String = "If ConvertTypes is given as a 1-dimensional array, each element must " & _
         "be a 1-dimensional array with two elements"
 
@@ -1002,7 +1002,7 @@ End Function
 Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
     ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
     ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean, _
-    ByRef ColByColFormatting As Boolean, ByVal HeaderRowNum As Long, ByRef CTDict As Scripting.Dictionary)
+    ByRef ColByColFormatting As Boolean, HeaderRowNum As Long, ByRef CTDict As Scripting.Dictionary)
     
     Const Err_2D As String = "If ConvertTypes is given as a two dimensional array then the " & _
         " lower bounds in each dimension must be 1"
@@ -1189,8 +1189,8 @@ End Sub
 ' Procedure  : Min4
 ' Purpose    : Returns the minimum of four inputs and an indicator of which of the four was the minimum
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Min4(ByVal N1 As Long, ByVal N2 As Long, ByVal N3 As Long, _
-    ByVal N4 As Long, ByRef Which As Long) As Long
+Private Function Min4(N1 As Long, N2 As Long, N3 As Long, _
+     N4 As Long, ByRef Which As Long) As Long
 
     If N1 < N2 Then
         Min4 = N1
@@ -1224,7 +1224,7 @@ End Function
 '            * UTF-8 files are not correctly handled by OpenAsTextStream, instead we use ADODB.Stream, setting CharSet
 '              to "UTF-8".
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub DetectEncoding(ByVal FilePath As String, ByRef TriState As Long, _
+Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, _
     ByRef CharSet As String, ByRef useADODB As Boolean)
 
     Dim intAsc1Chr As Long
@@ -1301,8 +1301,8 @@ End Sub
 '              semi-colon, colon or pipe (|). Only look in the first 10,000 characters, Would prefer to look at the first
 '              10 lines, but that presents a problem for files with Mac line endings as T.ReadLine doesn't work for them.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function InferDelimiter(ByVal st As enmSourceType, ByVal FileNameOrContents As String, _
-    ByVal TriState As Long, ByVal DecimalSeparator As String) As String
+Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As String, _
+     TriState As Long, DecimalSeparator As String) As String
     
     Const CHUNK_SIZE As Long = 1000
     Const Err_SourceType As String = "Cannot infer delimiter directly from URL"
@@ -1464,7 +1464,7 @@ End Sub
 ' Procedure  : ReplaceRepeats
 ' Purpose    : Replace repeated instances of a character in a string with a single instance.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub ReplaceRepeats(ByRef TheString As String, ByVal TheChar As String)
+Private Sub ReplaceRepeats(ByRef TheString As String, TheChar As String)
     Dim ChCh As String
     ChCh = TheChar & TheChar
     Do While InStr(TheString, ChCh) > 0
@@ -1508,9 +1508,9 @@ End Sub
 '  HeaderRow       : Set equal to the contents of the header row in the file, no type conversion, but quoted fields are
 '                    unquoted and leading and trailing spaces are removed.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseCSVContents(ContentsOrStream As Variant, ByVal useADODB As Boolean, ByVal QuoteChar As String, _
-    ByVal Delimiter As String, ByVal Comment As String, ByVal IgnoreEmptyLines As Boolean, _
-    ByVal IgnoreRepeated As Boolean, ByVal SkipToRow As Long, ByVal HeaderRowNum As Long, ByVal NumRows As Long, _
+Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boolean, QuoteChar As String, _
+     Delimiter As String, Comment As String, IgnoreEmptyLines As Boolean, _
+     IgnoreRepeated As Boolean, SkipToRow As Long, HeaderRowNum As Long, NumRows As Long, _
     ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, _
     ByRef Starts() As Long, ByRef Lengths() As Long, ByRef RowIndexes() As Long, ByRef ColIndexes() As Long, _
     ByRef QuoteCounts() As Long, ByRef HeaderRow As Variant) As String
@@ -1830,9 +1830,9 @@ End Function
 ' Purpose    : Sub-routine of ParseCSVContents. Skip a commented or empty row by incrementing i to the position of
 '              the line feed just before the next not-commented line.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub SkipLines(ByVal Streaming As Boolean, ByVal useADODB As Boolean, ByVal Comment As String, _
-    ByVal LComment As Long, ByVal IgnoreEmptyLines As Boolean, Stream As Object, ByVal Delimiter As String, _
-    ByRef Buffer As String, ByRef i As Long, ByVal QuoteChar As String, ByVal PosLF As Long, ByVal PosCR As Long, _
+Private Sub SkipLines(Streaming As Boolean, useADODB As Boolean, Comment As String, _
+    LComment As Long, IgnoreEmptyLines As Boolean, Stream As Object, ByVal Delimiter As String, _
+    ByRef Buffer As String, ByRef i As Long, QuoteChar As String, ByVal PosLF As Long, ByVal PosCR As Long, _
     ByRef BufferUpdatedTo As Long)
     
     Dim atEndOfStream As Boolean
@@ -1895,8 +1895,8 @@ End Sub
 '              location of the first found and sets the by-reference argument Which to indicate which element of
 '              SearchFor was the first to be found.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function SearchInBuffer(SearchFor() As String, ByVal StartingAt As Long, Stream As Object, _
-    ByVal useADODB As Boolean, ByVal Delimiter As String, ByVal QuoteChar As String, ByRef Which As Long, _
+Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Stream As Object, _
+    useADODB As Boolean, Delimiter As String, QuoteChar As String, ByRef Which As Long, _
     ByRef Buffer As String, ByRef BufferUpdatedTo As Long) As Long
 
     Dim atEndOfStream As Boolean
@@ -1947,8 +1947,8 @@ End Function
 '              SearchFor is found, search is restricted to region [StartingAt, EndingAt] and Which is updated with the
 '              index identifying which was the first of the strings to be found.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function InStrMulti(SearchFor() As String, SearchWithin As String, ByVal StartingAt As Long, _
-    ByVal EndingAt As Long, ByRef Which As Long) As Long
+Private Function InStrMulti(SearchFor() As String, SearchWithin As String, StartingAt As Long, _
+     EndingAt As Long, ByRef Which As Long) As Long
 
     Const Inf As Long = 2147483647
     Dim i As Long
@@ -1992,7 +1992,7 @@ End Function
 '              QuoteChar and vbCrLf. This ensures that the calls to Instr that search the buffer for these strings do
 '              not needlessly scan the unupdated part of the buffer.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub GetMoreFromStream(T As Variant, ByVal Delimiter As String, ByVal QuoteChar As String, _
+Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As String, _
 ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
 
     Const ChunkSize As Long = 5000  ' The number of characters to read from the stream on each call. _
@@ -2084,7 +2084,7 @@ End Sub
 ' Purpose    : Count the quotes in a string, only used when applying column-by-column type conversion, because in that
 '              case it's not possible to use the count of quotes made at parsing time which is organised row-by-row.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CountQuotes(ByVal Str As String, ByVal QuoteChar As String) As Long
+Private Function CountQuotes(Str As String, QuoteChar As String) As Long
     Dim N As Long
     Dim pos As Long
 
@@ -2141,14 +2141,14 @@ End Function
 '                         MissingStrings argument then values matching those strings are also converted to
 '                         ShowMissingsAs, thanks to method MakeSentinels.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ConvertField(ByVal Field As String, ByVal AnyConversion As Boolean, ByVal FieldLength As Long, _
-    ByVal TrimFields As Boolean, ByVal QuoteChar As String, ByVal quoteCount As Long, ByVal ConvertQuoted As Boolean, _
-    ByVal ShowNumbersAsNumbers As Boolean, ByVal SepStandard As Boolean, ByVal DecimalSeparator As String, _
-    ByVal SysDecimalSeparator As String, ByVal ShowDatesAsDates As Boolean, ByVal ISO8601 As Boolean, _
-    ByVal AcceptWithoutTimeZone As Boolean, ByVal AcceptWithTimeZone As Boolean, ByVal DateOrder As Long, _
-    ByVal DateSeparator As String, ByVal SysDateOrder As Long, ByVal SysDateSeparator As String, _
-    ByVal AnySentinels As Boolean, ByVal Sentinels As Dictionary, ByVal MaxSentinelLength As Long, _
-    ByVal ShowMissingsAs As Variant) As Variant
+Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, _
+     TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, _
+     ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
+     SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
+     AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
+     DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+     AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
+     ShowMissingsAs As Variant) As Variant
 
     Dim Converted As Boolean
     Dim dblResult As Double
@@ -2244,7 +2244,7 @@ End Function
 ' Procedure  : Unquote
 ' Purpose    : Unquote a field.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Unquote(ByVal Field As String, ByVal QuoteChar As String, ByVal quoteCount As Long) As String
+Private Function Unquote(ByVal Field As String, QuoteChar As String, quoteCount As Long) As String
 
     On Error GoTo ErrHandler
     If quoteCount > 0 Then
@@ -2268,8 +2268,8 @@ End Function
 ' Procedure  : CastToDouble, sub-routine of ConvertField
 ' Purpose    : Casts strIn to double where strIn has specified decimals separator.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToDouble(ByVal strIn As String, ByRef dblOut As Double, ByVal SepStandard As Boolean, _
-    ByVal DecimalSeparator As String, ByVal SysDecimalSeparator As String, ByRef Converted As Boolean)
+Private Sub CastToDouble(strIn As String, ByRef dblOut As Double, SepStandard As Boolean, _
+     DecimalSeparator As String, SysDecimalSeparator As String, ByRef Converted As Boolean)
     
     On Error GoTo ErrHandler
     If SepStandard Then
@@ -2430,8 +2430,8 @@ End Sub
 '  SysDateSeparator: The Windows system date separator
 '  Converted       : Boolean flipped to TRUE if conversion takes place
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToDate(ByVal strIn As String, ByRef dtOut As Date, ByVal DateOrder As Long, _
-    ByVal DateSeparator As String, ByVal SysDateOrder As Long, ByVal SysDateSeparator As String, _
+Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, _
+     DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
     ByRef Converted As Boolean)
     
     Dim D As String
@@ -2568,7 +2568,7 @@ End Sub
 ' Purpose   : Returns the number of dimensions in an array variable, or 0 if the variable
 '             is not an array.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function NumDimensions(ByVal x As Variant) As Long
+Private Function NumDimensions(x As Variant) As Long
     Dim i As Long
     Dim y As Long
     If Not IsArray(x) Then
@@ -2592,9 +2592,9 @@ End Function
 '              that field should be converted to the associated item value. Handles Booleans, Missings and Excel errors.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ByRef MaxLength As Long, _
-    ByRef AnySentinels As Boolean, ByVal ShowBooleansAsBooleans As Boolean, ByVal ShowErrorsAsErrors As Boolean, _
-    ByRef ShowMissingsAs As Variant, Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
-    Optional ByVal MissingStrings As Variant)
+    ByRef AnySentinels As Boolean, ShowBooleansAsBooleans As Boolean, ShowErrorsAsErrors As Boolean, _
+    ByRef ShowMissingsAs As Variant, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
+    Optional MissingStrings As Variant)
 
     Const Err_FalseStrings As String = "FalseStrings must be omitted or provided as a string or an array of " & _
         "strings that represent Boolean value False"
@@ -2673,8 +2673,8 @@ End Sub
 ' Procedure  : AddKeysToDict, Sub-routine of MakeSentinels
 ' Purpose    : Broadcast AddKeyToDict over an array of keys.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As Variant, ByVal item As Variant, _
-    ByVal FriendlyErrorString As String)
+Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As Variant, item As Variant, _
+     FriendlyErrorString As String)
 
     Dim i As Long
     Dim j As Long
@@ -2716,8 +2716,8 @@ End Sub
 ' Procedure  : AddKeyToDict, Sub-routine of MakeSentinels
 ' Purpose    : Wrap .Add method to have more helpful error message if things go awry.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Key As Variant, ByVal item As Variant, _
-    Optional ByVal FriendlyErrorString As String)
+Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant, item As Variant, _
+    Optional FriendlyErrorString As String)
 
     Dim FoundRepeated As Boolean
 
@@ -2829,7 +2829,7 @@ End Sub
 ' Procedure  : ParseISO8601
 ' Purpose    : Test harness for calling from spreadsheets
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function ParseISO8601(ByVal strIn As String) As Variant
+Public Function ParseISO8601(strIn As String) As Variant
     Dim Converted As Boolean
     Dim dtOut As Date
 
@@ -2850,7 +2850,7 @@ End Function
 ' Procedure  : CastToTime
 ' Purpose    : Cast strings that represent a time to a date, no handling of TimeZone.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToTime(ByVal strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
+Private Sub CastToTime(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
 
     On Error GoTo ErrHandler
     
@@ -2869,7 +2869,7 @@ End Sub
 ' Purpose    : CDate does not correctly cope with times such as '04:20:10.123 am' or '04:20:10.123', i.e, times with a
 '              fractional second, so this method is called after CastToTime
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToTimeB(ByVal strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
+Private Sub CastToTimeB(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
     Static rx As VBScript_RegExp_55.RegExp
     Dim DecPointAt As Long
     Dim FractionalSecond As Double
@@ -2928,7 +2928,7 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastISO8601(ByVal strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean, _
-    ByVal AcceptWithoutTimeZone As Boolean, ByVal AcceptWithTimeZone As Boolean)
+     AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
 
     Dim L As Long
     Dim LocalTime As Double
@@ -3237,9 +3237,9 @@ End Function
 '  SkipToLine         : Return starts at this line of the file.
 '  NumLinesToReturn   : This many lines are returned. Pass zero for all lines from SkipToLine.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseTextFile(FileNameOrContents As String, ByVal isFile As Boolean, ByVal useADODB As Boolean, _
-    ByVal CharSet As String, ByVal TriState As Long, ByVal SkipToLine As Long, ByVal NumLinesToReturn As Long, _
-    ByVal CallingFromWorksheet As Boolean) As Variant
+Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, useADODB As Boolean, _
+     CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long, _
+     CallingFromWorksheet As Boolean) As Variant
 
     Const Err_FileEmpty As String = "File is empty"
     Dim Buffer As String
@@ -3458,7 +3458,7 @@ End Sub
 '             methods to be used from VBA code while keeping error handling robust
 '             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function ThrowIfError(ByRef Data As Variant) As Variant
+Public Function ThrowIfError(Data As Variant) As Variant
     ThrowIfError = Data
     If VarType(Data) = vbString Then
         If Left$(Data, 1) = "#" Then
@@ -3473,7 +3473,7 @@ End Function
 ' Procedure  : FileExists
 ' Purpose    : Returns True if FileName exists on disk, False o.w.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function FileExists(ByVal FileName As String) As Boolean
+Private Function FileExists(FileName As String) As Boolean
     Dim F As Scripting.File
     On Error GoTo ErrHandler
     If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
@@ -3488,7 +3488,7 @@ End Function
 ' Procedure : FolderExists
 ' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function FolderExists(ByVal FolderPath As String) As Boolean
+Private Function FolderExists(FolderPath As String) As Boolean
     Dim F As Scripting.Folder
     
     On Error GoTo ErrHandler
@@ -3505,7 +3505,7 @@ End Function
 ' Procedure  : FileDelete
 ' Purpose    : Delete a file, returns True or error string.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub FileDelete(ByVal FileName As String)
+Private Sub FileDelete(FileName As String)
     Dim F As Scripting.File
     On Error GoTo ErrHandler
 
@@ -3593,7 +3593,7 @@ End Sub
 ' Procedure  : FileFromPath
 ' Purpose    : Split file-with-path to file name (if ReturnFileName is True) or path otherwise.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function FileFromPath(ByVal FullFileName As String, Optional ByVal ReturnFileName As Boolean = True) As Variant
+Private Function FileFromPath(FullFileName As String, Optional ReturnFileName As Boolean = True) As Variant
     Dim SlashPos As Long
     Dim SlashPos2 As Long
 
@@ -3619,7 +3619,7 @@ End Function
 ' Procedure : IsNumber
 ' Purpose   : Is a singleton a number?
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function IsNumber(ByVal x As Variant) As Boolean
+Private Function IsNumber(x As Variant) As Boolean
     Select Case VarType(x)
         Case vbDouble, vbInteger, vbSingle, vbLong ', vbCurrency, vbDecimal
             IsNumber = True
@@ -3676,7 +3676,7 @@ End Function
 ' TheArray  : An array of arbitrary values.
 '             Return is always 1-based, even when input is zero-based.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Transpose(ByVal TheArray As Variant) As Variant
+Private Function Transpose(TheArray As Variant) As Variant
     Dim Co As Long
     Dim i As Long
     Dim j As Long
@@ -3752,7 +3752,7 @@ ErrHandler:
     Throw "#Force2DArray: " & Err.Description & "!"
 End Sub
 
-Private Function MaxLngs(ByVal x As Long, ByVal y As Long) As Long
+Private Function MaxLngs(x As Long, y As Long) As Long
     If x > y Then
         MaxLngs = x
     Else
@@ -3760,7 +3760,7 @@ Private Function MaxLngs(ByVal x As Long, ByVal y As Long) As Long
     End If
 End Function
 
-Private Function MinLngs(ByVal x As Long, ByVal y As Long) As Long
+Private Function MinLngs(x As Long, y As Long) As Long
     If x > y Then
         MinLngs = y
     Else
@@ -3995,7 +3995,7 @@ End Function
 ' Purpose    : Convert text describing an operating system to the end-of-line marker employed. Note that "Mac" converts
 '              to vbCr but Apple operating systems since OSX use vbLf, matching Unix.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function OStoEOL(ByVal OS As String, ByVal ArgName As String) As String
+Private Function OStoEOL(OS As String, ArgName As String) As String
 
     Const Err_Invalid As String = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
 
@@ -4020,8 +4020,8 @@ End Function
 ' Procedure  : Encode
 ' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, ByVal DateFormat As String, ByVal DateTimeFormat As String, _
-    ByVal Delim As String) As String
+Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As String, DateTimeFormat As String, _
+     Delim As String) As String
     
     Const DQ As String = """"
     Const DQ2 As String = """"""
@@ -4100,7 +4100,7 @@ End Function
 '              argument" if the error is caused by attempting to write illegal characters to a stream opened with
 '              TriStateFalse.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub WriteLineWrap(T As TextStream, ByVal text As String, ByVal EOLIsWindows As Boolean, ByVal EOL As String, ByVal Unicode As Boolean)
+Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boolean, EOL As String, Unicode As Boolean)
 
     Dim ErrDesc As String
     Dim ErrNum As Long
@@ -4140,7 +4140,7 @@ End Sub
 '              list then they cannot:
 '             128,130,131,132,133,134,135,136,137,138,139,140,142,145,146,147,148,149,150,151,152,153,154,155,156,158,159
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function CanWriteCharToAscii(ByVal c As String) As Boolean
+Private Function CanWriteCharToAscii(c As String) As Boolean
     Dim code As Long
     code = AscW(c)
     If code > 255 Or code < 0 Then

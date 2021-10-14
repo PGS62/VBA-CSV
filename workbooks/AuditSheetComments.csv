@@ -1,4 +1,8 @@
 "Version","Date","Time","Author","Comment"
+142,14-Oct-2021,16:36:32,"Philip Swannell","In release 120 (or soon after) I followed suggestions from RubberDuck code analysis to explicitly declare all arguments as ByVal or ByRef with preference for ByVal. But I now believe that caused a performance hit, especially when ConvertTypes is not FALSE. Reverted declarations to as of version 119. I now declare as follows:
+ByVal = argument will be changed in function and we don't want that change to be visible to the caller.
+ByRef = argument will be changed in function and we DO want that change to be visible to the caller.
+Silent = argument won't be changed in the function, so pass by reference (the default) for better speed."
 141,14-Oct-2021,09:42:26,"Philip Swannell","Added to ToDo list."
 140,14-Oct-2021,09:26:58,"Philip Swannell","Comments in module modCSVTestRDatasets."
 139,13-Oct-2021,17:17:11,"Philip Swannell","Reinstated changes that were lost in 138."
