@@ -1,4 +1,5 @@
 "Version","Date","Time","Author","Comment"
+143,14-Oct-2021,17:09:13,"Philip Swannell","Moved performance testing methods out of modCSVReadWrite. 331 fewer loc."
 142,14-Oct-2021,16:36:32,"Philip Swannell","In release 120 (or soon after) I followed suggestions from RubberDuck code analysis to explicitly declare all arguments as ByVal or ByRef with preference for ByVal. But I now believe that caused a performance hit, especially when ConvertTypes is not FALSE. Reverted declarations to as of version 119. I now declare as follows:
 ByVal = argument will be changed in function and we don't want that change to be visible to the caller.
 ByRef = argument will be changed in function and we DO want that change to be visible to the caller.

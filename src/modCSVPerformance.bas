@@ -74,7 +74,7 @@ End Function
 Private Sub RunSpeedTests()
 
     Dim NumColsInTFPRet As Long
-    Const Timeout As Long = 1
+    Const Timeout As Long = 5
     Const Title As String = "VBA-CSV Speed Tests"
     Dim c As Range
     Dim JuliaResultsFile As String
@@ -116,6 +116,7 @@ Private Sub RunSpeedTests()
                     c.Resize(1, NumColsInTFPRet).value = TestResults
                     ws.Calculate
                     DoEvents
+                    Stop
                     Application.ScreenUpdating = True
                 Next
                 ThisWorkbook.Save

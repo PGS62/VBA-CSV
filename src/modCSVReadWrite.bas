@@ -6,6 +6,22 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Document: https://github.com/PGS62/VBA-CSV#readme
 ' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.15
 
+'Installation:
+'1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
+
+'2) Add two references (In VBA Editor Tools > References)
+'   Microsoft Scripting Runtime
+'   Microsoft VBScript Regular Expressions 5.5 (or the latest version available)
+
+'3) If you plan to call the functions from spreadsheet formulas then you might like to tell
+'   Excel's Function Wizard about them by adding calls to RegisterCSVRead and RegisterCSVWrite
+'   to the project's Workbook_Open event, which lives in the ThisWorkbook class module.
+
+'        Private Sub Workbook_Open()
+'            RegisterCSVRead
+'            RegisterCSVWrite
+'        End Sub
+
 Option Explicit
 
 Private m_FSO As Scripting.FileSystemObject
@@ -13,13 +29,9 @@ Private m_FSO As Scripting.FileSystemObject
 #If VBA7 And Win64 Then
     'for 64-bit Excel
     Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
-    Private Declare PtrSafe Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
-    Private Declare PtrSafe Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 #Else
     'for 32-bit Excel
     Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
-    Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
-    Private Declare Function QueryPerformanceFrequency Lib "kernel32" (lpFrequency As Currency) As Long
 #End If
 
 Private Enum enmErrorStyle
@@ -150,8 +162,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
     Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
     Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -305,11 +315,9 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     CallingFromWorksheet = TypeName(Application.Caller) = "Range"
     
     If CallingFromWorksheet Then
-        If SourceType = st_File Then
-            If FunctionWizardActive() Then
-                CSVRead = "#" & Err_FunctionWizard & "!"
-                Exit Function
-            End If
+        If FunctionWizardActive() Then
+            CSVRead = "#" & Err_FunctionWizard & "!"
+            Exit Function
         End If
     End If
     
@@ -352,23 +360,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             Stream.Close
         End If
     End If
-           
-'    'Useful for debugging method ParseCSVContents - return an array displaying the variables set by that method
-'    Dim Chars() As String, Numbers() As Long, Ascs() As Long
-'    ReDim Numbers(1 To Len(CSVContents), 1 To 1)
-'    ReDim Chars(1 To Len(CSVContents), 1 To 1)
-'    ReDim Ascs(1 To Len(CSVContents), 1 To 1)
-'    For i = 1 To Len(CSVContents)
-'        Chars(i, 1) = Mid$(CSVContents, i, 1)
-'        Numbers(i, 1) = i
-'        Ascs(i, 1) = AscW(Chars(i, 1))
-'    Next i
-'    Dim Headers
-'    Headers = HStack("NRF,NCF,NF,Dlm", "Starts", "Lengths", "RowIndexes", "ColIndexes", "QuoteCounts", "i", "Char(i)", "AscW(Char(i))")
-'    CSVRead = VStack(Headers, HStack(VStack(NumRowsFound, NumColsFound, NumFields, strDelimiter), Transpose(Starts), _
-'        Transpose(Lengths), Transpose(RowIndexes), Transpose(ColIndexes), Transpose(QuoteCounts), Numbers, Chars, Ascs))
-'    Exit Function
-           
+                     
     If NumCols = 0 Then
         NumColsInReturn = NumColsFound - SkipToCol + 1
         If NumColsInReturn <= 0 Then
@@ -2283,140 +2275,6 @@ ErrHandler:
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : SpeedTest_CastToDate
-' Purpose    : Helps tune CastToDate for speed.
-'Example output:
-'Running SpeedTest_CastToDate 2021-Sep-07 13:36:55
-'SysDateOrder = 0
-'SysDateSeparator = /
-'N = 1,000,000
-'Calls per second = 4,733,596  strIn = "foo"                      DateOrder = 2  Result as expected? True
-'Calls per second = 4,005,577  strIn = "foo-bar"                  DateOrder = 2  Result as expected? True
-'Calls per second = 771,609    strIn = "09-07-2021"               DateOrder = 0  Result as expected? True
-'Calls per second = 500,064    strIn = "07-09-2021"               DateOrder = 1  Result as expected? True
-'Calls per second = 729,058    strIn = "2021-09-07"               DateOrder = 2  Result as expected? True
-'Calls per second = 379,716    strIn = "08-24-2021 15:18:01"      DateOrder = 0  Result as expected? True
-'Calls per second = 202,723    strIn = "08-24-2021 15:18:01.123"  DateOrder = 0  Result as expected? True
-'Calls per second = 321,445    strIn = "24-08-2021 15:18:01"      DateOrder = 1  Result as expected? True
-'Calls per second = 200,997    strIn = "24-08-2021 15:18:01.123"  DateOrder = 1  Result as expected? True
-'Calls per second = 375,057    strIn = "2021-08-24 15:18:01"      DateOrder = 2  Result as expected? True
-'Calls per second = 207,064    strIn = "2021-08-24 15:18:01.123"  DateOrder = 2  Result as expected? True
-'Calls per second = 475,397    strIn = "2021-08-24 15:18:01.123x" DateOrder = 2  Result as expected? True
-' -----------------------------------------------------------------------------------------------------------------------
-Private Sub SpeedTest_CastToDate()
-
-    Const N As Long = 1000000
-    Dim Converted As Boolean
-    Dim DateOrder As Long
-    Dim DateSeparator As String
-    Dim dtOut As Date
-    Dim Expected As Date
-    Dim i As Long
-    Dim j As Long
-    Dim k As Long
-    Dim strIn As String
-    Dim SysDateOrder As Long
-    Dim SysDateSeparator As String
-    Dim t1 As Double
-    Dim t2 As Double
-
-    '0 = month-day-year, 1 = day-month-year, 2 = year-month-day
-    SysDateOrder = Application.International(xlDateOrder)
-    SysDateSeparator = Application.International(xlDateSeparator)
-
-    Debug.Print String(100, "=")
-    Debug.Print "Running SpeedTest_CastToDate " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
-    Debug.Print "SysDateOrder = " & SysDateOrder
-    Debug.Print "SysDateSeparator = " & SysDateSeparator
-    Debug.Print "N = " & Format$(N, "###,###")
-    
-    For k = 1 To 12
-        For j = 1 To 1 'Maybe do multiple times to test for variability or results.
-            dtOut = 0
-            Converted = False
-            Select Case k
-                Case 1
-                    DateOrder = 2
-                    DateSeparator = "-"
-                    strIn = "foo" 'Contains no date separator, so rejected quickly by CastToDate
-                    Expected = CDate(0)
-                Case 2
-                    DateOrder = 2
-                    DateSeparator = "-"
-                    strIn = "foo-bar" 'Contains only one date separator, so rejected quickly by CastToDate
-                    Expected = CDate(0)
-                Case 3
-                    DateOrder = 0 'month-day-year
-                    DateSeparator = "-"
-                    strIn = "09-07-2021"
-                    Expected = CDate("2021-Sep-07")
-                Case 4
-                    DateOrder = 1 'day-month-year
-                    DateSeparator = "-"
-                    strIn = "07-09-2021"
-                    Expected = CDate("2021-Sep-07")
-                Case 5
-                    DateOrder = 2   'year-month-day
-                    DateSeparator = "-"
-                    strIn = "2021-09-07"
-                    Expected = CDate("2021-Sep-07")
-                Case 6
-                    DateOrder = 0
-                    DateSeparator = "-"
-                    strIn = "08-24-2021 15:18:01" 'date with time, no fractions of second
-                    Expected = CDate("2021-Aug-24 15:18:01")
-                Case 7
-                    DateOrder = 0
-                    DateSeparator = "-"
-                    strIn = "08-24-2021 15:18:01.123" 'date with time, with fractions of second
-                    Expected = CDate("2021-Aug-24 15:18:01") + 0.123 / 86400
-                Case 8
-                    DateOrder = 1
-                    DateSeparator = "-"
-                    strIn = "24-08-2021 15:18:01" 'date with time, no fractions of second
-                    Expected = CDate("2021-Aug-24 15:18:01")
-                Case 9
-                    DateOrder = 1
-                    DateSeparator = "-"
-                    strIn = "24-08-2021 15:18:01.123" 'date with time, with fractions of second
-                    Expected = CDate("2021-Aug-24 15:18:01") + 0.123 / 86400
-                Case 10
-                    DateOrder = 2
-                    DateSeparator = "-"
-                    strIn = "2021-08-24 15:18:01" 'date with time, no fractions of second
-                    Expected = CDate("2021-Aug-24 15:18:01")
-                Case 11
-                    DateOrder = 2
-                    DateSeparator = "-"
-                    strIn = "2021-08-24 15:18:01.123" 'date with time, with fractions of second
-                    Expected = CDate("2021-Aug-24 15:18:01") + 0.123 / 86400
-                Case 12
-                    DateOrder = 2
-                    DateSeparator = "-"
-                    strIn = "2021-08-24 15:18:01.123x" 'Nearly a date, but final "x" stops it being so
-                    Expected = CDate(0)
-            End Select
-
-            t1 = ElapsedTime()
-            For i = 1 To N
-                CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
-            Next i
-            t2 = ElapsedTime()
-            Dim PrintThis As String
-            PrintThis = "Calls per second = " & Format$(N / (t2 - t1), "###,###")
-            If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
-            PrintThis = PrintThis & "strIn = """ & strIn & """"
-            If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
-            PrintThis = PrintThis & "DateOrder = " & DateOrder & "  Result as expected? " & (Expected = dtOut)
-            
-            Debug.Print PrintThis
-            DoEvents 'kick Immediate window to life
-        Next j
-    Next k
-
-End Sub
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastToDate, sub-routine of ConvertField
 ' Purpose    : In-place conversion of a string that looks like a date into a Long or Date. No error if string cannot be
 '              converted to date. Converts Dates, DateTimes and Times. Times in very simple format hh:mm:ss
@@ -2750,82 +2608,6 @@ ErrHandler:
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : SpeedTest_Sentinels
-' Purpose    : Test speed of accessing the sentinels dictionary, using similar approach to that employed in method
-'              ConvertField.
-'
-' Results:  On Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz   2.11 GHz, 16GB RAM
-'
-'Running SpeedTest_Sentinels 2021-08-25T15:01:33
-'Conversions per second = 90,346,968       Field = "This string is longer than the longest sentinel, which is 14"
-'Conversions per second = 20,976,150       Field = "mini" (Not a sentinel, but shorter than the longest sentinel)
-'Conversions per second = 9,295,050        Field = "True" (A sentinel, one of the elements of TrueStrings)
-' -----------------------------------------------------------------------------------------------------------------------
-Private Sub SpeedTest_Sentinels()
-    
-    Const N As Long = 10000000
-    Dim AnySentinels As Boolean
-    Dim Comment As String
-    Dim Field As String
-    Dim i As Long
-    Dim j As Long
-    Dim MaxLength As Long
-    Dim Res As Variant
-    Dim Sentinels As Scripting.Dictionary
-    Dim t1 As Double
-    Dim t2 As Double
-
-    On Error GoTo ErrHandler
-    
-        Set Sentinels = New Scripting.Dictionary
-        MakeSentinels Sentinels, MaxLength, AnySentinels, _
-        ShowBooleansAsBooleans:=True, _
-        ShowErrorsAsErrors:=True, _
-        ShowMissingsAs:=Empty, _
-        TrueStrings:=Array("True", "T"), _
-        FalseStrings:=Array("False", "F"), _
-        MissingStrings:=Array("NA", "-999")
-    
-    Dim Converted As Boolean
-    
-    Debug.Print "Running SpeedTest_Sentinels " & Format$(Now(), "yyyy-mm-ddThh:mm:ss")
-    
-    For j = 1 To 3
-    
-        Select Case j
-            Case 1
-                Field = "This string is longer than the longest sentinel, which is 14"
-            Case 2
-                Field = "mini"
-                Comment = "Not a sentinel, but shorter than the longest sentinel"
-            Case 3
-                Field = "True"
-                Comment = "A sentinel, one of the elements of TrueStrings"
-        End Select
-
-        t1 = ElapsedTime()
-        For i = 1 To N
-            If Len(Field) <= MaxLength Then
-                If Sentinels.Exists(Field) Then
-                    Res = Sentinels.item(Field)
-                    Converted = True
-                End If
-            End If
-        Next i
-        t2 = ElapsedTime()
-
-        Debug.Print "Conversions per second = " & Format$(N / (t2 - t1), "###,###"), _
-            "Field = """ & Field & """" & IIf(Comment = vbNullString, vbNullString, " (" & Comment & ")")
-
-    Next j
-
-    Exit Sub
-ErrHandler:
-    MsgBox "#SpeedTest_Sentinels: " & Err.Description & "!"
-
-End Sub
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseISO8601
 ' Purpose    : Test harness for calling from spreadsheets
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3078,106 +2860,10 @@ ErrHandler:
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : SpeedTest_CastISO8601
-' Purpose    : Testing speed of CastISO8601
-
-'Example output: (Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz   2.11 GHz, 16GB RAM)
-
-'Running SpeedTest_CastISO8601 2021-Sep-07 22:03:27
-'N = 5,000,000
-'Calls per second = 1,052,769  strIn = "xxxxxxxxxxxxxxxxxxxxxxxxxxx..."  Result as expected? True
-'Calls per second = 2,436,414  strIn = "Foo"                             Result as expected? True
-'Calls per second = 1,718,279  strIn = "xxxxxxxxxxxx"                    Result as expected? True
-'Calls per second = 1,718,023  strIn = "xxxx-xxxxxxx"                    Result as expected? True
-'Calls per second = 587,754    strIn = "2021-08-24T15:18:01.123+05:0x"   Result as expected? True
-'Calls per second = 574,610    strIn = "2021-08-23"                      Result as expected? True
-'Calls per second = 348,325    strIn = "2021-08-24T15:18:01"             Result as expected? True
-'Calls per second = 247,093    strIn = "2021-08-23T08:47:21.123"         Result as expected? True
-'Calls per second = 221,942    strIn = "2021-08-24T15:18:01+05:00"       Result as expected? True
-'Calls per second = 191,331    strIn = "2021-08-24T15:18:01.123+05:00"   Result as expected? True
-' -----------------------------------------------------------------------------------------------------------------------
-Private Sub SpeedTest_CastISO8601()
-
-    Const N As Long = 5000000
-    Dim Converted As Boolean
-    Dim dtOut As Date
-    Dim Expected As Date
-    Dim i As Long
-    Dim j As Long
-    Dim k As Long
-    Dim PrintThis As String
-    Dim strIn As String
-    Dim t1 As Double
-    Dim t2 As Double
-
-    Debug.Print String(100, "=")
-    Debug.Print "Running SpeedTest_CastISO8601 " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
-    Debug.Print "N = " & Format$(N, "###,###")
-    For k = 0 To 9
-        For j = 1 To 1
-            dtOut = 0
-            Select Case k
-                Case 0
-                    strIn = String(10000, "x")
-                    Expected = CDate(0)
-                Case 1
-                    strIn = "Foo" ' less than 10 in length
-                    Expected = CDate(0)
-                Case 2
-                    strIn = "xxxxxxxxxxxx" '5th character not "-"
-                    Expected = CDate(0)
-                Case 3
-                    strIn = "xxxx-xxxxxxx" 'rejected by RegEx
-                    Expected = CDate(0)
-                Case 4
-                    strIn = "2021-08-24T15:18:01.123+05:0x" ' rejected by regex
-                    Expected = CDate(0)
-                Case 5
-                    strIn = "2021-08-23"
-                    Expected = CDate("2021-Aug-23")
-                Case 6
-                    strIn = "2021-08-24T15:18:01"
-                    Expected = CDate("2021-Aug-24 15:18:01")
-                Case 7
-                    strIn = "2021-08-23T08:47:21.123"
-                    Expected = CDate("2021-Aug-23 08:47:21") + 0.123 / 86400
-                Case 8
-                    strIn = "2021-08-24T15:18:01+05:00"
-                    Expected = CDate("2021-Aug-24 15:18:01") - 5 / 24
-                Case 9
-                    strIn = "2021-08-24T15:18:01.123+05:00"
-                    Expected = CDate("2021-Aug-24 15:18:01") + 0.123 / 86400 - 5 / 24
-            End Select
-
-            t1 = ElapsedTime()
-            For i = 1 To N
-                CastISO8601 strIn, dtOut, Converted, True, True
-            Next i
-            t2 = ElapsedTime()
-            
-            PrintThis = "Calls per second = " & Format$(N / (t2 - t1), "###,###")
-            If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
-            If Len(strIn) > 30 Then
-                PrintThis = PrintThis & "strIn = """ & Left$(strIn, 27) & "..."""
-            Else
-                PrintThis = PrintThis & "strIn = """ & strIn & """"
-            End If
-            If Len(PrintThis) < 70 Then PrintThis = PrintThis & String(70 - Len(PrintThis), " ")
-            PrintThis = PrintThis & "  Result as expected? " & (Expected = dtOut)
-            
-            Debug.Print PrintThis
-            DoEvents 'kick Immediate window to life
-        Next j
-    Next k
-
-End Sub
-
-'See "gogeek"'s post at _
-https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : GetLocalOffsetToUTC
 ' Purpose    : Get the PC's offset to UTC.
+'See "gogeek"'s post at _
+ https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function GetLocalOffsetToUTC() As Double
     Dim dt As Object
@@ -3403,27 +3089,6 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     Exit Function
 ErrHandler:
     Throw "#ParseTextFile: " & Err.Description & "!"
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure : ElapsedTime
-' Purpose   : Retrieves the current value of the performance counter, which is a high resolution (<1us)
-'             time stamp that can be used for time-interval measurements.
-'
-'             See http://msdn.microsoft.com/en-us/library/windows/desktop/ms644904(v=vs.85).aspx
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function ElapsedTime() As Double
-    Dim a As Currency
-    Dim b As Currency
-    On Error GoTo ErrHandler
-
-    QueryPerformanceCounter a
-    QueryPerformanceFrequency b
-    ElapsedTime = a / b
-
-    Exit Function
-ErrHandler:
-    Throw "#ElapsedTime: " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4149,4 +3814,3 @@ Private Function CanWriteCharToAscii(c As String) As Boolean
         CanWriteCharToAscii = Chr$(AscW(c)) = c
     End If
 End Function
-
