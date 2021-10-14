@@ -17,13 +17,14 @@ RDatesetsFiles = Array("csv\openintro\military.csv", "csv\mosaicData\Birthdays.c
 
 End Function
 
-'Tested 5 Oct 2021:
+'Tested 5 Oct 2021, CSVRead against ArrayFromCSVfile, Nigel Hefferman's code given as an answer at
+'https://stackoverflow.com/questions/12259595/load-csv-file-into-a-vba-array-rather-than-excel-sheet
 
 'With RemoveQuotes = True
 'CSVRead     23.285191300005            ArrayFromCSVfile             281.768168099996,          True
 'CSVRead     23.8145522999985           ArrayFromCSVfile             325.074338899998           True
 
-'With RemoveQuotes = True
+'With RemoveQuotes = False
 'CSVRead     24.9822067999921           ArrayFromCSVfile             18.9174217000109           False
 
 Sub TestAgainstLargestFileInRDatasets()
