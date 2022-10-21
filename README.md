@@ -114,7 +114,8 @@ Creates a comma-separated file on disk containing `Data`. Any existing file of t
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
     Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
-    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString) As String
+    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
+    Optional TrueString As String = "True", Optional FalseString As String = "False") As String
 ```
 
 |Argument|Description|
@@ -127,6 +128,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
 |`Encoding`|Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this argument is `ANSI` but `Data` contains characters that cannot be written to an ANSI file. `UTF-8` and `UTF-16` files are written with a byte option mark.|
 |`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
+|`TrueString`|How the Boolean value True is to be represented in the file. Optional, defaulting to "True".|
+|`FalseString`|How the Boolean value False is to be represented in the file. Optional, defaulting to "False".|
 
 [source](https://github.com/PGS62/VBA-CSV/blob/f9cabb4f2038fdf79ded33e872d5f886fb9f0a72/src/modCSVReadWrite.bas#L3479-L3656)
 
