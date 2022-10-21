@@ -104,8 +104,7 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
-
-[source](https://github.com/PGS62/VBA-CSV/blob/0dd19a63aa25f0fc1bad6e0aff8aaf0e5bcb249a/vba/VBA-CSV.xlsm/modCSVReadWrite.bas#L53-L552)
+[source](https://github.com/PGS62/VBA-CSV/blob/c318365294420006e60f6dca3ca264eab3b02904/vba/VBA-CSV.xlsm/modCSVReadWrite.bas#L53-L552)
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
@@ -130,7 +129,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
 |`TrueString`|How the Boolean value True is to be represented in the file. Optional, defaulting to "True".|
 |`FalseString`|How the Boolean value False is to be represented in the file. Optional, defaulting to "False".|
 
-[source](https://github.com/PGS62/VBA-CSV/blob/f9cabb4f2038fdf79ded33e872d5f886fb9f0a72/src/modCSVReadWrite.bas#L3479-L3656)
+[source](https://github.com/PGS62/VBA-CSV/blob/c318365294420006e60f6dca3ca264eab3b02904/vba/VBA-CSV.xlsm/modCSVReadWrite.bas#L3481-L3670)
 
 # Errors
 You can call `CSVRead` and `CSVWrite` both from spreadsheets (best with Excel 365 and [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531)) and from VBA. When an error occurs, the functions return a string starting with `#` and ending with `!` which gives an explanation of what went wrong.
