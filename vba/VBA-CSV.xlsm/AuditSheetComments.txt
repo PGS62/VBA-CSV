@@ -1,4 +1,7 @@
 Version	Date	Time	Author	Comment
+148	21-Oct-2022	16:41	Philip Swannell	Bumped tag to 16.
+147	21-Oct-2022	16:39	Philip Swannell	Added arguments TrueString and FalseString to CSVWrite.
+146	21-Oct-2022	16:16	Philip Swannell	1) Bug fix to method ParseCSVContents for case ConvertTypes <> FALSE _and_ SkipToRow > 1 _and_ HeaderRow > 1 _and_ SkipToRow = HeaderRow. Test = 203<LF>2) Argument DateFormat can now use the space character as the deparator. e.g. "D M Y" is allowed. Test = 204.
 145	01-Nov-2021	16:18	Philip Swannell	Now use SolumAddin for exporting VBA code.
 144	01-Nov-2021	16:06	Philip Swannell	Vba code is now exported to folder c:\Projects\<ProjectName>\vba\<WorkbookName>
 143	14-Oct-2021	17:09	Philip Swannell	Moved performance testing methods out of modCSVReadWrite. 331 fewer loc.

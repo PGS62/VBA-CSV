@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.15
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.16
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -1391,13 +1391,13 @@ End Function
 ' Procedure  : ParseDateFormat
 ' Purpose    : Populate DateOrder and DateSeparator by parsing DateFormat.
 ' Parameters :
-'  DateFormat   : String such as D/M/Y or Y-M-D
+'  DateFormat   : String such as "D/M/Y" or "Y-M-D" or "M D Y"
 '  DateOrder    : ByRef argument is set to DateFormat using same convention as Application.International(xlDateOrder)
 '                 (0 = MDY, 1 = DMY, 2 = YMD)
-'  DateSeparator: ByRef argument is set to the DateSeparator, typically "-" or "/"
+'  DateSeparator: ByRef argument is set to the DateSeparator, typically "-" or "/", but can also be space character.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, _
-    ByRef ISO8601 As Boolean, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
+          ByRef ISO8601 As Boolean, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
 
     Dim Err_DateFormat As String
 
@@ -1416,8 +1416,8 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
     End If
     
     Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " & _
-        "'M/D/Y', 'D/M/Y' or 'Y/M/D'" & ". Omit to use the default date format of 'Y-M-D'"
-     
+        "'M/D/Y', 'D/M/Y', 'Y/M/D', 'M D Y', 'D M Y' or 'Y M D'" & ". Omit to use the default date format of 'Y-M-D'"
+        
     'Replace repeated D's with a single D, etc since CastToDate only needs _
      to know the order in which the three parts of the date appear.
     If Len(DateFormat) > 5 Then
@@ -1436,7 +1436,7 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
         Throw Err_DateFormat
     Else
         DateSeparator = Mid$(DateFormat, 2, 1)
-        If DateSeparator <> "/" And DateSeparator <> "-" Then Throw Err_DateFormat
+        If DateSeparator <> "/" And DateSeparator <> "-" And DateSeparator <> " " Then Throw Err_DateFormat
         Select Case UCase$(Left$(DateFormat, 1) & Mid$(DateFormat, 3, 1) & Right$(DateFormat, 1))
             Case "MDY"
                 DateOrder = 0
@@ -3446,7 +3446,7 @@ Public Sub RegisterCSVWrite()
 
     On Error GoTo ErrHandler
 
-    ReDim ArgDescs(1 To 8)
+    ReDim ArgDescs(1 To 10)
     ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
                   "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
                   "dimension then the output file has a single column, one field per row."
@@ -3468,6 +3468,9 @@ Public Sub RegisterCSVWrite()
     ArgDescs(8) = "Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. " & _
                   "Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or " & _
                   "the strings `CRLF`, `LF` or `CR`."
+    ArgDescs(9) = "How the Boolean value True is to be represented in the file. Optional, defaulting to ""True""."
+    ArgDescs(10) = "How the Boolean value False is to be represented in the file. Optional, defaulting to " & _
+                   """False""."
     Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
     Exit Sub
 
@@ -3504,6 +3507,9 @@ End Sub
 ' EOL       : Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`.
 '             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
 '             or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.
+' TrueString: How the Boolean value True is to be represented in the file. Optional, defaulting to "True".
+' FalseString: How the Boolean value False is to be represented in the file. Optional, defaulting to
+'             "False".
 '
 ' Notes     : See also companion function CSVRead.
 '
@@ -3513,7 +3519,8 @@ End Sub
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
     Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
-    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString) As String
+    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
+    Optional TrueString As String = "True", Optional FalseString As String = "False") As String
 Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
 Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
@@ -3540,6 +3547,14 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         Case "ANSI", "UTF-8", "UTF-16"
         Case Else
             Throw Err_Encoding
+    End Select
+    Select Case TrueString
+        Case "False", "false,""FALSE"
+            Throw "TrueString cannot take the value '" & TrueString & "'"
+    End Select
+    Select Case FalseString
+        Case "True", "true", "TRUE"
+            Throw "FalseString cannot take the value '" & FalseString & "'"
     End Select
 
     WriteToFile = Len(FileName) > 0
@@ -3597,7 +3612,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     
             For i = LBound(Data) To UBound(Data)
                 For j = LBound(Data, 2) To UBound(Data, 2)
-                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
+                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",", TrueString, FalseString)
                 Next j
                 OneLineJoined = VBA.Join(OneLine, Delimiter) & EOL
                 Stream.WriteText OneLineJoined
@@ -3612,7 +3627,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
   
             For i = LBound(Data) To UBound(Data)
                 For j = LBound(Data, 2) To UBound(Data, 2)
-                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
+                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",", TrueString, FalseString)
                 Next j
                 OneLineJoined = VBA.Join(OneLine, Delimiter)
                 WriteLineWrap Stream, OneLineJoined, EOLIsWindows, EOL, Unicode
@@ -3627,7 +3642,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
   
         For i = LBound(Data) To UBound(Data)
             For j = LBound(Data, 2) To UBound(Data, 2)
-                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",")
+                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",", TrueString, FalseString)
             Next j
             Lines(i) = VBA.Join(OneLine, Delimiter)
         Next i
@@ -3684,8 +3699,8 @@ End Function
 ' Procedure  : Encode
 ' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As String, DateTimeFormat As String, _
-     Delim As String) As String
+Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, ByVal DateFormat As String, _
+    ByVal DateTimeFormat As String, ByVal Delim As String, TrueString As String, FalseString As String) As String
     
     Const DQ As String = """"
     Const DQ2 As String = """"""
@@ -3707,8 +3722,10 @@ Private Function Encode(x As Variant, QuoteAllStrings As Boolean, DateFormat As 
             Else
                 Encode = x
             End If
-        Case vbBoolean, vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty 'vbLongLong - not available on 16 bit.
+        Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty  'vbLongLong - not available on 16 bit.
             Encode = CStr(x)
+        Case vbBoolean
+            Encode = IIf(x, TrueString, FalseString)
         Case vbDate
             If CLng(x) = CDbl(x) Then
                 Encode = Format$(x, DateFormat)
