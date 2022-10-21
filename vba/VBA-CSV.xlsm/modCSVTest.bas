@@ -238,6 +238,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test201 Folder, NumPassed, NumFailed, Failures
     Test202 Folder, NumPassed, NumFailed, Failures
     Test203 Folder, NumPassed, NumFailed, Failures
+    Test204 Folder, NumPassed, NumFailed, Failures
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -5694,6 +5695,28 @@ ErrHandler:
     Throw "#Test203 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
+Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test date separator is space"
+    Expected = HStack(Array("Col1", CDate("2022-Jan-01"), CDate("2022-Mar-02"), CDate("2022-Feb-01")))
+    FileName = "test_date_separator_is_space.csv"
+    TestRes = TestCSVRead(204, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="D M Y", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test204 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
 
 
 
