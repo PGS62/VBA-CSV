@@ -237,6 +237,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test200 Folder, NumPassed, NumFailed, Failures
     Test201 Folder, NumPassed, NumFailed, Failures
     Test202 Folder, NumPassed, NumFailed, Failures
+    Test203 Folder, NumPassed, NumFailed, Failures
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -5660,4 +5661,39 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     Throw "#Test202 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : Test203
+' Author     : Philip Swannell
+' Date       : 21-Oct-2022
+' Added after discovering bug when a)ConvertTypes <> FALSE; and b) SkipToRow = HeaderRow > 1. Problem was that variable
+' HeaderRow was not being populated which led to type mismatch.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub Test203(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptorow and headerrow equal and greater than 1"
+    Expected = HStack(Array("1", 4#, 7#), Array("2", 5#, 8#), Array("3", 6#, 9#))
+    FileName = "test_skiptorow_and_headerrow_equal_and_greater_than_1.csv"
+    TestRes = TestCSVRead(203, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        SkipToRow:=2, _
+        ShowMissingsAs:=Empty, _
+        HeaderRowNum:=2#, _
+        ExpectedHeaderRow:=HStack("1", "2", "3"))
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test203 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+
+
 

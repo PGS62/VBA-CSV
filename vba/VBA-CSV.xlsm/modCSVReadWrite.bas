@@ -1688,18 +1688,15 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
                     ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
                     QuoteCounts(j) = quoteCount: quoteCount = 0
                     
-                    If RowNum = 1 Then
-                        If SkipToRow = 1 Then
-                            If HeaderRowNum = 1 Then
-                                HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
-                                     ColIndexes, QuoteCounts, j)
-                            End If
+                    If HaveReachedSkipToRow Then
+                        If RowNum + SkipToRow - 1 = HeaderRowNum Then
+                            HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
+                                ColIndexes, QuoteCounts, j)
                         End If
-                    End If
-                    If Not HaveReachedSkipToRow Then
+                    Else
                         If RowNum = HeaderRowNum Then
                             HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
-                                 ColIndexes, QuoteCounts, j)
+                                ColIndexes, QuoteCounts, j)
                         End If
                     End If
                     
