@@ -105,8 +105,7 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
 
-
-[source](https://github.com/PGS62/VBA-CSV/blob/f9cabb4f2038fdf79ded33e872d5f886fb9f0a72/src/modCSVReadWrite.bas#L53-L550)
+[source](https://github.com/PGS62/VBA-CSV/blob/0dd19a63aa25f0fc1bad6e0aff8aaf0e5bcb249a/vba/VBA-CSV.xlsm/modCSVReadWrite.bas#L53-L552)
 
 #### _CSVWrite_
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
@@ -140,7 +139,7 @@ So, to get robust error handling from VBA, you should wrap calls to `CSVRead` an
 ```vba
 FileContents = ThrowIfError(CSVRead("c:\path\filename.csv"))
 ```
-[source](https://github.com/PGS62/VBA-CSV/blob/f9cabb4f2038fdf79ded33e872d5f886fb9f0a72/src/modCSVReadWrite.bas#L3119-L3135)
+[source](https://github.com/PGS62/VBA-CSV/blob/0dd19a63aa25f0fc1bad6e0aff8aaf0e5bcb249a/vba/VBA-CSV.xlsm/modCSVReadWrite.bas#L3481-L3670)
 
 An alternative approach is to change the constant `m_ErrorStyle` (at the top of module `modCSVRead`) from , `es_ReturnString` to `es_RaiseError`, but in that case calls from spreadsheet formulas will return `#VALUE!` if any error happens, with no description provided.
 
