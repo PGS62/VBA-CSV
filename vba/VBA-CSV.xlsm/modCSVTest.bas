@@ -5617,7 +5617,11 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     shHiddenSheet.Unprotect
     shHiddenSheet.UsedRange.Clear
     Set R = shHiddenSheet.Cells(1, 1)
-    R.Formula2 = Formula
+    If Val(Application.Version) >= 16 Then
+        R.Formula2 = Formula
+    Else
+        R.FormulaArray = Formula
+    End If
     Observed = R.value
     TestRes = Observed = Expected
     If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
@@ -5651,7 +5655,12 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     shHiddenSheet.Unprotect
     shHiddenSheet.UsedRange.Clear
     Set R = shHiddenSheet.Cells(1, 1)
-    R.Formula2 = Formula
+    If Val(Application.Version) >= 16 Then
+        R.Formula2 = Formula
+    Else
+        R.FormulaArray = Formula
+    End If
+
     Observed = R.value
     TestRes = Observed = Expected
     If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
