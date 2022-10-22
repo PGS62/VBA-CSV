@@ -1,4 +1,6 @@
 Version	Date	Time	Author	Comment
+151	22-Oct-2022	18:16	Philip Swannell	Improved handling of files containing long fields - length of field is now tested after "unquoting".
+150	22-Oct-2022	17:39	Philip Swannell	Now know that for Excel 2013 function MaxStringLengthInArray should return 255. Also changes to code that detects that an array to be returned to Excel contains a too-long string.
 149	22-Oct-2022	10:17	Philip Swannell	Tested on Excel 2010, with necessary changes to test code.
 148	21-Oct-2022	16:41	Philip Swannell	Bumped tag to 16.
 147	21-Oct-2022	16:39	Philip Swannell	Added arguments TrueString and FalseString to CSVWrite.

@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.16
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.17
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -153,17 +153,15 @@ End Enum
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
-    Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
-    Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
-    Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
-    Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
-    Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
-    Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
+        Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
+        Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
+        Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+        Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
+        Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
+        Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
+        Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+        Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
+        Optional ByRef HeaderRow As Variant) As Variant
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -392,16 +390,20 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         If j >= 1 And j <= NumColsInReturn Then
             If CallingFromWorksheet Then
                 If Lengths(k) > MSLIA Then
-                    Err_StringTooLong = "The file has a field (row " + CStr(i + SkipToRow - 1) & _
-                        ", column " & CStr(j + SkipToCol - 1) & ") of length " + Format$(Lengths(k), "###,###")
-                    If MSLIA >= 32767 Then
-                        Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format$(MSLIA, "####,####")
-                    Else
-                        Err_StringTooLong = Err_StringTooLong & _
-                            ". An array containing a string longer than " + Format$(MSLIA, "###,###") + _
-                            " cannot be returned from VBA to an Excel worksheet"
+                    Dim UnquotedLength As Long
+                    UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), """", 4))
+                    If UnquotedLength > MSLIA Then
+                        Err_StringTooLong = "The file has a field (row " + CStr(i + SkipToRow - 1) & _
+                            ", column " & CStr(j + SkipToCol - 1) & ") of length " + Format$(UnquotedLength, "###,###")
+                        If MSLIA >= 32767 Then
+                            Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format$(MSLIA, "####,####")
+                        Else
+                            Err_StringTooLong = Err_StringTooLong & _
+                                ". An array containing a string longer than " + Format$(MSLIA, "###,###") + _
+                                " cannot be returned from VBA to an Excel worksheet"
+                        End If
+                        Throw Err_StringTooLong
                     End If
-                    Throw Err_StringTooLong
                 End If
             End If
         
@@ -649,22 +651,17 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : MaxStringLengthInArray
 ' Purpose    : Different versions of Excel have different limits for the longest string that can be an element of an
-'              array passed from a VBA UDF back to Excel. I know the limit is 255 for Excel 2010 and earlier, and is
-'              32,767 for Excel 365 (as of Sep 2021). But don't yet know the limit for Excel 2013, 2016 and 2019.
-' Tried to get info from StackOverflow, without much joy:
-' https://stackoverflow.com/questions/69303804/excel-versions-and-limits-on-the-length-of-string-elements-in-arrays-returned-by
+'              array passed from a VBA UDF back to Excel. I believe the limit is 255 for Excel 2013 and earlier
+'              and 32,767 later versions of Excel including Excel 365.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function MaxStringLengthInArray() As Long
     Static Res As Long
     If Res = 0 Then
         Select Case Val(Application.Version)
-            Case Is <= 14 'Excel 2010
+            Case Is <= 15 'Excel 2013 and earlier
                 Res = 255
-            Case 15
-                Res = 32767 'Don't yet know if this is correct for Excel 2013
             Case Else
-                Res = 32767 'Excel 2016, 2019, 365. Hopefully these versions (which all _
-                             return 16 as Application.Version) have the same limit.
+                Res = 32767
         End Select
     End If
     MaxStringLengthInArray = Res
@@ -3521,8 +3518,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
     Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
     Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3830,3 +3825,6 @@ Private Function CanWriteCharToAscii(c As String) As Boolean
         CanWriteCharToAscii = Chr$(AscW(c)) = c
     End If
 End Function
+
+
+

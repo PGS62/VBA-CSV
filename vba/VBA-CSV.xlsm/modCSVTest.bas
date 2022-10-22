@@ -239,6 +239,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test202 Folder, NumPassed, NumFailed, Failures
     Test203 Folder, NumPassed, NumFailed, Failures
     Test204 Folder, NumPassed, NumFailed, Failures
+    Test205 Folder, NumPassed, NumFailed, Failures
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
@@ -5726,6 +5727,51 @@ Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     Throw "#Test204 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
+Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+          Dim Expected As Variant
+          Dim FileName As String
+          Dim Observed As Variant
+          Dim TestDescription As String
+          Dim TestRes As Boolean
+          Dim WhatDiffers As String
+          Dim R As Range
+          Dim Formula As String
+          Const NumQuotes = 32099
+          'File contains (at position 2,2) a sequence of 64,200 double qute characters, that should _
+          "unquote" to a sequence of 32,099 double quotes and a string that long _can_ be embedded in an array _
+          returned by a VBA UDF to Excel.
+
+1         On Error GoTo ErrHandler
+2         TestDescription = "test 32K limit quote handling"
+3         Expected = HStack(Array("x", "z"), Array("y", String(NumQuotes, """")))
+4         FileName = "test_32K_limit_quote_handling.csv"
+          
+5         Formula = "=CSVRead(""" & Folder & FileName & """, TRUE)"
+          
+6         shHiddenSheet.Unprotect
+7         shHiddenSheet.UsedRange.Clear
+          
+8         If Val(Application.Version) >= 16 Then
+9             Set R = shHiddenSheet.Cells(1, 1)
+10            R.Formula2 = Formula
+11            Observed = R.SpillingToRange.value
+12            TestRes = ArraysIdentical(Expected, Observed)
+13            If Not TestRes Then
+14                WhatDiffers = "File " & FileName & " not handled correctly - try inserting breakpoint in method Test205"
+15            End If
+16        Else
+17            TestRes = False
+18            WhatDiffers = "Cannot run this test on Excel version " & Application.Version
+19        End If
+          
+20        AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+21        Exit Sub
+ErrHandler:
+22        Throw "#Test205 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
 
 
 
