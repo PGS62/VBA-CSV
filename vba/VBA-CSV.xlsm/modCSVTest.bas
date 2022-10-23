@@ -242,6 +242,9 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test205 Folder, NumPassed, NumFailed, Failures
     Test206 Folder, NumPassed, NumFailed, Failures
     Test207 Folder, NumPassed, NumFailed, Failures
+    
+    shHiddenSheet.UsedRange.EntireRow.Delete
+    
     Exit Sub
 ErrHandler:
     Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"

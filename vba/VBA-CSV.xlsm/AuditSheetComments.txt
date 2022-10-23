@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+154	23-Oct-2022	16:32	Philip Swannell	Tweaked method ValidateTrueAndFalseStrings. Removed worksheet Adhoc.
 153	23-Oct-2022	15:52	Philip Swannell	Fixed compile error. Added test 207.
 152	23-Oct-2022	12:24	Philip Swannell	CSVWrite, improved validation of TrueString and FalseString. Added one more test for CSVRead.
 151	22-Oct-2022	18:16	Philip Swannell	Improved handling of files containing long fields - length of field is now tested after "unquoting".

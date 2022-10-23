@@ -3667,7 +3667,7 @@ End Function
 ' Purpose    : Stop the user from making bad choices for either TrueString or FalseString, i.e. strings that would be
 '              interpreted as (the wrong) Boolean, or as numbers, dates or empties
 ' -----------------------------------------------------------------------------------------------------------------------
-Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String)
+Private Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String)
     
     Dim Converted As Boolean
     Dim DateSeparator As Variant
@@ -3678,6 +3678,10 @@ Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String
     Dim SysDateSeparator As String
     
     Select Case LCase(TrueString)
+        Case "true"
+            If LCase(FalseString) = "false" Then
+                Exit Function 'Both variables take their default value (modulo case), so no validation required
+            End If
         Case "false"
             Throw "TrueString cannot take the value '" & TrueString & "'"
         Case ""
