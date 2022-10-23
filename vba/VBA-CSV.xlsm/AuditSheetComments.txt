@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+153	23-Oct-2022	15:52	Philip Swannell	Fixed compile error. Added test 207.
 152	23-Oct-2022	12:24	Philip Swannell	CSVWrite, improved validation of TrueString and FalseString. Added one more test for CSVRead.
 151	22-Oct-2022	18:16	Philip Swannell	Improved handling of files containing long fields - length of field is now tested after "unquoting".
 150	22-Oct-2022	17:39	Philip Swannell	Now know that for Excel 2013 function MaxStringLengthInArray should return 255. Also changes to code that detects that an array to be returned to Excel contains a too-long string.

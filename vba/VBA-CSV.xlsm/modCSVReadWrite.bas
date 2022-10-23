@@ -3668,7 +3668,6 @@ End Function
 '              interpreted as (the wrong) Boolean, or as numbers, dates or empties
 ' -----------------------------------------------------------------------------------------------------------------------
 Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String)
-    On Error GoTo ErrHandler
     
     Dim Converted As Boolean
     Dim DateSeparator As Variant
