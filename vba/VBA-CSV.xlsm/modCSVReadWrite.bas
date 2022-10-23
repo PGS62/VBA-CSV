@@ -162,6 +162,8 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
         Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
         Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
         Optional ByRef HeaderRow As Variant) As Variant
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -3518,6 +3520,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
     Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
     Optional TrueString As String = "True", Optional FalseString As String = "False") As String
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3543,14 +3547,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
         Case Else
             Throw Err_Encoding
     End Select
-    Select Case TrueString
-        Case "False", "false,""FALSE"
-            Throw "TrueString cannot take the value '" & TrueString & "'"
-    End Select
-    Select Case FalseString
-        Case "True", "true", "TRUE"
-            Throw "FalseString cannot take the value '" & FalseString & "'"
-    End Select
+    
+    ValidateTrueAndFalseStrings TrueString, FalseString
 
     WriteToFile = Len(FileName) > 0
 
@@ -3662,6 +3660,60 @@ ErrHandler:
     Else
         Throw ErrRet
     End If
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ValidateTrueAndFalseStrings
+' Purpose    : Stop the user from making bad choices for either TrueString or FalseString, i.e. strings that would be
+'              interpreted as (the wrong) Boolean, or as numbers, dates or empties
+' -----------------------------------------------------------------------------------------------------------------------
+Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String)
+    On Error GoTo ErrHandler
+    
+    Dim Converted As Boolean
+    Dim DateSeparator As Variant
+    Dim dtOut As Date
+    Dim i As Long
+    Dim j As Long
+    Dim SysDateOrder As Long
+    Dim SysDateSeparator As String
+    
+    Select Case LCase(TrueString)
+        Case "false"
+            Throw "TrueString cannot take the value '" & TrueString & "'"
+        Case ""
+            Throw "TrueString cannot be the zero-length string"
+    End Select
+    Select Case LCase(FalseString)
+        Case "true"
+            Throw "FalseString cannot take the value '" & FalseString & "'"
+        Case ""
+            Throw "FalseString cannot be the zero-length string"
+    End Select
+    If TrueString = FalseString Then
+        Throw "Got '" & TrueString & "' for both TrueString and FalseString, but these cannot be equal to one another"
+    End If
+    If IsNumeric(TrueString) Then
+        Throw "Got '" & TrueString & "' as TrueString but that's not valid because it represents a number"
+    End If
+    If IsNumeric(FalseString) Then
+        Throw "Got '" & FalseString & "' as FalseString but that's not valid because it represents a number"
+    End If
+    SysDateOrder = Application.International(xlDateOrder)
+    SysDateSeparator = Application.International(xlDateSeparator)
+
+    For j = 1 To 2
+        For i = 1 To 3
+            For Each DateSeparator In Array("/", "-", " ")
+                CastToDate IIf(j = 1, TrueString, FalseString), dtOut, i, _
+                    CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
+                If Converted Then
+                    Throw "Got '" & IIf(j = 1, TrueString, FalseString) & "' as " & _
+                        IIf(j = 1, "TrueString", "FalseString") & " but that's not valid because it represents a date."
+                End If
+            Next
+        Next
+    Next
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
