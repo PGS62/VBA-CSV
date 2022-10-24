@@ -242,6 +242,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test205 Folder, NumPassed, NumFailed, Failures
     Test206 Folder, NumPassed, NumFailed, Failures
     Test207 Folder, NumPassed, NumFailed, Failures
+    Test208 Folder, NumPassed, NumFailed, Failures
     
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -5856,6 +5857,42 @@ Private Sub Test207(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Exit Sub
 ErrHandler:
     Throw "#Test207 (line " & CStr(Erl) + "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival"
+    Expected = HStack( _
+        Array(vbNullString, "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine"), _
+        Array("survived", True, True, False), _
+        Array("sex", "female", "male", "female"), _
+        Array("age", "29", "0.916700006", "2"), _
+        Array("passengerClass", "1st", "1st", "1st"))
+    FileName = "https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv"
+    
+    TestRes = TestCSVRead(208, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        SkipToRow:=1, _
+        NumRows:=4, _
+        TrueStrings:="""yes""", _
+        FalseStrings:="""no""", _
+        MissingStrings:="NA", _
+        ShowMissingsAs:=Empty, _
+        HeaderRowNum:=1#, _
+        ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test208 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
 

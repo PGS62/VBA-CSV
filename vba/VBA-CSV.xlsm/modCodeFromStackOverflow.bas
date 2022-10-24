@@ -12,7 +12,7 @@ Option Explicit
 '
 
 Public Function ArrayFromCSVfile( _
-    strName As String, _
+    StrName As String, _
     Optional RowDelimiter As String = vbCrLf, _
     Optional FieldDelimiter = ",", _
     Optional RemoveQuotes As Boolean = True _
@@ -37,7 +37,7 @@ Public Function ArrayFromCSVfile( _
     Set objFSO = New Scripting.FileSystemObject
     '  strTemp = objFSO.GetSpecialFolder(Scripting.TemporaryFolder).ShortPath
     '  strFile = objFSO.BuildPath(strTemp, strName)
-    strFile = strName
+    strFile = StrName
     If Not objFSO.FileExists(strFile) Then  ' raise an error?
         Exit Function
     End If

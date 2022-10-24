@@ -174,11 +174,11 @@ Attribute item.VB_UserMemId = 0
             item = P_CSV_DATA(CLng(Index(0)))(CLng(Index(1)))
     End Select
 End Property
-Public Property Get items() As ECPArrayList
-Attribute items.VB_Description = "Gets or sets the result array over the current instance."
-    Set items = P_CSV_DATA
+Public Property Get Items() As ECPArrayList
+Attribute Items.VB_Description = "Gets or sets the result array over the current instance."
+    Set Items = P_CSV_DATA
 End Property
-Public Property Set items(values As ECPArrayList)
+Public Property Set Items(values As ECPArrayList)
     Set P_CSV_DATA = values
 End Property
 Public Property Get parseConfig() As parserConfig
@@ -315,7 +315,7 @@ Public Function CSVsubsetSplit(FilePath As String, _
         End If
         Do While Not CSVstream.atEndOfStream
             CSVstream.ReadText 'Read next CSV data chunk
-            Set curItems = CSVreader.ImportFromCSVString(CSVstream.bufferString, readerConf).items
+            Set curItems = CSVreader.ImportFromCSVString(CSVstream.bufferString, readerConf).Items
             If Not fileCreatedFlag Then
                 If Headers Then
                     i = 1
@@ -685,7 +685,7 @@ Public Function GetCSVsubset(FilePath As String, _
             CSVparser.GuessDelimiters configObj
             '@----------------------------------------------------
             ' Parse string
-            Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).items
+            Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).Items
             If configObj.Headers Then
                 filteredRecords.Add curItems(0) 'Save the CSV header
                 gssCounter = gssCounter + 1
@@ -697,7 +697,7 @@ Public Function GetCSVsubset(FilePath As String, _
             Next gssCounter
             Do While Not StreamReader.atEndOfStream
                 StreamReader.ReadText 'Read next CSV data chunk
-                Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).items
+                Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).Items
                 For gssCounter = 0 To curItems.count - 1
                     If MeetsCriterion(curItems(gssCounter)(keyIndex)) Then
                         filteredRecords.Add curItems(gssCounter) 'Append data
@@ -990,7 +990,7 @@ Public Function GetRecord() As ECPArrayList
                             Case Else 'The Token is stored on static_tmpToken object
                                 static_tmpToken.Add LeftB$(static_tmpCSV(static_Index), static_TokenEndingPos)
                                 If RequestedField(static_FieldID + 1&, static_MaxReqIndex) Then 'Filter fields
-                                    static_RecordToken.Add UnescapeField(Join$(static_tmpToken.items, static_RecordDelimiter), _
+                                    static_RecordToken.Add UnescapeField(Join$(static_tmpToken.Items, static_RecordDelimiter), _
                                                                     static_EscapeChr, static_EscapeSequence) 'Save whole Token
                                     static_tmpToken.Clear 'Clear static_tmpToken content
                                 End If
@@ -1025,7 +1025,7 @@ Public Function GetRecord() As ECPArrayList
                                 Case Else 'The Token is stored on static_tmpToken object
                                     static_tmpToken.Add LeftB$(static_tmpCSV(static_Index), static_OverStringPointer - 3)
                                     If RequestedField(static_FieldID + 1&, static_MaxReqIndex) Then 'Filter fields
-                                        static_RecordToken.Add UnescapeField(Join$(static_tmpToken.items, static_RecordDelimiter), _
+                                        static_RecordToken.Add UnescapeField(Join$(static_tmpToken.Items, static_RecordDelimiter), _
                                                                         static_EscapeChr, static_EscapeSequence) 'Save whole Token
                                         static_tmpToken.Clear 'Clear static_tmpToken content
                                     End If
@@ -1171,7 +1171,7 @@ Public Function GetRecord() As ECPArrayList
         static_EscapedBRS = False
         '@----------------------------------------------------------------------------
         'Save record
-        static_outputList.Add static_RecordToken.items
+        static_outputList.Add static_RecordToken.Items
         static_RecordToken.Reinitialize static_vectorsBound + 1
         P_VARYING_LENGTHS = (static_vectorsBound <> static_vectorsMaxBound)
         If static_IgnoreLines Then
@@ -2249,7 +2249,7 @@ Private Sub ParseCSVstring(ByRef csvText As String, _
                                 Case Else 'The Token is stored on tmpToken object
                                     tmpToken.Add LeftB$(tmpCSV(Index), TokenEndingPos)
                                     If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                        RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
+                                        RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
                                                                     EscapeChr, EscapeSequence)  'Save whole Token
                                     End If
                                     tmpToken.Clear 'Clear tmpToken content
@@ -2286,7 +2286,7 @@ Private Sub ParseCSVstring(ByRef csvText As String, _
                                     Case Else 'The Token is stored on tmpToken array
                                         tmpToken.Add LeftB$(tmpCSV(Index), OverStringPointer - 3)
                                         If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                            RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
+                                            RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
                                                                         EscapeChr, EscapeSequence)  'Save whole Token
                                         End If
                                         tmpToken.Clear 'Clear tmpToken content
@@ -2382,7 +2382,7 @@ Private Sub ParseCSVstring(ByRef csvText As String, _
         '@----------------------------------------------------------------------------
         'Start saving on given record
         If IncludeRecord Then
-            outputList.Add RecordToken.items
+            outputList.Add RecordToken.Items
             RecordToken.Reinitialize P_VECTORS_REGULAR_BOUND + 1
         End If
         P_VARYING_LENGTHS = (P_VECTORS_REGULAR_BOUND <> (FieldID - 1))
@@ -2857,7 +2857,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
                                 Case Else 'The Token is stored on tmpToken object
                                     tmpToken.Add LeftB$(tmpCSV(Index), TokenEndingPos)
                                     If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                        RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
+                                        RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
                                                                     EscapeChr, EscapeSequence)  'Save whole Token
                                     End If
                                     tmpToken.Clear 'Clear tmpToken content
@@ -2894,7 +2894,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
                                     Case Else 'The Token is stored on tmpToken array
                                         tmpToken.Add LeftB$(tmpCSV(Index), OverStringPointer - 3)
                                         If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                            RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
+                                            RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
                                                                             EscapeChr, EscapeSequence) 'Save whole Token
                                         End If
                                         tmpToken.Clear 'Clear tmpToken content
@@ -3002,7 +3002,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
         '@----------------------------------------------------------------------------
         'Start saving on given record
         If IncludeRecord Then
-            outputList.Add RecordToken.items
+            outputList.Add RecordToken.Items
             RecordToken.Reinitialize P_VECTORS_REGULAR_BOUND + 1
         End If
         P_VARYING_LENGTHS = (P_VECTORS_REGULAR_BOUND <> (FieldID - 1))

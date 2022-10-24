@@ -291,7 +291,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         ConvertQuoted, TrimFields, ColByColFormatting, HeaderRowNum, CTDict
 
     Set Sentinels = New Scripting.Dictionary
-    MakeSentinels Sentinels, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
+    MakeSentinels Sentinels, ConvertQuoted, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
         ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
     
     If ShowDatesAsDates Then
@@ -506,7 +506,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                 
             Set Sentinels = New Scripting.Dictionary
             
-            MakeSentinels Sentinels, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
+            MakeSentinels Sentinels, ConvertQuoted, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
                 ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
 
             For i = 1 To NR
@@ -2166,6 +2166,15 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
         End If
     End If
 
+    If AnySentinels Then
+        If FieldLength <= MaxSentinelLength Then
+            If Sentinels.Exists(Field) Then
+                ConvertField = Sentinels.item(Field)
+                Exit Function
+            End If
+        End If
+    End If
+
     If quoteCount > 0 Then
         If Left$(Field, 1) = QuoteChar Then
             If Right$(Field, 1) = QuoteChar Then
@@ -2179,15 +2188,6 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
                     ConvertField = Field
                     Exit Function
                 End If
-            End If
-        End If
-    End If
-
-    If AnySentinels Then
-        If FieldLength <= MaxSentinelLength Then
-            If Sentinels.Exists(Field) Then
-                ConvertField = Sentinels.item(Field)
-                Exit Function
             End If
         End If
     End If
@@ -2447,7 +2447,7 @@ End Function
 ' Purpose    : Returns a Dictionary keyed on strings for which if a key to the dictionary is a field of the CSV file then
 '              that field should be converted to the associated item value. Handles Booleans, Missings and Excel errors.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ByRef MaxLength As Long, _
+Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted As Boolean, ByRef MaxLength As Long, _
     ByRef AnySentinels As Boolean, ShowBooleansAsBooleans As Boolean, ShowErrorsAsErrors As Boolean, _
     ByRef ShowMissingsAs As Variant, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
     Optional MissingStrings As Variant)
@@ -2511,6 +2511,17 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ByRef MaxLeng
         AddKeyToDict Sentinels, "#GETTING_DATA!", CVErr(2043)
         AddKeyToDict Sentinels, "#FIELD!", CVErr(2049)
         AddKeyToDict Sentinels, "#CALC!", CVErr(2050)
+    End If
+
+    'Add "quoted versions" of the existing sentinels
+    If ConvertQuoted Then
+        Dim Keys, Items, NewKey As String, i As Long
+        Keys = Sentinels.Keys
+        Items = Sentinels.Items
+        For i = LBound(Keys) To UBound(Keys)
+            NewKey = """" & Replace(Keys(i), """", """""") & """"
+            AddKeyToDict Sentinels, NewKey, Items(i)
+        Next i
     End If
 
     Dim k As Variant
@@ -3548,7 +3559,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
             Throw Err_Encoding
     End Select
     
-    ValidateTrueAndFalseStrings TrueString, FalseString
+    ValidateTrueAndFalseStrings TrueString, FalseString, Delimiter
 
     WriteToFile = Len(FileName) > 0
 
@@ -3664,59 +3675,69 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ValidateTrueAndFalseStrings
-' Purpose    : Stop the user from making bad choices for either TrueString or FalseString, i.e. strings that would be
-'              interpreted as (the wrong) Boolean, or as numbers, dates or empties
+' Purpose    : Stop the user from making bad choices for either TrueString or FalseString, e.g: strings that would be
+'              interpreted as (the wrong) Boolean, or as numbers, dates or empties, strings containing line feed
+'              characters, containing the delimiter etc.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String)
+Private Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String, Delimiter As String)
     
     Dim Converted As Boolean
     Dim DateSeparator As Variant
+    Dim DQCount As Long
     Dim dtOut As Date
     Dim i As Long
     Dim j As Long
+    Dim StrName As String
+    Dim StrValue As String
     Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     
-    Select Case LCase(TrueString)
-        Case "true"
-            If LCase(FalseString) = "false" Then
-                Exit Function 'Both variables take their default value (modulo case), so no validation required
-            End If
-        Case "false"
-            Throw "TrueString cannot take the value '" & TrueString & "'"
-        Case ""
-            Throw "TrueString cannot be the zero-length string"
-    End Select
-    Select Case LCase(FalseString)
-        Case "true"
-            Throw "FalseString cannot take the value '" & FalseString & "'"
-        Case ""
-            Throw "FalseString cannot be the zero-length string"
-    End Select
+    If LCase(TrueString) = "true" Then
+        If LCase(FalseString) = "false" Then
+            Exit Function
+        End If
+    End If
+    
+    If LCase(TrueString) = "false" Then Throw "TrueString cannot take the value '" & TrueString & "'"
+    If LCase(FalseString) = "true" Then Throw "FalseString cannot take the value '" & FalseString & "'"
+
     If TrueString = FalseString Then
         Throw "Got '" & TrueString & "' for both TrueString and FalseString, but these cannot be equal to one another"
     End If
-    If IsNumeric(TrueString) Then
-        Throw "Got '" & TrueString & "' as TrueString but that's not valid because it represents a number"
-    End If
-    If IsNumeric(FalseString) Then
-        Throw "Got '" & FalseString & "' as FalseString but that's not valid because it represents a number"
-    End If
+    
     SysDateOrder = Application.International(xlDateOrder)
     SysDateSeparator = Application.International(xlDateSeparator)
-
+    
     For j = 1 To 2
+        StrValue = IIf(j = 1, TrueString, FalseString)
+        StrName = IIf(j = 1, "TrueString", "FalseString")
+        
+        If StrValue = "" Then Throw StrName & " cannot be the zero-length string"
+
+        If InStr(StrValue, vbLf) > 0 Then Throw StrName & " contains a line feed character (ascii 10), which is not permitted"
+        If InStr(StrValue, vbCr) > 0 Then Throw StrName & " contains a carriage return character (ascii 13), which is not permitted"
+        If InStr(StrValue, Delimiter) > 0 Then Throw StrName & " contains Delimiter '" & Delimiter & "' which is not permitted"
+        If InStr(StrValue, """") > 0 Then
+            DQCount = Len(StrValue) - Len(Replace(StrValue, """", ""))
+            If DQCount <> 2 Or Left(StrValue, 1) <> """" Or Right(StrValue, 1) <> """" Then
+                Throw "If " & StrName & " contains double quote characters (it does) then both the first and last characters must be double quotes and there must be no other double quotes"
+            End If
+        End If
+        
+        If IsNumeric(StrValue) Then Throw "Got '" & StrValue & "' as " & StrName & " but that's not valid because it represents a number"
+        
         For i = 1 To 3
             For Each DateSeparator In Array("/", "-", " ")
-                CastToDate IIf(j = 1, TrueString, FalseString), dtOut, i, _
+                CastToDate StrValue, dtOut, i, _
                     CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
                 If Converted Then
-                    Throw "Got '" & IIf(j = 1, TrueString, FalseString) & "' as " & _
-                        IIf(j = 1, "TrueString", "FalseString") & " but that's not valid because it represents a date."
+                    Throw "Got '" & StrValue & "' as " & _
+                        StrName & " but that's not valid because it represents a date."
                 End If
             Next
         Next
     Next
+    
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
