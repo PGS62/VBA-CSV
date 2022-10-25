@@ -35,7 +35,7 @@ Private Sub SpeedTest_CastToDate()
     Dim Converted As Boolean
     Dim DateOrder As Long
     Dim DateSeparator As String
-    Dim dtOut As Date
+    Dim DtOut As Date
     Dim Expected As Date
     Dim i As Long
     Dim j As Long
@@ -58,7 +58,7 @@ Private Sub SpeedTest_CastToDate()
     
     For k = 1 To 12
         For j = 1 To 1 'Maybe do multiple times to test for variability or results.
-            dtOut = 0
+            DtOut = 0
             Converted = False
             Select Case k
                 Case 1
@@ -133,7 +133,7 @@ Private Sub SpeedTest_CastToDate()
             If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
             PrintThis = PrintThis & "strIn = """ & strIn & """"
             If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
-            PrintThis = PrintThis & "DateOrder = " & DateOrder & "  Result as expected? " & (Expected = dtOut)
+            PrintThis = PrintThis & "DateOrder = " & DateOrder & "  Result as expected? " & (Expected = DtOut)
             
             Debug.Print PrintThis
             DoEvents 'kick Immediate window to life
@@ -174,8 +174,10 @@ Private Sub SpeedTest_Sentinels()
 
     On Error GoTo ErrHandler
     
+    Const ConvertQuoted As Boolean = False
+    
         Set Sentinels = New Scripting.Dictionary
-        'MakeSentinels Sentinels, MaxLength, AnySentinels, _
+      '  MakeSentinels Sentinels, ConvertQuoted, MaxLength, AnySentinels, _
         ShowBooleansAsBooleans:=True, _
         ShowErrorsAsErrors:=True, _
         ShowMissingsAs:=Empty, _
@@ -250,7 +252,7 @@ Private Sub SpeedTest_CastISO8601()
 
     Const N As Long = 5000000
     Dim Converted As Boolean
-    Dim dtOut As Date
+    Dim DtOut As Date
     Dim Expected As Date
     Dim i As Long
     Dim j As Long
@@ -265,7 +267,7 @@ Private Sub SpeedTest_CastISO8601()
     Debug.Print "N = " & Format$(N, "###,###")
     For k = 0 To 9
         For j = 1 To 1
-            dtOut = 0
+            DtOut = 0
             Select Case k
                 Case 0
                     strIn = String(10000, "x")
@@ -313,7 +315,7 @@ Private Sub SpeedTest_CastISO8601()
                 PrintThis = PrintThis & "strIn = """ & strIn & """"
             End If
             If Len(PrintThis) < 70 Then PrintThis = PrintThis & String(70 - Len(PrintThis), " ")
-            PrintThis = PrintThis & "  Result as expected? " & (Expected = dtOut)
+            PrintThis = PrintThis & "  Result as expected? " & (Expected = DtOut)
             
             Debug.Print PrintThis
             DoEvents 'kick Immediate window to life

@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+158	25-Oct-2022	18:18	Philip Swannell	Tweaks to CSVWrite including changed behaviour if DateFormat is passed as null string (as opposed to being omitted). Old behaviour: date format used in output would depend on the Windows locale. New behaviour: date format used is YYYY-MM-DD, i.e. same as omitting the argument.
 157	24-Oct-2022	09:39	Philip Swannell	CSVRead: better handling for when Booleans in file are represented by quoted strings. E.g. https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv where the TrueString is quoted yes and FalseString is quoted no.
 156	24-Oct-2022	09:22	Philip Swannell	Method ValidateTrueAndFalseStrings now rejects strings containing line feed, carriage return, delimiter (cont.)
 155	24-Oct-2022	09:03	Philip Swannell	Method ValidateTrueAndFalseStrings now rejects strings containing line feed, carriage return, delimiter.

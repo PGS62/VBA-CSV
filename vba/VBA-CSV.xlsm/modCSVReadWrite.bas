@@ -2286,7 +2286,7 @@ End Sub
 '  SysDateSeparator: The Windows system date separator
 '  Converted       : Boolean flipped to TRUE if conversion takes place
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, _
+Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, _
      DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
     ByRef Converted As Boolean)
     
@@ -2316,12 +2316,12 @@ Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, 
     If Not HasTimePart Then
         If DateOrder = 2 Then 'Y-M-D is unambiguous as long as year given as 4 digits
             If pos1 = 5 Then
-                dtOut = CDate(strIn)
+                DtOut = CDate(strIn)
                 Converted = True
                 Exit Sub
             End If
         ElseIf DateOrder = SysDateOrder Then
-            dtOut = CDate(strIn)
+            DtOut = CDate(strIn)
             Converted = True
             Exit Sub
         End If
@@ -2341,13 +2341,13 @@ Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, 
             Throw "DateOrder must be 0, 1, or 2"
         End If
         If SysDateOrder = 0 Then
-            dtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y)
+            DtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y)
             Converted = True
         ElseIf SysDateOrder = 1 Then
-            dtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y)
+            DtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y)
             Converted = True
         ElseIf SysDateOrder = 2 Then
-            dtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D)
+            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D)
             Converted = True
         End If
         Exit Sub
@@ -2378,37 +2378,37 @@ Private Sub CastToDate(strIn As String, ByRef dtOut As Date, DateOrder As Long, 
     If Not HasFractionalSecond Then
         If DateOrder = 2 Then 'Y-M-D is unambiguous as long as year given as 4 digits
             If pos1 = 5 Then
-                dtOut = CDate(strIn)
+                DtOut = CDate(strIn)
                 Converted = True
                 Exit Sub
             End If
         ElseIf DateOrder = SysDateOrder Then
-            dtOut = CDate(strIn)
+            DtOut = CDate(strIn)
             Converted = True
             Exit Sub
         End If
     
         If SysDateOrder = 0 Then
-            dtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y & TimePart)
+            DtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y & TimePart)
             Converted = True
         ElseIf SysDateOrder = 1 Then
-            dtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y & TimePart)
+            DtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y & TimePart)
             Converted = True
         ElseIf SysDateOrder = 2 Then
-            dtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
+            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
             Converted = True
         End If
     Else 'CDate does not cope with fractional seconds, so use CastToTimeB
         CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
         If Converted2 Then
             If SysDateOrder = 0 Then
-                dtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y) + TimePartConverted
+                DtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y) + TimePartConverted
                 Converted = True
             ElseIf SysDateOrder = 1 Then
-                dtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y) + TimePartConverted
+                DtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y) + TimePartConverted
                 Converted = True
             ElseIf SysDateOrder = 2 Then
-                dtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
+                DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
                 Converted = True
             End If
         End If
@@ -2622,13 +2622,13 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function ParseISO8601(strIn As String) As Variant
     Dim Converted As Boolean
-    Dim dtOut As Date
+    Dim DtOut As Date
 
     On Error GoTo ErrHandler
-    CastISO8601 strIn, dtOut, Converted, True, True
+    CastISO8601 strIn, DtOut, Converted, True, True
 
     If Converted Then
-        ParseISO8601 = dtOut
+        ParseISO8601 = DtOut
     Else
         ParseISO8601 = "#Not recognised as ISO8601 date!"
     End If
@@ -2641,12 +2641,12 @@ End Function
 ' Procedure  : CastToTime
 ' Purpose    : Cast strings that represent a time to a date, no handling of TimeZone.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToTime(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
+Private Sub CastToTime(strIn As String, ByRef DtOut As Date, ByRef Converted As Boolean)
 
     On Error GoTo ErrHandler
     
-    dtOut = CDate(strIn)
-    If dtOut <= 1 Then
+    DtOut = CDate(strIn)
+    If DtOut <= 1 Then
         Converted = True
     End If
     
@@ -2660,7 +2660,7 @@ End Sub
 ' Purpose    : CDate does not correctly cope with times such as '04:20:10.123 am' or '04:20:10.123', i.e, times with a
 '              fractional second, so this method is called after CastToTime
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToTimeB(strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean)
+Private Sub CastToTimeB(strIn As String, ByRef DtOut As Date, ByRef Converted As Boolean)
     Static rx As VBScript_RegExp_55.RegExp
     Dim DecPointAt As Long
     Dim FractionalSecond As Double
@@ -2683,7 +2683,7 @@ Private Sub CastToTimeB(strIn As String, ByRef dtOut As Date, ByRef Converted As
     If SpaceAt = 0 Then SpaceAt = Len(strIn) + 1
     FractionalSecond = CDbl(Mid$(strIn, DecPointAt, SpaceAt - DecPointAt)) / 86400
     
-    dtOut = CDate(Left$(strIn, DecPointAt - 1) + Mid$(strIn, SpaceAt)) + FractionalSecond
+    DtOut = CDate(Left$(strIn, DecPointAt - 1) + Mid$(strIn, SpaceAt)) + FractionalSecond
     Converted = True
     Exit Sub
 ErrHandler:
@@ -2718,7 +2718,7 @@ End Sub
 '       IMPORTANT:       WHEN TIMEZONE IS GIVEN THE FUNCTION RETURNS THE TIME IN UTC
 
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastISO8601(ByVal strIn As String, ByRef dtOut As Date, ByRef Converted As Boolean, _
+Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Converted As Boolean, _
      AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
 
     Dim L As Long
@@ -2777,7 +2777,7 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef dtOut As Date, ByRef Conver
     If L = 10 Then
         If rxNoNo.Test(strIn) Then
             'This works irrespective of Windows regional settings
-            dtOut = CDate(strIn)
+            DtOut = CDate(strIn)
             Converted = True
             Exit Sub
         End If
@@ -2809,7 +2809,7 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef dtOut As Date, ByRef Conver
     Mid$(strIn, 11, 1) = " "
     
     If L = 19 Then
-        dtOut = CDate(strIn)
+        DtOut = CDate(strIn)
         Converted = True
         Exit Sub
     End If
@@ -2848,18 +2848,18 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef dtOut As Date, ByRef Conver
     Dim Adjust As Date
     Select Case Sign
         Case 0
-            dtOut = LocalTime
+            DtOut = LocalTime
             Converted = True
             Exit Sub
         Case 1
             If L <> PlusPos + 5 Then Exit Sub
             Adjust = CDate(Right$(strIn, 5))
-            dtOut = LocalTime - Adjust
+            DtOut = LocalTime - Adjust
             Converted = True
         Case -1
             If L <> MinusPos + 5 Then Exit Sub
             Adjust = CDate(Right$(strIn, 5))
-            dtOut = LocalTime + Adjust
+            DtOut = LocalTime + Adjust
             Converted = True
     End Select
 
@@ -3531,8 +3531,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
     Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
     Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3578,8 +3576,14 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         Throw Err_Delimiter
     End If
     
+    If DateFormat = "" Then
+        'Avoid DateFormat being the null string as that would make CSVWrite's _
+         behaviour depend on Windows locale (via calls to Format$ in function Encode).
+        DateFormat = "YYYY-MM-DD"
+    End If
+    
     Select Case UCase$(DateTimeFormat)
-        Case "ISO"
+        Case "ISO", ""
             DateTimeFormat = "yyyy-mm-ddThh:mm:ss"
         Case "ISOZ"
             DateTimeFormat = ISOZFormatString()
@@ -3680,18 +3684,7 @@ End Function
 '              characters, containing the delimiter etc.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String, Delimiter As String)
-    
-    Dim Converted As Boolean
-    Dim DateSeparator As Variant
-    Dim DQCount As Long
-    Dim dtOut As Date
-    Dim i As Long
-    Dim j As Long
-    Dim StrName As String
-    Dim StrValue As String
-    Dim SysDateOrder As Long
-    Dim SysDateSeparator As String
-    
+       
     If LCase(TrueString) = "true" Then
         If LCase(FalseString) = "false" Then
             Exit Function
@@ -3705,39 +3698,60 @@ Private Function ValidateTrueAndFalseStrings(TrueString As String, FalseString A
         Throw "Got '" & TrueString & "' for both TrueString and FalseString, but these cannot be equal to one another"
     End If
     
+    ValidateBooleanRepresentation TrueString, "TrueString", Delimiter
+    ValidateBooleanRepresentation FalseString, "FalseString", Delimiter
+    
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ValidateBooleanRepresentation
+' Author     : Philip Swannell
+' Date       : 25-Oct-2022
+' Purpose    : Stop the user from making bad choices for either TrueString or FalseString, e.g: strings that would be
+'              interpreted as (the wrong) Boolean, or as numbers, dates or empties, strings containing line feed
+'              characters, containing the delimiter etc.
+' Parameters :
+'  strValue : The string chosen e.g. "TRUE" or "VRAI" or "Yes"
+'  strName  : Either the string "TrueString" or the string "FalseString", used for error message generation
+'  Delimiter: The delimiter character used in the file.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function ValidateBooleanRepresentation(strValue As String, strName As String, Delimiter As String)
+    Dim Converted As Boolean
+    Dim DateSeparator As Variant
+    Dim DQCount As Long
+    Dim DtOut As Date
+    Dim i As Long
+    Dim SysDateOrder As Long
+    Dim SysDateSeparator As String
+        
     SysDateOrder = Application.International(xlDateOrder)
     SysDateSeparator = Application.International(xlDateSeparator)
-    
-    For j = 1 To 2
-        StrValue = IIf(j = 1, TrueString, FalseString)
-        StrName = IIf(j = 1, "TrueString", "FalseString")
-        
-        If StrValue = "" Then Throw StrName & " cannot be the zero-length string"
 
-        If InStr(StrValue, vbLf) > 0 Then Throw StrName & " contains a line feed character (ascii 10), which is not permitted"
-        If InStr(StrValue, vbCr) > 0 Then Throw StrName & " contains a carriage return character (ascii 13), which is not permitted"
-        If InStr(StrValue, Delimiter) > 0 Then Throw StrName & " contains Delimiter '" & Delimiter & "' which is not permitted"
-        If InStr(StrValue, """") > 0 Then
-            DQCount = Len(StrValue) - Len(Replace(StrValue, """", ""))
-            If DQCount <> 2 Or Left(StrValue, 1) <> """" Or Right(StrValue, 1) <> """" Then
-                Throw "If " & StrName & " contains double quote characters (it does) then both the first and last characters must be double quotes and there must be no other double quotes"
-            End If
+    If strValue = "" Then Throw strName & " cannot be the zero-length string"
+
+    If InStr(strValue, vbLf) > 0 Then Throw strName & " contains a line feed character (ascii 10), which is not permitted"
+    If InStr(strValue, vbCr) > 0 Then Throw strName & " contains a carriage return character (ascii 13), which is not permitted"
+    If InStr(strValue, Delimiter) > 0 Then Throw strName & " contains Delimiter '" & Delimiter & "' which is not permitted"
+    If InStr(strValue, """") > 0 Then
+        DQCount = Len(strValue) - Len(Replace(strValue, """", ""))
+        If DQCount <> 2 Or Left(strValue, 1) <> """" Or Right(strValue, 1) <> """" Then
+            Throw "If " & strName & " contains double quote characters (it does) then both the first and last characters must be double quotes and there must be no other double quotes"
         End If
+    End If
         
-        If IsNumeric(StrValue) Then Throw "Got '" & StrValue & "' as " & StrName & " but that's not valid because it represents a number"
+    If IsNumeric(strValue) Then Throw "Got '" & strValue & "' as " & strName & " but that's not valid because it represents a number"
         
-        For i = 1 To 3
-            For Each DateSeparator In Array("/", "-", " ")
-                CastToDate StrValue, dtOut, i, _
-                    CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
-                If Converted Then
-                    Throw "Got '" & StrValue & "' as " & _
-                        StrName & " but that's not valid because it represents a date."
-                End If
-            Next
+    For i = 1 To 3
+        For Each DateSeparator In Array("/", "-", " ")
+            CastToDate strValue, DtOut, i, _
+                CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
+            If Converted Then
+                Throw "Got '" & strValue & "' as " & _
+                    strName & " but that's not valid because it represents a date."
+            End If
         Next
     Next
-    
+
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
