@@ -114,7 +114,6 @@ Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, _
 NumCols As Long, ExtraInfo As String, ByVal Encoding As String, Ragged As Boolean) As String
 If Encoding = "False" Then Encoding = "Ascii" 'backward-compatibility hack
 
-
     NameThatFile = (Folder & "\" & IIf(ExtraInfo = vbNullString, vbNullString, ExtraInfo & "_") & _
         IIf(OS = vbNullString, vbNullString, OS & "_") & Format$(NumRows, "0000") & "_x_" & Format$(NumCols, "000") & _
         "_" & Encoding & IIf(Ragged, "_Ragged", vbNullString) & ".csv")

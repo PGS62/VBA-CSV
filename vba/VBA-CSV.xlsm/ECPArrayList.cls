@@ -48,7 +48,6 @@ End Sub
 ''' Gets the amount of items stored in the current instance.
 ''' </summary>
 Public Property Get count() As Long
-Attribute count.VB_Description = "Gets the amount of items stored in the current instance"
     count = CurrentIndex + 1
 End Property
 
@@ -57,8 +56,6 @@ End Property
 ''' </summary>
 ''' <param name="Index">Item's position in this instance.</param>
 Public Property Get item(Index As Long) As Variant
-Attribute item.VB_Description = "Gets the Item, by its index, from the current instance."
-Attribute item.VB_UserMemId = 0
     Select Case Index
         Case 0 To CurrentIndex
             item = Buffer(Index)
@@ -71,7 +68,6 @@ End Property
 ''' Gets an array with all the Items from the current instance.
 ''' </summary>
 Public Property Get Items() As Variant
-Attribute Items.VB_Description = "Gets an array with all the Items from the current instance."
     If CurrentIndex >= 0 Then
         Dim tmpResult() As Variant
         tmpResult = Buffer
@@ -92,7 +88,6 @@ End Property
 ''' </summary>
 ''' <param name="aValue">The value to append.</param>
 Public Sub Add(AValue As Variant)
-Attribute Add.VB_Description = "Appends a copy of the specified value to the current instance."
     CurrentIndex = CurrentIndex + 1
     On Error GoTo Expand_Buffer
     Buffer(CurrentIndex) = AValue
@@ -107,7 +102,6 @@ End Sub
 ''' Reinitializes the current instance.
 ''' </summary>
 Public Sub Clear()
-Attribute Clear.VB_Description = "Reinitializes the current instance."
     Erase Buffer
     ReDim Buffer(0 To MaxIndex)
     CurrentIndex = -1
@@ -117,7 +111,6 @@ End Sub
 ''' Returns a copy of the current instance.
 ''' </summary>
 Public Function Clone() As Object
-Attribute Clone.VB_Description = "Returns a copy of the current instance"
     Set Clone = Me
 End Function
 
@@ -127,9 +120,8 @@ End Function
 ''' <param name="Index">The index into which the Item'll be inserted.</param>
 ''' <param name="aValue">The value to be inserted.</param>
 Public Sub Insert(Index As Long, AValue As Variant)
-Attribute Insert.VB_Description = "Inserts an Item, at the given Index, in the current instance of the class."
-    Dim tmpCopy() As Variant
     Dim iCounter As Long
+    Dim tmpCopy() As Variant
         
     Select Case Index
         Case 0 To CurrentIndex + 1 'Avoids to leave empty items
@@ -169,8 +161,9 @@ Private Sub Quicksort(leftt As Long, _
                         SortColumn As Long, _
                         Optional Descending As Boolean = False)
                         
+    Dim i As Long
+    Dim j As Long
     Dim Ulen As Long
-    Dim i As Long, j As Long
 
     Static RecursionLevel As Long
     RecursionLevel = RecursionLevel + 1
@@ -210,8 +203,8 @@ Private Sub Quicksort(leftt As Long, _
         pivot1 = Buffer(leftt)(SortColumn)
         pivot2 = Buffer(rightt)(SortColumn)
         'pointers
-        Dim less As Long
         Dim great As Long
+        Dim less As Long
         less = leftt + 1
         great = rightt - 1
         'sorting
@@ -278,7 +271,6 @@ End Sub
 ''' Reinitializes the current instance of the class and reserve user desired storage space.
 ''' </summary>
 Public Sub Reinitialize(bufferSize As Long)
-Attribute Reinitialize.VB_Description = "Reinitializes the current instance of the class and reserve user desired storage space."
     Select Case bufferSize
         Case Is >= 0
             CurrentIndex = -1
@@ -294,9 +286,8 @@ End Sub
 ''' </summary>
 ''' <param name="Index">The index of the Item'll be deleted.</param>
 Public Sub RemoveAt(Index As Long)
-Attribute RemoveAt.VB_Description = "Removes an Item at specified Index."
-    Dim tmpCopy() As Variant
     Dim iCounter As Long
+    Dim tmpCopy() As Variant
         
     Select Case Index
         Case 0 To CurrentIndex
@@ -324,10 +315,9 @@ End Sub
 ''' <param name="Index">The index of the first item to be deleted.</param>
 ''' <param name="Count">The number of item to be deleted.</param>
 Public Sub RemoveRange(Index As Long, count As Long)
-Attribute RemoveRange.VB_Description = "Removes a range of Items starting at specified Index."
-    Dim tmpCopy() As Variant
-    Dim iCounter As Long
     Dim EndIndex As Long
+    Dim iCounter As Long
+    Dim tmpCopy() As Variant
         
     Select Case Index
         Case 0 To CurrentIndex
@@ -362,7 +352,8 @@ End Sub
 Private Function ReverseOrder(Optional LB As Long = -1, _
                                 Optional UB As Long = -1) As Boolean
                                 
-    Dim i As Long, tmpVar As Variant
+    Dim i As Long
+    Dim tmpVar As Variant
     
     On Error Resume Next
     If LB < 0 Then
@@ -383,12 +374,10 @@ Private Function ReverseOrder(Optional LB As Long = -1, _
     End If
 End Function
 
-
 ''' <summary>
 ''' Shrinks the buffer size to avoid extra space reservation.
 ''' </summary>
 Public Sub ShrinkBuffer()
-Attribute ShrinkBuffer.VB_Description = "Shrinks the buffer size to avoid extra space reservation"
     If CurrentIndex >= 0 Then
         MaxIndex = CurrentIndex
         ReDim Preserve Buffer(0 To MaxIndex)
@@ -453,7 +442,6 @@ End Sub
 ''' Swap items in buffer.
 ''' </summary>
 Public Sub Swap(position1 As Long, position2 As Long)
-Attribute Swap.VB_Description = "Swap items in buffer"
     If CurrentIndex >= 0 Then
         tmpBuffer = Buffer(position1)
         Buffer(position1) = Buffer(position2)
@@ -462,3 +450,4 @@ Attribute Swap.VB_Description = "Swap items in buffer"
 End Sub
 '////////////////////////////////////////////////////////////////////////////////////////////
 '#
+

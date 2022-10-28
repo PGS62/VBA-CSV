@@ -4,14 +4,14 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.17
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.18
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
 
 '2) Add two references (In VBA Editor Tools > References)
 '   Microsoft Scripting Runtime
-'   Microsoft VBScript Regular Expressions 5.5 (or the latest version available)
+'   Microsoft VBScript Regular Expressions 5.5 (or a later version if available)
 
 '3) If you plan to call the functions from spreadsheet formulas then you might like to tell
 '   Excel's Function Wizard about them by adding calls to RegisterCSVRead and RegisterCSVWrite
@@ -162,8 +162,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
         Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
         Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
         Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -198,8 +196,8 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim CTDict As Scripting.Dictionary
     Dim DateOrder As Long
     Dim DateSeparator As String
-    Dim ErrRet As String
     Dim Err_StringTooLong As String
+    Dim ErrRet As String
     Dim i As Long
     Dim ISO8601 As Boolean
     Dim j As Long
@@ -675,10 +673,10 @@ End Function
 '             See https://msdn.microsoft.com/en-us/library/ms775123(v=vs.85).aspx
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function Download(URLAddress As String, ByVal FileName As String) As String
+    Dim EN As Long
     Dim ErrString As String
     Dim Res As Long
     Dim TargetFolder As String
-    Dim EN As Long
 
     On Error GoTo ErrHandler
     
@@ -2515,7 +2513,10 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
 
     'Add "quoted versions" of the existing sentinels
     If ConvertQuoted Then
-        Dim Keys, Items, NewKey As String, i As Long
+        Dim i As Long
+        Dim Items
+        Dim Keys
+        Dim NewKey As String
         Keys = Sentinels.Keys
         Items = Sentinels.Items
         For i = LBound(Keys) To UBound(Keys)
@@ -2943,7 +2944,9 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     Dim HaveReachedSkipToLine As Boolean
     Dim i As Long 'Index to read from Buffer
     Dim j As Long 'Index to write to Starts, Lengths
+    Dim Err_StringTooLong As String
     Dim Lengths() As Long
+    Dim MSLIA As Long
     Dim NumLinesFound As Long
     Dim PosCR As Long
     Dim PosLF As Long
@@ -2954,8 +2957,6 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     Dim Streaming As Boolean
     Dim Tmp As Long
     Dim Which As Long
-    Dim MSLIA As Long
-    Dim Err_StringTooLong As String
 
     On Error GoTo ErrHandler
     
@@ -3531,8 +3532,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
     Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
     Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3548,8 +3547,8 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim OneLine() As String
     Dim OneLineJoined As String
     Dim Stream As Object
-    Dim WriteToFile As Boolean
     Dim Unicode As Boolean
+    Dim WriteToFile As Boolean
 
     On Error GoTo ErrHandler
     
@@ -3718,6 +3717,7 @@ End Function
 '  Delimiter: The delimiter character used in the file.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ValidateBooleanRepresentation(strValue As String, strName As String, Delimiter As String)
+Const DQ = """"
     Dim Converted As Boolean
     Dim DateSeparator As Variant
     Dim DQCount As Long
@@ -3734,10 +3734,10 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
     If InStr(strValue, vbLf) > 0 Then Throw strName & " contains a line feed character (ascii 10), which is not permitted"
     If InStr(strValue, vbCr) > 0 Then Throw strName & " contains a carriage return character (ascii 13), which is not permitted"
     If InStr(strValue, Delimiter) > 0 Then Throw strName & " contains Delimiter '" & Delimiter & "' which is not permitted"
-    If InStr(strValue, """") > 0 Then
-        DQCount = Len(strValue) - Len(Replace(strValue, """", ""))
-        If DQCount <> 2 Or Left(strValue, 1) <> """" Or Right(strValue, 1) <> """" Then
-            Throw "If " & strName & " contains double quote characters (it does) then both the first and last characters must be double quotes and there must be no other double quotes"
+    If InStr(strValue, DQ) > 0 Then
+        DQCount = Len(strValue) - Len(Replace(strValue, DQ, vbNullString))
+        If DQCount <> 2 Or Left$(strValue, 1) <> DQ Or Right$(strValue, 1) <> DQ Then
+            Throw "When " & strName & " contains any double quote characters they must be at the start, the end and nowhere else"
         End If
     End If
         
@@ -3749,7 +3749,7 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
                 CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
             If Converted Then
                 Throw "Got '" & strValue & "' as " & _
-                    strName & " but that's not valid because it represents a date."
+                    strName & " but that's not valid because it represents a date"
             End If
         Next
     Next
@@ -3917,6 +3917,4 @@ Private Function CanWriteCharToAscii(c As String) As Boolean
         CanWriteCharToAscii = Chr$(AscW(c)) = c
     End If
 End Function
-
-
 

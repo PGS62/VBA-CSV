@@ -4,7 +4,6 @@ ECPArrayList.cls
 ECPTextStream.cls
 modAdHoc.bas
 modCodeFromStackOverflow.bas
-modCSVDevUtils.bas
 modCSVNotRFC4180.bas
 modCSVPerformance.bas
 modCSVPerformanceLowLevel.bas

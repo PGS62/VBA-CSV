@@ -29,8 +29,8 @@ Public Function ArrayFromCSVfile( _
 
     On Error Resume Next
 
-    Dim objFSO As Scripting.FileSystemObject
     Dim arrData As Variant
+    Dim objFSO As Scripting.FileSystemObject
     Dim strFile As String
     Dim strTemp As String
 
@@ -81,7 +81,6 @@ Public Function ArrayFromCSVfile( _
     ArrayFromCSVfile = arrData
     Erase arrData
 End Function
-
 
 Private Function Split2d(ByRef strInput As String, _
     Optional RowDelimiter As String = vbCr, _
@@ -180,7 +179,6 @@ Private Function Split2d(ByRef strInput As String, _
 
 End Function
 
-
 Private Function Join2d(ByRef InputArray As Variant, _
     Optional RowDelimiter As String = vbCr, _
     Optional FieldDelimiter = vbTab, _
@@ -263,3 +261,4 @@ Private Function Join2d(ByRef InputArray As Variant, _
     Erase arrTemp1
 
 End Function
+

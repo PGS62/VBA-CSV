@@ -8,10 +8,11 @@ Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As B
 
     Dim i As Long
     Dim j As Long
-    Dim ParserRes As Variant
+    Dim NC As Long
+    Dim NR As Long
     Dim OneDArray() As String
-    Dim NR As Long, NC As Long
     Dim Out As String
+    Dim ParserRes As Variant
 
     On Error GoTo ErrHandler
 
@@ -99,15 +100,15 @@ ErrHandler:
     TestNonStandardInput = "#TestNonStandardInput (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-
 Function SaveNotCompliantFile(ByVal InputString As String, FileName As String)
 
     Dim i As Long
     Dim j As Long
-    Dim ParserRes As Variant
+    Dim NC As Long
+    Dim NR As Long
     Dim OneDArray() As String
-    Dim NR As Long, NC As Long
     Dim Out As String
+    Dim ParserRes As Variant
 
     On Error GoTo ErrHandler
     On Error GoTo ErrHandler
@@ -132,3 +133,4 @@ Function SaveNotCompliantFile(ByVal InputString As String, FileName As String)
 ErrHandler:
     SaveNotCompliantFile = "#SaveNotCompliantFile (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
+

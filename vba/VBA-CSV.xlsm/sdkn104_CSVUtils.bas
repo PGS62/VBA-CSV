@@ -8,7 +8,6 @@ Attribute VB_Name = "sdkn104_CSVUtils"
 '
 Option Explicit
 
-
 ' Variables used in FindNextSeparator()
 Private nextSep1 As Long
 Private nextSep2 As Long
@@ -50,7 +49,6 @@ Public Sub SetCSVUtilsAnyErrorIsFatal(ByRef value As Boolean)
   CSVUtilsAnyErrorIsFatal = value
 End Sub
 
-
 '------ Public Function/Sub --------------------------------------------------------
 
 '
@@ -65,11 +63,15 @@ Public Function ParseCSVToCollection(ByRef csvText As String, Optional ByRef all
     If CSVUtilsAnyErrorIsFatal Then GoTo Head
     On Error Resume Next
 Head:
-    Dim csvPos As Long
-    Dim fieldText As String
-    Dim nextSep As Long, nextSepType As Long, quoteCount As Long, fieldStart As Long, fieldLen As Long
-    Dim fields As Collection
     Dim csvCollection As Collection
+    Dim csvPos As Long
+    Dim fieldLen As Long
+    Dim fields As Collection
+    Dim fieldStart As Long
+    Dim fieldText As String
+    Dim nextSep As Long
+    Dim nextSepType As Long
+    Dim quoteCount As Long
     Set csvCollection = New Collection 'empty collection
     
     Set ParseCSVToCollection = csvCollection
@@ -119,7 +121,6 @@ ErrorExit:
     Set ParseCSVToCollection = Nothing
 End Function
 
-
 '
 ' Parse CSV text and return 2-dim array
 '
@@ -133,13 +134,18 @@ Public Function ParseCSVToArray(ByRef csvText As String, Optional ByRef allowVar
     If CSVUtilsAnyErrorIsFatal Then GoTo Head
     On Error Resume Next
 Head:
+    Dim colCount As Long
     Dim csv As Collection
-    Dim rowCount As Long, colCount As Long
     Dim csvArray() As String
-    Dim ri As Long, fi As Long
-    Dim sepIndex As Long
-    Dim fieldStart As Long, fieldLen As Long, nextSepType As Long, quoteCount As Long
+    Dim fi As Long
+    Dim fieldLen As Long
+    Dim fieldStart As Long
     Dim fieldText As String
+    Dim nextSepType As Long
+    Dim quoteCount As Long
+    Dim ri As Long
+    Dim rowCount As Long
+    Dim sepIndex As Long
     
     ParseCSVToArray = Null 'for error
   
@@ -198,7 +204,6 @@ Head:
     ParseCSVToArray = csvArray
 End Function
 
-
 '
 ' Convert 2-dim array to CSV text string
 '
@@ -214,11 +219,14 @@ Public Function ConvertArrayToCSV(inArray As Variant, Optional fmtDate As String
     If CSVUtilsAnyErrorIsFatal Then GoTo Head
     On Error Resume Next
 Head:
-    Dim csv As String
-    Dim R As Long, c As Long, ub2 As Long
-    Dim v As Variant
+    Dim arrField As Variant
+    Dim arrRecord As Variant
+    Dim c As Long
     Dim cell As String
-    Dim arrRecord As Variant, arrField As Variant
+    Dim csv As String
+    Dim R As Long
+    Dim ub2 As Long
+    Dim v As Variant
     
     'error check
     If Not IsArray(inArray) Then
@@ -230,7 +238,8 @@ Head:
         GoTo ErrorExit
     End If
 
-    Dim rc As Long, cc As Long
+    Dim cc As Long
+    Dim rc As Long
     ReDim arrRecord(LBound(inArray, 1) To UBound(inArray, 1)) As String 'temporary array
     ReDim arrField(LBound(inArray, 2) To UBound(inArray, 2)) As String 'temporary array
     
@@ -260,7 +269,6 @@ ErrorExit:
     ConvertArrayToCSV = ""
 End Function
 
-
 '
 ' ParseCSVToDictionary
 '    return Dictionary whose key is value of keyColumn and whose value is a Collection of fields in the record
@@ -284,8 +292,8 @@ End Function
 '    return Dictionary whose key is field name and whose value is column number (1,2,3,...)  of the field
 '
 Public Function GetFieldDictionary(ByRef csvText As String) As Object
-    Dim coll As Collection
     Dim c As Long
+    Dim coll As Collection
     Dim v
     Set coll = ParseCSVToCollection(csvText, True, True) 'parse header only
     Set GetFieldDictionary = Nothing ' for error
@@ -312,11 +320,16 @@ Private Sub ParseCSV(ByRef rowCount As Long, ByRef colCount As Long, ByRef sepAr
     If CSVUtilsAnyErrorIsFatal Then GoTo Head
     On Error Resume Next
 Head:
-    Dim csvPos As Long
-    Dim fieldText As String
-    Dim nextSep As Long, nextSepType As Long, quoteCount As Long, fieldStart As Long, fieldLen As Long
     Dim colCountTmp As Long
-    Dim sepIndex As Long, sepSize As Long
+    Dim csvPos As Long
+    Dim fieldLen As Long
+    Dim fieldStart As Long
+    Dim fieldText As String
+    Dim nextSep As Long
+    Dim nextSepType As Long
+    Dim quoteCount As Long
+    Dim sepIndex As Long
+    Dim sepSize As Long
     
     sepSize = UBound(sepArray1)
     
@@ -368,7 +381,6 @@ Head:
     Loop
 End Sub
 
-
 ' Find next separator (comma, CR, LF, CRLF) in inText starting with the position "start"
 '   fieldStart = start position of found field
 '   fieldLen   = length of found field
@@ -389,14 +401,15 @@ Private Sub FindNextSeparatorInit(ByRef inText As String)
     If nextSep3 = 0 Then nextSep3 = lenText + 1 'EOF
 End Sub
 
-
 Private Function FindNextSeparator(ByRef inText As String, _
                     ByRef start As Long, _
                     ByRef fieldStart As Long, _
                     ByRef fieldLen As Long, _
                     nextSepType As Long, ByRef quoteCount As Long) As Boolean
-    Dim init_start As Long, lenText As Long
-    Dim nextSep As Long, nextStart As Long
+    Dim init_start As Long
+    Dim lenText As Long
+    Dim nextSep As Long
+    Dim nextStart As Long
     
     FindNextSeparator = False
     
@@ -465,8 +478,8 @@ End Function
 ' add number of double quotes in [n+1, p1] of Source to quoteCount
 '
 Private Sub StrCount(Source As String, N As Long, p1 As Long, ByRef quoteCount As Long)
-    Dim ss As String
     Dim nn As Long
+    Dim ss As String
     Do
         ss = Mid(Source, N + 1, p1 - N) ' to avoid from feeding long string to InStr().
         nn = InStr(1, ss, """")
@@ -481,7 +494,8 @@ End Sub
 '   * text MUST include two or more double-quotes (")
 Private Function TrimQuotes(ByRef text As String) As String
     'If InStr(text, """") = 0 Then Err.Raise 9999, "", "program error"
-    Dim p0 As Long, p1 As Long
+    Dim p0 As Long
+    Dim p1 As Long
     Dim s As String
     
     'trim tail
@@ -497,6 +511,4 @@ Private Function TrimQuotes(ByRef text As String) As String
     'return
     TrimQuotes = Mid(text, p0 + 1, p1 - p0 - 1)
 End Function
-
-
 

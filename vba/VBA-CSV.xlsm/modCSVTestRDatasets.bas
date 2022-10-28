@@ -30,8 +30,11 @@ End Function
 Sub TestAgainstLargestFileInRDatasets()
 
     Const FileName As String = "C:\Projects\RDatasets\csv\openintro\military.csv"
-    Dim t1 As Double, t2 As Double, t3 As Double
-    Dim res1, res2
+    Dim res1
+    Dim res2
+    Dim t1 As Double
+    Dim t2 As Double
+    Dim t3 As Double
     Const RemoveQuotes As Boolean = True
     Dim WhatDiffers As String
 
@@ -117,4 +120,5 @@ Sub TestAgainstRDatasets()
 ErrHandler:
     MsgBox "#TestAgainstRDatasets (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
+
 

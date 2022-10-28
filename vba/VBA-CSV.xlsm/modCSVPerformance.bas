@@ -116,7 +116,7 @@ Private Sub RunSpeedTests()
                     c.Resize(1, NumColsInTFPRet).value = TestResults
                     ws.Calculate
                     DoEvents
-                    Stop
+                  '  Stop
                     Application.ScreenUpdating = True
                 Next
                 ThisWorkbook.Save
@@ -284,7 +284,6 @@ ErrHandler:
     TimeParsers = "#TimeParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-
 Sub AddChartsNoExport()
     On Error GoTo ErrHandler
     AddCharts False
@@ -298,11 +297,11 @@ Sub AddCharts(Optional Export As Boolean = True)
     
     Dim c As ChartObject
     Dim N As Name
+    Dim NumSeries As Long
     Dim prot As Boolean
     Dim ws As Worksheet
     Dim xData As Range
     Dim yData As Range
-    Dim NumSeries As Long
 
     On Error GoTo ErrHandler
     
@@ -360,8 +359,6 @@ Private Function NameRefersToRange(N As Name) As Boolean
 ErrHandler:
     NameRefersToRange = False
 End Function
-
-
 
 Sub AddChartAtSelection()
     On Error GoTo ErrHandler

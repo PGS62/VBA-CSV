@@ -5737,12 +5737,12 @@ End Sub
 Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
     Dim FileName As String
+    Dim Formula As String
     Dim Observed As Variant
+    Dim R As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
-    Dim R As Range
-    Dim Formula As String
     Const NumQuotes = 32767
     'File contains (at position 2,2) a sequence of 65,536 double quote characters, that should _
      "unquote" to a sequence of 32,767 double quotes and a string that long _can_ be embedded in an array _
@@ -5778,16 +5778,15 @@ ErrHandler:
     Throw "#Test205 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-
 Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
     Dim FileName As String
+    Dim Formula As String
     Dim Observed As Variant
+    Dim R As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
-    Dim R As Range
-    Dim Formula As String
     Const NumQuotes = 32767
     'File contains (at position 2,2) a sequence of 65,538 double quote characters, that should _
      "unquote" to a sequence of 32,768 double quotes and a string that long _cannot_ be embedded in an array _
@@ -5859,7 +5858,6 @@ ErrHandler:
     Throw "#Test207 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
 
-
 Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
     Dim FileName As String
@@ -5894,8 +5892,4 @@ Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     Throw "#Test208 (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Sub
-
-
-
-
 

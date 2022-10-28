@@ -25,7 +25,9 @@ Public Sub RoundTripTest()
     Dim AllowLineFeed As Variant
     Dim Data As Variant
     Dim DateFormat As Variant
+    Dim DateFormats As Variant
     Dim Delimiter As Variant
+    Dim Encoding As Variant
     Dim EOL As String
     Dim ExtraInfo As String
     Dim Folder As String
@@ -37,8 +39,8 @@ Public Sub RoundTripTest()
     Dim NumTests As Long
     Dim OS As Variant
     Dim Prompt As String
-    Dim Encoding As Variant
     Dim WhatDiffers As String
+    
     Const Title As String = "VBA-CSV Round Trip Tests"
     
     On Error GoTo ErrHandler
@@ -46,12 +48,14 @@ Public Sub RoundTripTest()
     Folder = Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     Prompt = "Run Round Trip Tests?" + vbLf + vbLf + _
-        "Note this will generate 2,430 files in folder" + vbLf + _
+        "Note this will generate 5,346 files in folder" + vbLf + _
         Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
 
     ThrowIfError CreatePath(Folder)
+    
+    DateFormats = Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd", "mmm/dd/yyyy", "dd/mmm/yyyy", "yyyy/mm/dd", "mmm dd yyyy", "dd mmm yyyy", "yyyy mm dd")
 
     For Each OS In Array("Windows", "Unix", "Mac")
         EOL = IIf(OS = "Windows", vbCrLf, IIf(OS = "Unix", vbLf, vbCr))
@@ -63,7 +67,7 @@ Public Sub RoundTripTest()
         
                         'For Variants we need to vary AllowLineFeed and DateFormat
                         For Each AllowLineFeed In Array(True, False)
-                            For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
+                            For Each DateFormat In DateFormats
                                 Data = RandomVariants(CLng(NRows), CLng(NCols), CBool(AllowLineFeed), CStr(Encoding), EOL)
                                 NumTests = NumTests + 1
                                 ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomVariants" & IIf(AllowLineFeed, "WithLineFeed", vbNullString)
@@ -72,7 +76,7 @@ Public Sub RoundTripTest()
                         Next AllowLineFeed
 
                         'For Dates, we need to vary DateFormat
-                        For Each DateFormat In Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd")
+                        For Each DateFormat In DateFormats
                             Data = RandomDates(CLng(NRows), CLng(NCols))
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDates"
@@ -130,8 +134,8 @@ End Sub
 ' Purpose    : Test for "round trip" between functions CSVRead and CSVWrite. We write data to a file, then read it back
 '              and test that the read-back data is identical to the starting data. For round-tripping to work we must write
 '              with QuoteAllStrings being TRUE and read back with ShowMissingsAs being Empty (to be able to distinguish
-'              Empty and null string. Also method RandomDoubles only generates doubles that have exact representation as
-'              strings (avoid differences of order 10E-15).
+'              Empty and null string. Also method RandomDoubles only generates doubles that have exact decimal
+'              representation as strings (avoid differences of order 10E-15).
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Variant, DateFormat As String, _
     Encoding As String, EOL As String, Delimiter As String, ExtraInfo As String, ByRef WhatDiffers As String, _
@@ -159,6 +163,11 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     'The Call to CSVRead has to infer both Encoding and EOL
     DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
     
+    'Code to test the test
+    'If Rnd() < 0.001 Then
+    '    DataReadBack(1, 1) = "foo"
+    'End If
+    
     If ArraysIdentical(Data, DataReadBack, True, PermitBaseDifference, WhatDiffers) Then
         NumPassed = NumPassed + 1
     Else
@@ -179,10 +188,10 @@ End Sub
 Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL As String) As String
 
     Const maxlen As Long = 20
+    Dim ansi As Boolean
     Dim i As Long
     Dim Length As Long
     Dim Res As String
-    Dim ansi As Boolean
     
     On Error GoTo ErrHandler
     
@@ -478,4 +487,5 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
 ErrHandler:
     Throw "#RandomVariants: " & Err.Description & "!"
 End Function
+
 

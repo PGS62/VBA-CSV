@@ -232,7 +232,6 @@ End Sub
 '              b) Uncomment call to CastISO8601
 '              Don't forget to revert those changes!
 
-
 'Example output: (Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz   2.11 GHz, 16GB RAM)
 
 'Running SpeedTest_CastISO8601 2021-Sep-07 22:03:27
