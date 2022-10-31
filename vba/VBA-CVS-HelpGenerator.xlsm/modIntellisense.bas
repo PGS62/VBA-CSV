@@ -37,10 +37,10 @@ Sub CreateIntellisenseWorkbook()
 17            FnName = Choose(i, "CSVRead", "CSVWrite")
 18            Set SourceRange = shHelp.Range(FnName & "Args")
 19            targetsheet.Cells(1 + i, 1) = FnName
-20            targetsheet.Cells(1 + i, 2) = SourceRange.Cells(1, 1).Offset(-2, 1).value
+20            targetsheet.Cells(1 + i, 2) = vbCrLf & Replace(SourceRange.Cells(1, 1).Offset(-2, 1).value, vbLf, vbCrLf) & vbCrLf
 21            For j = 1 To SourceRange.Rows.Count
 22                targetsheet.Cells(1 + i, 2 * (1 + j)).value = SourceRange.Cells(j, 1).value
-23                targetsheet.Cells(1 + i, 1 + 2 * (1 + j)).value = SourceRange.Cells(j, 4).value 'Use the "long form" of the help...
+23                targetsheet.Cells(1 + i, 1 + 2 * (1 + j)).value = Replace(SourceRange.Cells(j, 4).value, vbLf, vbCrLf) 'Use the "long form" of the help...
 24            Next j
 25        Next i
 
