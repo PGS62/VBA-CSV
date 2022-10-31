@@ -153,7 +153,6 @@ Public Sub Throw(ByVal ErrorString As String)
     Err.Raise vbObjectError + 1, , ErrorString
 End Sub
 
-
 Public Function StringBetweenStrings(TheString, LeftString, RightString, Optional IncludeLeftString As Boolean, Optional IncludeRightString As Boolean)
     Dim MatchPoint1 As Long        ' the position of the first character to return
     Dim MatchPoint2 As Long        ' the position of the last character to return
@@ -319,4 +318,3 @@ Function RegExSyntaxValid(RegularExpression As String) As Boolean
 ErrHandler:
 11        RegExSyntaxValid = False
 End Function
-

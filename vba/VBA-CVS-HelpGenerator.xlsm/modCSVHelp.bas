@@ -95,8 +95,6 @@ ErrHandler:
     Throw "#InsertBreaksInStringLiteral: " & Err.Description & "!"
 End Function
 
-
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : HelpForVBE
 ' Purpose    : Generate a header to paste into the VBE. The header generated will be consistent with the registration
@@ -209,7 +207,6 @@ ErrHandler:
         Throw "#InsertBreaks: " & Err.Description & "!"
 End Function
 
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : MarkdownHelp
 ' Purpose    : Formats the help as a markdown table.
@@ -217,14 +214,15 @@ End Function
 Function MarkdownHelp(SourceFile As String, FunctionName As String, ByVal FunctionDescription As String, _
         ArgNames, ArgDescriptions, Optional Replacements)
 
-          Dim SourceCode As String
           Dim Declaration As String
-          Dim LeftString As String, RightString As String
           Dim Hlp As String
-          Dim i As Long, j As Long
-          Dim ThisArgDescription As String
+          Dim i As Long
+          Dim j As Long
+          Dim LeftString As String
+          Dim RightString As String
+          Dim SourceCode As String
           Dim StringsToEncloseInBackTicks
-          
+          Dim ThisArgDescription As String
 
 1         On Error GoTo ErrHandler
 2         SourceCode = RawFileContents(SourceFile)
@@ -243,8 +241,8 @@ Function MarkdownHelp(SourceFile As String, FunctionName As String, ByVal Functi
 12        Declaration = StringBetweenStrings(SourceCode, LeftString, ")", True, True)
 
           'Bodge - get the "As VarType"
-          Dim NextChars As String
           Dim matchPoint As Long
+          Dim NextChars As String
 13        matchPoint = InStr(SourceCode, Declaration)
 14        NextChars = Mid$(SourceCode, matchPoint + Len(Declaration), 100)
 15        If Left$(NextChars, 4) = " As " Then
@@ -296,9 +294,10 @@ ErrHandler:
 47        MarkdownHelp = "#MarkdownHelp (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
-
 Function RawFileContents(FileName As String)
-    Dim FSO As New FileSystemObject, F As Scripting.File, T As Scripting.TextStream
+    Dim F As Scripting.File
+    Dim FSO As New FileSystemObject
+    Dim T As Scripting.TextStream
     On Error GoTo ErrHandler
     Set F = FSO.GetFile(FileName)
     Set T = F.OpenAsTextStream()
@@ -309,6 +308,4 @@ Function RawFileContents(FileName As String)
 ErrHandler:
    ' Throw "#RawFileContents (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
-
-
 
