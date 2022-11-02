@@ -267,6 +267,9 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test230 Folder, NumPassed, NumFailed, Failures
     Test231 Folder, NumPassed, NumFailed, Failures
     Test232 Folder, NumPassed, NumFailed, Failures
+    Test233 Folder, NumPassed, NumFailed, Failures
+    Test234 Folder, NumPassed, NumFailed, Failures
+    Test235 Folder, NumPassed, NumFailed, Failures
     
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -6481,4 +6484,78 @@ ErrHandler:
     Throw "#Test232 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
+
+Private Sub Test233(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "20x20 triangular"
+    Expected = HStack(Array("1x1", "2x1", "3x1"), Array(Empty, "2x2", "3x2"), Array(Empty, Empty, "3x3"))
+    FileName = "20x20_triangular.csv"
+    TestRes = TestCSVRead(233, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        NumRows:=3, _
+        NumCols:=3, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test233 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test234(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "20x20 triangular"
+    Expected = HStack(Array(Empty, Empty, Empty, "4x4"))
+    FileName = "20x20_triangular.csv"
+    TestRes = TestCSVRead(234, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        SkipToCol:=4, _
+        NumRows:=4, _
+        NumCols:=1, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test234 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test235(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "20x20 triangular"
+    Expected = "#CSVRead: SkipToCol (5) exceeds the number of columns in the file (4)!"
+    FileName = "20x20_triangular.csv"
+    TestRes = TestCSVRead(235, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        SkipToCol:=5, _
+        NumRows:=4, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test235 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
 

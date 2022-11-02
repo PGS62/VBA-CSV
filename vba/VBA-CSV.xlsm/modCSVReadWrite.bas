@@ -430,7 +430,9 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
         If Not ShowMissingsAsEmpty Then
             For i = 1 + Adj To NumRowsInReturn + Adj
                 For j = 1 + Adj To NumColsInReturn + Adj
-                    If IsEmpty(ReturnArray(i, j)) Then ReturnArray(i, j) = ShowMissingsAs
+                    If IsEmpty(ReturnArray(i, j)) Then
+                        ReturnArray(i, j) = ShowMissingsAs
+                    End If
                 Next j
             Next i
         End If
@@ -517,24 +519,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
                 End If
             Next i
         Next j
-    End If
-
-    'Pad if necessary
-    If Not ShowMissingsAsEmpty Then
-        If NumColsInReturn > NumColsFound - SkipToCol + 1 Then
-            For i = 1 To NumRowsInReturn
-                For j = NumColsFound - SkipToCol + 2 To NumColsInReturn
-                    ReturnArray(i + Adj, j + Adj) = ShowMissingsAs
-                Next j
-            Next i
-        End If
-        If NumRowsInReturn > NumRowsFound Then
-            For i = NumRowsFound + 1 To NumRowsInReturn
-                For j = 1 To NumColsInReturn
-                    ReturnArray(i + Adj, j + Adj) = ShowMissingsAs
-                Next j
-            Next i
-        End If
     End If
 
     CSVRead = ReturnArray
@@ -3476,9 +3460,9 @@ Public Sub RegisterCSVWrite()
     ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this " & _
                   "argument is `ANSI` but Data contains characters that cannot be written to an ANSI file. `UTF-8` " & _
                   "and `UTF-16` files are written with a byte option mark."
-    ArgDescs(8) = "Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. " & _
-                  "Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or " & _
-                  "the strings `CRLF`, `LF` or `CR`."
+    ArgDescs(8) = "Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending " & _
+                  "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
+                  "is provided, or `Unix` if not."
     ArgDescs(9) = "How the Boolean value True is to be represented in the file. Optional, defaulting to ""True""."
     ArgDescs(10) = "How the Boolean value False is to be represented in the file. Optional, defaulting to " & _
                    """False""."
@@ -3486,7 +3470,7 @@ Public Sub RegisterCSVWrite()
     Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
+    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3515,9 +3499,10 @@ End Sub
 ' Encoding  : Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this
 '             argument is `ANSI` but Data contains characters that cannot be written to an ANSI file.
 '             `UTF-8` and `UTF-16` files are written with a byte option mark.
-' EOL       : Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`.
-'             Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13)
-'             or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.
+' EOL       : Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending
+'             characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF`
+'             or `CR`. The default is `Windows` if FileName is provided, or `Unix` if not. The last line of
+'             the file is written with a line ending.
 ' TrueString: How the Boolean value True is to be represented in the file. Optional, defaulting to "True".
 ' FalseString: How the Boolean value False is to be represented in the file. Optional, defaulting to
 '             "False".
@@ -3532,6 +3517,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
         Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
         Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
         Optional TrueString As String = "True", Optional FalseString As String = "False") As String
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3625,7 +3612,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     
             For i = LBound(Data) To UBound(Data)
                 For j = LBound(Data, 2) To UBound(Data, 2)
-                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",", TrueString, FalseString)
+                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, TrueString, FalseString)
                 Next j
                 OneLineJoined = VBA.Join(OneLine, Delimiter) & EOL
                 Stream.WriteText OneLineJoined
@@ -3640,7 +3627,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
   
             For i = LBound(Data) To UBound(Data)
                 For j = LBound(Data, 2) To UBound(Data, 2)
-                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",", TrueString, FalseString)
+                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, TrueString, FalseString)
                 Next j
                 OneLineJoined = VBA.Join(OneLine, Delimiter)
                 WriteLineWrap Stream, OneLineJoined, EOLIsWindows, EOL, Unicode
@@ -3655,7 +3642,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
   
         For i = LBound(Data) To UBound(Data)
             For j = LBound(Data, 2) To UBound(Data, 2)
-                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, ",", TrueString, FalseString)
+                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, TrueString, FalseString)
             Next j
             Lines(i) = VBA.Join(OneLine, Delimiter)
         Next i

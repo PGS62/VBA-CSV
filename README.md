@@ -110,10 +110,10 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
 ```vba
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
-    Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
-    Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
-    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
-    Optional TrueString As String = "True", Optional FalseString As String = "False") As String
+        Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
+        Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
+        Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
+        Optional TrueString As String = "True", Optional FalseString As String = "False") As String
 ```
 
 |Argument|Description|
@@ -125,7 +125,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
 |`DateTimeFormat`|Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data.|
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
 |`Encoding`|Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this argument is `ANSI` but `Data` contains characters that cannot be written to an ANSI file. `UTF-8` and `UTF-16` files are written with a byte option mark.|
-|`EOL`|Controls the line endings of the file written. Enter `Windows` (the default), `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The last line of the file is written with a line ending.|
+|`EOL`|Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if `FileName` is provided, or `Unix` if not. The last line of the file is written with a line ending.|
 |`TrueString`|How the Boolean value True is to be represented in the file. Optional, defaulting to "True".|
 |`FalseString`|How the Boolean value False is to be represented in the file. Optional, defaulting to "False".|
 

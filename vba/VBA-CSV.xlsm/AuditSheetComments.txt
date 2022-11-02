@@ -1,4 +1,6 @@
 Version	Date	Time	Author	Comment
+163	02-Nov-2022	19:24	Philip Swannell	Help changes
+162	02-Nov-2022	19:05	Philip Swannell	CSVWrite was not correctly handling argument QuoteAllStrings when the delimiter was not a comma. CSVRead fix to another edge case re ragged files and ShowMissingsAs.
 161	01-Nov-2022	17:05	Philip Swannell	CSVRead: Now reject elements of TrueStrings, FalseStrings and MissingStrings that are not valid fields of a CSV file. Added tests 209 to 232 (to increase code coverage). Use & instead of + for string concatenation. Fixed edge case in CSVRead with regards to missing fields in ragged files.
 160	31-Oct-2022	16:43	Philip Swannell	Code comments about intellisense.
 159	28-Oct-2022	14:27	Philip Swannell	Removed commented-out module modCSVDevUtils. Tweak to method ValidateBooleanRepresentation. Amended variable declaration (automatically, via a script).
