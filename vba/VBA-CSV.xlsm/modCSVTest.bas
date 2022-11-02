@@ -19,9 +19,10 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
 
     On Error GoTo ErrHandler
     Folder = ThisWorkbook.path
-    Folder = Left$(Folder, InStrRev(Folder, "\")) + "testfiles\"
+    Folder = Left$(Folder, InStrRev(Folder, "\")) & "testfiles\"
 
-    If Not FolderExists(Folder) Then Throw "Cannot find folder: '" + Folder + "'"
+    If Not FolderExists(Folder) Then Throw "Cannot find folder: '" & Folder & "'"
+    
     Test1 Folder, NumPassed, NumFailed, Failures
     Test2 Folder, NumPassed, NumFailed, Failures
     Test3 Folder, NumPassed, NumFailed, Failures
@@ -162,7 +163,6 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Else
         NumSkipped = NumSkipped + 1
     End If
-    Test128 Folder, NumPassed, NumFailed, Failures
     Test129 Folder, NumPassed, NumFailed, Failures
     Test130 Folder, NumPassed, NumFailed, Failures
     Test131 Folder, NumPassed, NumFailed, Failures
@@ -243,12 +243,36 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test206 Folder, NumPassed, NumFailed, Failures
     Test207 Folder, NumPassed, NumFailed, Failures
     Test208 Folder, NumPassed, NumFailed, Failures
+    Test209 Folder, NumPassed, NumFailed, Failures
+    Test210 Folder, NumPassed, NumFailed, Failures
+    Test211 Folder, NumPassed, NumFailed, Failures
+    Test212 Folder, NumPassed, NumFailed, Failures
+    Test213 Folder, NumPassed, NumFailed, Failures
+    Test214 Folder, NumPassed, NumFailed, Failures
+    Test215 Folder, NumPassed, NumFailed, Failures
+    Test216 Folder, NumPassed, NumFailed, Failures
+    Test217 Folder, NumPassed, NumFailed, Failures
+    Test218 Folder, NumPassed, NumFailed, Failures
+    Test219 Folder, NumPassed, NumFailed, Failures
+    Test220 Folder, NumPassed, NumFailed, Failures
+    Test221 Folder, NumPassed, NumFailed, Failures
+    Test222 Folder, NumPassed, NumFailed, Failures
+    Test223 Folder, NumPassed, NumFailed, Failures
+    Test224 Folder, NumPassed, NumFailed, Failures
+    Test225 Folder, NumPassed, NumFailed, Failures
+    Test226 Folder, NumPassed, NumFailed, Failures
+    Test227 Folder, NumPassed, NumFailed, Failures
+    Test228 Folder, NumPassed, NumFailed, Failures
+    Test229 Folder, NumPassed, NumFailed, Failures
+    Test230 Folder, NumPassed, NumFailed, Failures
+    Test231 Folder, NumPassed, NumFailed, Failures
+    Test232 Folder, NumPassed, NumFailed, Failures
     
     shHiddenSheet.UsedRange.EntireRow.Delete
     
     Exit Sub
 ErrHandler:
-    Throw "#RunTests (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#RunTests (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -283,7 +307,7 @@ Public Sub RunTestsFromButton()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#RunTestsFromButton (line " & CStr(Erl) + "): " & Err.Description & "!", vbCritical
+    MsgBox "#RunTestsFromButton (line " & CStr(Erl) & "): " & Err.Description & "!", vbCritical
 End Sub
 
 Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
@@ -308,7 +332,7 @@ Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
 
     Exit Sub
 ErrHandler:
-    Throw "#PasteFailures (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#PasteFailures (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -381,14 +405,14 @@ Private Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestDescription = "test one row of data.cscv"
     Expected = HStack(1#, 2#, 3#)
     FileName = "test_one_row_of_data.cscv"
-    TestRes = TestCSVRead(1, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(1, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test1 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test1 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -403,12 +427,12 @@ Private Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestDescription = "test empty file newlines"
     FileName = "test_empty_file_newlines.csv"
     Expected = HStack(Array(Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty))
-    TestRes = TestCSVRead(2, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty, IgnoreEmptyLines:=False)
+    TestRes = TestCSVRead(2, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty, IgnoreEmptyLines:=False)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test2 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test2 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -423,14 +447,14 @@ Private Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestDescription = "test single column"
     Expected = HStack(Array("col1", 1#, 2#, 3#))
     FileName = "test_single_column.csv"
-    TestRes = TestCSVRead(3, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(3, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test3 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test3 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -445,12 +469,12 @@ Private Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestDescription = "comma decimal"
     FileName = "comma_decimal.csv"
     Expected = HStack(Array("x", 3.14, 1#), Array("y", 1#, 1#))
-    TestRes = TestCSVRead(4, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty, DecimalSeparator:=",")
+    TestRes = TestCSVRead(4, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty, DecimalSeparator:=",")
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test4 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test4 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -469,12 +493,12 @@ Private Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
         Array("B", 2#, 5#), _
         Array("C", 3#, 6#), _
         Array("D", Empty, Empty))
-    TestRes = TestCSVRead(5, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(5, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test5 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test5 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -489,12 +513,12 @@ Private Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestDescription = "initial spaces when ignore repeated"
     FileName = "test_issue_326.wsv"
     Expected = HStack(Array("A", 1#, 11#), Array("B", 2#, 22#))
-    TestRes = TestCSVRead(6, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(6, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test6 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test6 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -515,12 +539,12 @@ Private Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
         Array("D", Empty, Empty), _
         Array("E", Empty, Empty))
 
-    TestRes = TestCSVRead(7, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(7, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test7 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test7 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -535,12 +559,12 @@ Private Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestDescription = "test comments1"
     FileName = "test_comments1.csv"
     Expected = HStack(Array("a", 1#, 7#), Array("b", 2#, 8#), Array("c", 3#, 9#))
-    TestRes = TestCSVRead(8, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(8, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test8 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test8 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -555,12 +579,12 @@ Private Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestDescription = "test comments multichar"
     FileName = "test_comments_multichar.csv"
     Expected = HStack(Array("a", 1#, 7#), Array("b", 2#, 8#), Array("c", 3#, 9#))
-    TestRes = TestCSVRead(9, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="//")
+    TestRes = TestCSVRead(9, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="//")
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test9 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test9 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -580,12 +604,12 @@ Private Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("C", 3#, 6#), _
         Array("D", Empty, Empty), _
         Array("E", Empty, Empty))
-    TestRes = TestCSVRead(10, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(10, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test10 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test10 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -606,12 +630,12 @@ Private Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("D", 4#, Empty), _
         Array("E", 5#, Empty))
 
-    TestRes = TestCSVRead(11, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(11, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test11 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test11 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -631,12 +655,12 @@ Private Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("C", "x", "y"), _
         Array("D", 100#, 200#))
 
-    TestRes = TestCSVRead(12, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(12, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test12 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test12 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -651,12 +675,12 @@ Private Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test basic"
     FileName = "test_basic.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(13, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(13, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test13 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test13 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -671,12 +695,12 @@ Private Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test basic pipe"
     FileName = "test_basic_pipe.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(14, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(14, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test14 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test14 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -691,12 +715,12 @@ Private Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test mac line endings"
     FileName = "test_mac_line_endings.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(15, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(15, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test15 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test15 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -711,12 +735,12 @@ Private Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test newline line endings"
     FileName = "test_newline_line_endings.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(16, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(16, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test16 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test16 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -731,12 +755,12 @@ Private Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test delim.tsv"
     FileName = "test_delim.tsv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(17, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(17, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test17 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test17 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -751,12 +775,12 @@ Private Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test delim.wsv"
     FileName = "test_delim.wsv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(18, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(18, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test18 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test18 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -776,7 +800,7 @@ Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("C", "x", "y"), _
         Array("D", 100#, 200#))
 
-    TestRes = TestCSVRead(19, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(19, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         MissingStrings:="NULL", _
         ShowMissingsAs:=Empty)
@@ -784,7 +808,7 @@ Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test19 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test19 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -799,12 +823,12 @@ Private Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test crlf line endings"
     FileName = "test_crlf_line_endings.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(20, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(20, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test20 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test20 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -819,7 +843,7 @@ Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test header on row 4"
     FileName = "test_header_on_row_4.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(21, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(21, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         SkipToRow:=4, _
         ShowMissingsAs:=Empty, _
@@ -828,7 +852,7 @@ Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test21 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test21 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -843,12 +867,12 @@ Private Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test missing last field"
     FileName = "test_missing_last_field.csv"
     Expected = HStack(Array("col1", 1#, 4#), Array("col2", 2#, 5#), Array("col3", 3#, Empty))
-    TestRes = TestCSVRead(22, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(22, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test22 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test22 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -863,12 +887,12 @@ Private Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test no header"
     FileName = "test_no_header.csv"
     Expected = HStack(Array(1#, 4#, 7#), Array(2#, 5#, 8#), Array(3#, 6#, 9#))
-    TestRes = TestCSVRead(23, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(23, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test23 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test23 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -883,13 +907,13 @@ Private Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test dates"
     FileName = "test_dates.csv"
     Expected = HStack(Array("col1", CDate("2015-Jan-01"), CDate("2015-Jan-02"), CDate("2015-Jan-03")))
-    TestRes = TestCSVRead(24, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="Y-M-D", _
+    TestRes = TestCSVRead(24, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test24 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test24 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -904,12 +928,12 @@ Private Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test excel date formats"
     FileName = "test_excel_date_formats.csv"
     Expected = HStack(Array("col1", CDate("2015-Jan-01"), CDate("2015-Feb-01"), CDate("2015-Mar-01")))
-    TestRes = TestCSVRead(25, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="D/M/Y", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(25, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="D/M/Y", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test25 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test25 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -930,12 +954,12 @@ Private Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("d", 4#, 4#, 4#), _
         Array("e", 5#, 5#, 5#))
 
-    TestRes = TestCSVRead(26, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(26, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test26 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test26 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -950,12 +974,12 @@ Private Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test simple quoted"
     FileName = "test_simple_quoted.csv"
     Expected = HStack(Array("col1", "quoted field 1"), Array("col2", "quoted field 2"))
-    TestRes = TestCSVRead(27, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(27, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test27 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test27 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -974,12 +998,12 @@ Private Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col2", "2", "5", "8", "11", Empty), _
         Array("col3", "3", "6", "9", "12", Empty))
 
-    TestRes = TestCSVRead(28, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(28, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test28 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test28 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -994,13 +1018,13 @@ Private Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     On Error GoTo ErrHandler
     TestDescription = "test quoted delim and newline"
     FileName = "test_quoted_delim_and_newline.csv"
-    Expected = HStack(Array("col1", "quoted ,field 1"), Array("col2", "quoted" + vbCrLf + " field 2"))
-    TestRes = TestCSVRead(29, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
+    Expected = HStack(Array("col1", "quoted ,field 1"), Array("col2", "quoted" & vbCrLf & " field 2"))
+    TestRes = TestCSVRead(29, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test29 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test29 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1015,12 +1039,12 @@ Private Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test missing value"
     FileName = "test_missing_value.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, Empty, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(30, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(30, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test30 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test30 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1038,7 +1062,7 @@ Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("int", 1#, 2#, 3#, 4#, 5#, 6#), _
         Array("bools", True, True, True, False, False, False))
 
-    TestRes = TestCSVRead(31, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(31, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         TrueStrings:=HStack("T", "TRUE", "true"), _
         FalseStrings:=HStack("F", "FALSE", "false"), _
@@ -1047,7 +1071,7 @@ Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test31 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test31 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1062,12 +1086,12 @@ Private Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test floats"
     FileName = "test_floats.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(32, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(32, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test32 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test32 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1082,12 +1106,12 @@ Private Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test utf8"
     FileName = "test_utf8.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(33, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(33, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test33 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test33 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1102,12 +1126,12 @@ Private Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test windows"
     FileName = "test_windows.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(34, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(34, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test34 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test34 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1122,7 +1146,7 @@ Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test missing value NULL"
     FileName = "test_missing_value_NULL.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, Empty, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(35, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(35, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         MissingStrings:="NULL", _
         ShowMissingsAs:=Empty)
@@ -1130,7 +1154,7 @@ Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test35 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test35 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1150,12 +1174,12 @@ Private Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col2", 1#, 42#, 12#), _
         Array("col3", 1#, 42#, 12#))
 
-    TestRes = TestCSVRead(36, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="NQ", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(36, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NQ", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test36 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test36 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1175,7 +1199,7 @@ Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col2", 2#, 5#, 8#, 11#, 14#), _
         Array("col3", 3#, 6#, 9#, 12#, 15#))
 
-    TestRes = TestCSVRead(37, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(37, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         IgnoreEmptyLines:=True)
@@ -1183,7 +1207,7 @@ Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test37 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test37 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1198,12 +1222,12 @@ Private Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test utf8 with BOM"
     FileName = "test_utf8_with_BOM.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(38, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(38, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test38 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test38 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1225,12 +1249,12 @@ Private Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col4", 3#, 7#, 11#), _
         Array("col5", 4#, 8#, 12#))
 
-    TestRes = TestCSVRead(39, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(39, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test39 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test39 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1250,7 +1274,7 @@ Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("C", -0.371, Empty, Empty, -0.371), _
         Array(Empty, Empty, Empty, Empty, Empty))
 
-    TestRes = TestCSVRead(40, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(40, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         MissingStrings:="++", _
         ShowMissingsAs:=Empty, _
@@ -1259,7 +1283,7 @@ Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test40 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test40 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1275,13 +1299,13 @@ Private Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test mixed date formats"
     FileName = "test_mixed_date_formats.csv"
     Expected = HStack(Array("col1", "01/01/2015", "01/02/2015", "01/03/2015", CDate("2015-Jan-02"), CDate("2015-Jan-03")))
-    TestRes = TestCSVRead(41, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="Y-M-D", _
+    TestRes = TestCSVRead(41, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test41 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test41 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1300,7 +1324,7 @@ Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col2", 2#, Empty, Empty, Empty), _
         Array("col3", 3#, 6#, 9#, 9#))
 
-    TestRes = TestCSVRead(42, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(42, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         MissingStrings:=HStack("NULL", "NA", "\N"), _
         ShowMissingsAs:=Empty)
@@ -1308,7 +1332,7 @@ Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test42 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test42 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1328,12 +1352,12 @@ Private Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("num3", 5#, 3#), _
         Array("num4", 978300760#, 978302109#))
 
-    TestRes = TestCSVRead(43, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:="::", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(43, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:="::", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test43 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test43 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1352,12 +1376,12 @@ Private Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col2", False, True, True, False), _
         Array("col3", 1#, 2#, 3#, 4#))
 
-    TestRes = TestCSVRead(44, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(44, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test44 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test44 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1376,12 +1400,12 @@ Private Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col2", False, True, True, False), _
         Array("col3", 1#, 2#, 3#, 4#))
 
-    TestRes = TestCSVRead(45, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(45, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test45 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test45 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1396,12 +1420,12 @@ Private Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test comment first row"
     FileName = "test_comment_first_row.csv"
     Expected = HStack(Array("a", 1#, 7#), Array("b", 2#, 8#), Array("c", 3#, 9#))
-    TestRes = TestCSVRead(46, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(46, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test46 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test46 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1424,12 +1448,12 @@ Private Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("e", 1#, "2,773.9000"), _
         Array("f", -0.002033899, Empty))
 
-    TestRes = TestCSVRead(47, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(47, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test47 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test47 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1448,12 +1472,12 @@ Private Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("b", 2#, 8#, 11#, 14#), _
         Array("c", 3#, 9#, 12#, 15#))
 
-    TestRes = TestCSVRead(48, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(48, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test48 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test48 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1469,12 +1493,12 @@ Private Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test utf16"
     FileName = "test_utf16.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(49, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
+    TestRes = TestCSVRead(49, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test49 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test49 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1490,12 +1514,12 @@ Private Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test utf16 le"
     FileName = "test_utf16_le.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(50, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
+    TestRes = TestCSVRead(50, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test50 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test50 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1519,7 +1543,7 @@ Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("weakrefstring", "there"), _
         Array("missing", Empty))
 
-    TestRes = TestCSVRead(51, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(51, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
@@ -1527,7 +1551,7 @@ Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test51 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test51 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1545,12 +1569,12 @@ Private Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Yes", "Yes", "Yes", "Yes", "No", "Yes"), _
         Array("Medium rare", "Medium", "Medium", "Medium rare", Empty, "Rare"))
 
-    TestRes = TestCSVRead(52, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(52, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test52 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test52 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1572,7 +1596,7 @@ Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("EURIBOR à 6 mois", -0.271, -0.27, -0.27, Empty, Empty, -0.271), _
         Array("EURIBOR à 9 mois", -0.219, -0.219, -0.219, Empty, Empty, -0.219))
     FileName = "issue_198.csv"
-    TestRes = TestCSVRead(53, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(53, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="D/M/Y", _
         MissingStrings:="-", _
@@ -1583,7 +1607,7 @@ Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test53 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test53 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1603,12 +1627,12 @@ Private Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col3", 48.98, 50.41, 73.74, 34.94, 45.99, 12.93, 55#, 58.4), _
         Array("acentric_factor", -0.002, 0.087, 0.225, 0.045, 0.011, -0.217, 0.005, 0.008))
 
-    TestRes = TestCSVRead(54, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N", Comment:="#", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(54, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", Comment:="#", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test54 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test54 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1633,12 +1657,12 @@ Private Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("COOR_Z", 0#, 0#, 0#), _
         Array("TEMP", 0.0931399, 0.311013, 0.424537))
 
-    TestRes = TestCSVRead(55, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(55, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test55 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test55 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1662,7 +1686,7 @@ Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("datetime", CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), CDate("2020-Jun-20"), Empty), _
         Array("time", CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), CDate("12:00:00"), Empty))
 
-    TestRes = TestCSVRead(56, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(56, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
@@ -1670,7 +1694,7 @@ Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test56 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test56 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1690,14 +1714,14 @@ Private Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         "Home Depot Inc", "International Business Machines Co...", "Intel Corp", "Johnson & Johnson", "JPMorgan Chase and Co", "The Coca-Cola Co", "McDonald's Corp", "3M Co", "Merck & Co Inc", "Microsoft Corp", "Nike Inc", "Pfizer Inc", _
         "Procter & Gamble Co", "AT&T Inc", "Travelers Companies Inc", "UnitedHealth Group Inc", "United Technologies Corp", "Visa Inc", "Verizon Communications Inc", "Wal-Mart Stores Inc", "Exxon Mobil Corp"))
 
-    TestRes = TestCSVRead(57, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(57, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="T", _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test57 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test57 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1718,12 +1742,12 @@ Private Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("MARKER", "rs710865", "rs11249215", "rs11249215", "rs10903129", "rs621559", "rs1514175", "rs773564", "rs2794520", "rs296547", "rs296547", "rs10927875", "rs2251760", "rs2251760", "rs2475335", "rs2413583"), _
         Array("RATIO", "0.0214", "0.0107", "0.00253", "0.0116", "0.00842", "0.0202", "0.00955", "0.0193", "0.0135", "0.0239", "0.0157", "0.0154", "0.0154", "0.00784", "0.0112"))
 
-    TestRes = TestCSVRead(58, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(58, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test58 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test58 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1748,7 +1772,7 @@ Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("raisedCurrency", "USD", "USD"), _
         Array("round", "b", "a"))
     FileName = "TechCrunchcontinentalUSA.csv"
-    TestRes = TestCSVRead(59, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(59, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="ND", _
         DateFormat:="D-M-Y", _
         NumRows:=3, _
@@ -1757,7 +1781,7 @@ Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test59 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test59 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1793,12 +1817,12 @@ Private Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(60.07, 38.27, 61.38, 49.23, 42.49), _
         Array(132.356, 132.356, 132.356, 132.356, 132.356))
 
-    TestRes = TestCSVRead(60, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(60, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test60 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test60 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1824,12 +1848,12 @@ Private Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("INTPTLAT", 18.180555, 18.362268, 18.455183), _
         Array("INTPTLONG", -66.749961, -67.17613, -67.119887))
 
-    TestRes = TestCSVRead(61, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="NT", Delimiter:=vbTab, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(61, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NT", Delimiter:=vbTab, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test61 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test61 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1850,12 +1874,12 @@ Private Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("LeaseName", "BLUM", "DAVIS WELL", "GREAT NORTH. O AND G PIPELINE CO.", "ROBINSON PATD LAND", "GLENFIELD OIL COMPANY", "NORTHWEST OIL CO.", "OIL SYNDICATE", "ARMSTRONG", "GEHRINGER", "PETROLEUM CO.", "BURNSTAD", "OIL COMPANY", "NELS KAMP", "EXPLORATION-NORTH DAKOTA", "WACHTER", "FRANKLIN INVESTMENT CO.", "RUDDY BROS", "J. H. KLINE", "STRATIGRAPHIC TEST", "AANSTAD STRATIGRAPHIC TEST", "FRITZ LEUTZ", "VAUGHN HANSON", "J. J. WEBER", "NORTH DAKOTA STATE A"), _
         Array("OriginalWellName", "PIONEER OIL & GAS #1", "DAVIS WELL #1", "GREAT NORTHERN OIL & GAS PIPELINE #1", "ROBINSON PAT'D LAND #1", "GLENFIELD OIL COMPANY #1", "#1", "H. HANSON OIL SYNDICATE #1", "ARMSTRONG #1", "GEHRINGER #1", "VELVA PETROLEUM CO. #1", "BURNSTAD #1", "BIG VIKING #1", "NELS KAMP #1", "EXPLORATION-NORTH DAKOTA #1", "E. L. SEMLING #1", "FRANKLIN INVESTMENT CO. #1", "RUDDY BROS #1", "J. H. KLINE #1", "STRATIGRAPHIC TEST #1", "AANSTAD STRATIGRAPHIC TEST #1", "FRITZ LEUTZ #1", "VAUGHN HANSON #1", "J. J. WEBER #1", "NORTH DAKOTA STATE ""A"" #1"))
 
-    TestRes = TestCSVRead(62, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(62, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test62 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test62 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1886,12 +1910,12 @@ Private Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("W-L%post", Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, 0.429, Empty, Empty, 0.5, 0.462, 0.333, Empty, 0.786, 0.562, 0.556, 0.556, 0.5, 0#, 0.5, 0.4, 0.4, 0.4, 0.25, Empty, Empty, Empty, Empty, 0.25, 0.429, 0.496, 0.493), _
         Array(Empty, Empty, Empty, Empty, "First half of season", "Second half of season", Empty, Empty, Empty, Empty, Empty, Empty, Empty, "NL Pennant", "NL Pennant", Empty, Empty, "WS Champs", "NL Pennant", Empty, Empty, "NL Pennant", Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, "5 Pennants and 1 World Series Title", "5 Pennants and 1 World Series Title"))
 
-    TestRes = TestCSVRead(63, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(63, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test63 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test63 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1909,7 +1933,7 @@ Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array(44424#, CDate("2021-Aug-18"), True, "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(64, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(64, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
@@ -1917,7 +1941,7 @@ Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test64 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test64 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1935,12 +1959,12 @@ Private Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", "2021-08-18", "True", "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(65, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(65, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test65 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test65 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1958,12 +1982,12 @@ Private Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array(44424#, "2021-08-18", "True", "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(66, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(66, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test66 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test66 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1981,12 +2005,12 @@ Private Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", CDate("2021-Aug-18"), "True", "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(67, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="D", DateFormat:="Y-M-D", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(67, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="D", DateFormat:="Y-M-D", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test67 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test67 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2004,12 +2028,12 @@ Private Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", "2021-08-18", True, "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(68, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="B", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(68, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="B", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test68 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test68 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2027,12 +2051,12 @@ Private Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", "2021-08-18", "True", CVErr(2007), "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(69, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="E", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(69, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="E", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test69 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test69 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2050,12 +2074,12 @@ Private Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array(44424#, "2021-08-18", "True", "#DIV/0!", 1#, "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(70, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="NQ", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(70, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NQ", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test70 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test70 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2073,7 +2097,7 @@ Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", CDate("2021-Aug-18"), "True", "#DIV/0!", "1", CDate("2021-Aug-16"), "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(71, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(71, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="DQ", _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
@@ -2081,7 +2105,7 @@ Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test71 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test71 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2099,12 +2123,12 @@ Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", "2021-08-18", True, "#DIV/0!", "1", "16-Aug-2021", True, "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(72, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="BQ", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(72, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="BQ", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test72 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test72 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2122,12 +2146,12 @@ Private Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", "2021-08-18", "True", CVErr(2007), "1", "16-Aug-2021", "TRUE", CVErr(2007), "abc", "abc""def"))
 
-    TestRes = TestCSVRead(73, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="EQ", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(73, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="EQ", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test73 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test73 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2145,12 +2169,12 @@ Private Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array(44424#, CDate("2021-Aug-18"), True, CVErr(2007), "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
-    TestRes = TestCSVRead(74, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, ConvertTypes:="NDBE", DateFormat:="Y-M-D", ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(74, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NDBE", DateFormat:="Y-M-D", ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test74 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test74 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2168,7 +2192,7 @@ Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array(44424#, CDate("2021-Aug-18"), True, CVErr(2007), 1#, CDate("2021-Aug-16"), True, CVErr(2007), "abc", "abc""def"))
 
-    TestRes = TestCSVRead(75, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(75, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="NDBEQ", _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
@@ -2176,7 +2200,7 @@ Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test75 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test75 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2191,7 +2215,7 @@ Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "latest (1)"
     FileName = "latest (1).csv"
     Expected = Empty
-    TestRes = TestCSVRead(76, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(76, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="ND", _
         DateFormat:="ISO", _
         MissingStrings:="\N", _
@@ -2208,7 +2232,7 @@ Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test76 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test76 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2223,7 +2247,7 @@ Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "int64 overflow"
     FileName = "int64_overflow.csv"
     Expected = HStack(Array("col1", 1#, 2#, 3#, 9.22337203685478E+18))
-    TestRes = TestCSVRead(77, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(77, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         RelTol:=0.000000000000001)
@@ -2231,7 +2255,7 @@ Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test77 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test77 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2265,7 +2289,7 @@ Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("construction", "Masonry"), _
         Array("point_granularity", 1#))
 
-    TestRes = TestCSVRead(78, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(78, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="N", _
         NumRows:=2, _
         ShowMissingsAs:=Empty)
@@ -2273,7 +2297,7 @@ Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test78 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test78 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2288,7 +2312,7 @@ Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "FL insurance sample"
     FileName = "FL_insurance_sample.csv"
     Expected = Empty
-    TestRes = TestCSVRead(79, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(79, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="N", _
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=36635, _
@@ -2297,7 +2321,7 @@ Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test79 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test79 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2312,14 +2336,14 @@ Private Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test float in int column"
     FileName = "test_float_in_int_column.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5.4, 8#), Array("col3", 3#, 6#, 9#))
-    TestRes = TestCSVRead(80, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(80, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test80 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test80 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2334,12 +2358,12 @@ Private Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test skip args"
     FileName = "test_skip_args.csv"
     Expected = HStack(Array("3,3", "4,3", "5,3", "6,3", "7,3", "8,3", "9,3", "10,3", Empty, Empty))
-    TestRes = TestCSVRead(81, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, SkipToRow:=3, SkipToCol:=3, NumRows:=10, NumCols:=1, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(81, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, SkipToRow:=3, SkipToCol:=3, NumRows:=10, NumCols:=1, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test81 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test81 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2354,12 +2378,12 @@ Private Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test skip args"
     FileName = "test_skip_args.csv"
     Expected = HStack("6,5", "6,6", "6,7", "6,8", "6,9", "6,10", Empty, Empty)
-    TestRes = TestCSVRead(82, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, SkipToRow:=6, SkipToCol:=5, NumRows:=1, NumCols:=8, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(82, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, SkipToRow:=6, SkipToCol:=5, NumRows:=1, NumCols:=8, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test82 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test82 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2379,12 +2403,12 @@ Private Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("8,10", "9,10", "10,10", Empty), _
         Array(Empty, Empty, Empty, Empty))
 
-    TestRes = TestCSVRead(83, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, SkipToRow:=8, SkipToCol:=8, NumRows:=4, NumCols:=4, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(83, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, SkipToRow:=8, SkipToCol:=8, NumRows:=4, NumCols:=4, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test83 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test83 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2399,12 +2423,12 @@ Private Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test skip args with comments"
     FileName = "test_skip_args_with_comments.csv"
     Expected = HStack(Array("3,3", "4,3", "5,3", "6,3", "7,3", "8,3", "9,3", "10,3", Empty, Empty))
-    TestRes = TestCSVRead(84, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=3, SkipToCol:=3, NumRows:=10, NumCols:=1, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(84, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=3, SkipToCol:=3, NumRows:=10, NumCols:=1, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test84 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test84 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2419,12 +2443,12 @@ Private Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test skip args with comments"
     FileName = "test_skip_args_with_comments.csv"
     Expected = HStack("6,5", "6,6", "6,7", "6,8", "6,9", "6,10", Empty, Empty)
-    TestRes = TestCSVRead(85, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=6, SkipToCol:=5, NumRows:=1, NumCols:=8, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(85, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=6, SkipToCol:=5, NumRows:=1, NumCols:=8, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test85 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test85 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2444,12 +2468,12 @@ Private Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("8,10", "9,10", "10,10", Empty), _
         Array(Empty, Empty, Empty, Empty))
 
-    TestRes = TestCSVRead(86, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=8, SkipToCol:=8, NumRows:=4, NumCols:=4, ShowMissingsAs:=Empty)
+    TestRes = TestCSVRead(86, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=8, SkipToCol:=8, NumRows:=4, NumCols:=4, ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test86 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test86 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2475,14 +2499,14 @@ Private Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, 1#, 1#), _
         Array(Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, 1#))
 
-    TestRes = TestCSVRead(87, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(87, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test87 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test87 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2503,7 +2527,7 @@ Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(4#, 9#, 14#, 19#, 24#, 29#, 34#, 39#, 44#, 49#), _
         Array(5#, 10#, 15#, 20#, 25#, 30#, 35#, 40#, 45#, 50#))
 
-    TestRes = TestCSVRead(88, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(88, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:="{""}", _
         ShowMissingsAs:=Empty)
@@ -2511,7 +2535,7 @@ Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test88 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test88 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2532,7 +2556,7 @@ Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(4#, 9#, 14#, 19#, 24#, 29#, 34#, 39#, 44#, 49#), _
         Array(5#, 10#, 15#, 20#, 25#, 30#, 35#, 40#, 45#, 50#))
 
-    TestRes = TestCSVRead(89, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(89, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:="Delim", _
         IgnoreRepeated:=True, _
@@ -2541,7 +2565,7 @@ Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test89 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test89 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2556,13 +2580,13 @@ Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestDescription = "test empty file"
     FileName = "test_empty_file.csv"
     Expected = "#CSVRead: #InferDelimiter: File is empty!!"
-    TestRes = TestCSVRead(90, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(90, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test90 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test90 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2599,7 +2623,7 @@ Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         "bias_gsurf_cfg30", "nse_hatmo_cfg30", "r_hatmo_cfg30", "bias_hatmo_cfg30", "nse_latmo_cfg30", "r_latmo_cfg30", "bias_latmo_cfg30", "nse_melt_cfg30", "r_melt_cfg30", "bias_melt_cfg30", "nse_rnet_cfg30", "r_rnet_cfg30", "bias_rnet_cfg30", "nse_rof_cfg30", "r_rof_cfg30", "bias_rof_cfg30", "nse_snowdepth_cfg30", "r_snowdepth_cfg30", "bias_snowdepth_cfg30", "nse_swe_cfg30", "r_swe_cfg30", "bias_swe_cfg30", "nse_gsurf_cfg31", "r_gsurf_cfg31", "bias_gsurf_cfg31", "nse_hatmo_cfg31", "r_hatmo_cfg31", "bias_hatmo_cfg31", "nse_latmo_cfg31", "r_latmo_cfg31", "bias_latmo_cfg31", "nse_melt_cfg31", "r_melt_cfg31", "bias_melt_cfg31", "nse_rnet_cfg31", _
         "r_rnet_cfg31", "bias_rnet_cfg31", "nse_rof_cfg31", "r_rof_cfg31", "bias_rof_cfg31", "nse_snowdepth_cfg31", "r_snowdepth_cfg31", "bias_snowdepth_cfg31", "nse_swe_cfg31", "r_swe_cfg31", "bias_swe_cfg31", "nse_gsurf_cfg32", "r_gsurf_cfg32", "bias_gsurf_cfg32", "nse_hatmo_cfg32", "r_hatmo_cfg32", "bias_hatmo_cfg32", "nse_latmo_cfg32", "r_latmo_cfg32", "bias_latmo_cfg32", "nse_melt_cfg32", "r_melt_cfg32", "bias_melt_cfg32", "nse_rnet_cfg32", "r_rnet_cfg32", "bias_rnet_cfg32", "nse_rof_cfg32", "r_rof_cfg32", "bias_rof_cfg32", "nse_snowdepth_cfg32", "r_snowdepth_cfg32", "bias_snowdepth_cfg32", "nse_swe_cfg32", "r_swe_cfg32", "bias_swe_cfg32"))
 
-    TestRes = TestCSVRead(91, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(91, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         NumRows:=1, _
         ShowMissingsAs:=Empty)
@@ -2607,7 +2631,7 @@ Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test91 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test91 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2626,7 +2650,7 @@ Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "pandas_zeros.csv"
     Expected = Empty
     Observed = Empty
-    TestRes = TestCSVRead(92, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(92, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="N", _
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=100001, _
@@ -2640,14 +2664,14 @@ Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Next
         If Total <> 2499772 Then
             TestRes = False
-            WhatDiffers = "Test 92 pandas zeros FAILED, Test was that sum of elements be 2,499,772, but instead its " + Format$(Total, "###,###")
+            WhatDiffers = "Test 92 pandas zeros FAILED, Test was that sum of elements be 2,499,772, but instead its " & Format$(Total, "###,###")
         End If
     End If
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test92 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test92 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
@@ -2664,7 +2688,7 @@ Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("#t", 0#, 0.05), _
         Array("heat_flux", 1.14914917397E-07, 1.14914917397E-07))
 
-    TestRes = TestCSVRead(93, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(93, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=" ", _
         IgnoreRepeated:=True, _
@@ -2674,7 +2698,7 @@ Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test93 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test93 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2711,7 +2735,7 @@ Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Batch 1 Mapping", "052E.7-25-17.F"), Array("Mgx_batch Mapping", "Mgx_batch001"), _
         Array("16S_batch Mapping", "16S_batch001"), Array("Mother/Child Dyads", Empty))
 
-    TestRes = TestCSVRead(94, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(94, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="Y-M-D", _
         NumRows:=2, _
@@ -2720,7 +2744,7 @@ Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test94 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test94 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2738,7 +2762,7 @@ Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(CDate("2021-Sep-01 16:23:13"), CDate("2022-Oct-09 04:16:13"), CDate("2022-Dec-27 13:56:15"), CDate("2022-May-07 08:56:31"), CDate("2024-Jan-14 05:29:48"), _
         CDate("2023-Jan-16 08:12:25"), CDate("2023-Dec-10 13:35:13"), CDate("2023-Jan-11 20:59:27"), CDate("2021-Oct-28 07:31:59"), CDate("2023-Jul-21 00:02:45"), CDate("2021-Dec-16 19:15:38")))
 
-    TestRes = TestCSVRead(95, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(95, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
         DateFormat:="D-M-Y", _
@@ -2747,7 +2771,7 @@ Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test95 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test95 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2765,7 +2789,7 @@ Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(CDate("2021-Sep-01 16:23:13"), CDate("2022-Oct-09 04:16:13"), CDate("2022-Dec-27 13:56:15"), CDate("2022-May-07 08:56:31"), CDate("2024-Jan-14 05:29:48"), _
         CDate("2023-Jan-16 08:12:25"), CDate("2023-Dec-10 13:35:13"), CDate("2023-Jan-11 20:59:27"), CDate("2021-Oct-28 07:31:59"), CDate("2023-Jul-21 00:02:45"), CDate("2021-Dec-16 19:15:38")))
 
-    TestRes = TestCSVRead(96, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(96, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
         DateFormat:="M-D-Y", _
@@ -2774,7 +2798,7 @@ Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test96 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test96 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2792,7 +2816,7 @@ Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(CDate("2021-Sep-01 16:23:13"), CDate("2022-Oct-09 04:16:13"), CDate("2022-Dec-27 13:56:15"), CDate("2022-May-07 08:56:31"), CDate("2024-Jan-14 05:29:48"), _
         CDate("2023-Jan-16 08:12:25"), CDate("2023-Dec-10 13:35:13"), CDate("2023-Jan-11 20:59:27"), CDate("2021-Oct-28 07:31:59"), CDate("2023-Jul-21 00:02:45"), CDate("2021-Dec-16 19:15:38")))
 
-    TestRes = TestCSVRead(97, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(97, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
         DateFormat:="Y-M-D", _
@@ -2801,7 +2825,7 @@ Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test97 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test97 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2822,7 +2846,7 @@ Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Dist", 12#, 148#, 42#, 85#, 107#, 109#, 156#, 224#, 293#), _
         Array("Accel", 0.359, 0.014, 0.196, 0.135, 0.062, 0.054, 0.014, 0.018, 0.01))
 
-    TestRes = TestCSVRead(98, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(98, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="N", _
         NumRows:=10, _
         ShowMissingsAs:=Empty)
@@ -2830,7 +2854,7 @@ Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test98 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test98 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2846,9 +2870,9 @@ Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good ISO8601 with DateFormat = ISO"
     FileName = "test_good_ISO8601.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=3))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=3))
     CastDoublesToDates Expected
-    TestRes = TestCSVRead(99, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(99, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
         DateFormat:="ISO", _
@@ -2860,7 +2884,7 @@ Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test99 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test99 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2876,9 +2900,9 @@ Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good ISO8601 with DateFormat = ISOZ"
     FileName = "test_good_ISO8601.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=4))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=4))
     CastDoublesToDates Expected
-    TestRes = TestCSVRead(100, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(100, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
         DateFormat:="ISOZ", _
@@ -2890,7 +2914,7 @@ Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test100 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test100 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2905,8 +2929,8 @@ Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct ISO8601 does not convert to dates
     TestDescription = "test bad ISO8601"
     FileName = "test_bad_ISO8601.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
-    TestRes = TestCSVRead(101, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    TestRes = TestCSVRead(101, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
         DateFormat:="ISO", _
@@ -2917,7 +2941,7 @@ Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test101 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test101 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2933,9 +2957,9 @@ Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good Y-M-D"
     FileName = "test_good_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
     CastDoublesToDates Expected
-    TestRes = TestCSVRead(102, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(102, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
         DateFormat:="Y-M-D", _
@@ -2947,7 +2971,7 @@ Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test102 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test102 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2962,8 +2986,8 @@ Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct Y-M-D does not convert to dates
     TestDescription = "test bad Y-M-D"
     FileName = "test_bad_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
-    TestRes = TestCSVRead(103, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    TestRes = TestCSVRead(103, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
         DateFormat:="Y-M-D", _
@@ -2974,7 +2998,7 @@ Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test103 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test103 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2990,9 +3014,9 @@ Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good D-M-Y"
     FileName = "test_good_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
     CastDoublesToDates Expected
-    TestRes = TestCSVRead(104, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(104, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
         DateFormat:="D-M-Y", _
@@ -3004,7 +3028,7 @@ Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test104 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test104 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3019,8 +3043,8 @@ Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct D-M-Y does not convert to dates
     TestDescription = "test bad D-M-Y"
     FileName = "test_bad_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
-    TestRes = TestCSVRead(105, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    TestRes = TestCSVRead(105, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
         DateFormat:="D-M-Y", _
@@ -3031,7 +3055,7 @@ Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test105 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test105 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3047,9 +3071,9 @@ Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good M-D-Y"
     FileName = "test_good_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
     CastDoublesToDates Expected
-    TestRes = TestCSVRead(106, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(106, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
         DateFormat:="M-D-Y", _
@@ -3061,7 +3085,7 @@ Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test106 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test106 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3076,8 +3100,8 @@ Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct M-D-Y does not convert to dates
     TestDescription = "test bad M-D-Y"
     FileName = "test_bad_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
-    TestRes = TestCSVRead(107, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    TestRes = TestCSVRead(107, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
         DateFormat:="M-D-Y", _
@@ -3088,7 +3112,7 @@ Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test107 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test107 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3120,7 +3144,7 @@ Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("TECHNICAL_DESCRIPTION", "This is a test interlock", "<p>REDACTED<br><br>REDACTED<br>REDACTED</p>"), _
         Array("types", "O", "SC"))
 
-    TestRes = TestCSVRead(108, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(108, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="M/D/Y", _
         ShowMissingsAs:=Empty)
@@ -3128,7 +3152,7 @@ Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test108 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test108 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3143,14 +3167,14 @@ Private Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "time"
     FileName = "time.csv"
     Expected = HStack(Array("time", CDate("00:00:00"), CDate("00:10:00")), Array("value", 1#, 2#))
-    TestRes = TestCSVRead(109, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(109, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test109 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test109 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3166,7 +3190,7 @@ Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'CDate can't cope with fractions of a second, so adjust via 0.001/86400 term
     Expected = HStack(Array("col1", CDate("2015-Jan-01"), CDate("2015-Jan-02 00:00:01"), CDate("2015-Jan-03 00:12:00") + 0.001 / 86400))
     FileName = "test_datetimes.csv"
-    TestRes = TestCSVRead(110, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(110, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=",", _
         DateFormat:="Y-M-D", _
@@ -3175,7 +3199,7 @@ Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test110 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test110 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3190,7 +3214,7 @@ Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "dash as null"
     FileName = "dash_as_null.csv"
     Expected = HStack(Array("x", 1#, Empty), Array("y", 2#, 4#))
-    TestRes = TestCSVRead(111, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(111, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         MissingStrings:="-", _
         ShowMissingsAs:=Empty)
@@ -3198,7 +3222,7 @@ Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test111 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test111 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3214,7 +3238,7 @@ Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test null only column"
     FileName = "test_null_only_column.csv"
     Expected = HStack(Array("col1", 123#, "abc", "123abc"), Array("col2", Empty, Empty, Empty))
-    TestRes = TestCSVRead(112, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(112, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         MissingStrings:="NA", _
         ShowMissingsAs:=Empty)
@@ -3222,7 +3246,7 @@ Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test112 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test112 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3237,14 +3261,14 @@ Private Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test one row of data"
     FileName = "test_one_row_of_data.csv"
     Expected = HStack(1#, 2#, 3#)
-    TestRes = TestCSVRead(113, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(113, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test113 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test113 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3259,7 +3283,7 @@ Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "plus as null"
     FileName = "plus_as_null.csv"
     Expected = HStack(Array("x", 1#, Empty), Array("y", CDate("1900-Jan-01"), CDate("1900-Jan-03")))
-    TestRes = TestCSVRead(114, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(114, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         MissingStrings:="+", _
         ShowMissingsAs:=Empty)
@@ -3267,7 +3291,7 @@ Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test114 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test114 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3282,14 +3306,14 @@ Private Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "categorical"
     FileName = "categorical.csv"
     Expected = HStack(Array("cat", "a", "a", "a", "b", "b", "b", "b", "b", "b", "b", "c", "c", "c", "c", "a"))
-    TestRes = TestCSVRead(115, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(115, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test115 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test115 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3309,14 +3333,14 @@ Private Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array(" ", " ", " "), _
         Array(Empty, " comment ", Empty))
 
-    TestRes = TestCSVRead(116, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(116, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test116 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test116 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3339,7 +3363,7 @@ Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("hiredate", 37355#, 40731#, 42419#, 36854#, 37261#, 39583#, 38797#, Empty, 36686#, 37519#, 38821#, Empty, 37489#, 39239#, 40336#, 36794#, 39764#, 42123#, 38319#), _
         Array("lastclockin", CDate("2002-Jan-17 21:32:00"), CDate("2000-Sep-25 06:36:00"), CDate("2002-Sep-13 08:28:00"), CDate("2011-Jul-10 11:24:00"), CDate("2003-Feb-11 11:43:00"), CDate("2016-Jan-21 06:32:00"), CDate("2004-Jan-12 12:36:00"), Empty, CDate("2006-Dec-30 09:48:00"), CDate("2016-Apr-07 14:07:00"), CDate("2015-Mar-19 15:01:00"), Empty, CDate("2005-Jun-29 11:14:00"), CDate("2001-Sep-17 11:47:00"), CDate("2014-Aug-30 02:41:00"), CDate("2015-Nov-07 01:23:00"), CDate("2009-Sep-06 20:21:00"), CDate("2011-May-14 14:38:00"), CDate("2000-Oct-17 14:18:00")))
 
-    TestRes = TestCSVRead(117, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(117, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         NumRows:=20, _
@@ -3348,7 +3372,7 @@ Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test117 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test117 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3362,10 +3386,10 @@ Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "escape row starts"
     Expected = HStack( _
-        Array("5111", "escaped row with " + vbCrLf + " newlines " + vbCrLf + "  " + vbCrLf + "  " + vbCrLf + "  in it", "5113"), _
+        Array("5111", "escaped row with " & vbCrLf & " newlines " & vbCrLf & "  " & vbCrLf & "  " & vbCrLf & "  in it", "5113"), _
         Array("5112", "5113", "5114"))
     FileName = "escape_row_starts.csv"
-    TestRes = TestCSVRead(118, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(118, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         SkipToRow:=5112, _
         NumRows:=3, _
         ShowMissingsAs:=Empty)
@@ -3373,7 +3397,7 @@ Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test118 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test118 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3388,7 +3412,7 @@ Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "Sacramentorealestatetransactions"
     FileName = "Sacramentorealestatetransactions.csv"
     Expected = Empty
-    TestRes = TestCSVRead(119, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(119, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=986, _
@@ -3397,7 +3421,7 @@ Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test119 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test119 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3411,7 +3435,7 @@ Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "log001 vehicle status flags 0.txt"
     FileName = "log001_vehicle_status_flags_0.txt"
-    TestRes = TestCSVRead(120, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(120, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=282, _
@@ -3420,7 +3444,7 @@ Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test120 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test120 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3448,7 +3472,7 @@ Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("Latitude", 51.5, 39.195, 46.18806, -36.1333333, 33.52056, 39.79, 40.69361, 36.34333, 32.0666667, 48.8833333, 40.71417, 51.45, 29.42389, 43.69556, 40.03222, 53.6772222, 45.4166667, 17.3833333, 51.52721), _
         Array("Longitude", -1.1166667, -94.68194, -123.83, 144.75, -86.8025, -75.23806, -89.58889, -88.85028, 34.7666667, 2.15, -74.00639, 5.4666667, -98.49333, -116.35306, -74.95778, -6.3191667, -75.7, 78.4666667, 0.14559))
 
-    TestRes = TestCSVRead(121, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(121, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="M/D/Y", _
         NumRows:=20, _
@@ -3457,7 +3481,7 @@ Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test121 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test121 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3472,7 +3496,7 @@ Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "GSM2230757 human1 umifm counts"
     FileName = "GSM2230757_human1_umifm_counts.csv"
     Expected = Empty
-    TestRes = TestCSVRead(122, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(122, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=4, _
@@ -3481,7 +3505,7 @@ Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test122 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test122 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3506,7 +3530,7 @@ Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array(38.5566387, 38.57783198, 38.53759051, 38.57203045, 38.52718667, 38.47962803), _
         Array(-121.4597445, -121.4704595, -121.4925914, -121.4670118, -121.4712477, -121.5286345))
 
-    TestRes = TestCSVRead(123, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(123, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="M/D/Y", _
         SkipToRow:=7580, _
@@ -3515,7 +3539,7 @@ Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test123 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test123 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3530,13 +3554,13 @@ Private Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test empty lines"
     Expected = HStack(Array("a", "1", "4", "7"), Array("b", "2", "5", "8"), Array("c", "3", "6", "9"))
     FileName = "test_empty_lines.csv"
-    TestRes = TestCSVRead(124, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(124, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test124 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test124 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3556,7 +3580,7 @@ Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("col3", 3#, 6#, 9#, Empty), _
         Array(Empty, Empty, Empty, Empty, Empty))
 
-    TestRes = TestCSVRead(125, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(125, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         NumRows:=5, _
         NumCols:=4, _
@@ -3565,7 +3589,7 @@ Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test125 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test125 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3580,14 +3604,14 @@ Private Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test not delimited"
     FileName = "test_not_delimited.csv"
     Expected = HStack(Array("col1,col2,col3", "1,2,3", "4,5,6", "7,8,9"))
-    TestRes = TestCSVRead(126, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(126, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:="False", _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test126 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test126 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3612,7 +3636,7 @@ Private Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test127 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test127 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3627,7 +3651,7 @@ Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "Fielding"
     FileName = "Fielding.csv"
     Expected = Empty
-    TestRes = TestCSVRead(128, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(128, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="N", _
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=167939, _
@@ -3636,7 +3660,7 @@ Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test128 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test128 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3660,7 +3684,7 @@ Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("datetime", CDate("2020-Jun-20")), _
         Array("time", CDate("12:00:00")))
 
-    TestRes = TestCSVRead(129, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(129, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         NumRows:=2, _
@@ -3669,7 +3693,7 @@ Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test129 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test129 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3684,7 +3708,7 @@ Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "precompile"
     FileName = "precompile.csv"
     Expected = Empty
-    TestRes = TestCSVRead(130, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(130, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty, _
@@ -3694,7 +3718,7 @@ Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test130 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test130 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3714,7 +3738,7 @@ Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("lazy", "hey", "hey"), _
         Array("lazy_missing", Empty, "ho"))
 
-    TestRes = TestCSVRead(131, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(131, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         NumRows:=3, _
@@ -3723,7 +3747,7 @@ Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test131 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test131 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3738,7 +3762,7 @@ Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test headers"
     FileName = "test_headers.csv"
     Expected = HStack(Array(2, 12), Array(3, 13))
-    TestRes = TestCSVRead(132, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(132, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         SkipToRow:=2, _
@@ -3752,7 +3776,7 @@ Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test132 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test132 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3778,7 +3802,7 @@ Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array(Empty, Empty, Empty), _
         Array(Empty, Empty, Empty))
 
-    TestRes = TestCSVRead(133, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(133, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
         SkipToRow:=2, _
@@ -3790,7 +3814,7 @@ Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test133 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test133 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3805,7 +3829,7 @@ Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test header on row 4"
     FileName = "test_header_on_row_4.csv"
     Expected = HStack(Array("1", "4", "7"), Array("2", "5", "8"), Array("3", "6", "9"))
-    TestRes = TestCSVRead(134, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(134, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         SkipToRow:=5, _
         ShowMissingsAs:=Empty, _
@@ -3815,7 +3839,7 @@ Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test134 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test134 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3830,7 +3854,7 @@ Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents!"
-    TestRes = TestCSVRead(135, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(135, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:=1, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -3838,7 +3862,7 @@ Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test135 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test135 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3853,7 +3877,7 @@ Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: Delimiter must have at least one character and cannot start with a double quote, line feed or carriage return!"
-    TestRes = TestCSVRead(136, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(136, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:="""bad", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -3861,7 +3885,7 @@ Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test136 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test136 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3876,7 +3900,7 @@ Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: NumCols must be positive to read a given number of columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered.!"
-    TestRes = TestCSVRead(137, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(137, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         NumCols:=-1, _
         ShowMissingsAs:=Empty)
@@ -3884,7 +3908,7 @@ Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test137 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test137 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3899,7 +3923,7 @@ Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: NumRows must be positive to read a given number of rows, or zero or omitted to read all rows from SkipToRow to the end of the file.!"
-    TestRes = TestCSVRead(138, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(138, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         NumRows:=-1, _
         ShowMissingsAs:=Empty)
@@ -3907,7 +3931,7 @@ Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test138 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test138 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3922,7 +3946,7 @@ Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: DecimalSeparator must be a single character!"
-    TestRes = TestCSVRead(139, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(139, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         DecimalSeparator:="bad")
@@ -3930,7 +3954,7 @@ Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test139 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test139 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3945,7 +3969,7 @@ Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: DecimalSeparator must not be equal to the first character of Delimiter or to a line-feed or carriage-return!"
-    TestRes = TestCSVRead(140, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(140, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="N", _
         Delimiter:=",", _
         IgnoreEmptyLines:=False, _
@@ -3955,7 +3979,7 @@ Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test140 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test140 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3970,7 +3994,7 @@ Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: SkipToCol must be at least 1.!"
-    TestRes = TestCSVRead(141, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(141, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         SkipToCol:=-1, _
         ShowMissingsAs:=Empty)
@@ -3978,7 +4002,7 @@ Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test141 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test141 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3993,7 +4017,7 @@ Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: HeaderRowNum must be greater than or equal to zero and less than or equal to SkipToRow!"
-    TestRes = TestCSVRead(142, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(142, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         SkipToRow:=-1, _
         ShowMissingsAs:=Empty)
@@ -4001,7 +4025,7 @@ Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test142 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test142 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4016,7 +4040,7 @@ Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: Comment must not contain double-quote, line feed or carriage return!"
-    TestRes = TestCSVRead(143, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(143, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Comment:="bad""", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4024,7 +4048,7 @@ Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test143 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test143 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4039,7 +4063,7 @@ Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: HeaderRowNum must be greater than or equal to zero and less than or equal to SkipToRow!"
-    TestRes = TestCSVRead(144, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(144, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=-1#)
@@ -4047,7 +4071,7 @@ Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test144 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test144 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4062,7 +4086,7 @@ Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
     FileName = "test_bad_inputs.csv"
-    TestRes = TestCSVRead(145, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(145, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         Encoding:="BAD")
@@ -4070,7 +4094,7 @@ Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test145 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test145 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4085,7 +4109,7 @@ Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: #OneDArrayToTwoDArray: If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements!!!"
-    TestRes = TestCSVRead(146, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(146, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         ConvertTypes:=Array(Array(1, "N", "BAD")))
@@ -4093,7 +4117,7 @@ Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test146 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test146 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4108,7 +4132,7 @@ Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes is ambiguous, it can be interpreted as two rows, or as two columns!!"
-    TestRes = TestCSVRead(147, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(147, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=Array(Array(1, "D"), Array("B", "N")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4116,7 +4140,7 @@ Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test147 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test147 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4131,7 +4155,7 @@ Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is of type Boolean!!"
-    TestRes = TestCSVRead(148, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(148, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=Array(Array(True, "D"), Array("B", "N"), Array(1, "D")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4139,7 +4163,7 @@ Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test148 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test148 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4154,7 +4178,7 @@ Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: #ParseCTString: ConvertTypes is incorrect, ""Q"" indicates that conversion should apply even to quoted fields, but none of ""N"", ""D"", ""B"" or ""E"" are present to indicate which type conversion to apply!!!"
-    TestRes = TestCSVRead(149, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(149, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="Q", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4162,7 +4186,7 @@ Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test149 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test149 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4177,7 +4201,7 @@ Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: Delimiter must have at least one character and cannot start with a double quote, line feed or carriage return!"
-    TestRes = TestCSVRead(150, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(150, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:="""", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4185,7 +4209,7 @@ Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test150 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test150 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4200,7 +4224,7 @@ Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: TrueStrings must be omitted or provided as string or an array of strings that represent Boolean value True but '2' is of type Double!!!!"
-    TestRes = TestCSVRead(151, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(151, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
         IgnoreEmptyLines:=False, _
         TrueStrings:=2#, _
@@ -4209,7 +4233,7 @@ Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test151 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test151 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4224,7 +4248,7 @@ Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #MakeSentinels: TrueStrings has been provided, but type conversion for Booleans is not switched on for any column!!"
-    TestRes = TestCSVRead(152, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(152, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         TrueStrings:="Bad", _
         ShowMissingsAs:=Empty)
@@ -4232,7 +4256,7 @@ Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test152 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test152 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4247,7 +4271,7 @@ Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #MakeSentinels: FalseStrings has been provided, but type conversion for Booleans is not switched on for any column!!"
-    TestRes = TestCSVRead(153, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(153, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         FalseStrings:="Bad", _
         ShowMissingsAs:=Empty)
@@ -4255,7 +4279,7 @@ Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test153 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test153 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4269,8 +4293,8 @@ Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test ragged headers, take 2"
     FileName = "test_ragged_headers.csv"
-    Expected = HStack(Array(0#, "15"), Array(0#, Empty))
-    TestRes = TestCSVRead(154, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = HStack(Array(Empty, "15"), Array(Empty, Empty))
+    TestRes = TestCSVRead(154, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         SkipToRow:=5, _
         SkipToCol:=5, _
@@ -4283,7 +4307,7 @@ Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test154 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test154 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4299,15 +4323,15 @@ Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     FileName = "test_column-by-column.csv"
     Expected = HStack( _
         Array("Type", "Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String", "String"), _
-        Array("Col A", 44424#, CDate("2021-Aug-24 12:49:13"), True, "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col B", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col C", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col D", "44424", "2021-08-24T12:49:13", True, CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col E", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", 1#, "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col F", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", CDate("2021-Aug-24 12:49:13"), "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col G", "44424", "2021-08-24T12:49:13", True, CVErr(2007), "1", "2021-08-24T12:49:13", True, CVErr(2007), "abc", "abc""def", "Line" + vbCrLf + "Feed"))
+        Array("Col A", 44424#, CDate("2021-Aug-24 12:49:13"), True, "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col B", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col C", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col D", "44424", "2021-08-24T12:49:13", True, CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col E", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", 1#, "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col F", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", CDate("2021-Aug-24 12:49:13"), "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col G", "44424", "2021-08-24T12:49:13", True, CVErr(2007), "1", "2021-08-24T12:49:13", True, CVErr(2007), "abc", "abc""def", "Line" & vbCrLf & "Feed"))
 
-    TestRes = TestCSVRead(155, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(155, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(0#, "Col B", "Col C", "Col D", "Col E", "Col F", "Col G"), Array(True, "N", "D", "BE", "NQ", "DQ", "BEQ")), _
         DateFormat:="ISO", _
         IgnoreEmptyLines:=False, _
@@ -4319,7 +4343,7 @@ Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test155 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test155 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4341,7 +4365,7 @@ Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         VStack(vbNullString, """""""", "    benchmarkonefile(filename::String, timeout::Int)", "Average time (over sufficient trials to take `timeout` seconds) to load file `filename` to", "a DataFrame, using CSV.File.", """""""", "function benchmarkonefile(filename::String, timeout::Int)", "    i = 0", "    time2 = time() # needed to give time2 scope outside the loop.", "    time1 = time()"), _
         VStack("    while true", "        i = i + 1", "        res = CSV.File(filename, header=false, type=String) |> DataFrame", "        time2 = time()", "        time2 - time1 < timeout || break", "    end", "    (time2 - time1) / i, i", "end"))
 
-    TestRes = TestCSVRead(156, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(156, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:=False, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4349,7 +4373,7 @@ Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test156 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test156 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4364,7 +4388,7 @@ Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents!"
-    TestRes = TestCSVRead(157, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(157, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:=99#, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4372,7 +4396,7 @@ Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test157 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test157 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4387,7 +4411,7 @@ Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: SkipToCol (4) exceeds the number of columns in the file (3)!"
-    TestRes = TestCSVRead(158, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(158, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
         SkipToCol:=4, _
@@ -4396,7 +4420,7 @@ Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test158 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test158 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4422,7 +4446,7 @@ Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array(vbNullString, 9#, 19#, 29#, 39#, 49#, 59#, 69#, 79#, 89#, 99#), _
         Array(vbNullString, 10#, 20#, 30#, 40#, 50#, 60#, 70#, 80#, 90#, 100#))
 
-    TestRes = TestCSVRead(159, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(159, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
@@ -4433,7 +4457,7 @@ Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test159 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test159 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4448,7 +4472,7 @@ Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: #ParseCTString: ConvertTypes must be Boolean or string with allowed letters NDBETQ. ""N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans as Booleans, ""E"" show Excel errors as errors, ""T"" to trim leading and trailing spaces from fields, ""Q"" rules NDBE apply even to quoted fields, TRUE = ""NDB"" (convert unquoted numbers, dates and Booleans), FALSE = no conversion Found unrecognised character 'X'!!!"
-    TestRes = TestCSVRead(160, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(160, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="XYZ", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4456,7 +4480,7 @@ Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test160 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test160 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4482,7 +4506,7 @@ Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("Col9", 9#, 19#, 29#, 39#, 49#, 59#, 69#, 79#, 89#, 99#), _
         Array("Col10", 10#, 20#, 30#, 40#, 50#, 60#, 70#, 80#, 90#, 100#))
 
-    TestRes = TestCSVRead(161, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(161, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
@@ -4493,7 +4517,7 @@ Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test161 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test161 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4510,7 +4534,7 @@ Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Error string varies according to date format on PC, so use simple regexp
     'Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y' or 'Y/M/D'. Omit to use the default date format on this PC which is ""M/D/Y""!!"
     Expected = "DateFormat not valid"
-    TestRes = TestCSVRead(162, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(162, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="BAD", _
         IgnoreEmptyLines:=False, _
@@ -4519,7 +4543,7 @@ Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test162 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test162 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4536,7 +4560,7 @@ Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Error string varies according to date format on PC, so use simple regexp
     'Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y' or 'Y/M/D'. Omit to use the default date format on this PC which is ""M/D/Y""!!"
     Expected = "DateFormat not valid"
-    TestRes = TestCSVRead(163, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(163, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="Y-M/D", _
         IgnoreEmptyLines:=False, _
@@ -4545,7 +4569,7 @@ Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test163 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test163 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4560,7 +4584,7 @@ Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: #OneDArrayToTwoDArray: If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements!!!"
-    TestRes = TestCSVRead(164, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(164, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=Array(1.5, "N"), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4568,7 +4592,7 @@ Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test164 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test164 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4583,7 +4607,7 @@ Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is 1.5!!"
-    TestRes = TestCSVRead(165, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(165, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(1.5, 2#), Array("N", "N")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4591,7 +4615,7 @@ Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test165 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test165 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4606,7 +4630,7 @@ Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test not delimited.txt"
     FileName = "test_not_delimited.txt"
     Expected = HStack(Array("Use:", "]add CSV#main", "=#"))
-    TestRes = TestCSVRead(166, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(166, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:=False, _
         IgnoreEmptyLines:=False, _
         SkipToRow:=3, _
@@ -4616,7 +4640,7 @@ Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test166 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test166 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4634,7 +4658,7 @@ Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("Date1", CDate("2021-Aug-30"), CDate("2021-Aug-31")), _
         Array("Date2", CDate("2021-Aug-31"), CDate("2021-Sep-01")))
 
-    TestRes = TestCSVRead(167, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(167, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="YYYY-MM-DD", _
         IgnoreEmptyLines:=False, _
@@ -4643,7 +4667,7 @@ Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test167 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test167 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4658,7 +4682,7 @@ Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = HStack(Array("Col1", "1", "4", "7"), Array("Col2", 2#, 5#, 8#), Array("Col3", "3", "6", "9"))
-    TestRes = TestCSVRead(168, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(168, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(1#, False), Array(2#, True), Array(3#, False)), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4666,7 +4690,7 @@ Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test168 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test168 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4681,7 +4705,7 @@ Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes is contradictory. Column 2 is specified to be converted using two different conversion rules: B and N!!"
-    TestRes = TestCSVRead(169, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(169, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(1#, "NB"), Array(1#, "BN"), Array(2#, "N"), Array(2#, "B")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4689,7 +4713,7 @@ Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test169 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test169 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4732,7 +4756,7 @@ Private Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test170 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test170 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4748,15 +4772,15 @@ Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     FileName = "test_column-by-column.csv"
     Expected = HStack( _
         Array("Type", "Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String", "String"), _
-        Array("Col A", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col B", "44424", "2021-08-24T12:49:13", True, "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col C", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col D", "44424", "2021-08-24T12:49:13", "True", CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col E", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", 1#, "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col F", "44424", "2021-08-24T12:49:13", True, "#DIV/0!", "1", "2021-08-24T12:49:13", True, "#DIV/0!", "abc", "abc""def", "Line" + vbCrLf + "Feed"), _
-        Array("Col G", "44424", "2021-08-24T12:49:13", "True", CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", CVErr(2007), "abc", "abc""def", "Line" + vbCrLf + "Feed"))
+        Array("Col A", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col B", "44424", "2021-08-24T12:49:13", True, "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col C", "44424", CDate("2021-Aug-24 12:49:13"), "True", "#DIV/0!", "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col D", "44424", "2021-08-24T12:49:13", "True", CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col E", 44424#, "2021-08-24T12:49:13", "True", "#DIV/0!", 1#, "2021-08-24T12:49:13", "TRUE", "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col F", "44424", "2021-08-24T12:49:13", True, "#DIV/0!", "1", "2021-08-24T12:49:13", True, "#DIV/0!", "abc", "abc""def", "Line" & vbCrLf & "Feed"), _
+        Array("Col G", "44424", "2021-08-24T12:49:13", "True", CVErr(2007), "1", "2021-08-24T12:49:13", "TRUE", CVErr(2007), "abc", "abc""def", "Line" & vbCrLf & "Feed"))
 
-    TestRes = TestCSVRead(171, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(171, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack( _
         Array(0#, False), _
         Array(2#, "N"), _
@@ -4773,7 +4797,7 @@ Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test171 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test171 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4788,7 +4812,7 @@ Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
     Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is -2!!"
-    TestRes = TestCSVRead(172, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(172, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack( _
         Array(-2#, False), _
         Array(2#, "N"), _
@@ -4804,7 +4828,7 @@ Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test172 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test172 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4819,7 +4843,7 @@ Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
     Expected = "#CSVRead: #ParseConvertTypes: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,2) is string ""XX""!!"
-    TestRes = TestCSVRead(173, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(173, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(0#, False), Array(2#, "XX"), Array(3#, "B"), Array(4#, "D")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4827,7 +4851,7 @@ Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test173 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test173 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4842,7 +4866,7 @@ Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
     Expected = "#CSVRead: #ParseConvertTypes: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,1) is of type Error!!"
-    TestRes = TestCSVRead(174, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(174, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(3#, CVErr(2007)), Array(4#, "D"), Array(5#, "E")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4850,7 +4874,7 @@ Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test174 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test174 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4865,7 +4889,7 @@ Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
     Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes specifies columns by their header (instead of by number), but HeaderRowNum has not been specified!!"
-    TestRes = TestCSVRead(175, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(175, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array("Col A", "N"), Array("Col B", "N"), Array("Col C", "N")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -4873,7 +4897,7 @@ Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test175 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test175 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4887,9 +4911,9 @@ Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test various time formats"
     FileName = "test_various_time_formats.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
     CastDoublesToDates Expected
-    TestRes = TestCSVRead(176, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(176, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         DateFormat:="Y-M-D", _
         IgnoreEmptyLines:=False, _
@@ -4902,7 +4926,7 @@ Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test176 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test176 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4916,9 +4940,9 @@ Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test y-m-d dates with fractional seconds"
     FileName = "test_y-m-d_dates_with_fractional_seconds.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
     CastDoublesToDates Expected
-    TestRes = TestCSVRead(177, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(177, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         DateFormat:="Y-M-D", _
         IgnoreEmptyLines:=False, _
@@ -4931,7 +4955,7 @@ Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test177 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test177 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4964,7 +4988,7 @@ Private Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test178 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test178 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4986,7 +5010,7 @@ Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array("Col6", 9066#, 20#, 80821#, 203158#))
     FileName = "test_headers_in_fixed_width_file.csv"
     
-    TestRes = TestCSVRead(179, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(179, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         Delimiter:=" ", _
         IgnoreRepeated:=True, _
@@ -5000,7 +5024,7 @@ Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test179 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test179 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5015,7 +5039,7 @@ Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test array lower bounds"
     Expected = HStack(Array("Col1", 1#, 2#, 3#), Array("Col2", 4#, 5#, 6#), Array("Col3", 7#, 8#, 9#))
     FileName = "test_array_lower_bounds.csv"
-    TestRes = TestCSVRead(180, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(180, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -5031,7 +5055,7 @@ Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test180 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test180 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5054,7 +5078,7 @@ Private Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test181 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test181 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -5081,7 +5105,7 @@ Function TwoFiveFiveChars() As Variant
 
     Exit Function
 ErrHandler:
-    Throw "#TwoFiveFiveChars (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#TwoFiveFiveChars (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5096,7 +5120,7 @@ Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "255 characters-ANSI"
     FileName = "255_characters-ANSI.csv"
     Expected = TwoFiveFiveChars()
-    TestRes = TestCSVRead(182, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(182, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=False, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
@@ -5104,7 +5128,7 @@ Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test182 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test182 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5119,14 +5143,14 @@ Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "255 characters-UTF-8"
     Expected = TwoFiveFiveChars()
     FileName = "255_characters-UTF-8.csv"
-    TestRes = TestCSVRead(183, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(183, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test183 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test183 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5141,14 +5165,14 @@ Private Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "255 characters-UTF-8-BOM"
     Expected = TwoFiveFiveChars()
     FileName = "255_characters-UTF-8-BOM.csv"
-    TestRes = TestCSVRead(184, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(184, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test184 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test184 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5163,13 +5187,13 @@ Private Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "255 characters-UTF-16-BE-BOM"
     Expected = TwoFiveFiveChars()
     FileName = "255_characters-UTF-16-BE-BOM.csv"
-    TestRes = TestCSVRead(185, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(185, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
     Exit Sub
 ErrHandler:
-    Throw "#Test185 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test185 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5184,13 +5208,13 @@ Private Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "255 characters-UTF-16-LE-BOM"
     Expected = TwoFiveFiveChars()
     FileName = "255_characters-UTF-16-LE-BOM.csv"
-    TestRes = TestCSVRead(186, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(186, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
     Exit Sub
 ErrHandler:
-    Throw "#Test186 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test186 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5205,7 +5229,7 @@ Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test mac line endings"
     Expected = HStack(Array("1,2,3", "4,5,6"))
     FileName = "test_mac_line_endings.csv"
-    TestRes = TestCSVRead(187, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(187, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:=False, _
         IgnoreEmptyLines:=False, _
         SkipToRow:=2, _
@@ -5215,7 +5239,7 @@ Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test187 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test187 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5229,8 +5253,8 @@ Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "FileName passed as CSV Contents, parse as not delimited"
     Expected = HStack(Array("2", "3", "4", "5", "6"))
-    FileName = "1" + vbCrLf + "2" + vbCrLf + "3" + vbCrLf + "4" + vbCrLf + "5" + vbCrLf + "6" + vbCrLf + "7" + vbCrLf + "8" + vbCrLf + "9" + vbCrLf + "10" + vbCrLf + vbNullString
-    TestRes = TestCSVRead(188, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    FileName = "1" & vbCrLf & "2" & vbCrLf & "3" & vbCrLf & "4" & vbCrLf & "5" & vbCrLf & "6" & vbCrLf & "7" & vbCrLf & "8" & vbCrLf & "9" & vbCrLf & "10" & vbCrLf & vbNullString
+    TestRes = TestCSVRead(188, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:=False, _
         IgnoreEmptyLines:=False, _
         SkipToRow:=2, _
@@ -5240,7 +5264,7 @@ Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test188 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test188 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5252,12 +5276,11 @@ Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
-    TestDescription = "FileName passed as CSV Contents, parse as delimited"
+    TestDescription = "1,2,3<CRLF>4,5,6<CRLF>7,8,9<CRLF>10,11,12<CRLF>13,14,15<CRLF>16,17,18<CRLF>"
     Expected = HStack(Array(5#, 8#), Array(6#, 9#))
-    FileName = "1,2,3" + vbCrLf + "4,5,6" + vbCrLf + "7,8,9" + vbCrLf + "10,11,12" + vbCrLf + "13,14,15" + vbCrLf + "16,17,18" + vbCrLf + vbNullString
+    FileName = "1,2,3" & vbCrLf & "4,5,6" & vbCrLf & "7,8,9" & vbCrLf & "10,11,12" & vbCrLf & "13,14,15" & vbCrLf & "16,17,18" & vbCrLf & ""
     TestRes = TestCSVRead(189, TestDescription, Expected, FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
-        IgnoreEmptyLines:=False, _
         SkipToRow:=2, _
         SkipToCol:=2, _
         NumRows:=2, _
@@ -5267,7 +5290,7 @@ Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test189 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test189 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5282,7 +5305,7 @@ Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "norwegian data"
     Expected = Empty
     FileName = "norwegian_data.csv"
-    TestRes = TestCSVRead(190, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(190, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="Y-M-D", _
         IgnoreEmptyLines:=False, _
@@ -5306,7 +5329,7 @@ Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test190 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test190 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5321,7 +5344,7 @@ Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "csv segfault.txt"
     Expected = Empty
     FileName = "csv_segfault.txt"
-    TestRes = TestCSVRead(191, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(191, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=468, _
         NumColsExpected:=9, _
         IgnoreEmptyLines:=True, _
@@ -5333,7 +5356,7 @@ Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test191 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test191 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5348,7 +5371,7 @@ Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "Enedis smart meter data"
     Expected = Empty
     FileName = "Enedis_smart_meter_data.csv"
-    TestRes = TestCSVRead(192, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(192, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=415, _
         NumColsExpected:=47, _
         ConvertTypes:=True, _
@@ -5358,7 +5381,7 @@ Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test192 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test192 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5390,7 +5413,7 @@ Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         6243108#, _
         87933755#)
     FileName = "Enedis_smart_meter_data.csv"
-    TestRes = TestCSVRead(193, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(193, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="ISOZ", _
         NumRows:=1, _
@@ -5418,7 +5441,7 @@ Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test193 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test193 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5433,14 +5456,14 @@ Private Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "utf 8 with bom"
     Expected = HStack(Array(1#, 5#, 9#), Array(2#, 6#, 10#), Array(3#, 7#, 11#), Array(4#, 8#, 12#))
     FileName = "utf_8_with_bom.csv"
-    TestRes = TestCSVRead(194, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(194, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
 ErrHandler:
-    Throw "#Test194 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test194 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5454,8 +5477,8 @@ Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad D-M-Y"
     FileName = "test_bad_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, False))
-    TestRes = TestCSVRead(195, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = ThrowIfError(CSVRead(Folder & FileName, False))
+    TestRes = TestCSVRead(195, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=776, _
         NumColsExpected:=2, _
         ConvertTypes:=True, _
@@ -5465,7 +5488,7 @@ Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test195 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test195 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5479,8 +5502,8 @@ Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad M-D-Y"
     FileName = "test_bad_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, False))
-    TestRes = TestCSVRead(196, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = ThrowIfError(CSVRead(Folder & FileName, False))
+    TestRes = TestCSVRead(196, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=776, _
         NumColsExpected:=2, _
         ConvertTypes:=True, _
@@ -5490,7 +5513,7 @@ Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test196 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test196 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5504,8 +5527,8 @@ Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad Y-M-D"
     FileName = "test_bad_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, False))
-    TestRes = TestCSVRead(197, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    Expected = ThrowIfError(CSVRead(Folder & FileName, False))
+    TestRes = TestCSVRead(197, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=776, _
         NumColsExpected:=2, _
         ConvertTypes:=True, _
@@ -5515,7 +5538,7 @@ Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test197 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test197 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5529,10 +5552,10 @@ Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test good D-M-Y"
     FileName = "test_good_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
     CastDoublesToDates Expected
     
-    TestRes = TestCSVRead(198, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(198, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="D-M-Y", _
         SkipToRow:=2, _
@@ -5543,7 +5566,7 @@ Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test198 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test198 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5557,10 +5580,10 @@ Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test good M-D-Y"
     FileName = "test_good_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
     CastDoublesToDates Expected
     
-    TestRes = TestCSVRead(199, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(199, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="M-D-Y", _
         SkipToRow:=2, _
@@ -5571,7 +5594,7 @@ Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test199 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test199 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5585,10 +5608,10 @@ Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test good Y-M-D"
     FileName = "test_good_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder + FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = ThrowIfError(CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
     CastDoublesToDates Expected
     
-    TestRes = TestCSVRead(200, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(200, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="Y-M-D", _
         SkipToRow:=2, _
@@ -5599,7 +5622,7 @@ Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test200 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test200 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
@@ -5637,7 +5660,7 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test201 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test201 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
@@ -5676,13 +5699,11 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test202 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test202 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Test203
-' Author     : Philip Swannell
-' Date       : 21-Oct-2022
 ' Added after discovering bug when a)ConvertTypes <> FALSE; and b) SkipToRow = HeaderRow > 1. Problem was that variable
 ' HeaderRow was not being populated which led to type mismatch.
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -5698,7 +5719,7 @@ Private Sub Test203(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test skiptorow and headerrow equal and greater than 1"
     Expected = HStack(Array("1", 4#, 7#), Array("2", 5#, 8#), Array("3", 6#, 9#))
     FileName = "test_skiptorow_and_headerrow_equal_and_greater_than_1.csv"
-    TestRes = TestCSVRead(203, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(203, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         SkipToRow:=2, _
         ShowMissingsAs:=Empty, _
@@ -5708,7 +5729,7 @@ Private Sub Test203(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test203 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test203 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5723,7 +5744,7 @@ Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test date separator is space"
     Expected = HStack(Array("Col1", CDate("2022-Jan-01"), CDate("2022-Mar-02"), CDate("2022-Feb-01")))
     FileName = "test_date_separator_is_space.csv"
-    TestRes = TestCSVRead(204, TestDescription, Expected, Folder + FileName, Observed, WhatDiffers, _
+    TestRes = TestCSVRead(204, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         DateFormat:="D M Y", _
         ShowMissingsAs:=Empty)
@@ -5731,7 +5752,7 @@ Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test204 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test204 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5775,7 +5796,7 @@ Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test205 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test205 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5820,7 +5841,7 @@ Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test206 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test206 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 'Tests TrueString and FalseString (in this case yes and no) appearing in the file with quotes.
@@ -5855,7 +5876,7 @@ Private Sub Test207(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test207 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test207 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5890,6 +5911,574 @@ Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test208 (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Test208 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
+
+Private Sub Test209(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Boolean value 'True' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(209, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        TrueStrings:="foo", _
+        FalseStrings:="foo", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test209 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test210(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'True' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(210, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        TrueStrings:="foo", _
+        MissingStrings:="foo", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test210 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test211(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(211, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        FalseStrings:="foo", _
+        MissingStrings:="foo", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test211 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test212(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeyToDict: There is a conflicting definition of what the string '""foo""' should be converted to, both the Boolean value 'True' and the Boolean value 'False' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(212, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="BQ", _
+        TrueStrings:="foo", _
+        FalseStrings:="""foo""", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test212 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test213(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""foo' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(213, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        TrueStrings:="""foo", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test213 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test214(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""foo' as FalseString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(214, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        FalseStrings:="""foo", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test214 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test215(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""foo' as MissingString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(215, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        MissingStrings:="""foo", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test215 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test216(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "foo,DQfooDQ<LF>1,2<LF>"
+    Expected = HStack(Array(True, "1"), Array(False, "2"))
+    FileName = "foo,""foo""" & vbLf & "1,2" & vbLf & ""
+    TestRes = TestCSVRead(216, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+        ConvertTypes:="B", _
+        TrueStrings:="foo", _
+        FalseStrings:="""foo""", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test216 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test217(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: Delimiter character must be passed as a string, FALSE for no delimiter. Omit to guess from file contents!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(217, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        Delimiter:=True, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test217 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test218(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = HStack(Array("Col1", 1#, 4#, 7#), Array("Col2", 2#, 5#, 8#), Array("Col3", 3#, 6#, 9#))
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(218, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test218 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test219(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y', 'Y/M/D', 'M D Y', 'D M Y' or 'Y M D'. Omit to use the default date format of 'Y-M-D'!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(219, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="Y-D-M", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test219 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test220(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "this file does not exists"
+    Expected = "#CSVRead: #ParseEncoding: #DetectEncoding: File not found!!!!"
+    FileName = "this file does not exists.csv"
+    TestRes = TestCSVRead(220, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test220 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(221, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ShowMissingsAs:=Empty, _
+        Encoding:="Foo")
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test221 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test222(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "Four by four ragged"
+    Expected = HStack(Array("A", 1#, 1#, 1#, 1#), Array("B", "NA", 2#, 2#, 2#), Array("C", "NA", "NA", 3#, 3#), Array("D", "NA", "NA", "NA", 4#))
+    FileName = "Four_by_four_ragged.csv"
+    TestRes = TestCSVRead(222, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        FalseStrings:="NA", _
+        ShowMissingsAs:="NA")
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test222 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test223(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "Four by four ragged"
+    Expected = HStack( _
+        Array("A", 1#, 1#, 1#, 1#, Empty), _
+        Array("B", Empty, 2#, 2#, 2#, Empty), _
+        Array("C", Empty, Empty, 3#, 3#, Empty), _
+        Array("D", Empty, Empty, Empty, 4#, Empty), _
+        Array(Empty, Empty, Empty, Empty, Empty, Empty), _
+        Array(Empty, Empty, Empty, Empty, Empty, Empty))
+    FileName = "Four_by_four_ragged.csv"
+    TestRes = TestCSVRead(223, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        NumRows:=6, _
+        NumCols:=6, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test223 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test224(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #ParseCSVContents: SkipToRow (10) exceeds the number of not empty rows in the file (4)!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(224, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=True, _
+        SkipToRow:=10, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test224 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+'Test on non compliant input - odd number of double quotes
+Private Sub Test225(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "DQaDQ,DQbDQ<LF>DQc,d<LF>"
+    Expected = HStack(Array("a", """c,d" & vbLf & ""), Array("b", Empty)) '<- not sure this should be empty
+    FileName = """a"",""b""" & vbLf & """c,d" & vbLf & ""
+    TestRes = TestCSVRead(225, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test225 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test226(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #ParseCSVContents: SkipToRow (11) exceeds the number of not empty rows in the file (4)!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(226, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        ShowMissingsAs:=Empty, _
+        HeaderRowNum:=10#, _
+        ExpectedHeaderRow:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test226 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test227(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #ParseTextFile: SkipToLine (11) exceeds the number of lines in the file (4)!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(227, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        Delimiter:=False, _
+        ShowMissingsAs:=Empty, _
+        HeaderRowNum:=10#, _
+        ExpectedHeaderRow:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test227 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+' x""y does not get unquoted since it's not correctly quoted in the first place.
+Private Sub Test228(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "xDQDQy,z"
+    Expected = HStack("x""""y", "z")
+    FileName = "x""""y,z"
+    TestRes = TestCSVRead(228, TestDescription, Expected, FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test228 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test229(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got 'foo""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(229, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        TrueStrings:="foo""", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test229 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test230(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""f""oo""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(230, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        TrueStrings:="""f""oo""", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test230 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test231(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test bad inputs"
+    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    FileName = "test_bad_inputs.csv"
+    TestRes = TestCSVRead(231, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        TrueStrings:="""", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test231 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test232(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test column-by-column"
+    Expected = HStack(Array("Type", "Number"), Array("Col A", 44424#))
+    FileName = "test_column-by-column.csv"
+    TestRes = TestCSVRead(232, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=HStack(Array(0#, True), Array(1#, False)), _
+        DateFormat:="ISO", _
+        NumRows:=2, _
+        NumCols:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test232 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
 

@@ -39,22 +39,22 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
     Const PermitBaseDifference As Boolean = True
 
     WhatDiffers = vbNullString
-    TestDescription = "Test " + CStr(TestNo) + " " + TestDescription
+    TestDescription = "Test " & CStr(TestNo) & " " & TestDescription
 
     Observed = CSVRead(FileName, ConvertTypes, Delimiter, IgnoreRepeated, DateFormat, Comment, IgnoreEmptyLines, HeaderRowNum, SkipToRow, _
         SkipToCol, NumRows, NumCols, TrueStrings, FalseStrings, MissingStrings, ShowMissingsAs, Encoding, DecimalSeparator, HeaderRow)
         
     If Not IsMissing(ExpectedHeaderRow) Then
         If Not ArraysIdentical(ExpectedHeaderRow, HeaderRow, True, PermitBaseDifference, WhatDiffers) Then
-            WhatDiffers = TestDescription + " FAILED. HeaderRow failed to match ExpectedHeaderRow: " & WhatDiffers
+            WhatDiffers = TestDescription & " FAILED. HeaderRow failed to match ExpectedHeaderRow: " & WhatDiffers
             GoTo Failed
         End If
     End If
 
     If NumRowsExpected <> 0 Or NumColsExpected <> 0 Then
         If NRows(Observed) <> NumRowsExpected Or NCols(Observed) <> NumColsExpected Then
-            WhatDiffers = TestDescription + " FAILED, expected dimensions: " + CStr(NumRowsExpected) + _
-                ", " + CStr(NumColsExpected) + " observed dimensions: " + CStr(NRows(Observed)) + ", " + CStr(NCols(Observed))
+            WhatDiffers = TestDescription & " FAILED, expected dimensions: " & CStr(NumRowsExpected) & _
+                ", " & CStr(NumColsExpected) & " observed dimensions: " & CStr(NRows(Observed)) & ", " & CStr(NCols(Observed))
             GoTo Failed
         ElseIf IsEmpty(Expected) Then
             TestCSVRead = True
@@ -72,17 +72,17 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
                     TestCSVRead = True
                     Exit Function
                 Else
-                    WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + _
-                        "' but expected a different error: '" + Expected + "'"
+                    WhatDiffers = TestDescription & " FAILED, CSVRead returned error: '" & Observed & _
+                        "' but expected a different error: '" & Expected & "'"
                     GoTo Failed
                 End If
             Else
-                WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + _
-                    "' but expected a different error: '" + Expected + "'"
+                WhatDiffers = TestDescription & " FAILED, CSVRead returned error: '" & Observed & _
+                    "' but expected a different error: '" & Expected & "'"
                 GoTo Failed
             End If
         Else
-            WhatDiffers = TestDescription + " FAILED, CSVRead returned error: '" + Observed + "'"
+            WhatDiffers = TestDescription & " FAILED, CSVRead returned error: '" & Observed & "'"
             GoTo Failed
         End If
     End If
@@ -92,13 +92,13 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
             TestCSVRead = True
             Exit Function
         Else
-            WhatDiffers = TestDescription + " FAILED, observed and expected differed: " + WhatDiffers
+            WhatDiffers = TestDescription & " FAILED, observed and expected differed: " & WhatDiffers
             GoTo Failed
         End If
     Else
         TestCSVRead = False
-        WhatDiffers = TestDescription + " FAILED, observed has " + CStr(NumDimensions(Observed)) + _
-            " dimensions, expected has " + CStr(NumDimensions(Expected)) + " dimensions"
+        WhatDiffers = TestDescription & " FAILED, observed has " & CStr(NumDimensions(Observed)) & _
+            " dimensions, expected has " & CStr(NumDimensions(Expected)) & " dimensions"
     End If
 
 Failed:
@@ -107,7 +107,7 @@ Failed:
 
     Exit Function
 ErrHandler:
-    Throw "#TestCSVRead (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#TestCSVRead (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, _
@@ -190,7 +190,7 @@ Function CreatePath(ByVal FolderPath As String) As String
     FolderPath = Replace(FolderPath, "/", "\")
 
     If Right$(FolderPath, 1) <> "\" Then
-        FolderPath = FolderPath + "\"
+        FolderPath = FolderPath & "\"
     End If
 
     Set FSO = New FileSystemObject
@@ -209,7 +209,7 @@ Function CreatePath(ByVal FolderPath As String) As String
         End If
     Next i
 
-    If F Is Nothing Then Throw "Cannot create folder " + Left$(FolderPath, 3)
+    If F Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
 
     'now add folders one level at a time
     For i = Len(ParentFolderName) + 1 To Len(FolderPath)
@@ -344,7 +344,7 @@ Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, Optional 
 
     Exit Sub
 ErrHandler:
-    Throw "#Force2DArray (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Force2DArray (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -499,7 +499,7 @@ Function IsApprox(ByVal x As Variant, ByVal y As Variant, Optional CaseSensitive
             IsApprox = (x = y)
         End If
     Else
-        If VTA = vbBoolean Or VTB = vbBoolean Or VTA = vbString Or VTB = vbString Then
+        If VTA = vbBoolean Or VTB = vbBoolean Or VTA = vbString Or VTB = vbString Or VTA = vbEmpty Or VTB = vbEmpty Then
             IsApprox = False
         Else
             IsApprox = (x = y)
@@ -539,7 +539,7 @@ Public Function Transpose(ByVal TheArray As Variant)
     Transpose = Result
     Exit Function
 ErrHandler:
-    Transpose = "#Transpose (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Transpose = "#Transpose (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -637,7 +637,7 @@ Public Function HStack(ParamArray Arrays()) As Variant
 
     Exit Function
 ErrHandler:
-    HStack = "#HStack (line " & CStr(Erl) + "): " & Err.Description & "!"
+    HStack = "#HStack (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -675,11 +675,11 @@ Public Function ArraysIdentical(ByVal Array1 As Variant, ByVal Array2 As Variant
 
     WhatDiffers = vbNullString
     If (UBound(Array1, 1) - LBound(Array1, 1)) <> (UBound(Array2, 1) - LBound(Array2, 1)) Then
-        WhatDiffers = "Row count different: " + CStr(1 + (UBound(Array1, 1) - LBound(Array1, 1))) + " vs " _
+        WhatDiffers = "Row count different: " & CStr(1 + (UBound(Array1, 1) - LBound(Array1, 1))) & " vs " _
             + CStr(1 + (UBound(Array2, 1) - LBound(Array2, 1)))
         ArraysIdentical = False
     ElseIf (UBound(Array1, 2) - LBound(Array1, 2)) <> (UBound(Array2, 2) - LBound(Array2, 2)) Then
-        WhatDiffers = "Column count different: " + CStr(1 + (UBound(Array1, 2) - LBound(Array1, 2))) + " vs " _
+        WhatDiffers = "Column count different: " & CStr(1 + (UBound(Array1, 2) - LBound(Array1, 2))) & " vs " _
             + CStr(1 + (UBound(Array2, 2) - LBound(Array2, 2)))
         ArraysIdentical = False
     Else
@@ -697,9 +697,9 @@ Public Function ArraysIdentical(ByVal Array1 As Variant, ByVal Array2 As Variant
                 If Not IsApprox(Array1(i, j), Array2(i + rN, j + cN), CaseSensitive, AbsTol, RelTol) Then
                     NumDiff = NumDiff + 1
                     If NumDiff = 1 Then
-                        WhatDiffers = "first difference at " + CStr(i) + "," + CStr(j) + ": " + _
-                            TypeName(Array1(i, j)) + " '" + CStr(Array1(i, j)) + "' vs " + _
-                            TypeName(Array2(i + rN, j + cN)) + " '" + CStr(Array2(i + rN, j + cN)) + "' SafeSubtract = " & SafeSubtract(Array1(i, j), Array2(i + rN, j + cN))
+                        WhatDiffers = "first difference at " & CStr(i) & "," & CStr(j) & ": " & _
+                            TypeName(Array1(i, j)) & " '" & CStr(Array1(i, j)) & "' vs " & _
+                            TypeName(Array2(i + rN, j + cN)) & " '" & CStr(Array2(i + rN, j + cN)) & "' SafeSubtract = " & SafeSubtract(Array1(i, j), Array2(i + rN, j + cN))
                     End If
                     ArraysIdentical = False
                 Else
@@ -711,14 +711,14 @@ Public Function ArraysIdentical(ByVal Array1 As Variant, ByVal Array2 As Variant
             ArraysIdentical = True
         Else
             ArraysIdentical = False
-            WhatDiffers = CStr(NumDiff) + " of " + CStr(NumDiff + NumSame) + " elements differ, " + WhatDiffers
+            WhatDiffers = CStr(NumDiff) & " of " & CStr(NumDiff + NumSame) & " elements differ, " & WhatDiffers
         End If
 
     End If
 
     Exit Function
 ErrHandler:
-    ArraysIdentical = "#ArraysIdentical (line " & CStr(Erl) + "): " & Err.Description & "!"
+    ArraysIdentical = "#ArraysIdentical (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 Public Sub FileCopy(SourceFile As String, TargetFile As String)
@@ -734,6 +734,6 @@ Public Sub FileCopy(SourceFile As String, TargetFile As String)
 ErrHandler:
     CopyOfErr = Err.Description
     Set FSO = Nothing: Set F = Nothing
-    Throw "#" + CopyOfErr + "!"
+    Throw "#" & CopyOfErr & "!"
 End Sub
 

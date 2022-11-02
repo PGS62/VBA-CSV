@@ -47,8 +47,8 @@ Public Sub RoundTripTest()
     
     Folder = Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
-    Prompt = "Run Round Trip Tests?" + vbLf + vbLf + _
-        "Note this will generate 5,346 files in folder" + vbLf + _
+    Prompt = "Run Round Trip Tests?" & vbLf & vbLf & _
+        "Note this will generate 5,346 files in folder" & vbLf & _
         Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
@@ -115,14 +115,16 @@ Public Sub RoundTripTest()
             Next Delimiter
         Next Encoding
     Next OS
-    Debug.Print "Finished. NumPassed = " + Format$(NumPassed, "###,##0") & " NumFailed = " & Format$(NumFailed, "###,##0")
+    Debug.Print "Finished. NumPassed = " & Format$(NumPassed, "###,##0") & " NumFailed = " & Format$(NumFailed, "###,##0")
     If NumFailed = 0 Then
-        Prompt = "Finished, all " + Format$(NumPassed, "###,##0") + " tests passed"
+        Prompt = "Finished, all " & Format$(NumPassed, "###,##0") & " tests passed"
         MsgBox Prompt, vbOKOnly + vbInformation, Title
     Else
-        Prompt = "Finished, " + Format$(NumPassed, "###,##0") + " tests passed, and " & Format$(NumFailed, "###,##0") + " tests failed. See VBA immediate window for details."
+        Prompt = "Finished, " & Format$(NumPassed, "###,##0") & " tests passed, and " & Format$(NumFailed, "###,##0") & " tests failed. See VBA immediate window for details."
         MsgBox Prompt, vbOKOnly + vbCritical, Title
     End If
+
+    Application.StatusBar = False
 
     Exit Sub
 ErrHandler:
@@ -178,7 +180,10 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     End If
 
     NumDone = NumPassed + NumFailed
-    If NumDone Mod 50 = 0 Then Debug.Print Format$(NumDone, "###,##0")
+    If NumDone Mod 50 = 0 Then
+        Debug.Print Format$(NumDone, "###,##0")
+        Application.StatusBar = Format$(NumDone, "###,##0")
+    End If
     
     Exit Sub
 ErrHandler:

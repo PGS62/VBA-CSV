@@ -15,7 +15,7 @@ Function TempFolder() As String
 End Function
 
 Function TestFolder()
-    TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "testfiles\"
+    TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & "testfiles\"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ Function FileReadAll(FileName As String) As String
 
     Exit Function
 ErrHandler:
-    Throw "#FileReadAll (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#FileReadAll (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ Function VStack(ParamArray Arrays()) As Variant
     End If
     Exit Function
 ErrHandler:
-    VStack = "#VStack (line " & CStr(Erl) + "): " & Err.Description & "!"
+    VStack = "#VStack (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 Function FileSize(FileName As String)
@@ -170,7 +170,7 @@ Function FileSize(FileName As String)
 
     Exit Function
 ErrHandler:
-    Throw "#FileSize (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#FileSize (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -245,7 +245,7 @@ Function AllCombinations(Arg1 As Variant, Optional Arg2 As Variant, Optional Arg
 
     Exit Function
 ErrHandler:
-    AllCombinations = "#AllCombinations (line " & CStr(Erl) + "): " & Err.Description & "!"
+    AllCombinations = "#AllCombinations (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -282,7 +282,7 @@ Function MakeGoodStringsBad(GoodStrings As Variant, Optional InsertThis As Strin
 
     Exit Function
 ErrHandler:
-    MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -304,7 +304,7 @@ Private Function InsertInString(InsertThis As String, ByVal InToThis As String, 
     InsertInString = InToThis
     Exit Function
 ErrHandler:
-    Throw "#InsertInString (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#InsertInString (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -416,7 +416,7 @@ EarlyExit:
 
     Exit Function
 ErrHandler:
-    IsRegMatch = "#IsRegMatch (line " & CStr(Erl) + "): " & Err.Description & "!"
+    IsRegMatch = "#IsRegMatch (line " & CStr(Erl) & "): " & Err.Description & "!"
     Set rx = Nothing
 End Function
 

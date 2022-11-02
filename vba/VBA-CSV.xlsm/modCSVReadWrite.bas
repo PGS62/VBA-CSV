@@ -1,10 +1,9 @@
 Attribute VB_Name = "modCSVReadWrite"
 ' VBA-CSV
-
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.18
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.19
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -25,7 +24,7 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.18/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.19/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 Option Explicit
@@ -159,17 +158,15 @@ End Enum
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
-        Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
-        Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
-        Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
-        Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
-        Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
-        Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
-        Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-        Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
-        Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
+    Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
+    Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
+    Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+    Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
+    Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
+    Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
+    Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+    Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
+    Optional ByRef HeaderRow As Variant) As Variant
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -297,7 +294,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         ConvertQuoted, TrimFields, ColByColFormatting, HeaderRowNum, CTDict
 
     Set Sentinels = New Scripting.Dictionary
-    MakeSentinels Sentinels, ConvertQuoted, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
+    MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
         ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
     
     If ShowDatesAsDates Then
@@ -330,6 +327,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     End If
     
     If NotDelimited Then
+        HeaderRow = Empty
         CSVRead = ParseTextFile(FileName, SourceType <> st_String, useADODB, CharSet, TriState, SkipToRow, NumRows, CallingFromWorksheet)
         Exit Function
     End If
@@ -401,13 +399,13 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                     Dim UnquotedLength As Long
                     UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), """", 4))
                     If UnquotedLength > MSLIA Then
-                        Err_StringTooLong = "The file has a field (row " + CStr(i + SkipToRow - 1) & _
-                            ", column " & CStr(j + SkipToCol - 1) & ") of length " + Format$(UnquotedLength, "###,###")
+                        Err_StringTooLong = "The file has a field (row " & CStr(i + SkipToRow - 1) & _
+                            ", column " & CStr(j + SkipToCol - 1) & ") of length " & Format$(UnquotedLength, "###,###")
                         If MSLIA >= 32767 Then
-                            Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format$(MSLIA, "####,####")
-                        Else
+                            Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " & Format$(MSLIA, "####,####")
+                        Else 'Excel 2013 and earlier
                             Err_StringTooLong = Err_StringTooLong & _
-                                ". An array containing a string longer than " + Format$(MSLIA, "###,###") + _
+                                ". An array containing a string longer than " & Format$(MSLIA, "###,###") & _
                                 " cannot be returned from VBA to an Excel worksheet"
                         End If
                         Throw Err_StringTooLong
@@ -425,33 +423,24 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                     Sentinels, MaxSentinelLength, ShowMissingsAs)
             End If
             
-            'File has variable number of fields per line...
-            If Ragged Then
-                If Not ShowMissingsAsEmpty Then
-                    If k = NumFields Then
-                        NeedToFill = j < NumColsInReturn
-                    ElseIf RowIndexes(k + 1) > RowIndexes(k) Then
-                        NeedToFill = j < NumColsInReturn
-                    Else
-                        NeedToFill = False
-                    End If
-                    If NeedToFill Then
-                        For m = j + 1 To NumColsInReturn
-                            ReturnArray(i + Adj, m + Adj) = ShowMissingsAs
-                        Next m
-                    End If
-                End If
-            End If
         End If
     Next k
-
+    
     If Ragged Then
+        If Not ShowMissingsAsEmpty Then
+            For i = 1 + Adj To NumRowsInReturn + Adj
+                For j = 1 + Adj To NumColsInReturn + Adj
+                    If IsEmpty(ReturnArray(i, j)) Then ReturnArray(i, j) = ShowMissingsAs
+                Next j
+            Next i
+        End If
         If Not IsEmpty(HeaderRow) Then
             If NCols(HeaderRow) < NCols(ReturnArray) + SkipToCol - 1 Then
                 ReDim Preserve HeaderRow(1 To 1, 1 To NCols(ReturnArray) + SkipToCol - 1)
             End If
         End If
     End If
+
     If SkipToCol > 1 Then
         If Not IsEmpty(HeaderRow) Then
             Dim HeaderRowTruncated() As String
@@ -512,7 +501,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                 
             Set Sentinels = New Scripting.Dictionary
             
-            MakeSentinels Sentinels, ConvertQuoted, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
+            MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
                 ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
 
             For i = 1 To NR
@@ -619,7 +608,7 @@ Public Sub RegisterCSVRead()
     Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVRead failed with error: " + Err.Description
+    Debug.Print "Warning: Registration of function CSVRead failed with error: " & Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -696,7 +685,7 @@ Private Function Download(URLAddress As String, ByVal FileName As String) As Str
         EN = Err.Number
         On Error GoTo ErrHandler
         If EN <> 0 Then
-            Throw "Cannot download from URL '" + URLAddress + "' because target file '" + FileName + _
+            Throw "Cannot download from URL '" & URLAddress & "' because target file '" & FileName & _
                 "' already exists and cannot be deleted. Is the target file open in a program such as Excel?"
         End If
     End If
@@ -806,7 +795,7 @@ Private Function ReadAllFromStream(Stream As Object) As String
     ElseIf TypeName(Stream) = "TextStream" Then
         ReadAllFromStream = Stream.ReadAll
     Else
-        Throw "Stream has unknown type: " + TypeName(Stream)
+        Throw "Stream has unknown type: " & TypeName(Stream)
     End If
 
     Exit Function
@@ -958,6 +947,7 @@ Private Function OneDArrayToTwoDArray(x As Variant) As Variant
     Dim i As Long
     Dim k As Long
     Dim TwoDArray() As Variant
+    
     On Error GoTo ErrHandler
     ReDim TwoDArray(1 To UBound(x) - LBound(x) + 1, 1 To 2)
     For i = LBound(x) To UBound(x)
@@ -1541,7 +1531,6 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
     Dim Which As Long
 
     On Error GoTo ErrHandler
-    On Error GoTo ErrHandler
     HeaderRow = Empty
     
     If VarType(ContentsOrStream) = vbString Then
@@ -1834,6 +1823,7 @@ Private Sub SkipLines(Streaming As Boolean, useADODB As Boolean, Comment As Stri
     Dim atEndOfStream As Boolean
     Dim LookAheadBy As Long
     Dim SkipThisLine As Boolean
+    
     On Error GoTo ErrHandler
     Do
         If Streaming Then
@@ -2295,7 +2285,7 @@ End Sub
 Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, _
      DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
     ByRef Converted As Boolean)
-    
+
     Dim D As String
     Dim m As String
     Dim pos1 As Long 'First date separator
@@ -2367,7 +2357,6 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
         D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
         y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
         TimePart = Mid$(strIn, pos3)
-
     ElseIf DateOrder = 1 Then 'D-M-Y
         D = Left$(strIn, pos1 - 1)
         m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
@@ -2453,7 +2442,7 @@ End Function
 ' Purpose    : Returns a Dictionary keyed on strings for which if a key to the dictionary is a field of the CSV file then
 '              that field should be converted to the associated item value. Handles Booleans, Missings and Excel errors.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted As Boolean, ByRef MaxLength As Long, _
+Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted As Boolean, Delimiter As String, ByRef MaxLength As Long, _
     ByRef AnySentinels As Boolean, ShowBooleansAsBooleans As Boolean, ShowErrorsAsErrors As Boolean, _
     ByRef ShowMissingsAs As Variant, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
     Optional MissingStrings As Variant)
@@ -2479,19 +2468,19 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
     End Select
     
     If Not IsMissing(MissingStrings) And Not IsEmpty(MissingStrings) Then
-        AddKeysToDict Sentinels, MissingStrings, ShowMissingsAs, Err_MissingStrings
+        AddKeysToDict Sentinels, MissingStrings, ShowMissingsAs, Err_MissingStrings, "MissingString", Delimiter
     End If
 
     If ShowBooleansAsBooleans Then
         If IsMissing(TrueStrings) Or IsEmpty(TrueStrings) Then
-            AddKeysToDict Sentinels, Array("TRUE", "true", "True"), True, Err_TrueStrings
+            AddKeysToDict Sentinels, Array("TRUE", "true", "True"), True, Err_TrueStrings, "TrueString", Delimiter
         Else
-            AddKeysToDict Sentinels, TrueStrings, True, Err_TrueStrings
+            AddKeysToDict Sentinels, TrueStrings, True, Err_TrueStrings, "TrueString", Delimiter
         End If
         If IsMissing(FalseStrings) Or IsEmpty(FalseStrings) Then
-            AddKeysToDict Sentinels, Array("FALSE", "false", "False"), False, Err_FalseStrings
+            AddKeysToDict Sentinels, Array("FALSE", "false", "False"), False, Err_FalseStrings, "FalseString", Delimiter
         Else
-            AddKeysToDict Sentinels, FalseStrings, False, Err_FalseStrings
+            AddKeysToDict Sentinels, FalseStrings, False, Err_FalseStrings, "FalseString", Delimiter
         End If
     Else
         If Not (IsMissing(TrueStrings) Or IsEmpty(TrueStrings)) Then
@@ -2550,7 +2539,7 @@ End Sub
 ' Purpose    : Broadcast AddKeyToDict over an array of keys.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As Variant, item As Variant, _
-     FriendlyErrorString As String)
+    FriendlyErrorString As String, KeyType As String, Delimiter As String)
 
     Dim i As Long
     Dim j As Long
@@ -2569,14 +2558,17 @@ Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As
     
     Select Case NumDimensions(Keys)
         Case 0
+            ValidateCSVField CStr(Keys), KeyType, Delimiter
             AddKeyToDict Sentinels, Keys, item, FriendlyErrorString
         Case 1
             For i = LBound(Keys) To UBound(Keys)
+                ValidateCSVField CStr(Keys(i)), KeyType, Delimiter
                 AddKeyToDict Sentinels, Keys(i), item, FriendlyErrorString
             Next i
         Case 2
             For i = LBound(Keys, 1) To UBound(Keys, 1)
                 For j = LBound(Keys, 2) To UBound(Keys, 2)
+                    ValidateCSVField CStr(Keys(i, j)), KeyType, Delimiter
                     AddKeyToDict Sentinels, Keys(i, j), item, FriendlyErrorString
                 Next j
             Next i
@@ -3088,12 +3080,12 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     For i = 1 To MinLngs(NumLinesToReturn, NumLinesFound)
         If CallingFromWorksheet Then
             If Lengths(i) > MSLIA Then
-                Err_StringTooLong = "Line " & Format$(i, "#,###") & " of the file is of length " + Format$(Lengths(i), "###,###")
+                Err_StringTooLong = "Line " & Format$(i, "#,###") & " of the file is of length " & Format$(Lengths(i), "###,###")
                 If MSLIA >= 32767 Then
-                    Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " + Format$(MSLIA, "####,####")
+                    Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " & Format$(MSLIA, "####,####")
                 Else
                     Err_StringTooLong = Err_StringTooLong & _
-                        ". An array containing a string longer than " + Format$(MSLIA, "###,###") + _
+                        ". An array containing a string longer than " & Format$(MSLIA, "###,###") & _
                         " cannot be returned from VBA to an Excel worksheet"
                 End If
                 Throw Err_StringTooLong
@@ -3494,7 +3486,7 @@ Public Sub RegisterCSVWrite()
     Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
+    Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3536,12 +3528,10 @@ End Sub
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
-    Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
-    Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
-    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
-    Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
+        Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
+        Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
+        Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
+        Optional TrueString As String = "True", Optional FalseString As String = "False") As String
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3562,11 +3552,15 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     On Error GoTo ErrHandler
     
-    Select Case UCase$(Encoding)
-        Case "ANSI", "UTF-8", "UTF-16"
-        Case Else
-            Throw Err_Encoding
-    End Select
+    WriteToFile = Len(FileName) > 0
+    
+    If WriteToFile Then
+        Select Case UCase$(Encoding)
+            Case "ANSI", "UTF-8", "UTF-16"
+            Case Else
+                Throw Err_Encoding
+        End Select
+    End If
     
     ValidateTrueAndFalseStrings TrueString, FalseString, Delimiter
 
@@ -3716,8 +3710,6 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ValidateBooleanRepresentation
-' Author     : Philip Swannell
-' Date       : 25-Oct-2022
 ' Purpose    : Stop the user from making bad choices for either TrueString or FalseString, e.g: strings that would be
 '              interpreted as (the wrong) Boolean, or as numbers, dates or empties, strings containing line feed
 '              characters, containing the delimiter etc.
@@ -3765,6 +3757,69 @@ Const DQ = """"
     Next
 
 End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ValidateCSVField
+' Purpose    : Throw an error if FieldValue could not be a field of a CSV file, e.g. contains a line feed character but
+'              does not start and end with double quotes.
+' Parameters :
+'  FieldValue : The field value to be validated
+'  FieldName  : The name of the field - used for constructing the error description
+'  Delimiter: The delimiter in use in the CSV
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub ValidateCSVField(FieldValue As String, FieldName As String, Delimiter As String)
+
+    Const DQ = """"
+    Dim HasDelim As Boolean
+    Dim HasCR As Boolean
+    Dim HasLF As Boolean
+    Dim HasDQ As Boolean
+    Dim DQsGood As Boolean
+    Dim InnerPart As String
+
+    On Error GoTo ErrHandler
+    If Len(Delimiter) > 0 Then
+        HasDelim = InStr(FieldValue, Delimiter) > 0
+    End If
+    HasCR = InStr(FieldValue, vbCr) > 0
+    HasLF = InStr(FieldValue, vbLf) > 0
+    HasDQ = InStr(FieldValue, DQ) > 0
+
+    If Not (HasDelim Or HasCR Or HasLF Or HasDQ) Then
+        Exit Sub
+    End If
+
+    If HasDQ Then
+        DQsGood = True
+        If Left$(FieldValue, 1) <> DQ Then
+            DQsGood = False
+        ElseIf Right$(FieldValue, 1) <> DQ Then
+            DQsGood = False
+        Else
+            If Len(FieldValue) < 2 Then
+                DQsGood = False
+            Else
+                InnerPart = Mid$(FieldValue, 2, Len(FieldValue) - 2)
+                If InStr(InnerPart, DQ) > 0 Then
+                    If Len(Replace(InnerPart, DQ & DQ, "")) <> Len(Replace(InnerPart, DQ, "")) Then
+                        DQsGood = False
+                    End If
+                End If
+            End If
+        End If
+    End If
+
+    If HasCR Or HasLF Or HasDelim Or HasDQ Then
+        If Not DQsGood Then
+            Throw "Got '" & Replace(Replace(FieldValue, vbCr, "<CR>"), vbLf, "<LF>") & "' as " & _
+                FieldName & ", but that cannot be a field in a CSV file, since it is not correctly quoted"
+        End If
+    End If
+
+    Exit Sub
+ErrHandler:
+    Throw "#ValidateCSVField: " & Err.Description & "!"
+End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : OStoEOL

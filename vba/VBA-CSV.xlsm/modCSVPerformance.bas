@@ -87,8 +87,8 @@ Private Sub RunSpeedTests()
     
     Set ws = ActiveSheet
     
-    Prompt = "Run Speed tests?" + vbLf + vbLf + _
-        "Note this will generate approx 227MB of files in folder" + vbLf + _
+    Prompt = "Run Speed tests?" & vbLf & vbLf & _
+        "Note this will generate approx 227MB of files in folder" & vbLf & _
         Environ$("Temp") & "\VBA-CSV\Performance"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
@@ -100,9 +100,9 @@ Private Sub RunSpeedTests()
     'Julia results file created by Julia function benchmark. See julia/benchmarkCSV.jl
     
     NumColsInTFPRet = ws.Range("ParserNames").Columns.count * 2 + 2
-    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "julia\juliaparsetimes.csv"
+    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & "julia\juliaparsetimes.csv"
     If Not FileExists(JuliaResultsFile) Then
-        Throw "Cannot find file '" + JuliaResultsFile + "'"
+        Throw "Cannot find file '" & JuliaResultsFile & "'"
     End If
     
     For Each N In ws.Names
@@ -132,7 +132,7 @@ Private Sub RunSpeedTests()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#RunSpeedTests (line " & CStr(Erl) + "): " & Err.Description & "!", vbCritical
+    MsgBox "#RunSpeedTests (line " & CStr(Erl) & "): " & Err.Description & "!", vbCritical
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -176,7 +176,7 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
         Overhead = (ElapsedTime() - t1) / 100000
     End If
     
-    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "julia\juliaparsetimes.csv"
+    JuliaResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & "julia\juliaparsetimes.csv"
     
     JuliaResults = ThrowIfError(CSVRead(JuliaResultsFile, True))
     
@@ -266,7 +266,7 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
             timeTaken = timeTaken * NumCalls
             On Error GoTo ErrHandler
         Else
-            Throw "Unrecognised element of ParserNames: " + CStr(ParserNames(1, j))
+            Throw "Unrecognised element of ParserNames: " & CStr(ParserNames(1, j))
         End If
         On Error Resume Next
         Ret(1, j) = (timeTaken / NumCalls) - Overhead
@@ -281,7 +281,7 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
 
     Exit Function
 ErrHandler:
-    TimeParsers = "#TimeParsers (line " & CStr(Erl) + "): " & Err.Description & "!"
+    TimeParsers = "#TimeParsers (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
 Sub AddChartsNoExport()
@@ -290,7 +290,7 @@ Sub AddChartsNoExport()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#AddChartsNoExport (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MsgBox "#AddChartsNoExport (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Sub AddCharts(Optional Export As Boolean = True)
@@ -345,7 +345,7 @@ Sub AddCharts(Optional Export As Boolean = True)
 
     Exit Sub
 ErrHandler:
-    MsgBox "#AddCharts (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MsgBox "#AddCharts (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 Private Function NameRefersToRange(N As Name) As Boolean
@@ -367,7 +367,7 @@ Sub AddChartAtSelection()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#AddChartAtSelection (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MsgBox "#AddChartAtSelection (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -379,10 +379,10 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
 
     Dim ChartsInCol As String
     
-    Const Err_BadSelection As String = "That selection does not look correct." + vbLf + vbLf + _
-        "Select two areas to define the data to plot. The first area should contain " + _
-        "the independent data and have a single column with top cell giving the x axis " + _
-        "label. The second area should contain the dependent data with one column per data " + _
+    Const Err_BadSelection As String = "That selection does not look correct." & vbLf & vbLf & _
+        "Select two areas to define the data to plot. The first area should contain " & _
+        "the independent data and have a single column with top cell giving the x axis " & _
+        "label. The second area should contain the dependent data with one column per data " & _
         "series and top row giving the series names. Both areas should have the same number of rows"
         
     Dim ch As Chart
@@ -436,7 +436,7 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
     ch.Axes(xlValue, xlPrimary).HasTitle = True
     ch.Axes(xlValue, xlPrimary).AxisTitle.text = "Seconds to read. Log Scale"
     ch.Axes(xlCategory).HasTitle = True
-    ch.Axes(xlCategory).AxisTitle.text = xData.Cells(1, 1).value + ". Log Scale"
+    ch.Axes(xlCategory).AxisTitle.text = xData.Cells(1, 1).value & ". Log Scale"
     ch.ChartTitle.Caption = Title
     With xData
         ch.Axes(xlCategory).MinimumScale = .Cells(2, 1).value
@@ -453,13 +453,13 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
         Dim FileName As String
         Dim Folder As String
         FileName = Replace(TitleCell.Offset(-1).value, " ", "_")
-        Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + "images\"
+        Folder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & "images\"
         ch.Export Folder + FileName
     End If
 
     Exit Sub
 ErrHandler:
-    Throw "#AddChart (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#AddChart (line " & CStr(Erl) & "): " & Err.Description & "!"
 
 End Sub
 

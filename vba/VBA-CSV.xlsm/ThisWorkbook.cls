@@ -16,5 +16,5 @@ Private Sub Workbook_Open()
 
     Exit Sub
 ErrHandler:
-    Throw "#Workbook_Open (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#Workbook_Open (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub

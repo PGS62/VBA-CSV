@@ -60,7 +60,7 @@ Sub TestAgainstRDatasets()
     
     Dim ResultsFile As String
     
-    ResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) + _
+    ResultsFile = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & _
         "testresults\SpeedTestRDatasets.csv"
     
     Dim CSVResult As Variant
@@ -87,12 +87,12 @@ Sub TestAgainstRDatasets()
 
     For i = LBound(Files) To UBound(Files)
         FileName = DatasetsFolder & Files(i)
-        If Not FileExists(FileName) Then Throw "Cannot find file '" + FileName + "'"
+        If Not FileExists(FileName) Then Throw "Cannot find file '" & FileName & "'"
     Next
 
     For i = LBound(Files) To UBound(Files)
         FileName = DatasetsFolder & Files(i)
-        If Not FileExists(FileName) Then Throw "Cannot find file '" + FileName + "'"
+        If Not FileExists(FileName) Then Throw "Cannot find file '" & FileName & "'"
         t1 = ElapsedTime()
         CSVResult = CSVRead(FileName)
         t2 = ElapsedTime()
@@ -118,7 +118,7 @@ Sub TestAgainstRDatasets()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#TestAgainstRDatasets (line " & CStr(Erl) + "): " & Err.Description & "!"
+    MsgBox "#TestAgainstRDatasets (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
 
