@@ -167,6 +167,17 @@ The return from `CSVRead` is an array with lower bounds of one. If you prefer ar
 ### Excel limits on string length
 There is a [limit](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) on the total number of characters that an Excel cell can contain of 32,767. Therefore, when `CSVWrite` is called from a worksheet formula with the `FileName` argument omitted, the function will return an error string if the return would otherwise be longer than 32,767 characters. Similarly `CSVRead`, when called from a worksheet formula, will return an error string if any individual field to be returned is longer than 32,767.
 
+### Providing Help
+There are two ways to provide help to those using `CSVRead` and `CSVWrite` from a spreadsheet:
+ 1. Register the functions with the Excel Function Wizard. To do so, add the code below to the `ThisWorkbook` class module of the workbook which contains `modCSVReadWrite`.
+ ```
+Private Sub Workbook_Open()
+    RegisterCSVRead
+    RegisterCSVWrite
+End Sub
+```
+2. Alternatively, (or in addition) install [Excel-DNA Intellisense](https://github.com/Excel-DNA/IntelliSense) and copy the worksheet `_Intellisense_` from `VBA-CSV-Intellisense.xlsx` (in the [latest release](https://github.com/PGS62/VBA-CSV/releases)) into the workbook which contains `modCSVReadWrite`.
+
 # Performance
 On a test machine<sup>[3](#myfootnote3)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
 
