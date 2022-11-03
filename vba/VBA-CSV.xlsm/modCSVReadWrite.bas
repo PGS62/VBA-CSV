@@ -3570,10 +3570,10 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
         Throw Err_Delimiter
     End If
     
-    If DateFormat = "" Then
+    If DateFormat = "" Or UCase(DateFormat) = "ISO" Then
         'Avoid DateFormat being the null string as that would make CSVWrite's _
          behaviour depend on Windows locale (via calls to Format$ in function Encode).
-        DateFormat = "YYYY-MM-DD"
+        DateFormat = "yyyy-mm-dd"
     End If
     
     Select Case UCase$(DateTimeFormat)

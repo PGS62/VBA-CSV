@@ -48,22 +48,23 @@ Public Sub RoundTripTest()
     Folder = Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     Prompt = "Run Round Trip Tests?" & vbLf & vbLf & _
-        "Note this will generate 5,346 files in folder" & vbLf & _
+        "Note this will generate 3,312 files in folder" & vbLf & _
         Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
 
     ThrowIfError CreatePath(Folder)
     
-    DateFormats = Array("mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd", "mmm/dd/yyyy", "dd/mmm/yyyy", "yyyy/mm/dd", "mmm dd yyyy", "dd mmm yyyy", "yyyy mm dd")
-
+    DateFormats = Array("ISO", "mmm-dd-yyyy", "dd-mmm-yyyy", "yyyy-mm-dd", "mmm/dd/yyyy", _
+        "dd/mmm/yyyy", "yyyy/mm/dd", "mmm dd yyyy", "dd mmm yyyy", "yyyy mm dd")
+    
     For Each OS In Array("Windows", "Unix", "Mac")
         EOL = IIf(OS = "Windows", vbCrLf, IIf(OS = "Unix", vbLf, vbCr))
     
         For Each Encoding In Array("ANSI", "UTF-8", "UTF-16")
             For Each Delimiter In Array(",", "::::")
-                For Each NRows In Array(1, 2, 20)
-                    For Each NCols In Array(1, 2, 10)
+                For Each NRows In Array(1, 5)
+                    For Each NCols In Array(1, 5)
         
                         'For Variants we need to vary AllowLineFeed and DateFormat
                         For Each AllowLineFeed In Array(True, False)
@@ -80,6 +81,14 @@ Public Sub RoundTripTest()
                             Data = RandomDates(CLng(NRows), CLng(NCols))
                             NumTests = NumTests + 1
                             ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDates"
+                            RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CStr(Encoding), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
+                        Next DateFormat
+                        
+                        'Test DateTimes, RoundTripTestCore appends " hh:mm:ss" to DateFormat to get DateTimeFormat which is passed to CSVWrite
+                        For Each DateFormat In DateFormats
+                            Data = RandomDateTimes(CLng(NRows), CLng(NCols))
+                            NumTests = NumTests + 1
+                            ExtraInfo = "Test " & CStr(NumTests) & " " & "RandomDateTimes"
                             RoundTripTestCore Folder, CStr(OS), Data, CStr(DateFormat), CStr(Encoding), CStr(OS), CStr(Delimiter), ExtraInfo, WhatDiffers, NumPassed, NumFailed
                         Next DateFormat
 
@@ -150,6 +159,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     Dim NC As Long
     Dim NR As Long
     Dim NumDone As Long
+    Dim DateTimeFormat As String
     
     On Error GoTo ErrHandler
     
@@ -159,8 +169,14 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     NC = NCols(Data)
 
     FileName = NameThatFile(Folder, OS, NR, NC, ExtraInfo, Encoding, False)
+    
+    If DateFormat = "ISO" Then
+        DateTimeFormat = "ISO"
+    Else
+        DateTimeFormat = DateFormat & " hh:mm:ss"
+    End If
 
-    ThrowIfError CSVWrite(Data, FileName, True, DateFormat, , Delimiter, Encoding, EOL)
+    ThrowIfError CSVWrite(Data, FileName, True, DateFormat, DateTimeFormat, Delimiter, Encoding, EOL)
 
     'The Call to CSVRead has to infer both Encoding and EOL
     DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
@@ -337,12 +353,45 @@ ErrHandler:
     Throw "#RandomBooleans: " & Err.Description & "!"
 End Function
 
+Private Function RandomDateTime() As Date
+    'Random datetime in range 1 Jan 1970 to 1 Jan 2070, with 1 second resolution
+
+    On Error GoTo ErrHandler
+    RandomDateTime = CDate(Format(CLng(RandomDate) + Rnd(), "dd-mmm-yyyy hh:mm:ss"))
+
+    Exit Function
+ErrHandler:
+    Throw "#RandomDateTime (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Function
+
+
 Private Function RandomDate() As Date
     On Error GoTo ErrHandler
     RandomDate = CDate(CLng(25569 + Rnd() * 36525)) 'Date in range 1 Jan 1970 to 1 Jan 2070
     Exit Function
 ErrHandler:
     Throw "#RandomDate: " & Err.Description & "!"
+End Function
+
+Private Function RandomDateTimes(NumRows As Long, NumCols As Long)
+    
+    Dim i As Long
+    Dim j As Long
+    Dim Result() As Date
+    
+    On Error GoTo ErrHandler
+    
+    ReDim Result(1 To NumRows, 1 To NumCols)
+    For i = 1 To NumRows
+        For j = 1 To NumCols
+            Result(i, j) = RandomDateTime()
+        Next j
+    Next i
+    RandomDateTimes = Result
+    Exit Function
+    
+ErrHandler:
+    Throw "#RandomDateTimes: " & Err.Description & "!"
 End Function
 
 Private Function RandomDates(NumRows As Long, NumCols As Long)
