@@ -15,7 +15,7 @@ Function CodeToRegister(FunctionName, Description As String, ArgDescs)
 
     On Error GoTo ErrHandler
 
-    If Len(Description) > 255 Then Throw "Description " + CStr(i) + " is of length " + CStr(Len(Description)) + " but must be of length 255 or less."
+    If Len(Description) > 255 Then Throw "Description " & CStr(i) & " is of length " & CStr(Len(Description)) & " but must be of length 255 or less."
     
     code = code & "' " & String(119, "-") & vbLf
     code = code & "' Procedure  : Register" & FunctionName & vbLf
@@ -23,25 +23,25 @@ Function CodeToRegister(FunctionName, Description As String, ArgDescs)
     code = code & "'              WorkBook_Open event." & vbLf
     code = code & "' " & String(119, "-") & vbLf
 
-    code = code & "Public Sub Register" + FunctionName + "()" + vbLf
-    code = code + "    Const Description As String = " + InsertBreaksInStringLiteral(DQ + Replace(Description, DQ, DQ + DQ) + DQ, 34) + vbLf
-    code = code + "    Dim " + "ArgDescs() As String" + vbLf + vbLf
-    code = code + "    On Error GoTo ErrHandler" + vbLf + vbLf
+    code = code & "Public Sub Register" & FunctionName & "()" & vbLf
+    code = code & "    Const Description As String = " & InsertBreaksInStringLiteral(DQ & Replace(Description, DQ, DQ & DQ) & DQ, 34) & vbLf
+    code = code & "    Dim " & "ArgDescs() As String" & vbLf & vbLf
+    code = code & "    On Error GoTo ErrHandler" & vbLf & vbLf
     
-    code = code + "    ReDim " + "ArgDescs(" + CStr(LBound(ArgDescs, 1)) + " To " & CStr(UBound(ArgDescs, 1)) + ")" + vbLf
+    code = code & "    ReDim " & "ArgDescs(" & CStr(LBound(ArgDescs, 1)) & " To " & CStr(UBound(ArgDescs, 1)) & ")" & vbLf
 
     For i = LBound(ArgDescs, 1) To UBound(ArgDescs, 1)
-        If Len(ArgDescs(i, 1)) > 255 Then Throw "ArgDescs element " + CStr(i) + " is of length " + CStr(Len(ArgDescs(i, 1))) + " but must be of length 255 or less."
-        code = code + "    " + "ArgDescs(" & CStr(i) & ") = " & InsertBreaksInStringLiteral(DQ + Replace(ArgDescs(i, 1), DQ, DQ + DQ) + DQ, IIf(i < 10, 18, 19)) + vbLf
+        If Len(ArgDescs(i, 1)) > 255 Then Throw "ArgDescs element " & CStr(i) & " is of length " & CStr(Len(ArgDescs(i, 1))) & " but must be of length 255 or less."
+        code = code & "    " & "ArgDescs(" & CStr(i) & ") = " & InsertBreaksInStringLiteral(DQ & Replace(ArgDescs(i, 1), DQ, DQ & DQ) & DQ, IIf(i < 10, 18, 19)) & vbLf
     Next i
 
-    code = code + "    Application.MacroOptions """ + FunctionName + """, Description, , , , , , , , , ArgDescs" + vbLf
+    code = code & "    Application.MacroOptions """ & FunctionName & """, Description, , , , , , , , , ArgDescs" & vbLf
     
-    code = code + "    Exit Sub" & vbLf + vbLf
+    code = code & "    Exit Sub" & vbLf & vbLf
     
-    code = code + "ErrHandler:" + vbLf
-    code = code + "    Debug.Print ""Warning: Registration of function " + FunctionName + " failed with error: "" + Err.Description" + vbLf
-    code = code + "End Sub"
+    code = code & "ErrHandler:" & vbLf
+    code = code & "    Debug.Print ""Warning: Registration of function " & FunctionName & " failed with error: "" & Err.Description" & vbLf
+    code = code & "End Sub"
 
     CodeToRegister = Application.WorksheetFunction.Transpose(VBA.Split(code, vbLf))
 

@@ -167,6 +167,8 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
     Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
     Optional ByRef HeaderRow As Variant) As Variant
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -548,8 +550,8 @@ Public Sub RegisterCSVRead()
     ReDim ArgDescs(1 To 19)
     ArgDescs(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV " & _
                   "format."
-    ArgDescs(2) = "Type conversion: Boolean or string, subset of letters NDBETQ. N = convert Numbers, D = convert " & _
-                  "Dates, B = Convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = " & _
+    ArgDescs(2) = "Type conversion: Boolean or string. Allowed letters NDBETQ. N = convert Numbers, D = convert " & _
+                  "Dates, B = convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = " & _
                   "quoted fields also converted. TRUE = NDB, FALSE = no conversion."
     ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found " & _
                   "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
