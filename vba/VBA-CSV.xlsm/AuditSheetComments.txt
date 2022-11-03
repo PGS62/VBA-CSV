@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+170	03-Nov-2022	19:29	Philip Swannell	Bumped version to v0.20
 169	03-Nov-2022	18:59	Philip Swannell	Removed breakpoint, removed declared but unused variables.
 168	03-Nov-2022	18:25	Philip Swannell	Method InferDelimiter could fail for UTF-8 and UTF-16 files (the BOM was being read as part of the file's contents). Fixed this.
 167	03-Nov-2022	16:43	Philip Swannell	Improved method InferDelimiter to avoid interpreting the colon inside a date-with-time field as the file delimiter.
