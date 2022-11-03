@@ -300,7 +300,7 @@ Public Function CSVsubsetSplit(FilePath As String, _
         If LenB(Dir(outputPath, vbDirectory)) = 0 Then
             MkDir outputPath
         End If
-        Do While Not CSVstream.atEndOfStream
+        Do While Not CSVstream.AtEndOfStream
             CSVstream.ReadText 'Read next CSV data chunk
             Set curItems = CSVreader.ImportFromCSVString(CSVstream.bufferString, readerConf).Items
             If Not fileCreatedFlag Then
@@ -686,7 +686,7 @@ Public Function GetCSVsubset(FilePath As String, _
                     filteredRecords.Add curItems(gssCounter) 'Append data
                 End If
             Next gssCounter
-            Do While Not StreamReader.atEndOfStream
+            Do While Not StreamReader.AtEndOfStream
                 StreamReader.ReadText 'Read next CSV data chunk
                 Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).Items
                 For gssCounter = 0 To curItems.count - 1
@@ -890,7 +890,7 @@ Public Function GetRecord() As ECPArrayList
                                     With static_CSVstream
                                         .ReadText
                                         static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                                        static_StreamEnd = .atEndOfStream
+                                        static_StreamEnd = .AtEndOfStream
                                         If static_UseUnixEscapeSeq Then
                                             static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
                                                                     static_UnixEscapeSeq, static_EscapeSequence), static_RecordDelimiter)
@@ -1032,7 +1032,7 @@ Public Function GetRecord() As ECPArrayList
                                 With static_CSVstream
                                     .ReadText
                                     static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                                    static_StreamEnd = .atEndOfStream
+                                    static_StreamEnd = .AtEndOfStream
                                     If static_UseUnixEscapeSeq Then
                                         static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
                                                                 static_UnixEscapeSeq, static_EscapeSequence), static_RecordDelimiter)
@@ -1115,7 +1115,7 @@ Public Function GetRecord() As ECPArrayList
                         With static_CSVstream
                             .ReadText
                             static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                            static_StreamEnd = .atEndOfStream
+                            static_StreamEnd = .AtEndOfStream
                             If static_UseUnixEscapeSeq Then
                                 static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, static_UnixEscapeSeq, _
                                                 static_EscapeSequence), static_RecordDelimiter)
@@ -1182,7 +1182,7 @@ Public Function GetRecord() As ECPArrayList
             With static_CSVstream
                 .ReadText
                 static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                static_StreamEnd = .atEndOfStream
+                static_StreamEnd = .AtEndOfStream
                 If static_UseUnixEscapeSeq Then
                     static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
                                             static_UnixEscapeSeq, static_EscapeSequence), static_RecordDelimiter)
@@ -1753,7 +1753,7 @@ Private Sub LoadNewStream()
     With CSVstream
         .ReadText
         StreamWithQuotes = InStrB(1, .bufferString, EscapeChr)
-        StreamEnd = .atEndOfStream
+        StreamEnd = .AtEndOfStream
         If UseUnixEscapeSeq Then
             tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, UnixEscapeSeq, _
                                 EscapeSequence), RecordDelimiter)
@@ -1946,7 +1946,7 @@ Public Sub OpenSeqReader(configObj As parserConfig, _
     With static_CSVstream
         .ReadText
         static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-        static_StreamEnd = .atEndOfStream
+        static_StreamEnd = .AtEndOfStream
     End With
     '@----------------------------------------------------------------------------
     'Ensuring the stream is sufficient enough to hold at least one CSV line
@@ -1957,7 +1957,7 @@ Public Sub OpenSeqReader(configObj As parserConfig, _
             .RestartPointer
             .ReadText
             static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-            static_StreamEnd = .atEndOfStream
+            static_StreamEnd = .AtEndOfStream
         Loop
         If static_UseUnixEscapeSeq Then
             static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
@@ -2698,7 +2698,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
     With CSVstream
         .ReadText
         StreamWithQuotes = InStrB(1, .bufferString, EscapeChr)
-        StreamEnd = .atEndOfStream
+        StreamEnd = .AtEndOfStream
     End With
     '@----------------------------------------------------------------------------
     'Ensuring the stream is sufficient enough to hold at least one CSV line
@@ -2709,7 +2709,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
             .RestartPointer
             .ReadText
             StreamWithQuotes = InStrB(1, .bufferString, EscapeChr)
-            StreamEnd = .atEndOfStream
+            StreamEnd = .AtEndOfStream
         Loop
         If UseUnixEscapeSeq Then
             tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, UnixEscapeSeq, EscapeSequence), RecordDelimiter)
@@ -3100,7 +3100,7 @@ AdvanceLine:
             If UnwantedLine Then
                 idx = idx + 1&
                 If idx > MaxIdx Then
-                    If Not Ostream.atEndOfStream Then
+                    If Not Ostream.AtEndOfStream Then
                         '@----------------------------------------------
                         'Advance stream
                         With Ostream
@@ -3124,7 +3124,7 @@ AdvanceLine:
             End If
         Loop While UnwantedLine And idx <= MaxIdx
     Else
-        If Not Ostream.atEndOfStream Then
+        If Not Ostream.AtEndOfStream Then
             '@----------------------------------------------
             'Advance stream
             Ostream.ReadText

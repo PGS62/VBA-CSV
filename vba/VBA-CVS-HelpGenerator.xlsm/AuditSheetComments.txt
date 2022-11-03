@@ -1,5 +1,6 @@
 Version	Date	Time	Author	Comment
-19	03-Nov-2022	09:59	Philip Swannell	Tweask to method CodeToRegister.
+20	03-Nov-2022	16:39	Philip Swannell	Updated help for Delimiter argument to CSVRead.
+19	03-Nov-2022	09:59	Philip Swannell	Tweak to method CodeToRegister.
 18	03-Nov-2022	09:38	Philip Swannell	Tweaks to help text
 17	02-Nov-2022	19:21	Philip Swannell	Changed help for EOL argument to CSVWrite.
 16	31-Oct-2022	16:12	Philip Swannell	Changes to code that creates the intellisense workbook.

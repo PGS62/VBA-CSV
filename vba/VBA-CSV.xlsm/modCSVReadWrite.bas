@@ -94,8 +94,9 @@ End Enum
 '             `Array(Array(0,"N"),Array(3,""),Array("Phone",""))` to convert all numbers in a file into
 '             numbers in the return except for those in column 3 and in the column(s) headed "Phone".
 ' Delimiter : By default, CSVRead will try to detect a file's delimiter as the first instance of comma, tab,
-'             semi-colon, colon or pipe found outside quoted regions in the first 10,000 characters of the
-'             file. If it can't auto-detect the delimiter, it will assume comma. If your file includes a
+'             semi-colon, colon or pipe found in the first 10,000 characters of the file, searching only
+'             outside of quoted regions and outside of date-with-time fields (since these contain colons).
+'             If it can't auto-detect the delimiter, it will assume comma. If your file includes a
 '             different character or string delimiter you should pass that as the Delimiter argument.
 '
 '             Alternatively, enter `FALSE` as the delimiter to treat the file as "not a delimited file". In
@@ -141,7 +142,7 @@ End Enum
 '             the value of ShowMissingsAs. Likewise, if NumCols is greater than the number of columns in
 '             the file.
 ' Encoding  : Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be
-'             omitted and CSVRead will detect the file's encoding. If auto-detection does not work then
+'             omitted and CSVRead will detect the file's encoding. If auto-detection does not work, then
 '             it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte option mark to
 '             identify the encoding. Experiment with Encoding as each of `UTF-8` and `UTF-16`.
 ' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
@@ -241,7 +242,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim TempFile As String
     Dim TrimFields As Boolean
     Dim TriState As Long
-    Dim useADODB As Boolean
+    Dim UseADODB As Boolean
     
     On Error GoTo ErrHandler
 
@@ -256,7 +257,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     'Parse and validate inputs...
     If SourceType <> st_String Then
-        ParseEncoding FileName, Encoding, TriState, CharSet, useADODB
+        ParseEncoding FileName, Encoding, TriState, CharSet, UseADODB
     End If
 
     If VarType(Delimiter) = vbBoolean Then
@@ -267,14 +268,14 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         End If
     ElseIf VarType(Delimiter) = vbString Then
         If Len(Delimiter) = 0 Then
-            strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator)
+            strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator, UseADODB, CharSet)
         ElseIf Left$(Delimiter, 1) = DQ Or Left$(Delimiter, 1) = vbLf Or Left$(Delimiter, 1) = vbCr Then
             Throw Err_Delimiter2
         Else
             strDelimiter = Delimiter
         End If
     ElseIf IsEmpty(Delimiter) Or IsMissing(Delimiter) Then
-        strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator)
+        strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator, UseADODB, CharSet)
     Else
         Throw Err_Delimiter
     End If
@@ -330,20 +331,20 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     
     If NotDelimited Then
         HeaderRow = Empty
-        CSVRead = ParseTextFile(FileName, SourceType <> st_String, useADODB, CharSet, TriState, SkipToRow, NumRows, CallingFromWorksheet)
+        CSVRead = ParseTextFile(FileName, SourceType <> st_String, UseADODB, CharSet, TriState, SkipToRow, NumRows, CallingFromWorksheet)
         Exit Function
     End If
           
     If SourceType = st_String Then
         CSVContents = FileName
         
-        ParseCSVContents CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+        ParseCSVContents CSVContents, UseADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
             IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, _
             NumFields, Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
     Else
         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             
-        If useADODB Then
+        If UseADODB Then
             Set Stream = CreateObject("ADODB.Stream")
             Stream.CharSet = CharSet
             Stream.Open
@@ -351,18 +352,18 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             If Stream.EOS Then Throw Err_FileEmpty
         Else
             Set Stream = m_FSO.GetFile(FileName).OpenAsTextStream(ForReading, TriState)
-            If Stream.atEndOfStream Then Throw Err_FileEmpty
+            If Stream.AtEndOfStream Then Throw Err_FileEmpty
         End If
 
         If SkipToRow = 1 And NumRows = 0 Then
             CSVContents = ReadAllFromStream(Stream)
             Stream.Close
             
-            ParseCSVContents CSVContents, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+            ParseCSVContents CSVContents, UseADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                 IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
                 Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
         Else
-            CSVContents = ParseCSVContents(Stream, useADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+            CSVContents = ParseCSVContents(Stream, UseADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                 IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
                 Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow)
             Stream.Close
@@ -800,40 +801,40 @@ End Function
 '  useADODB: Should file be read via ADODB.Stream, which is capable of reading UTF-8 files
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseEncoding(FileName As String, Encoding As Variant, ByRef TriState As Long, _
-    ByRef CharSet As String, ByRef useADODB As Boolean)
+    ByRef CharSet As String, ByRef UseADODB As Boolean)
 
     Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding be " & _
         "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM"""
     
     On Error GoTo ErrHandler
     If IsEmpty(Encoding) Or IsMissing(Encoding) Then
-        DetectEncoding FileName, TriState, CharSet, useADODB
+        DetectEncoding FileName, TriState, CharSet, UseADODB
     ElseIf VarType(Encoding) = vbString Then
         Select Case UCase$(Replace(Replace(Encoding, "-", vbNullString), " ", vbNullString))
             Case "ASCII"
                 CharSet = "ascii" 'not actually relevant, since we won't use ADODB
                 TriState = TristateFalse
-                useADODB = False
+                UseADODB = False
             Case "ANSI"
                 CharSet = "_autodetect_all" 'not actually relevant, since we won't use ADODB
                 TriState = TristateFalse
-                useADODB = False
+                UseADODB = False
             Case "UTF8"
                 CharSet = "utf-8"
                 TriState = TristateFalse
-                useADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
+                UseADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
             Case "UTF8BOM"
                 CharSet = "utf-8"
                 TriState = TristateFalse
-                useADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
+                UseADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
             Case "UTF16"
                 CharSet = "utf-16"
                 TriState = TristateTrue
-                useADODB = False
+                UseADODB = False
             Case "UTF16BOM"
                 CharSet = "utf-16"
                 TriState = TristateTrue
-                useADODB = False
+                UseADODB = False
             Case Else
                 Throw Err_Encoding
         End Select
@@ -1200,7 +1201,7 @@ End Function
 '              to "UTF-8".
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, _
-    ByRef CharSet As String, ByRef useADODB As Boolean)
+    ByRef CharSet As String, ByRef UseADODB As Boolean)
 
     Dim intAsc1Chr As Long
     Dim intAsc2Chr As Long
@@ -1217,19 +1218,19 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, _
 
     ' 1=Read-only, False=do not create if not exist, -1=Unicode 0=ASCII
     Set T = m_FSO.OpenTextFile(FilePath, 1, False, 0)
-    If T.atEndOfStream Then
+    If T.AtEndOfStream Then
         T.Close: Set T = Nothing
         TriState = TristateFalse
         CharSet = "_autodetect_all"
-        useADODB = False
+        UseADODB = False
         Exit Sub
     End If
     intAsc1Chr = Asc(T.Read(1))
-    If T.atEndOfStream Then
+    If T.AtEndOfStream Then
         T.Close: Set T = Nothing
         TriState = TristateFalse
         CharSet = "_autodetect_all"
-        useADODB = False
+        UseADODB = False
         Exit Sub
     End If
     
@@ -1239,14 +1240,14 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, _
         'File is probably encoded UTF-16 LE BOM (little endian, with Byte Option Marker)
         TriState = TristateTrue
         CharSet = "utf-16"
-        useADODB = False
+        UseADODB = False
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
         TriState = TristateTrue
         CharSet = "utf-16"
-        useADODB = False
+        UseADODB = False
     Else
-        If T.atEndOfStream Then
+        If T.AtEndOfStream Then
             TriState = TristateFalse
             Exit Sub
         End If
@@ -1255,12 +1256,12 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, _
             'File is probably encoded UTF-8 with BOM
             CharSet = "utf-8"
             TriState = TristateFalse
-            useADODB = True
+            UseADODB = True
         Else
             'We don't know, assume ANSI but that may be incorrect.
             CharSet = vbNullString
             TriState = TristateFalse
-            useADODB = False
+            UseADODB = False
         End If
     End If
 
@@ -1271,13 +1272,87 @@ ErrHandler:
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : AmendDelimiterIfFirstFieldIsDateTime
+' Purpose    : Subroutine of InferDelimiter. When the first field in a file is a date-with-time this method allows us to
+'              avoid interpreting the colons inside that first field as the file delimiter.
+' Parameters :
+'  FirstChunk: Beginning part of the file.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Sub AmendDelimiterIfFirstFieldIsDateTime(FirstChunk As String, ByRef Delimiter As String)
+
+    Dim DelimAt As Long
+    Dim FirstField As String
+
+    Dim SysDateSeparator As String
+    Dim SysDateOrder As Long
+    Dim DateSeparator As Variant
+    Dim DateOrder As Long
+    Dim i As Long
+    Dim Converted As Boolean
+    Dim DtOut As Date
+    Dim TrialDelim As Variant
+    
+    On Error GoTo ErrHandler
+    For Each TrialDelim In Array(",", vbTab, "|", ";", vbCr, vbLf)
+        DelimAt = InStr(FirstChunk, CStr(TrialDelim))
+        If DelimAt > 0 Then
+            FirstField = Left$(FirstChunk, DelimAt - 1)
+            If InStr(FirstField, "-") > 0 Or InStr(FirstField, "/") > 0 Or InStr(FirstField, " ") > 0 Then
+
+                SysDateOrder = Application.International(xlDateOrder)
+                SysDateSeparator = Application.International(xlDateSeparator)
+
+                For Each DateSeparator In Array("/", "-", " ")
+                    For DateOrder = 0 To 2
+                        CastToDate FirstField, DtOut, DateOrder, CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
+                        If Not Converted Then
+                            CastISO8601 FirstField, DtOut, Converted, True, True
+                        End If
+                        If Converted Then
+                            Select Case TrialDelim
+                                Case vbCr, vbLf
+                                    Delimiter = ","
+                                Case Else
+                                    Delimiter = TrialDelim
+                            End Select
+                            Exit Sub
+                        End If
+                    Next DateOrder
+                Next
+            End If
+        End If
+    Next TrialDelim
+    
+    Exit Sub
+ErrHandler:
+    Throw "#AmendDelimiterIfFirstFieldIsDateTime (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Function AtEndOfStream(Stream As Object, UseADODB As Boolean)
+    If UseADODB Then
+        AtEndOfStream = Stream.EOS
+    Else
+        AtEndOfStream = Stream.AtEndOfStream
+    End If
+End Function
+
+Private Function ReadFromStream(Stream As Object, Characters As Long, UseADODB As Boolean)
+    If UseADODB Then
+        ReadFromStream = Stream.ReadText(Characters)
+    Else
+        ReadFromStream = Stream.Read(Characters)
+    End If
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : InferDelimiter
 ' Purpose    : Infer the delimiter in a file by looking for first occurrence outside quoted regions of comma, tab,
 '              semi-colon, colon or pipe (|). Only look in the first 10,000 characters, Would prefer to look at the first
 '              10 lines, but that presents a problem for files with Mac line endings as T.ReadLine doesn't work for them.
+'              But see also sub-routine AmendDelimiterIfFirstFieldIsDateTime.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As String, _
-     TriState As Long, DecimalSeparator As String) As String
+    TriState As Long, DecimalSeparator As String, UseADODB As Boolean, CharSet As String) As String
     
     Const CHUNK_SIZE As Long = 1000
     Const Err_SourceType As String = "Cannot infer delimiter directly from URL"
@@ -1290,26 +1365,29 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
     Dim i As Long
     Dim j As Long
     Dim MaxChars As Long
-    Dim T As TextStream
+    Dim Stream As Object
+    Const Err_FileEmpty As String = "File is empty"
 
     On Error GoTo ErrHandler
-
-    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
 
     EvenQuotes = True
     If st = st_File Then
 
-        Set F = m_FSO.GetFile(FileNameOrContents)
-        Set T = F.OpenAsTextStream(ForReading, TriState)
-
-        If T.atEndOfStream Then
-            T.Close: Set T = Nothing: Set F = Nothing
-            Throw "File is empty"
+        If UseADODB Then
+            Set Stream = CreateObject("ADODB.Stream")
+            Stream.CharSet = CharSet
+            Stream.Open
+            Stream.LoadFromFile FileNameOrContents
+            If Stream.EOS Then Throw Err_FileEmpty
+        Else
+            If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+            Set Stream = m_FSO.GetFile(FileNameOrContents).OpenAsTextStream(ForReading, TriState)
+            If Stream.AtEndOfStream Then Throw Err_FileEmpty
         End If
 
-        Do While Not T.atEndOfStream And j <= MAX_CHUNKS
+        Do While Not AtEndOfStream(Stream, UseADODB) And j <= MAX_CHUNKS
             j = j + 1
-            Contents = T.Read(CHUNK_SIZE)
+            Contents = ReadFromStream(Stream, CHUNK_SIZE, UseADODB)
             For i = 1 To Len(Contents)
                 Select Case Mid$(Contents, i, 1)
                     Case QuoteChar
@@ -1318,14 +1396,19 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
                         If EvenQuotes Then
                             If Mid$(Contents, i, 1) <> DecimalSeparator Then
                                 InferDelimiter = Mid$(Contents, i, 1)
-                                T.Close: Set T = Nothing: Set F = Nothing
+                                If InferDelimiter = ":" Then
+                                    If j = 1 Then
+                                        AmendDelimiterIfFirstFieldIsDateTime Contents, InferDelimiter
+                                    End If
+                                End If
+                                Stream.Close: Set Stream = Nothing: Set F = Nothing
                                 Exit Function
                             End If
                         End If
                 End Select
             Next i
         Loop
-        T.Close
+        Stream.Close
     ElseIf st = st_String Then
         Contents = FileNameOrContents
         MaxChars = MAX_CHUNKS * CHUNK_SIZE
@@ -1339,6 +1422,11 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
                     If EvenQuotes Then
                         If Mid$(Contents, i, 1) <> DecimalSeparator Then
                             InferDelimiter = Mid$(Contents, i, 1)
+                            If InferDelimiter = ":" Then
+                                If i < 100 Then
+                                    AmendDelimiterIfFirstFieldIsDateTime Contents, InferDelimiter
+                                End If
+                            End If
                             Exit Function
                         End If
                     End If
@@ -1361,9 +1449,9 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
     Exit Function
 ErrHandler:
     CopyOfErr = "#InferDelimiter: " & Err.Description & "!"
-    If Not T Is Nothing Then
-        T.Close
-        Set T = Nothing: Set F = Nothing
+    If Not Stream Is Nothing Then
+        Stream.Close
+        Set Stream = Nothing: Set F = Nothing
     End If
     Throw CopyOfErr
 End Function
@@ -1483,7 +1571,7 @@ End Sub
 '  HeaderRow       : Set equal to the contents of the header row in the file, no type conversion, but quoted fields are
 '                    unquoted and leading and trailing spaces are removed.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boolean, QuoteChar As String, _
+Private Function ParseCSVContents(ContentsOrStream As Variant, UseADODB As Boolean, QuoteChar As String, _
      Delimiter As String, Comment As String, IgnoreEmptyLines As Boolean, _
      IgnoreRepeated As Boolean, SkipToRow As Long, HeaderRowNum As Long, NumRows As Long, _
     ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, _
@@ -1567,7 +1655,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
     i = 0: j = 1
     
     If DoSkipping Then
-        SkipLines Streaming, useADODB, Comment, LComment, IgnoreEmptyLines, _
+        SkipLines Streaming, UseADODB, Comment, LComment, IgnoreEmptyLines, _
             Stream, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
     End If
     
@@ -1592,7 +1680,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
                 If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
                 i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
             Else
-                i = SearchInBuffer(SearchFor, i + 1, Stream, useADODB, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
+                i = SearchInBuffer(SearchFor, i + 1, Stream, UseADODB, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
             End If
 
             If i >= BufferUpdatedTo + 1 Then
@@ -1635,7 +1723,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
                     End If
                     
                     If DoSkipping Then
-                        SkipLines Streaming, useADODB, Comment, LComment, IgnoreEmptyLines, Stream, _
+                        SkipLines Streaming, UseADODB, Comment, LComment, IgnoreEmptyLines, Stream, _
                             Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
                     End If
                     
@@ -1708,7 +1796,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, useADODB As Boole
             If Not Streaming Then
                 PosQC = InStr(i + 1, Buffer, QuoteChar)
             Else
-                If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray, i + 1, Stream, useADODB, _
+                If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray, i + 1, Stream, UseADODB, _
                     Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
             End If
             
@@ -1801,12 +1889,12 @@ End Function
 ' Purpose    : Sub-routine of ParseCSVContents. Skip a commented or empty row by incrementing i to the position of
 '              the line feed just before the next not-commented line.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub SkipLines(Streaming As Boolean, useADODB As Boolean, Comment As String, _
+Private Sub SkipLines(Streaming As Boolean, UseADODB As Boolean, Comment As String, _
     LComment As Long, IgnoreEmptyLines As Boolean, Stream As Object, ByVal Delimiter As String, _
     ByRef Buffer As String, ByRef i As Long, QuoteChar As String, ByVal PosLF As Long, ByVal PosCR As Long, _
     ByRef BufferUpdatedTo As Long)
     
-    Dim atEndOfStream As Boolean
+    Dim AtEndOfStream As Boolean
     Dim LookAheadBy As Long
     Dim SkipThisLine As Boolean
     
@@ -1815,12 +1903,12 @@ Private Sub SkipLines(Streaming As Boolean, useADODB As Boolean, Comment As Stri
         If Streaming Then
             LookAheadBy = MaxLngs(LComment, 2)
             If i + LookAheadBy > BufferUpdatedTo Then
-                If useADODB Then
-                    atEndOfStream = Stream.EOS
+                If UseADODB Then
+                    AtEndOfStream = Stream.EOS
                 Else
-                    atEndOfStream = Stream.atEndOfStream
+                    AtEndOfStream = Stream.AtEndOfStream
                 End If
-                If Not atEndOfStream Then
+                If Not AtEndOfStream Then
                     GetMoreFromStream Stream, Delimiter, QuoteChar, Buffer, BufferUpdatedTo
                 End If
             End If
@@ -1868,10 +1956,10 @@ End Sub
 '              SearchFor was the first to be found.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Stream As Object, _
-    useADODB As Boolean, Delimiter As String, QuoteChar As String, ByRef Which As Long, _
+    UseADODB As Boolean, Delimiter As String, QuoteChar As String, ByRef Which As Long, _
     ByRef Buffer As String, ByRef BufferUpdatedTo As Long) As Long
 
-    Dim atEndOfStream As Boolean
+    Dim AtEndOfStream As Boolean
     Dim InstrRes As Long
     Dim PrevBufferUpdatedTo As Long
 
@@ -1883,12 +1971,12 @@ Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Strea
         SearchInBuffer = InstrRes
         Exit Function
     Else
-        If useADODB Then
-            atEndOfStream = Stream.EOS
+        If UseADODB Then
+            AtEndOfStream = Stream.EOS
         Else
-            atEndOfStream = Stream.atEndOfStream
+            AtEndOfStream = Stream.AtEndOfStream
         End If
-        If atEndOfStream Then
+        If AtEndOfStream Then
             SearchInBuffer = BufferUpdatedTo + 1
             Exit Function
         End If
@@ -1973,7 +2061,7 @@ ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
                               just the first line of a file. Suggest 5000? Note that when reading _
                               an entire file (NumRows argument to CSVRead is zero) function _
                               GetMoreFromStream is not called.
-    Dim atEndOfStream As Boolean
+    Dim AtEndOfStream As Boolean
     Dim ExpandBufferBy As Long
     Dim FirstPass As Boolean
     Dim i As Long
@@ -1997,13 +2085,13 @@ ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
     Do
         If IsScripting Then
             NewChars = T.Read(IIf(FirstPass, ChunkSize, 1))
-            atEndOfStream = T.atEndOfStream
+            AtEndOfStream = T.AtEndOfStream
         Else
             NewChars = T.ReadText(IIf(FirstPass, ChunkSize, 1))
-            atEndOfStream = T.EOS
+            AtEndOfStream = T.EOS
         End If
         FirstPass = False
-        If atEndOfStream Then
+        If AtEndOfStream Then
             'Ensure NewChars terminates with vbCrLf
             If Right$(NewChars, 1) <> vbCr And Right$(NewChars, 1) <> vbLf Then
                 NewChars = NewChars & vbCrLf
@@ -2919,7 +3007,7 @@ End Function
 '  SkipToLine         : Return starts at this line of the file.
 '  NumLinesToReturn   : This many lines are returned. Pass zero for all lines from SkipToLine.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, useADODB As Boolean, _
+Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, UseADODB As Boolean, _
      CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long, _
      CallingFromWorksheet As Boolean) As Variant
 
@@ -2947,7 +3035,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     On Error GoTo ErrHandler
     
     If isFile Then
-        If useADODB Then
+        If UseADODB Then
             Set Stream = CreateObject("ADODB.Stream")
             Stream.CharSet = CharSet
             Stream.Open
@@ -2956,7 +3044,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
         Else
             If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             Set Stream = m_FSO.GetFile(FileNameOrContents).OpenAsTextStream(ForReading, TriState)
-            If Stream.atEndOfStream Then Throw Err_FileEmpty
+            If Stream.AtEndOfStream Then Throw Err_FileEmpty
         End If
     
         If NumLinesToReturn = 0 Then
@@ -3007,7 +3095,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
                 i = PosLF
             End If
         Else
-            i = SearchInBuffer(SearchFor, i + 1, Stream, useADODB, vbNullString, _
+            i = SearchInBuffer(SearchFor, i + 1, Stream, UseADODB, vbNullString, _
                 vbNullString, Which, Buffer, BufferUpdatedTo)
             FoundCR = (Which = 2)
         End If

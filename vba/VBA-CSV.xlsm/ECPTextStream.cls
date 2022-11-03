@@ -79,8 +79,8 @@ End Enum
 '////////////////////////////////////////////////////////////////////////////////////////////
 '#
 ' PROPERTIES:
-Public Property Get atEndOfStream() As Boolean
-    atEndOfStream = P_ATENDOFSTREAM
+Public Property Get AtEndOfStream() As Boolean
+    AtEndOfStream = P_ATENDOFSTREAM
 End Property
 Public Property Get bufferLength() As Long
     bufferLength = P_BUFFERLENGTH

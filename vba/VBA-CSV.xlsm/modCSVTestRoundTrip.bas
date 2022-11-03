@@ -48,7 +48,7 @@ Public Sub RoundTripTest()
     Folder = Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     Prompt = "Run Round Trip Tests?" & vbLf & vbLf & _
-        "Note this will generate 3,312 files in folder" & vbLf & _
+        "Note this will generate 4,968 files in folder" & vbLf & _
         Environ$("Temp") & "\VBA-CSV\RoundTripTests"
 
     If MsgBox(Prompt, vbOKCancel + vbQuestion, Title) <> vbOK Then Exit Sub
@@ -62,7 +62,7 @@ Public Sub RoundTripTest()
         EOL = IIf(OS = "Windows", vbCrLf, IIf(OS = "Unix", vbLf, vbCr))
     
         For Each Encoding In Array("ANSI", "UTF-8", "UTF-16")
-            For Each Delimiter In Array(",", "::::")
+            For Each Delimiter In Array(",", "::::", vbTab)
                 For Each NRows In Array(1, 5)
                     For Each NCols In Array(1, 5)
         
@@ -160,6 +160,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     Dim NR As Long
     Dim NumDone As Long
     Dim DateTimeFormat As String
+    Dim DelimiterForRead As Variant
     
     On Error GoTo ErrHandler
     
@@ -177,9 +178,16 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     End If
 
     ThrowIfError CSVWrite(Data, FileName, True, DateFormat, DateTimeFormat, Delimiter, Encoding, EOL)
-
-    'The Call to CSVRead has to infer both Encoding and EOL
-    DataReadBack = CSVRead(FileName, ConvertTypes, Delimiter, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
+    
+    Select Case Delimiter
+        Case vbTab, ",", "|", ";", ":"
+            DelimiterForRead = CreateMissing() 'Force CSVRead to infer the delimiter
+        Case Else
+            DelimiterForRead = Delimiter
+    End Select
+    
+    'The Call to CSVRead has to infer both Encoding and EOL, and in most cases must infer the delimiter
+    DataReadBack = CSVRead(FileName, ConvertTypes, DelimiterForRead, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
     
     'Code to test the test
     'If Rnd() < 0.001 Then

@@ -270,6 +270,19 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test233 Folder, NumPassed, NumFailed, Failures
     Test234 Folder, NumPassed, NumFailed, Failures
     Test235 Folder, NumPassed, NumFailed, Failures
+    Test236 Folder, NumPassed, NumFailed, Failures
+    Test237 Folder, NumPassed, NumFailed, Failures
+    Test238 Folder, NumPassed, NumFailed, Failures
+    Test239 Folder, NumPassed, NumFailed, Failures
+    Test240 Folder, NumPassed, NumFailed, Failures
+    Test241 Folder, NumPassed, NumFailed, Failures
+    Test242 Folder, NumPassed, NumFailed, Failures
+    Test243 Folder, NumPassed, NumFailed, Failures
+    Test244 Folder, NumPassed, NumFailed, Failures
+    Test245 Folder, NumPassed, NumFailed, Failures
+    Test246 Folder, NumPassed, NumFailed, Failures
+    Test247 Folder, NumPassed, NumFailed, Failures
+    Test248 Folder, NumPassed, NumFailed, Failures
     
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -6557,5 +6570,304 @@ Private Sub Test235(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Exit Sub
 ErrHandler:
     Throw "#Test235 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test236(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime ANSI comma"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_ANSI_comma.csv"
+    TestRes = TestCSVRead(236, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test236 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test237(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime ANSI Tab"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_ANSI_Tab.csv"
+    TestRes = TestCSVRead(237, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test237 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test238(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime ANSI Semi colon"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_ANSI_Semi colon.csv"
+    TestRes = TestCSVRead(238, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test238 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test239(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime ANSI Bar"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_ANSI_Bar.csv"
+    TestRes = TestCSVRead(239, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test239 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test240(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-8 comma"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-8_comma.csv"
+    TestRes = TestCSVRead(240, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test240 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test241(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-8 Tab"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-8_Tab.csv"
+    TestRes = TestCSVRead(241, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test241 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test242(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-8 Semi colon"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-8_Semi colon.csv"
+    TestRes = TestCSVRead(242, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test242 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test243(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-8 Bar"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-8_Bar.csv"
+    TestRes = TestCSVRead(243, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test243 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test244(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-16 comma"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-16_comma.csv"
+    TestRes = TestCSVRead(244, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test244 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test245(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-16 Tab"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-16_Tab.csv"
+    TestRes = TestCSVRead(245, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test245 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test246(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-16 Semi colon"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-16_Semi colon.csv"
+    TestRes = TestCSVRead(246, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test246 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test247(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test infer delimiter first field is datetime UTF-16 Bar"
+    Expected = HStack(Array(CDate("2022-Nov-03 17:41:30"), CDate("2022-Nov-03 17:42:04")), Array(1#, 3#), Array(2#, 4#))
+    FileName = "test_infer_delimiter_first_field_is_datetime_UTF-16_Bar.csv"
+    TestRes = TestCSVRead(247, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="ISO", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test247 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+Private Sub Test248(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test inferring delimiter when decimal is comma"
+    Expected = HStack(Array(3.14159265358979, 3.14159265358979), Array(3.14159265358979, 3.14159265358979))
+    FileName = "test_inferring_delimiter_when_decimal_is_comma.csv"
+    TestRes = TestCSVRead(248, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        ShowMissingsAs:=Empty, _
+        DecimalSeparator:=",")
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test248 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
