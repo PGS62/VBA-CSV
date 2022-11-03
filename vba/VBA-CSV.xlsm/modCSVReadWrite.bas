@@ -168,8 +168,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
     Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
     Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
@@ -211,10 +209,8 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim j As Long
     Dim k As Long
     Dim Lengths() As Long
-    Dim m As Long
     Dim MaxSentinelLength As Long
     Dim MSLIA As Long
-    Dim NeedToFill As Boolean
     Dim NotDelimited As Boolean
     Dim NumColsFound As Long
     Dim NumColsInReturn As Long
@@ -1280,16 +1276,14 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub AmendDelimiterIfFirstFieldIsDateTime(FirstChunk As String, ByRef Delimiter As String)
 
-    Dim DelimAt As Long
-    Dim FirstField As String
-
-    Dim SysDateSeparator As String
-    Dim SysDateOrder As Long
-    Dim DateSeparator As Variant
-    Dim DateOrder As Long
-    Dim i As Long
     Dim Converted As Boolean
+    Dim DateOrder As Long
+    Dim DateSeparator As Variant
+    Dim DelimAt As Long
     Dim DtOut As Date
+    Dim FirstField As String
+    Dim SysDateOrder As Long
+    Dim SysDateSeparator As String
     Dim TrialDelim As Variant
     
     On Error GoTo ErrHandler
@@ -1325,7 +1319,7 @@ Private Sub AmendDelimiterIfFirstFieldIsDateTime(FirstChunk As String, ByRef Del
     
     Exit Sub
 ErrHandler:
-    Throw "#AmendDelimiterIfFirstFieldIsDateTime (line " & CStr(Erl) & "): " & Err.Description & "!"
+    Throw "#AmendDelimiterIfFirstFieldIsDateTime: " & Err.Description & "!"
 End Sub
 
 Private Function AtEndOfStream(Stream As Object, UseADODB As Boolean)
@@ -3607,8 +3601,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
         Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
         Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
         Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
@@ -3847,11 +3839,11 @@ End Function
 Private Sub ValidateCSVField(FieldValue As String, FieldName As String, Delimiter As String)
 
     Const DQ = """"
-    Dim HasDelim As Boolean
-    Dim HasCR As Boolean
-    Dim HasLF As Boolean
-    Dim HasDQ As Boolean
     Dim DQsGood As Boolean
+    Dim HasCR As Boolean
+    Dim HasDelim As Boolean
+    Dim HasDQ As Boolean
+    Dim HasLF As Boolean
     Dim InnerPart As String
 
     On Error GoTo ErrHandler
@@ -4059,4 +4051,5 @@ Private Function CanWriteCharToAscii(c As String) As Boolean
         CanWriteCharToAscii = Chr$(AscW(c)) = c
     End If
 End Function
+
 

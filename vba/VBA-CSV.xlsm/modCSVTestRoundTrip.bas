@@ -155,12 +155,12 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     Const ConvertTypes As String = "NDBE" 'must use this for round-tripping to work.
     Const PermitBaseDifference As Boolean = True
     Dim DataReadBack As Variant
+    Dim DateTimeFormat As String
+    Dim DelimiterForRead As Variant
     Dim FileName As String
     Dim NC As Long
     Dim NR As Long
     Dim NumDone As Long
-    Dim DateTimeFormat As String
-    Dim DelimiterForRead As Variant
     
     On Error GoTo ErrHandler
     
@@ -372,7 +372,6 @@ ErrHandler:
     Throw "#RandomDateTime (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
 
-
 Private Function RandomDate() As Date
     On Error GoTo ErrHandler
     RandomDate = CDate(CLng(25569 + Rnd() * 36525)) 'Date in range 1 Jan 1970 to 1 Jan 2070
@@ -549,5 +548,4 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
 ErrHandler:
     Throw "#RandomVariants: " & Err.Description & "!"
 End Function
-
 

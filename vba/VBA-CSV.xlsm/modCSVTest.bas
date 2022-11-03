@@ -6282,7 +6282,6 @@ ErrHandler:
     Throw "#Test223 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
-
 Private Sub Test224(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
     Dim FileName As String
@@ -6471,7 +6470,6 @@ ErrHandler:
     Throw "#Test231 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
-
 Private Sub Test232(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
     Dim FileName As String
@@ -6497,7 +6495,6 @@ ErrHandler:
     Throw "#Test232 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
-
 Private Sub Test233(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
     Dim FileName As String
@@ -6521,7 +6518,6 @@ Private Sub Test233(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     Throw "#Test233 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
-
 
 Private Sub Test234(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
