@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+171	04-Nov-2022	17:18	Philip Swannell	Added tests for CSVWrite. modCSVWrite now uses consts DQ and DQ2 throughout.
 170	03-Nov-2022	19:29	Philip Swannell	Bumped version to v0.20
 169	03-Nov-2022	18:59	Philip Swannell	Removed breakpoint, removed declared but unused variables.
 168	03-Nov-2022	18:25	Philip Swannell	Method InferDelimiter could fail for UTF-8 and UTF-16 files (the BOM was being read as part of the file's contents). Fixed this.
