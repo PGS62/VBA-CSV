@@ -3,7 +3,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.20
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.21
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -24,12 +24,14 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.20/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.21/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 Option Explicit
 
 Private m_FSO As Scripting.FileSystemObject
+Private Const DQ = """"
+Private Const DQ2 = """"""
 
 #If VBA7 And Win64 Then
     'for 64-bit Excel
@@ -171,7 +173,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
 Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
-    Const DQ As String = """"
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
         "Omit to guess from file contents"
     Const Err_Delimiter2 As String = "Delimiter must have at least one character and cannot start with a double " & _
@@ -398,7 +399,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             If CallingFromWorksheet Then
                 If Lengths(k) > MSLIA Then
                     Dim UnquotedLength As Long
-                    UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), """", 4))
+                    UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), DQ, 4))
                     If UnquotedLength > MSLIA Then
                         Err_StringTooLong = "The file has a field (row " & CStr(i + SkipToRow - 1) & _
                             ", column " & CStr(j + SkipToCol - 1) & ") of length " & Format$(UnquotedLength, "###,###")
@@ -1353,7 +1354,6 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
     Const CHUNK_SIZE As Long = 1000
     Const Err_SourceType As String = "Cannot infer delimiter directly from URL"
     Const MAX_CHUNKS As Long = 10
-    Const QuoteChar As String = """"
     Dim Contents As String
     Dim CopyOfErr As String
     Dim EvenQuotes As Boolean
@@ -1386,7 +1386,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
             Contents = ReadFromStream(Stream, CHUNK_SIZE, UseADODB)
             For i = 1 To Len(Contents)
                 Select Case Mid$(Contents, i, 1)
-                    Case QuoteChar
+                    Case DQ
                         EvenQuotes = Not EvenQuotes
                     Case ",", vbTab, "|", ";", ":"
                         If EvenQuotes Then
@@ -1412,7 +1412,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
 
         For i = 1 To MaxChars
             Select Case Mid$(Contents, i, 1)
-                Case QuoteChar
+                Case DQ
                     EvenQuotes = Not EvenQuotes
                 Case ",", vbTab, "|", ";", ":"
                     If EvenQuotes Then
@@ -1871,7 +1871,7 @@ Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() 
     ReDim Res(1 To 1, 1 To NC)
     For i = j To j - NC + 1 Step -1
         Field = Mid$(Buffer, Starts(i), Lengths(i))
-        Res(1, NC + i - j) = Unquote(Trim$(Field), """", QuoteCounts(i))
+        Res(1, NC + i - j) = Unquote(Trim$(Field), DQ, QuoteCounts(i))
     Next i
     GetLastParsedRow = Res
 
@@ -2587,7 +2587,7 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
         Keys = Sentinels.Keys
         Items = Sentinels.Items
         For i = LBound(Keys) To UBound(Keys)
-            NewKey = """" & Replace(Keys(i), """", """""") & """"
+            NewKey = DQ & Replace(Keys(i), DQ, DQ2) & DQ
             AddKeyToDict Sentinels, NewKey, Items(i)
         Next i
     End If
@@ -3599,16 +3599,17 @@ End Sub
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
-        Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
-        Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
-        Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
-        Optional TrueString As String = "True", Optional FalseString As String = "False") As String
+    Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
+    Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
+    Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
+    Optional TrueString As String = "True", Optional FalseString As String = "False") As String
 Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
 Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
-    Const DQ As String = """"
-    Const Err_Delimiter As String = "Delimiter must have at least one character and cannot start with a " & _
-        "double  quote, line feed or carriage return"
+    Const Err_Delimiter1 = "Delimiter must have at least one character"
+    Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _
+        "double quote, line feed or carriage return"
+        
     Const Err_Dimensions As String = "Data has more than two dimensions, which is not supported"
     Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
     
@@ -3629,10 +3630,19 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     
     If WriteToFile Then
         Select Case UCase$(Encoding)
+            Case ""
+                Encoding = "ANSI"
             Case "ANSI", "UTF-8", "UTF-16"
             Case Else
                 Throw Err_Encoding
         End Select
+    End If
+    
+    If Len(Delimiter) = 0 Then
+        Throw Err_Delimiter1
+    End If
+    If Left$(Delimiter, 1) = DQ Or Left$(Delimiter, 1) = vbLf Or Left$(Delimiter, 1) = vbCr Then
+        Throw Err_Delimiter2
     End If
     
     ValidateTrueAndFalseStrings TrueString, FalseString, Delimiter
@@ -3649,10 +3659,6 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     EOL = OStoEOL(EOL, "EOL")
     EOLIsWindows = EOL = vbCrLf
-
-    If Len(Delimiter) = 0 Or Left$(Delimiter, 1) = DQ Or Left$(Delimiter, 1) = vbLf Or Left$(Delimiter, 1) = vbCr Then
-        Throw Err_Delimiter
-    End If
     
     If DateFormat = "" Or UCase(DateFormat) = "ISO" Then
         'Avoid DateFormat being the null string as that would make CSVWrite's _
@@ -3763,14 +3769,14 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String, Delimiter As String)
        
-    If LCase(TrueString) = "true" Then
-        If LCase(FalseString) = "false" Then
+    If LCase$(TrueString) = "true" Then
+        If LCase$(FalseString) = "false" Then
             Exit Function
         End If
     End If
     
-    If LCase(TrueString) = "false" Then Throw "TrueString cannot take the value '" & TrueString & "'"
-    If LCase(FalseString) = "true" Then Throw "FalseString cannot take the value '" & FalseString & "'"
+    If LCase$(TrueString) = "false" Then Throw "TrueString cannot take the value '" & TrueString & "'"
+    If LCase$(FalseString) = "true" Then Throw "FalseString cannot take the value '" & FalseString & "'"
 
     If TrueString = FalseString Then
         Throw "Got '" & TrueString & "' for both TrueString and FalseString, but these cannot be equal to one another"
@@ -3792,7 +3798,7 @@ End Function
 '  Delimiter: The delimiter character used in the file.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ValidateBooleanRepresentation(strValue As String, strName As String, Delimiter As String)
-Const DQ = """"
+    
     Dim Converted As Boolean
     Dim DateSeparator As Variant
     Dim DQCount As Long
@@ -3842,7 +3848,6 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ValidateCSVField(FieldValue As String, FieldName As String, Delimiter As String)
 
-    Const DQ = """"
     Dim DQsGood As Boolean
     Dim HasCR As Boolean
     Dim HasDelim As Boolean
@@ -3927,15 +3932,12 @@ End Function
 Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, ByVal DateFormat As String, _
     ByVal DateTimeFormat As String, ByVal Delim As String, TrueString As String, FalseString As String) As String
     
-    Const DQ As String = """"
-    Const DQ2 As String = """"""
-
     On Error GoTo ErrHandler
     Select Case VarType(x)
 
         Case vbString
             If InStr(x, DQ) > 0 Then
-                Encode = DQ & Replace(x, DQ, DQ2) & DQ
+                Encode = DQ & Replace$(x, DQ, DQ2) & DQ
             ElseIf QuoteAllStrings Then
                 Encode = DQ & x & DQ
             ElseIf InStr(x, vbCr) > 0 Then
