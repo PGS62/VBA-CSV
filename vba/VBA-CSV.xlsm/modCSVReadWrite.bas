@@ -802,7 +802,7 @@ End Function
 Private Sub ParseEncoding(FileName As String, Encoding As Variant, ByRef TriState As Long, _
     ByRef CharSet As String, ByRef UseADODB As Boolean)
 
-    Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding be " & _
+    Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding must be " & _
         "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM"""
     
     On Error GoTo ErrHandler
@@ -2531,9 +2531,15 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
 
     On Error GoTo ErrHandler
 
-    If IsMissing(ShowMissingsAs) Then ShowMissingsAs = Empty
+    If IsMissing(ShowMissingsAs) Then
+        ShowMissingsAs = Empty
+    ElseIf TypeName(ShowMissingsAs) = "Range" Then
+        ShowMissingsAs = ShowMissingsAs.value
+    End If
+    
     Select Case VarType(ShowMissingsAs)
-        Case vbObject, vbArray, vbByte, vbDataObject, vbUserDefinedType, vbVariant
+        Case vbEmpty, vbString, vbBoolean, vbError, vbLong, vbInteger, vbSingle, vbDouble
+        Case Else
             Throw Err_ShowMissings
     End Select
     
@@ -2662,6 +2668,7 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
     On Error GoTo ErrHandler
 
     If VarType(Key) <> vbString Then Throw FriendlyErrorString & " but '" & CStr(Key) & "' is of type " & TypeName(Key)
+    
     If Len(Key) = 0 Then Exit Sub
     
     If Not Sentinels.Exists(Key) Then

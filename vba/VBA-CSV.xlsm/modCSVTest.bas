@@ -4100,7 +4100,7 @@ Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
+    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(145, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
@@ -6217,7 +6217,7 @@ Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
+    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(221, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty, _
