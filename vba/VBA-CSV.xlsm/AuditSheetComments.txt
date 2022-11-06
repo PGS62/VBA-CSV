@@ -1,4 +1,8 @@
 Version	Date	Time	Author	Comment
+176	06-Nov-2022	11:07	Philip Swannell	Added worksheet UnicodeTests
+175	06-Nov-2022	09:09	Philip Swannell	Refactored method ParseEncoding. Previously there were two places in the code where we decided whether to use a TextStream or ADODB (according to whether the Encoding argument had been provided or had to be guessed\inferred), now only one place.
+174	06-Nov-2022	08:23	Philip Swannell	Reverted the 4 class modules (garcia code) to as they were in version 145. They had since been amended by MZTools\my AmendVBA code. Did so because my function wrap_ws_garcia has stopped working...
+173	05-Nov-2022	09:09	Philip Swannell	Tweak to method ReadAllFromStream.
 172	04-Nov-2022	19:37	Philip Swannell	Improved validation of argument ShowMissingsAs.
 171	04-Nov-2022	17:18	Philip Swannell	Added tests for CSVWrite. modCSVWrite now uses consts DQ and DQ2 throughout.
 170	03-Nov-2022	19:29	Philip Swannell	Bumped version to v0.20

@@ -214,10 +214,17 @@ ErrHandler:
     Throw "#RoundTripTestCore: " & Err.Description & "!"
 End Sub
 
+Function ChrW_Wrap(CharCode As Long)
+ChrW_Wrap = ChrW$(CharCode)
+End Function
+
+
+
 Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL As String) As String
 
     Const maxlen As Long = 20
-    Dim ansi As Boolean
+    Dim utf8 As Boolean
+    
     Dim i As Long
     Dim Length As Long
     Dim Res As String
@@ -226,21 +233,35 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
     
     Length = CLng(1 + Rnd() * maxlen)
     Res = String(Length, " ")
-    ansi = UCase$(Encoding) = "ANSI"
 
-    For i = 1 To Length
-        If ansi Then
-            Mid$(Res, i, 1) = Chr$(34 + Rnd() * 88)
-        Else
-            Mid$(Res, i, 1) = ChrW$(33 + Rnd() * 370)
-        End If
+    Select Case Encoding
+        Case "ANSI"
+            For i = 1 To Length
+                Mid$(Res, i, 1) = Chr$(34 + Rnd() * 88)
+            Next i
 
-        If Not AllowLineFeed Then
-            If Mid$(Res, i, 1) = vbLf Or Mid$(Res, i, 1) = vbCr Then
-                Mid$(Res, i, 1) = " "
-            End If
-        End If
-    Next
+        Case "UTF-8"
+            For i = 1 To Length
+                Mid$(Res, i, 1) = ChrW$(Rnd() * 55295)
+                If Not AllowLineFeed Then
+                    If Mid$(Res, i, 1) = vbLf Or Mid$(Res, i, 1) = vbCr Then
+                        Mid$(Res, i, 1) = " "
+                    End If
+                End If
+            Next i
+
+        Case "UTF-16"
+            For i = 1 To Length
+                Mid$(Res, i, 1) = ChrW$(Rnd() * 65535)
+                If Not AllowLineFeed Then
+                    If Mid$(Res, i, 1) = vbLf Or Mid$(Res, i, 1) = vbCr Then
+                        Mid$(Res, i, 1) = " "
+                    End If
+                End If
+            Next i
+        Case Else
+            Stop
+    End Select
 
     If AllowLineFeed Then
         If Length > 5 Then

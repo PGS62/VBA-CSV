@@ -141,24 +141,32 @@ Public Property Get count() As Long
     count = P_CSV_DATA.count
 End Property
 Public Property Get errDescription() As String
+Attribute errDescription.VB_Description = "Gets the description for the last occurred error over the current instance."
     errDescription = P_ERROR_DESC
 End Property
 Public Property Get errNumber() As Long
+Attribute errNumber.VB_Description = "Gets the number for the last occurred error over the current instance."
     errNumber = P_ERROR_NUMBER
 End Property
 Public Property Get errSource() As String
+Attribute errSource.VB_Description = "Gets the source for the last occurred error over the current instance."
     errSource = P_ERROR_SOURCE
 End Property
 Public Property Get exportSuccess() As Boolean
+Attribute exportSuccess.VB_Description = "Gets the status for the last export operation."
     exportSuccess = P_SUCCESSFUL_EXPORT
 End Property
 Public Property Get csvHeader() As ECPArrayList
+Attribute csvHeader.VB_Description = "Gets the imported CSV/TSV headers."
     Set csvHeader = P_CSV_HEADER
 End Property
 Public Property Get importSuccess() As Boolean
+Attribute importSuccess.VB_Description = "Gets the status for the last import operation. Returns True if it was success."
     importSuccess = P_SUCCESSFUL_IMPORT
 End Property
 Public Property Get item(ParamArray Index() As Variant) As Variant
+Attribute item.VB_Description = "Gets a field, or an array with an entire record, from the result array on the current instance."
+Attribute item.VB_UserMemId = 0
     Select Case UBound(Index)
         Case 0
             item = P_CSV_DATA(CLng(Index(0)))
@@ -166,25 +174,30 @@ Public Property Get item(ParamArray Index() As Variant) As Variant
             item = P_CSV_DATA(CLng(Index(0)))(CLng(Index(1)))
     End Select
 End Property
-Public Property Get Items() As ECPArrayList
-    Set Items = P_CSV_DATA
+Public Property Get items() As ECPArrayList
+Attribute items.VB_Description = "Gets or sets the result array over the current instance."
+    Set items = P_CSV_DATA
 End Property
-Public Property Set Items(values As ECPArrayList)
+Public Property Set items(values As ECPArrayList)
     Set P_CSV_DATA = values
 End Property
 Public Property Get parseConfig() As parserConfig
+Attribute parseConfig.VB_Description = "Gets or sets, the parser configuration object."
     Set parseConfig = config
 End Property
 Public Property Set parseConfig(configuration As parserConfig)
     Set config = configuration
 End Property
 Public Property Get rectangularResults() As Boolean
+Attribute rectangularResults.VB_Description = "Gets the result array regularity on the current instance. If true, the internal array is not irregular."
     rectangularResults = Not P_VARYING_LENGTHS
 End Property
 Public Property Get vectorsBound() As Long
+Attribute vectorsBound.VB_Description = "Gets the regular bound of the vectors in the result array on the current instance."
     vectorsBound = P_VECTORS_REGULAR_BOUND
 End Property
 Public Property Get vectorsMaxBound() As Long
+Attribute vectorsMaxBound.VB_Description = "Gets the max bound of the vectors in the result array on the current instance."
     vectorsMaxBound = P_VECTORS_MAX_BOUND
 End Property
 '////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,8 +223,8 @@ Public Sub CloseSeqReader()
     Set static_outputList = Nothing
 End Sub
 Public Sub CreateJagged(ByRef ArrVar() As Variant, ArraySize As Long, VectorSize As Long)
-    Dim arrPointer As Long
     Dim Vector() As String
+    Dim arrPointer As Long
     
     ReDim ArrVar(0 To ArraySize)
     ReDim Vector(0 To VectorSize)
@@ -300,9 +313,9 @@ Public Function CSVsubsetSplit(FilePath As String, _
         If LenB(Dir(outputPath, vbDirectory)) = 0 Then
             MkDir outputPath
         End If
-        Do While Not CSVstream.AtEndOfStream
+        Do While Not CSVstream.atEndOfStream
             CSVstream.ReadText 'Read next CSV data chunk
-            Set curItems = CSVreader.ImportFromCSVString(CSVstream.bufferString, readerConf).Items
+            Set curItems = CSVreader.ImportFromCSVString(CSVstream.bufferString, readerConf).items
             If Not fileCreatedFlag Then
                 If Headers Then
                     i = 1
@@ -392,10 +405,8 @@ Public Sub DumpToArray(OutPutArray() As Variant, _
         Set DataSource = P_CSV_DATA
     End If
     If Not DataSource Is Nothing Then
-        Dim Counter1 As Long
-        Dim Counter2 As Long
-        Dim UB1 As Long
-        Dim ub2 As Long
+        Dim UB1 As Long, ub2 As Long
+        Dim Counter1 As Long, Counter2 As Long
         
         UB1 = DataSource.count - 1
         ReDim OutPutArray(0 To UB1, 0 To P_VECTORS_MAX_BOUND)
@@ -414,8 +425,8 @@ Public Sub DumpToJaggedArray(OutPutArray() As Variant, _
         Set DataSource = P_CSV_DATA
     End If
     If Not DataSource Is Nothing Then
-        Dim Counter1 As Long
         Dim UB1 As Long
+        Dim Counter1 As Long
         
         UB1 = DataSource.count - 1
         ReDim OutPutArray(0 To UB1)
@@ -439,9 +450,9 @@ Public Sub DumpToSheet(Optional WBookName As String, _
         colNumber = UBound(DataSource(0))
     End If
     If Not DataSource Is Nothing Then
-        Dim OutputRange As Range
-        Dim outputSheet As Worksheet
         Dim WBook As Workbook
+        Dim outputSheet As Worksheet
+        Dim OutputRange As Range
         
         EnableOptimization
         '@------------------------------------------------------
@@ -462,11 +473,9 @@ Public Sub DumpToSheet(Optional WBookName As String, _
         End If
         '@------------------------------------------------------
         'Dump the data
-        Dim Counter1 As Long
-        Dim Counter2 As Long
         Dim tmpOutputArray() As String
-        Dim UB1 As Long
-        Dim ub2 As Long
+        Dim UB1 As Long, ub2 As Long
+        Dim Counter1 As Long, Counter2 As Long
         
         UB1 = DataSource.count - 1
         ReDim tmpOutputArray(0 To UB1, 0 To colNumber)
@@ -631,11 +640,11 @@ Public Function GetCSVsubset(FilePath As String, _
                         keyIndex As Long, _
                         Optional configObj As parserConfig = Nothing) As ECPArrayList
                         
-    Dim CSVparser As CSVinterface
+    Dim StreamReader As ECPTextStream
     Dim curItems As ECPArrayList
     Dim filteredRecords As ECPArrayList
+    Dim CSVparser As CSVinterface
     Dim gssCounter As Long
-    Dim StreamReader As ECPTextStream
     
     Set CSVparser = New CSVinterface
     Set filteredRecords = New ECPArrayList
@@ -676,7 +685,7 @@ Public Function GetCSVsubset(FilePath As String, _
             CSVparser.GuessDelimiters configObj
             '@----------------------------------------------------
             ' Parse string
-            Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).Items
+            Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).items
             If configObj.Headers Then
                 filteredRecords.Add curItems(0) 'Save the CSV header
                 gssCounter = gssCounter + 1
@@ -686,9 +695,9 @@ Public Function GetCSVsubset(FilePath As String, _
                     filteredRecords.Add curItems(gssCounter) 'Append data
                 End If
             Next gssCounter
-            Do While Not StreamReader.AtEndOfStream
+            Do While Not StreamReader.atEndOfStream
                 StreamReader.ReadText 'Read next CSV data chunk
-                Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).Items
+                Set curItems = CSVparser.ImportFromCSVString(StreamReader.bufferString, configObj).items
                 For gssCounter = 0 To curItems.count - 1
                     If MeetsCriterion(curItems(gssCounter)(keyIndex)) Then
                         filteredRecords.Add curItems(gssCounter) 'Append data
@@ -755,12 +764,11 @@ Private Function GetFileNameAndExtension(path As String) As String()
 End Function
 Private Function GetLongFilters(ByRef tmpFilters() As Variant, _
                                 ByRef header As ECPArrayList) As Long()
-    Dim arridx As Long
+    Dim tmpResult() As Long
+    Dim tmpColl As Collection
+    Dim trqidx As Long, arridx As Long
     Dim filterCount As Long
     Dim matchFound As Boolean
-    Dim tmpColl As Collection
-    Dim tmpResult() As Long
-    Dim trqidx As Long
 
     If Not header Is Nothing Then
         Set tmpColl = New Collection
@@ -890,7 +898,7 @@ Public Function GetRecord() As ECPArrayList
                                     With static_CSVstream
                                         .ReadText
                                         static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                                        static_StreamEnd = .AtEndOfStream
+                                        static_StreamEnd = .atEndOfStream
                                         If static_UseUnixEscapeSeq Then
                                             static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
                                                                     static_UnixEscapeSeq, static_EscapeSequence), static_RecordDelimiter)
@@ -982,7 +990,7 @@ Public Function GetRecord() As ECPArrayList
                             Case Else 'The Token is stored on static_tmpToken object
                                 static_tmpToken.Add LeftB$(static_tmpCSV(static_Index), static_TokenEndingPos)
                                 If RequestedField(static_FieldID + 1&, static_MaxReqIndex) Then 'Filter fields
-                                    static_RecordToken.Add UnescapeField(Join$(static_tmpToken.Items, static_RecordDelimiter), _
+                                    static_RecordToken.Add UnescapeField(Join$(static_tmpToken.items, static_RecordDelimiter), _
                                                                     static_EscapeChr, static_EscapeSequence) 'Save whole Token
                                     static_tmpToken.Clear 'Clear static_tmpToken content
                                 End If
@@ -1017,7 +1025,7 @@ Public Function GetRecord() As ECPArrayList
                                 Case Else 'The Token is stored on static_tmpToken object
                                     static_tmpToken.Add LeftB$(static_tmpCSV(static_Index), static_OverStringPointer - 3)
                                     If RequestedField(static_FieldID + 1&, static_MaxReqIndex) Then 'Filter fields
-                                        static_RecordToken.Add UnescapeField(Join$(static_tmpToken.Items, static_RecordDelimiter), _
+                                        static_RecordToken.Add UnescapeField(Join$(static_tmpToken.items, static_RecordDelimiter), _
                                                                         static_EscapeChr, static_EscapeSequence) 'Save whole Token
                                         static_tmpToken.Clear 'Clear static_tmpToken content
                                     End If
@@ -1032,7 +1040,7 @@ Public Function GetRecord() As ECPArrayList
                                 With static_CSVstream
                                     .ReadText
                                     static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                                    static_StreamEnd = .AtEndOfStream
+                                    static_StreamEnd = .atEndOfStream
                                     If static_UseUnixEscapeSeq Then
                                         static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
                                                                 static_UnixEscapeSeq, static_EscapeSequence), static_RecordDelimiter)
@@ -1115,7 +1123,7 @@ Public Function GetRecord() As ECPArrayList
                         With static_CSVstream
                             .ReadText
                             static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                            static_StreamEnd = .AtEndOfStream
+                            static_StreamEnd = .atEndOfStream
                             If static_UseUnixEscapeSeq Then
                                 static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, static_UnixEscapeSeq, _
                                                 static_EscapeSequence), static_RecordDelimiter)
@@ -1163,7 +1171,7 @@ Public Function GetRecord() As ECPArrayList
         static_EscapedBRS = False
         '@----------------------------------------------------------------------------
         'Save record
-        static_outputList.Add static_RecordToken.Items
+        static_outputList.Add static_RecordToken.items
         static_RecordToken.Reinitialize static_vectorsBound + 1
         P_VARYING_LENGTHS = (static_vectorsBound <> static_vectorsMaxBound)
         If static_IgnoreLines Then
@@ -1182,7 +1190,7 @@ Public Function GetRecord() As ECPArrayList
             With static_CSVstream
                 .ReadText
                 static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-                static_StreamEnd = .AtEndOfStream
+                static_StreamEnd = .atEndOfStream
                 If static_UseUnixEscapeSeq Then
                     static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
                                             static_UnixEscapeSeq, static_EscapeSequence), static_RecordDelimiter)
@@ -1269,8 +1277,8 @@ Private Sub GuessInString(ByRef confObject As parserConfig, _
     Dim LinesEnds() As String
     Dim Quote As String
     Dim QuoteChar() As EscapeTokens
-    Dim skipComments As Boolean
     Dim SkipEmpty As Boolean
+    Dim skipComments As Boolean
     Dim StartRec As Long
     Dim tmpCSVstr As String
     Dim tmpDelimiters() As String
@@ -1384,9 +1392,9 @@ Public Function ImportFromCSV(configObj As parserConfig, _
                 GoTo ImportFromCSV_EmptyFile
             End If
             If UBound(.dTypingTemplate) >= UBound(.dTypingLinks) Then
+                Dim tmpRequested() As Variant
                 Dim curConfig As parserConfig
                 Dim emptyParam() As Variant
-                Dim tmpRequested() As Variant
                 ReDim emptyParam(-1 To -1) 'Emule empty ParamArray
         
                 If .delimitersGuessing Then
@@ -1452,9 +1460,9 @@ Public Function ImportFromCSVString(ByRef CSVstring As String, _
             If LenB(CSVstring) = 0 Then
                 GoTo ImportFromCSV_EmptyString
             End If
+            Dim tmpRequested() As Variant
             Dim curConfig As parserConfig
             Dim emptyParam() As Variant
-            Dim tmpRequested() As Variant
             ReDim emptyParam(-1 To -1) 'Emule empty ParamArray
             
             If .delimitersGuessing Then
@@ -1530,8 +1538,7 @@ Private Function IsSheetInWorkbook(SheetName As String, WBook As Workbook) As Bo
     End With
 End Function
 Private Function IsWorkbookOpen(WBookName As String) As Boolean
-    Dim BookMatching As Boolean
-    Dim WBook As Workbook
+    Dim WBook As Workbook, BookMatching As Boolean
     
     On Error Resume Next
     For Each WBook In Workbooks
@@ -1540,16 +1547,11 @@ Private Function IsWorkbookOpen(WBookName As String) As Boolean
     IsWorkbookOpen = BookMatching
 End Function
 Public Sub JaggedToTwoDimArray(ByRef JaggedArray() As Variant, ByRef TwoDimArray() As Variant)
-    Dim jgdCounter1 As Long
-    Dim jgdCounter2 As Long
-    Dim LBj1 As Long
-    Dim LBj2 As Long
-    Dim MaxDim1 As Long
-    Dim MaxDim2 As Long
-    Dim tdimCounter As Long
-    Dim tmpDimension As Long
-    Dim UBj1 As Long
-    Dim UBj2 As Long
+    Dim UBj1 As Long, LBj1 As Long
+    Dim UBj2 As Long, LBj2 As Long
+    Dim MaxDim1 As Long, MaxDim2 As Long
+    Dim jgdCounter1 As Long, jgdCounter2 As Long
+    Dim tmpDimension As Long, tdimCounter As Long
     
     On Error GoTo JaggedToTwoDimArray_Err_Handler
     LBj1 = LBound(JaggedArray)
@@ -1585,13 +1587,10 @@ Private Function JoinRecordsFields(ByRef RecordsArray As Variant, _
     Dim ConcatenatedArray() As String
     Dim EscapeT As EscapeTokens
     Dim FldDelimiter As String
-    Dim iLCounter As Long
-    Dim jLCounter As Long
-    Dim LB1 As Long
-    Dim LB2 As Long
+    Dim iLCounter As Long, jLCounter As Long
+    Dim LB1 As Long, UB1 As Long
+    Dim LB2 As Long, ub2 As Long
     Dim recDelimiter As String
-    Dim UB1 As Long
-    Dim ub2 As Long
     
     On Error GoTo JoinRecordsFields_Error
     '@----------------------------------------------------------------------------
@@ -1753,7 +1752,7 @@ Private Sub LoadNewStream()
     With CSVstream
         .ReadText
         StreamWithQuotes = InStrB(1, .bufferString, EscapeChr)
-        StreamEnd = .AtEndOfStream
+        StreamEnd = .atEndOfStream
         If UseUnixEscapeSeq Then
             tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, UnixEscapeSeq, _
                                 EscapeSequence), RecordDelimiter)
@@ -1776,9 +1775,7 @@ Private Sub LoadNewStream()
     End If
 End Sub
 Private Function MaxIndexVal(ByRef values() As Long) As Long
-    Dim idx As Long
-    Dim idx0 As Long
-    Dim tmpVal As Long
+    Dim tmpVal As Long, idx0 As Long, idx As Long
     
     idx0 = LBound(values)
     idx = idx0
@@ -1792,9 +1789,7 @@ Private Function MaxIndexVal(ByRef values() As Long) As Long
     MaxIndexVal = idx
 End Function
 Private Function MinIndexVal(ByRef values() As Double) As Long
-    Dim idx As Long
-    Dim idx0 As Long
-    Dim tmpVal As Double
+    Dim tmpVal As Double, idx0 As Long, idx As Long
     
     idx0 = LBound(values)
     idx = idx0
@@ -1837,8 +1832,8 @@ Public Sub OpenSeqReader(configObj As parserConfig, _
                 GoTo OpenSeqReader_EmptyFile
             End If
             If UBound(.dTypingTemplate) >= UBound(.dTypingLinks) Then
-                Dim emptyParam() As Variant
                 Dim tmpConf As parserConfig
+                Dim emptyParam() As Variant
                 ReDim emptyParam(-1 To -1) 'Emule empty ParamArray
                 
                 If .delimitersGuessing Then
@@ -1946,7 +1941,7 @@ Public Sub OpenSeqReader(configObj As parserConfig, _
     With static_CSVstream
         .ReadText
         static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-        static_StreamEnd = .AtEndOfStream
+        static_StreamEnd = .atEndOfStream
     End With
     '@----------------------------------------------------------------------------
     'Ensuring the stream is sufficient enough to hold at least one CSV line
@@ -1957,7 +1952,7 @@ Public Sub OpenSeqReader(configObj As parserConfig, _
             .RestartPointer
             .ReadText
             static_StreamWithQuotes = InStrB(1, .bufferString, static_EscapeChr)
-            static_StreamEnd = .AtEndOfStream
+            static_StreamEnd = .atEndOfStream
         Loop
         If static_UseUnixEscapeSeq Then
             static_tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, _
@@ -2006,8 +2001,8 @@ Private Sub ParseCSVstring(ByRef csvText As String, _
     Dim EscapeChrCount As Long
     Dim EscapedBRS As Boolean
     Dim EscapedWFS As Boolean
-    Dim FieldDelimiter As String
     Dim FieldID As Long
+    Dim FieldDelimiter As String
     Dim hpointer As Long
     Dim IgnoreCommentLines As Boolean
     Dim IgnoreLines As Boolean
@@ -2254,7 +2249,7 @@ Private Sub ParseCSVstring(ByRef csvText As String, _
                                 Case Else 'The Token is stored on tmpToken object
                                     tmpToken.Add LeftB$(tmpCSV(Index), TokenEndingPos)
                                     If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                        RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
+                                        RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
                                                                     EscapeChr, EscapeSequence)  'Save whole Token
                                     End If
                                     tmpToken.Clear 'Clear tmpToken content
@@ -2291,7 +2286,7 @@ Private Sub ParseCSVstring(ByRef csvText As String, _
                                     Case Else 'The Token is stored on tmpToken array
                                         tmpToken.Add LeftB$(tmpCSV(Index), OverStringPointer - 3)
                                         If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                            RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
+                                            RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
                                                                         EscapeChr, EscapeSequence)  'Save whole Token
                                         End If
                                         tmpToken.Clear 'Clear tmpToken content
@@ -2387,7 +2382,7 @@ Private Sub ParseCSVstring(ByRef csvText As String, _
         '@----------------------------------------------------------------------------
         'Start saving on given record
         If IncludeRecord Then
-            outputList.Add RecordToken.Items
+            outputList.Add RecordToken.items
             RecordToken.Reinitialize P_VECTORS_REGULAR_BOUND + 1
         End If
         P_VARYING_LENGTHS = (P_VECTORS_REGULAR_BOUND <> (FieldID - 1))
@@ -2438,9 +2433,9 @@ End Sub
 Private Function RecordScore(ByRef strArray As Variant) As Double
     Dim arrLB As Long
     Dim arrUB As Long
+    Dim L0 As Long
     Dim CfieldScore As Double
     Dim CumulativeScore As Double
-    Dim L0 As Long
     
     On Error GoTo RecordScore_ErrHandler
     CfieldScore = FieldScore(strArray)
@@ -2512,8 +2507,8 @@ Private Sub SkipUnwantedLines(ByRef idx As Long, _
                                 ByVal CommentToken As Long, _
                                 Optional skipComments As Boolean = True, _
                                 Optional SkipEmptyLines As Boolean = True)
-    Dim CharCode As Long
     Dim CurLength As Long
+    Dim CharCode As Long
     Dim UnwantedLine As Boolean
 
     '@----------------------------------------------------------------------------
@@ -2544,6 +2539,7 @@ Public Function Sort(Optional ByVal fromIndex As Long = -1, _
                         Optional ByVal toIndex As Long = -1, _
                         Optional ByVal SortColumn As Long = -1, _
                         Optional ByVal Descending As Boolean = False) As CSVinterface
+Attribute Sort.VB_Description = "Sorts the imported CSV data."
     
     On Error GoTo Sort_Error_Handler:
     
@@ -2581,8 +2577,8 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
     Dim EscapeChrCount As Long
     Dim EscapedBRS As Boolean
     Dim EscapedWFS As Boolean
-    Dim FieldDelimiter As String
     Dim FieldID As Long
+    Dim FieldDelimiter As String
     Dim hpointer As Long
     Dim IgnoreCommentLines As Boolean
     Dim IgnoreLines As Boolean
@@ -2698,7 +2694,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
     With CSVstream
         .ReadText
         StreamWithQuotes = InStrB(1, .bufferString, EscapeChr)
-        StreamEnd = .AtEndOfStream
+        StreamEnd = .atEndOfStream
     End With
     '@----------------------------------------------------------------------------
     'Ensuring the stream is sufficient enough to hold at least one CSV line
@@ -2709,7 +2705,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
             .RestartPointer
             .ReadText
             StreamWithQuotes = InStrB(1, .bufferString, EscapeChr)
-            StreamEnd = .AtEndOfStream
+            StreamEnd = .atEndOfStream
         Loop
         If UseUnixEscapeSeq Then
             tmpCSV() = Split(UnixToStandardEscapeSeq(.bufferString, UnixEscapeSeq, EscapeSequence), RecordDelimiter)
@@ -2861,7 +2857,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
                                 Case Else 'The Token is stored on tmpToken object
                                     tmpToken.Add LeftB$(tmpCSV(Index), TokenEndingPos)
                                     If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                        RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
+                                        RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
                                                                     EscapeChr, EscapeSequence)  'Save whole Token
                                     End If
                                     tmpToken.Clear 'Clear tmpToken content
@@ -2898,7 +2894,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
                                     Case Else 'The Token is stored on tmpToken array
                                         tmpToken.Add LeftB$(tmpCSV(Index), OverStringPointer - 3)
                                         If RequestedField(FieldID + 1&, MaxReqIndex) Then 'Filter fields
-                                            RecordToken.Add UnescapeField(Join$(tmpToken.Items, RecordDelimiter), _
+                                            RecordToken.Add UnescapeField(Join$(tmpToken.items, RecordDelimiter), _
                                                                             EscapeChr, EscapeSequence) 'Save whole Token
                                         End If
                                         tmpToken.Clear 'Clear tmpToken content
@@ -3006,7 +3002,7 @@ Private Sub StreamParseCSV(configObj As parserConfig, _
         '@----------------------------------------------------------------------------
         'Start saving on given record
         If IncludeRecord Then
-            outputList.Add RecordToken.Items
+            outputList.Add RecordToken.items
             RecordToken.Reinitialize P_VECTORS_REGULAR_BOUND + 1
         End If
         P_VARYING_LENGTHS = (P_VECTORS_REGULAR_BOUND <> (FieldID - 1))
@@ -3073,8 +3069,8 @@ Private Sub StreamSkipUnwantedLines(ByRef idx As Long, _
                                     ByRef QuotedStreamVariable As Boolean, _
                                     Optional skipComments As Boolean = True, _
                                     Optional SkipEmptyLines As Boolean = True)
-    Dim CharCode As Long
     Dim CurLength As Long
+    Dim CharCode As Long
     Dim UnwantedLine As Boolean
 
 start:
@@ -3100,7 +3096,7 @@ AdvanceLine:
             If UnwantedLine Then
                 idx = idx + 1&
                 If idx > MaxIdx Then
-                    If Not Ostream.AtEndOfStream Then
+                    If Not Ostream.atEndOfStream Then
                         '@----------------------------------------------
                         'Advance stream
                         With Ostream
@@ -3124,7 +3120,7 @@ AdvanceLine:
             End If
         Loop While UnwantedLine And idx <= MaxIdx
     Else
-        If Not Ostream.AtEndOfStream Then
+        If Not Ostream.atEndOfStream Then
             '@----------------------------------------------
             'Advance stream
             Ostream.ReadText
@@ -3152,7 +3148,8 @@ Private Function SubTablesScore(DelimitersArray() As String, _
     Dim tmpFldLen As Long
     Dim tmpRecord As Variant
     Dim tmpTablesMatch As Long
-
+    
+    
     SubTablesCount = 0
     MaxFieldLen = 0
     SubTableFactor = 0
@@ -3178,11 +3175,11 @@ Private Function SubTablesScore(DelimitersArray() As String, _
     SubTablesScore = ResultArrayList.count * (MaxFieldLen * RegularFieldsCount) / (SubTableFactor * SubTablesCount + 1)
 End Function
 Private Function TableScore(ByRef ArrayList As ECPArrayList) As Double
-    Dim AVGrecScores As Double
-    Dim CumulativeTblScore As Double
     Dim L0 As Long
     Dim RecScores() As Double
     Dim SumRecScores As Double
+    Dim AVGrecScores As Double
+    Dim CumulativeTblScore As Double
     
     ReDim RecScores(0 To ArrayList.count - 1)
     SumRecScores = 0
@@ -3202,16 +3199,11 @@ Private Function TableScore(ByRef ArrayList As ECPArrayList) As Double
     End If
 End Function
 Public Sub TwoDimToJaggedArray(ByRef TwoDimArray() As Variant, ByRef JaggedArray() As Variant)
-    Dim jgdCounter1 As Long
-    Dim jgdCounter2 As Long
-    Dim LBj1 As Long
-    Dim LBj2 As Long
-    Dim MaxDim1 As Long
-    Dim MaxDim2 As Long
-    Dim tdimCounter As Long
-    Dim tdimCounter2 As Long
-    Dim UBj1 As Long
-    Dim UBj2 As Long
+    Dim UBj1 As Long, LBj1 As Long
+    Dim UBj2 As Long, LBj2 As Long
+    Dim MaxDim1 As Long, MaxDim2 As Long
+    Dim jgdCounter1 As Long, jgdCounter2 As Long
+    Dim tdimCounter As Long, tdimCounter2 As Long
     
     On Error GoTo TwoDimToJaggedArray_Err_Handler
     If MultiDimensional(TwoDimArray) Then
@@ -3265,8 +3257,7 @@ Private Function TypeData(ByRef Data As Variant, _
     If TemplateDefined Then
         If TargetsDefined Then
             If Not IsHeader Then
-                Dim maxTypingIdx As Long
-                Dim typingIdx As Long
+                Dim typingIdx As Long, maxTypingIdx As Long
                 Dim typingNeed As Boolean
             
                 typingIdx = LBound(dTTargets)

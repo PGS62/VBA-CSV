@@ -351,7 +351,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
             If Stream.EOS Then Throw Err_FileEmpty
         Else
             Set Stream = m_FSO.GetFile(FileName).OpenAsTextStream(ForReading, TriState)
-            If Stream.AtEndOfStream Then Throw Err_FileEmpty
+            If Stream.atEndOfStream Then Throw Err_FileEmpty
         End If
 
         If SkipToRow = 1 And NumRows = 0 Then
@@ -759,30 +759,31 @@ Private Function ReadAllFromStream(Stream As Object) As String
     Const ChunkSize As Long = 10000
 
     On Error GoTo ErrHandler
-    If TypeName(Stream) = "Stream" Then
-        Contents = String(ChunkSize, " ")
+    Select Case TypeName(Stream)
+        Case "Stream"
+            Contents = String(ChunkSize, " ")
 
-        i = 1
-        Do While Not Stream.EOS
-            Chunk = Stream.ReadText(ChunkSize)
-            If i - 1 + Len(Chunk) > Len(Contents) Then
-                Contents = Contents & String(i - 1 + Len(Chunk), " ")
+            i = 1
+            Do While Not Stream.EOS
+                Chunk = Stream.ReadText(ChunkSize)
+                If i - 1 + Len(Chunk) > Len(Contents) Then
+                    Contents = Contents & String(i - 1 + Len(Chunk), " ")
+                End If
+
+                Mid$(Contents, i, Len(Chunk)) = Chunk
+                i = i + Len(Chunk)
+            Loop
+
+            If (i - 1) < Len(Contents) Then
+                Contents = Left$(Contents, i - 1)
             End If
 
-            Mid$(Contents, i, Len(Chunk)) = Chunk
-            i = i + Len(Chunk)
-        Loop
-
-        If (i - 1) < Len(Contents) Then
-            Contents = Left$(Contents, i - 1)
-        End If
-
-        ReadAllFromStream = Contents
-    ElseIf TypeName(Stream) = "TextStream" Then
-        ReadAllFromStream = Stream.ReadAll
-    Else
-        Throw "Stream has unknown type: " & TypeName(Stream)
-    End If
+            ReadAllFromStream = Contents
+        Case "TextStream"
+            ReadAllFromStream = Stream.ReadAll
+        Case Else
+            Throw "Stream has unknown type: " & TypeName(Stream)
+    End Select
 
     Exit Function
 ErrHandler:
@@ -807,8 +808,11 @@ Private Sub ParseEncoding(FileName As String, Encoding As Variant, ByRef TriStat
     
     On Error GoTo ErrHandler
     If IsEmpty(Encoding) Or IsMissing(Encoding) Then
-        DetectEncoding FileName, TriState, CharSet, UseADODB
-    ElseIf VarType(Encoding) = vbString Then
+        Encoding = GuessEncoding(FileName)
+    End If
+        
+        
+    If VarType(Encoding) = vbString Then
         Select Case UCase$(Replace(Replace(Encoding, "-", vbNullString), " ", vbNullString))
             Case "ASCII"
                 CharSet = "ascii" 'not actually relevant, since we won't use ADODB
@@ -1186,8 +1190,9 @@ Private Function Min4(N1 As Long, N2 As Long, N3 As Long, _
     End If
 End Function
 
+
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : DetectEncoding
+' Procedure  : GuessEncoding
 ' Purpose    : Guesses whether a file needs to be opened with the "format" argument to File.OpenAsTextStream set to
 '              TriStateTrue or TriStateFalse.
 '              The documentation at
@@ -1199,8 +1204,7 @@ End Function
 '            * UTF-8 files are not correctly handled by OpenAsTextStream, instead we use ADODB.Stream, setting CharSet
 '              to "UTF-8".
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, _
-    ByRef CharSet As String, ByRef UseADODB As Boolean)
+Private Function GuessEncoding(FilePath As String)
 
     Dim intAsc1Chr As Long
     Dim intAsc2Chr As Long
@@ -1217,58 +1221,46 @@ Private Sub DetectEncoding(FilePath As String, ByRef TriState As Long, _
 
     ' 1=Read-only, False=do not create if not exist, -1=Unicode 0=ASCII
     Set T = m_FSO.OpenTextFile(FilePath, 1, False, 0)
-    If T.AtEndOfStream Then
-        T.Close: Set T = Nothing
-        TriState = TristateFalse
-        CharSet = "_autodetect_all"
-        UseADODB = False
-        Exit Sub
+    If T.atEndOfStream Then
+    GuessEncoding = "ANSI"
+        Exit Function
     End If
     intAsc1Chr = Asc(T.Read(1))
-    If T.AtEndOfStream Then
-        T.Close: Set T = Nothing
-        TriState = TristateFalse
-        CharSet = "_autodetect_all"
-        UseADODB = False
-        Exit Sub
+    If T.atEndOfStream Then
+    GuessEncoding = "ANSI"
+        Exit Function
     End If
     
     intAsc2Chr = Asc(T.Read(1))
     
     If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
         'File is probably encoded UTF-16 LE BOM (little endian, with Byte Option Marker)
-        TriState = TristateTrue
-        CharSet = "utf-16"
-        UseADODB = False
+        GuessEncoding = "UTF-16-BOM"
+        Exit Function
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
-        TriState = TristateTrue
-        CharSet = "utf-16"
-        UseADODB = False
+        GuessEncoding = "UTF-16-BOM"
+        Exit Function
     Else
-        If T.AtEndOfStream Then
-            TriState = TristateFalse
-            Exit Sub
+        If T.atEndOfStream Then
+        GuessEncoding = "ANSI"
+            Exit Function
         End If
         intAsc3Chr = Asc(T.Read(1))
         If (intAsc1Chr = 239) And (intAsc2Chr = 187) And (intAsc3Chr = 191) Then
             'File is probably encoded UTF-8 with BOM
-            CharSet = "utf-8"
-            TriState = TristateFalse
-            UseADODB = True
+            GuessEncoding = "UTF-8"
         Else
             'We don't know, assume ANSI but that may be incorrect.
-            CharSet = vbNullString
-            TriState = TristateFalse
-            UseADODB = False
+            GuessEncoding = "ANSI"
         End If
     End If
 
     T.Close: Set T = Nothing
-    Exit Sub
+    Exit Function
 ErrHandler:
-    Throw "#DetectEncoding: " & Err.Description & "!"
-End Sub
+    Throw "#GuessEncoding: " & Err.Description & "!"
+End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : AmendDelimiterIfFirstFieldIsDateTime
@@ -1325,11 +1317,11 @@ ErrHandler:
     Throw "#AmendDelimiterIfFirstFieldIsDateTime: " & Err.Description & "!"
 End Sub
 
-Private Function AtEndOfStream(Stream As Object, UseADODB As Boolean)
+Private Function atEndOfStream(Stream As Object, UseADODB As Boolean)
     If UseADODB Then
-        AtEndOfStream = Stream.EOS
+        atEndOfStream = Stream.EOS
     Else
-        AtEndOfStream = Stream.AtEndOfStream
+        atEndOfStream = Stream.atEndOfStream
     End If
 End Function
 
@@ -1378,10 +1370,10 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
         Else
             If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             Set Stream = m_FSO.GetFile(FileNameOrContents).OpenAsTextStream(ForReading, TriState)
-            If Stream.AtEndOfStream Then Throw Err_FileEmpty
+            If Stream.atEndOfStream Then Throw Err_FileEmpty
         End If
 
-        Do While Not AtEndOfStream(Stream, UseADODB) And j <= MAX_CHUNKS
+        Do While Not atEndOfStream(Stream, UseADODB) And j <= MAX_CHUNKS
             j = j + 1
             Contents = ReadFromStream(Stream, CHUNK_SIZE, UseADODB)
             For i = 1 To Len(Contents)
@@ -1890,7 +1882,7 @@ Private Sub SkipLines(Streaming As Boolean, UseADODB As Boolean, Comment As Stri
     ByRef Buffer As String, ByRef i As Long, QuoteChar As String, ByVal PosLF As Long, ByVal PosCR As Long, _
     ByRef BufferUpdatedTo As Long)
     
-    Dim AtEndOfStream As Boolean
+    Dim atEndOfStream As Boolean
     Dim LookAheadBy As Long
     Dim SkipThisLine As Boolean
     
@@ -1900,11 +1892,11 @@ Private Sub SkipLines(Streaming As Boolean, UseADODB As Boolean, Comment As Stri
             LookAheadBy = MaxLngs(LComment, 2)
             If i + LookAheadBy > BufferUpdatedTo Then
                 If UseADODB Then
-                    AtEndOfStream = Stream.EOS
+                    atEndOfStream = Stream.EOS
                 Else
-                    AtEndOfStream = Stream.AtEndOfStream
+                    atEndOfStream = Stream.atEndOfStream
                 End If
-                If Not AtEndOfStream Then
+                If Not atEndOfStream Then
                     GetMoreFromStream Stream, Delimiter, QuoteChar, Buffer, BufferUpdatedTo
                 End If
             End If
@@ -1955,7 +1947,7 @@ Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Strea
     UseADODB As Boolean, Delimiter As String, QuoteChar As String, ByRef Which As Long, _
     ByRef Buffer As String, ByRef BufferUpdatedTo As Long) As Long
 
-    Dim AtEndOfStream As Boolean
+    Dim atEndOfStream As Boolean
     Dim InstrRes As Long
     Dim PrevBufferUpdatedTo As Long
 
@@ -1968,11 +1960,11 @@ Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Strea
         Exit Function
     Else
         If UseADODB Then
-            AtEndOfStream = Stream.EOS
+            atEndOfStream = Stream.EOS
         Else
-            AtEndOfStream = Stream.AtEndOfStream
+            atEndOfStream = Stream.atEndOfStream
         End If
-        If AtEndOfStream Then
+        If atEndOfStream Then
             SearchInBuffer = BufferUpdatedTo + 1
             Exit Function
         End If
@@ -2057,7 +2049,7 @@ ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
                               just the first line of a file. Suggest 5000? Note that when reading _
                               an entire file (NumRows argument to CSVRead is zero) function _
                               GetMoreFromStream is not called.
-    Dim AtEndOfStream As Boolean
+    Dim atEndOfStream As Boolean
     Dim ExpandBufferBy As Long
     Dim FirstPass As Boolean
     Dim i As Long
@@ -2081,13 +2073,13 @@ ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
     Do
         If IsScripting Then
             NewChars = T.Read(IIf(FirstPass, ChunkSize, 1))
-            AtEndOfStream = T.AtEndOfStream
+            atEndOfStream = T.atEndOfStream
         Else
             NewChars = T.ReadText(IIf(FirstPass, ChunkSize, 1))
-            AtEndOfStream = T.EOS
+            atEndOfStream = T.EOS
         End If
         FirstPass = False
-        If AtEndOfStream Then
+        If atEndOfStream Then
             'Ensure NewChars terminates with vbCrLf
             If Right$(NewChars, 1) <> vbCr And Right$(NewChars, 1) <> vbLf Then
                 NewChars = NewChars & vbCrLf
@@ -2587,14 +2579,14 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
     'Add "quoted versions" of the existing sentinels
     If ConvertQuoted Then
         Dim i As Long
-        Dim Items
+        Dim items
         Dim Keys
         Dim NewKey As String
         Keys = Sentinels.Keys
-        Items = Sentinels.Items
+        items = Sentinels.items
         For i = LBound(Keys) To UBound(Keys)
             NewKey = DQ & Replace(Keys(i), DQ, DQ2) & DQ
-            AddKeyToDict Sentinels, NewKey, Items(i)
+            AddKeyToDict Sentinels, NewKey, items(i)
         Next i
     End If
 
@@ -3047,7 +3039,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
         Else
             If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             Set Stream = m_FSO.GetFile(FileNameOrContents).OpenAsTextStream(ForReading, TriState)
-            If Stream.AtEndOfStream Then Throw Err_FileEmpty
+            If Stream.atEndOfStream Then Throw Err_FileEmpty
         End If
     
         If NumLinesToReturn = 0 Then
