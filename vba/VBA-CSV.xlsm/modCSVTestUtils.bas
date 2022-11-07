@@ -201,7 +201,6 @@ Function ElementToVBALitteral(x As Variant) As String
 ErrHandler:
     Throw "#ElementToVBALitteral (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Function
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ArrayToVBALitteral
 ' Purpose    : Metaprogramming. Given an array of arbitrary data (strings, doubles, booleans, empties, errors) returns a

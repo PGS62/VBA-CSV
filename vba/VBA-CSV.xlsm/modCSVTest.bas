@@ -287,7 +287,8 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test250 Folder, NumPassed, NumFailed, Failures
     Test251 Folder, NumPassed, NumFailed, Failures
     Test252 Folder, NumPassed, NumFailed, Failures
-    
+    Test253 Folder, NumPassed, NumFailed, Failures
+
     shHiddenSheet.UsedRange.EntireRow.Delete
     
     Exit Sub
@@ -5165,7 +5166,8 @@ Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     FileName = "255_characters-UTF-8.csv"
     TestRes = TestCSVRead(183, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
-        ShowMissingsAs:=Empty)
+        ShowMissingsAs:=Empty, _
+        Encoding:="UTF-8")
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
@@ -6987,4 +6989,34 @@ Private Sub Test252(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     Throw "#Test252 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
+
+Private Sub Test253(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected() As String
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+    Dim i As Long
+
+    On Error GoTo ErrHandler
+    TestDescription = "Chars 1 to 65535 UTF-16 LE BOM"
+    
+    ReDim Expected(1 To 65535, 1 To 1)
+    For i = 1 To 65535
+        Expected(i, 1) = ChrW$(i)
+    Next i
+    
+    FileName = "Chars_1_to_65535_UTF-16_LE_BOM.csv"
+    TestRes = TestCSVRead(253, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        SkipToCol:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test253 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
 

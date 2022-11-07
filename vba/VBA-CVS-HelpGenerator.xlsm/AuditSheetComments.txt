@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+21	07-Nov-2022	18:58	Philip Swannell	Updated help for Encoding argument to CSVRead.
 20	03-Nov-2022	16:39	Philip Swannell	Updated help for Delimiter argument to CSVRead.
 19	03-Nov-2022	09:59	Philip Swannell	Tweak to method CodeToRegister.
 18	03-Nov-2022	09:38	Philip Swannell	Tweaks to help text

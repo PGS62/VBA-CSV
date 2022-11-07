@@ -49,7 +49,7 @@ End Enum
 Private Const m_ErrorStyle As Long = es_ReturnString
 
 Private Const m_LBound As Long = 1 'Sets the array lower bounds of the return from CSVRead.
-                                   'To return zero-based arrays, change the value of this constant to 0.
+'To return zero-based arrays, change the value of this constant to 0.
 
 Private Enum enmSourceType
     st_File = 0
@@ -147,6 +147,8 @@ End Enum
 '             omitted and CSVRead will detect the file's encoding. If auto-detection does not work, then
 '             it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte option mark to
 '             identify the encoding. Experiment with Encoding as each of `UTF-8` and `UTF-16`.
+'
+'             `ANSI` is taken to mean `Windows-1252` encoding.
 ' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
 '             instead of a period (3,14 vs. 3.14). CSVRead can correctly parse these numbers by passing in
 '             the DecimalSeparator as a comma, in which case comma ceases to be a candidate if the parser
@@ -554,46 +556,46 @@ Public Sub RegisterCSVRead()
 
     ReDim ArgDescs(1 To 19)
     ArgDescs(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV " & _
-                  "format."
+        "format."
     ArgDescs(2) = "Type conversion: Boolean or string. Allowed letters NDBETQ. N = convert Numbers, D = convert " & _
-                  "Dates, B = convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = " & _
-                  "quoted fields also converted. TRUE = NDB, FALSE = no conversion."
+        "Dates, B = convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = " & _
+        "quoted fields also converted. TRUE = NDB, FALSE = no conversion."
     ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found " & _
-                  "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
-                  "contents as would be displayed in a text editor."
+        "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
+        "contents as would be displayed in a text editor."
     ArgDescs(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after " & _
-                  "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
-                  "padding between fields."
+        "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
+        "padding between fields."
     ArgDescs(5) = "The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO` " & _
-                  "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
-                  "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
+        "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
+        "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
     ArgDescs(6) = "Rows that start with this string will be skipped while parsing."
     ArgDescs(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column " & _
-                  "will be assigned ShowMissingsAs for that empty row)."
+        "will be assigned ShowMissingsAs for that empty row)."
     ArgDescs(8) = "The row in the file containing headers. Optional and defaults to 0. Type conversion is not " & _
-                  "applied to fields in the header row, though leading and trailing spaces are trimmed."
+        "applied to fields in the header row, though leading and trailing spaces are trimmed."
     ArgDescs(9) = "The first row in the file that's included in the return. Optional and defaults to one more than " & _
-                  "HeaderRowNum."
+        "HeaderRowNum."
     ArgDescs(10) = "The column in the file at which reading starts. Optional and defaults to 1 to read from the " & _
-                   "first column."
+        "first column."
     ArgDescs(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the " & _
-                   "end of the file are read."
+        "end of the file are read."
     ArgDescs(12) = "The number of columns to read from the file. If omitted (or zero), all columns from SkipToCol " & _
-                   "are read."
+        "are read."
     ArgDescs(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings " & _
-                   "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
+        "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
     ArgDescs(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings " & _
-                   "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
+        "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
     ArgDescs(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings " & _
-                   "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
-                   "considered missing."
+        "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
+        "considered missing."
     ArgDescs(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the " & _
-                   "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
-                   "string or `#N/A!` error value can be good alternatives."
+        "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
+        "string or `#N/A!` error value can be good alternatives."
     ArgDescs(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be " & _
-                   "omitted and CSVRead will detect the file's encoding."
+        "omitted and CSVRead will detect the file's encoding."
     ArgDescs(18) = "The character that represents a decimal point. If omitted, then the value from Windows " & _
-                   "regional settings is used."
+        "regional settings is used."
     ArgDescs(19) = "For use from VBA only."
     Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgDescs
     Exit Sub
@@ -830,28 +832,32 @@ Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef T
                 TriState = TristateFalse
                 UseADODBToInferDelimiter = False
                
-                'Experimental 6 Nov 2022
                 CharSet = "us-ascii"
                 UseADODBToRead = True
                
             Case "ANSI"
+                'Unfortunately "ANSI" is not well defined. See
+                'https://stackoverflow.com/questions/701882/what-is-ansi-format
+                
+                'For a list of the character set names that are known by a system, see the subkeys of
+                'HKEY_CLASSES_ROOT\MIME\Database\Charset in the Windows Registry.
+
                 Encoding = "ANSI"
                 TriState = TristateFalse
                 UseADODBToInferDelimiter = False
                 
-                'Experimental 6 Nov 2022
-                CharSet = "iso-8859-1"
+                CharSet = "windows-1252"
                 UseADODBToRead = True
                 
             Case "UTF8"
                 Encoding = "UTF-8"
                 CharSet = "utf-8"
-                TriState = TristateFalse
-                UseADODBToRead = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
+                TriState = TristateFalse 'Not needed since we don't use Scripting.TextStream
+                UseADODBToRead = True
                 UseADODBToInferDelimiter = True
             Case "UTF16"
                 Encoding = "UTF-16"
-                CharSet = "utf-16"
+                CharSet = "utf-16" 'Not needed since we don't use ADODB
                 TriState = TristateTrue
                 UseADODBToRead = False
                 UseADODBToInferDelimiter = False
@@ -1186,7 +1192,7 @@ End Sub
 ' Purpose    : Returns the minimum of four inputs and an indicator of which of the four was the minimum
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function Min4(N1 As Long, N2 As Long, N3 As Long, _
-     N4 As Long, ByRef Which As Long) As Long
+    N4 As Long, ByRef Which As Long) As Long
 
     If N1 < N2 Then
         Min4 = N1
@@ -1299,12 +1305,12 @@ End Function
 Private Function EstimateNumChars(FileSize As Long, Encoding As String)
     Select Case Encoding
         Case "ANSI", "ASCII"
-             'will be exact
+            'will be exact
             EstimateNumChars = FileSize
         Case "UTF-16"
             'Will be exact if the file has a BOM (2 bytes) and contains only _
-            ansi characters (2 bytes each). When file contains non-ansi characters _
-            this will overestimate the character count.
+             ansi characters (2 bytes each). When file contains non-ansi characters _
+             this will overestimate the character count.
             EstimateNumChars = (FileSize - 2) / 2
         Case "UTF-8"
             'Will be exact if the file has a BOM (3 bytes) and contains only ansi characters (1 byte each).
@@ -1414,7 +1420,6 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
     EvenQuotes = True
     If st = st_File Then
 
-
         If UseADODB Then
             Set Stream = CreateObject("ADODB.Stream")
             Stream.CharSet = CharSet
@@ -1508,7 +1513,7 @@ End Function
 '  DateSeparator: ByRef argument is set to the DateSeparator, typically "-" or "/", but can also be space character.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, _
-          ByRef ISO8601 As Boolean, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
+    ByRef ISO8601 As Boolean, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
 
     Dim Err_DateFormat As String
 
@@ -1614,8 +1619,8 @@ End Sub
 '                    unquoted and leading and trailing spaces are removed.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseCSVContents(ContentsOrStream As Variant, UseADODB As Boolean, QuoteChar As String, _
-     Delimiter As String, Comment As String, IgnoreEmptyLines As Boolean, _
-     IgnoreRepeated As Boolean, SkipToRow As Long, HeaderRowNum As Long, NumRows As Long, _
+    Delimiter As String, Comment As String, IgnoreEmptyLines As Boolean, _
+    IgnoreRepeated As Boolean, SkipToRow As Long, HeaderRowNum As Long, NumRows As Long, _
     ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, _
     ByRef Starts() As Long, ByRef Lengths() As Long, ByRef RowIndexes() As Long, ByRef ColIndexes() As Long, _
     ByRef QuoteCounts() As Long, ByRef HeaderRow As Variant) As String
@@ -2050,7 +2055,7 @@ End Function
 '              index identifying which was the first of the strings to be found.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InStrMulti(SearchFor() As String, SearchWithin As String, StartingAt As Long, _
-     EndingAt As Long, ByRef Which As Long) As Long
+    EndingAt As Long, ByRef Which As Long) As Long
 
     Const Inf As Long = 2147483647
     Dim i As Long
@@ -2095,14 +2100,14 @@ End Function
 '              not needlessly scan the unupdated part of the buffer.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As String, _
-ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
+    ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
 
     Const ChunkSize As Long = 5000  ' The number of characters to read from the stream on each call. _
-                              Set to a small number for testing logic and a bigger number for _
-                              performance, but not too high since a common use case is reading _
-                              just the first line of a file. Suggest 5000? Note that when reading _
-                              an entire file (NumRows argument to CSVRead is zero) function _
-                              GetMoreFromStream is not called.
+                                      Set to a small number for testing logic and a bigger number for _
+                                      performance, but not too high since a common use case is reading _
+                                      just the first line of a file. Suggest 5000? Note that when reading _
+                                      an entire file (NumRows argument to CSVRead is zero) function _
+                                      GetMoreFromStream is not called.
     Dim atEndOfStream As Boolean
     Dim ExpandBufferBy As Long
     Dim FirstPass As Boolean
@@ -2244,13 +2249,13 @@ End Function
 '                         ShowMissingsAs, thanks to method MakeSentinels.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, _
-     TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, _
-     ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
-     SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
-     AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
-     DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
-     AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
-     ShowMissingsAs As Variant) As Variant
+    TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, _
+    ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
+    SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
+    AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
+    DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+    AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
+    ShowMissingsAs As Variant) As Variant
 
     Dim Converted As Boolean
     Dim dblResult As Double
@@ -2371,7 +2376,7 @@ End Function
 ' Purpose    : Casts strIn to double where strIn has specified decimals separator.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastToDouble(strIn As String, ByRef dblOut As Double, SepStandard As Boolean, _
-     DecimalSeparator As String, SysDecimalSeparator As String, ByRef Converted As Boolean)
+    DecimalSeparator As String, SysDecimalSeparator As String, ByRef Converted As Boolean)
     
     On Error GoTo ErrHandler
     If SepStandard Then
@@ -2399,7 +2404,7 @@ End Sub
 '  Converted       : Boolean flipped to TRUE if conversion takes place
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, _
-     DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+    DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
     ByRef Converted As Boolean)
 
     Dim D As String
@@ -2843,7 +2848,7 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Converted As Boolean, _
-     AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
+    AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
 
     Dim L As Long
     Dim LocalTime As Double
@@ -3057,8 +3062,8 @@ End Function
 '  NumLinesToReturn   : This many lines are returned. Pass zero for all lines from SkipToLine.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, UseADODB As Boolean, _
-     CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long, _
-     CallingFromWorksheet As Boolean) As Variant
+    CharSet As String, TriState As Long, SkipToLine As Long, NumLinesToReturn As Long, _
+    CallingFromWorksheet As Boolean) As Variant
 
     Const Err_FileEmpty As String = "File is empty"
     Dim Buffer As String
@@ -3573,38 +3578,38 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub RegisterCSVWrite()
     Const Description As String = "Creates a comma-separated file on disk containing Data. Any existing file of " & _
-                                  "the same name is overwritten. If successful, the function returns FileName, " & _
-                                  "otherwise an ""error string"" (starts with `#`, ends with `!`) describing what " & _
-                                  "went wrong."
+        "the same name is overwritten. If successful, the function returns FileName, " & _
+        "otherwise an ""error string"" (starts with `#`, ends with `!`) describing what " & _
+        "went wrong."
     Dim ArgDescs() As String
 
     On Error GoTo ErrHandler
 
     ReDim ArgDescs(1 To 10)
     ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
-                  "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
-                  "dimension then the output file has a single column, one field per row."
+        "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
+        "dimension then the output file has a single column, one field per row."
     ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
-                  "function returns Data converted CSV-style to a string."
+        "function returns Data converted CSV-style to a string."
     ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
-                  "FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. " & _
-                  "Double quotes are always escaped by another double quote."
+        "FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. " & _
+        "Double quotes are always escaped by another double quote."
     ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
-                  "file. If omitted, defaults to `yyyy-mm-dd`."
+        "file. If omitted, defaults to `yyyy-mm-dd`."
     ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
-                  "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
-                  "inconsistent across the datetimes in data."
+        "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
+        "inconsistent across the datetimes in data."
     ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
-                  "character."
+        "character."
     ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this " & _
-                  "argument is `ANSI` but Data contains characters that cannot be written to an ANSI file. `UTF-8` " & _
-                  "and `UTF-16` files are written with a byte option mark."
+        "argument is `ANSI` but Data contains characters that cannot be written to an ANSI file. `UTF-8` " & _
+        "and `UTF-16` files are written with a byte option mark."
     ArgDescs(8) = "Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending " & _
-                  "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
-                  "is provided, or `Unix` if not."
+        "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
+        "is provided, or `Unix` if not."
     ArgDescs(9) = "How the Boolean value True is to be represented in the file. Optional, defaulting to ""True""."
     ArgDescs(10) = "How the Boolean value False is to be represented in the file. Optional, defaulting to " & _
-                   """False""."
+        """False""."
     Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
     Exit Sub
 
