@@ -32,7 +32,7 @@ Private Sub Workbook_Open()
     RegisterCSVWrite
 End Sub
 ```
-5. Alternatively, (or in addition) install [Excel-DNA Intellisense](https://github.com/Excel-DNA/IntelliSense) and copy the worksheet `_Intellisense_` from `VBA-CSV-Intellisense.xlsx` (in the [latest release](https://github.com/PGS62/VBA-CSV/releases)) into the workbook which contains `modCSVReadWrite`.
+5. Alternatively, (or in addition) install [Excel-DNA Intellisense](https://github.com/Excel-DNA/IntelliSense) and copy the worksheet `_Intellisense_` from `VBA-CSV-Intellisense.xlsx` (in the [latest release](https://github.com/PGS62/VBA-CSV/releases)) into the same workbook into which you copied `modCSVReadWrite`.
 
 # Acknowledgements
 I re-worked the parsing code of `CSVRead` after examining [sdkn104](https://github.com/sdkn104)'s code available [here](https://github.com/sdkn104/VBA-CSV); my approach is now similar to the one employed there, and the performance is similar too.
