@@ -283,6 +283,10 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test246 Folder, NumPassed, NumFailed, Failures
     Test247 Folder, NumPassed, NumFailed, Failures
     Test248 Folder, NumPassed, NumFailed, Failures
+    Test249 Folder, NumPassed, NumFailed, Failures
+    Test250 Folder, NumPassed, NumFailed, Failures
+    Test251 Folder, NumPassed, NumFailed, Failures
+    Test252 Folder, NumPassed, NumFailed, Failures
     
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -4100,7 +4104,7 @@ Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
+    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(145, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
@@ -6196,8 +6200,8 @@ Private Sub Test220(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "this file does not exists"
-    Expected = "#CSVRead: #ParseEncoding: #DetectEncoding: File not found!!!!"
     FileName = "this file does not exists.csv"
+    Expected = "#CSVRead: Could not find file '" & Folder & FileName & "'!"
     TestRes = TestCSVRead(220, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
@@ -6217,7 +6221,7 @@ Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM""!!"
+    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(221, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty, _
@@ -6865,5 +6869,122 @@ Private Sub Test248(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Exit Sub
 ErrHandler:
     Throw "#Test248 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test249(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected() As String
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+    Dim i As Long
+
+    On Error GoTo ErrHandler
+    TestDescription = "Chars 14 to 55295 UTF-8"
+    
+    ReDim Expected(1 To 55295 - 14 + 1, 1 To 1)
+    For i = 14 To 55295
+        Expected(i - 13, 1) = ChrW$(i)
+    Next i
+    
+    FileName = "Chars_14_to_55295_UTF-8.tsv"
+    TestRes = TestCSVRead(249, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        SkipToCol:=2, _
+        ShowMissingsAs:=Empty, _
+        Encoding:="UTF-8")
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test249 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test250(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected() As String
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+    Dim i As Long
+
+    On Error GoTo ErrHandler
+    TestDescription = "Chars 14 to 55295 UTF-8-BOM"
+    
+    ReDim Expected(1 To 55295 - 14 + 1, 1 To 1)
+    For i = 14 To 55295
+        Expected(i - 13, 1) = ChrW$(i)
+    Next i
+    
+    FileName = "Chars_14_to_55295_UTF-8_BOM.tsv"
+    TestRes = TestCSVRead(250, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        SkipToCol:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test250 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test251(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected() As String
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+    Dim i As Long
+
+    On Error GoTo ErrHandler
+    TestDescription = "Chars 14 to 55295 UTF-16 BE BOM"
+    
+    ReDim Expected(1 To 55295 - 14 + 1, 1 To 1)
+    For i = 14 To 55295
+        Expected(i - 13, 1) = ChrW$(i)
+    Next i
+    
+    FileName = "Chars_14_to_55295_UTF-16_BE_BOM.tsv"
+    TestRes = TestCSVRead(251, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        SkipToCol:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test251 (line " & CStr(Erl) & "): " & Err.Description & "!"
+End Sub
+
+
+Private Sub Test252(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected() As String
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+    Dim i As Long
+
+    On Error GoTo ErrHandler
+    TestDescription = "Chars 14 to 55295 UTF-16 LE BOM"
+    
+    ReDim Expected(1 To 55295 - 14 + 1, 1 To 1)
+    For i = 14 To 55295
+        Expected(i - 13, 1) = ChrW$(i)
+    Next i
+    
+    FileName = "Chars_14_to_55295_UTF-16_LE_BOM.tsv"
+    TestRes = TestCSVRead(252, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        SkipToCol:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    Throw "#Test252 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 

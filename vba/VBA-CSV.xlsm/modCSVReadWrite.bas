@@ -205,8 +205,10 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim CTDict As Scripting.Dictionary
     Dim DateOrder As Long
     Dim DateSeparator As String
-    Dim Err_StringTooLong As String
     Dim ErrRet As String
+    Dim Err_StringTooLong As String
+    Dim EstNumChars As Long
+    Dim FileSize As Long
     Dim i As Long
     Dim ISO8601 As Boolean
     Dim j As Long
@@ -242,6 +244,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim TrimFields As Boolean
     Dim TriState As Long
     Dim UseADODB As Boolean
+    Dim UseADODBToInferDelimiter As Boolean
     
     On Error GoTo ErrHandler
 
@@ -256,7 +259,9 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     'Parse and validate inputs...
     If SourceType <> st_String Then
-        ParseEncoding FileName, Encoding, TriState, CharSet, UseADODB
+        FileSize = GetFileSize(FileName)
+        ParseEncoding FileName, Encoding, TriState, CharSet, UseADODB, UseADODBToInferDelimiter
+        EstNumChars = EstimateNumChars(FileSize, CStr(Encoding))
     End If
 
     If VarType(Delimiter) = vbBoolean Then
@@ -267,14 +272,14 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         End If
     ElseIf VarType(Delimiter) = vbString Then
         If Len(Delimiter) = 0 Then
-            strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator, UseADODB, CharSet)
+            strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator, UseADODBToInferDelimiter, CharSet)
         ElseIf Left$(Delimiter, 1) = DQ Or Left$(Delimiter, 1) = vbLf Or Left$(Delimiter, 1) = vbCr Then
             Throw Err_Delimiter2
         Else
             strDelimiter = Delimiter
         End If
     ElseIf IsEmpty(Delimiter) Or IsMissing(Delimiter) Then
-        strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator, UseADODB, CharSet)
+        strDelimiter = InferDelimiter(SourceType, FileName, TriState, DecimalSeparator, UseADODBToInferDelimiter, CharSet)
     Else
         Throw Err_Delimiter
     End If
@@ -355,7 +360,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         End If
 
         If SkipToRow = 1 And NumRows = 0 Then
-            CSVContents = ReadAllFromStream(Stream)
+            CSVContents = ReadAllFromStream(Stream, EstNumChars)
             Stream.Close
             
             ParseCSVContents CSVContents, UseADODB, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
@@ -747,22 +752,24 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ReadAllFromStream
-' Purpose    : Handles both ADOB.Stream and Scripting.TextStream. Note that ADODB.ReadText(-1) to read all of a stream
+' Purpose    : Handles both ADODB.Stream and Scripting.TextStream. Note that ADODB.ReadText(-1) to read all of a stream
 '              in a single operation has _very_ poor performance for large files, but reading 10,000 characters at a time
-'              in a loop appears to solve that problem.
+'              in a loop appears to solve that problem. In the case of ADODB stream, performance for large files is
+'              improved if we already know the number of characters in the file.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ReadAllFromStream(Stream As Object) As String
+Private Function ReadAllFromStream(Stream As Object, Optional ByVal EstNumChars As Long) As String
       
     Dim Chunk As String
     Dim Contents As String
     Dim i As Long
     Const ChunkSize As Long = 10000
 
+    If EstNumChars = 0 Then EstNumChars = 10000
+
     On Error GoTo ErrHandler
     Select Case TypeName(Stream)
         Case "Stream"
-            Contents = String(ChunkSize, " ")
-
+            Contents = String(EstNumChars, " ")
             i = 1
             Do While Not Stream.EOS
                 Chunk = Stream.ReadText(ChunkSize)
@@ -796,48 +803,58 @@ End Function
 ' Parameters :
 '  FileName:
 '  Encoding: Optional argument passed in to CSVRead. If not passed, we delegate to DetectEncoding.
-'  TriState: Set by reference. Needed only when we read files using Scripting.TextStream, i.e. when useADODB is False.
-'  CharSet : Set by reference. Needed only when we read files using ADODB.Stream, i.e. when useADODB is True.
-'  useADODB: Should file be read via ADODB.Stream, which is capable of reading UTF-8 files
+'            NB the encoding argument (which may be user input) is "standardised" by this method to one of
+'            "ASCII", "ANSI", "UTF-8", "UTF-16"
+'  TriState: Set by reference. Needed only when we read files using Scripting.TextStream, i.e. when UseADODBToRead is False.
+'  CharSet : Set by reference. Needed only when we read files using ADODB.Stream, i.e. when UseADODBToRead is True.
+'  UseADODBToRead: Should file be read via ADODB.Stream, which is capable of reading UTF-8 files.
+'  UseADODBToInferDelimiter: In the event that the delimiter must be inferred, should the file be read using ADODB (set
+'                            to true) or a File System Object text stream (set to False). The latter is faster to read
+'                            relatively few characters from a large file.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub ParseEncoding(FileName As String, Encoding As Variant, ByRef TriState As Long, _
-    ByRef CharSet As String, ByRef UseADODB As Boolean)
+Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef TriState As Long, _
+    ByRef CharSet As String, ByRef UseADODBToRead As Boolean, ByRef UseADODBToInferDelimiter As Boolean)
 
     Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding must be " & _
-        "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-8-BOM"", ""UTF-16"" or ""UTF-16-BOM"""
+        "either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16"""
     
     On Error GoTo ErrHandler
     If IsEmpty(Encoding) Or IsMissing(Encoding) Then
-        Encoding = GuessEncoding(FileName)
+        Encoding = DetectEncoding(FileName)
     End If
-        
         
     If VarType(Encoding) = vbString Then
         Select Case UCase$(Replace(Replace(Encoding, "-", vbNullString), " ", vbNullString))
             Case "ASCII"
-                CharSet = "ascii" 'not actually relevant, since we won't use ADODB
+                Encoding = "ASCII"
                 TriState = TristateFalse
-                UseADODB = False
+                UseADODBToInferDelimiter = False
+               
+                'Experimental 6 Nov 2022
+                CharSet = "us-ascii"
+                UseADODBToRead = True
+               
             Case "ANSI"
-                CharSet = "_autodetect_all" 'not actually relevant, since we won't use ADODB
+                Encoding = "ANSI"
                 TriState = TristateFalse
-                UseADODB = False
+                UseADODBToInferDelimiter = False
+                
+                'Experimental 6 Nov 2022
+                CharSet = "iso-8859-1"
+                UseADODBToRead = True
+                
             Case "UTF8"
+                Encoding = "UTF-8"
                 CharSet = "utf-8"
                 TriState = TristateFalse
-                UseADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
-            Case "UTF8BOM"
-                CharSet = "utf-8"
-                TriState = TristateFalse
-                UseADODB = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
+                UseADODBToRead = True 'Use ADODB because Scripting.TextStream can't cope with UTF-8
+                UseADODBToInferDelimiter = True
             Case "UTF16"
+                Encoding = "UTF-16"
                 CharSet = "utf-16"
                 TriState = TristateTrue
-                UseADODB = False
-            Case "UTF16BOM"
-                CharSet = "utf-16"
-                TriState = TristateTrue
-                UseADODB = False
+                UseADODBToRead = False
+                UseADODBToInferDelimiter = False
             Case Else
                 Throw Err_Encoding
         End Select
@@ -1190,9 +1207,8 @@ Private Function Min4(N1 As Long, N2 As Long, N3 As Long, _
     End If
 End Function
 
-
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : GuessEncoding
+' Procedure  : DetectEncoding
 ' Purpose    : Guesses whether a file needs to be opened with the "format" argument to File.OpenAsTextStream set to
 '              TriStateTrue or TriStateFalse.
 '              The documentation at
@@ -1202,9 +1218,9 @@ End Function
 '              "UTF-16 LE BOM" or "UTF-16 BE BOM"
 '            * TristateFalse needs to be passed for files encoded as "ANSI"
 '            * UTF-8 files are not correctly handled by OpenAsTextStream, instead we use ADODB.Stream, setting CharSet
-'              to "UTF-8".
+'              to "utf-8".
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function GuessEncoding(FilePath As String)
+Private Function DetectEncoding(FilePath As String)
 
     Dim intAsc1Chr As Long
     Dim intAsc2Chr As Long
@@ -1222,12 +1238,14 @@ Private Function GuessEncoding(FilePath As String)
     ' 1=Read-only, False=do not create if not exist, -1=Unicode 0=ASCII
     Set T = m_FSO.OpenTextFile(FilePath, 1, False, 0)
     If T.atEndOfStream Then
-    GuessEncoding = "ANSI"
+        DetectEncoding = "ANSI"
+        T.Close
         Exit Function
     End If
     intAsc1Chr = Asc(T.Read(1))
     If T.atEndOfStream Then
-    GuessEncoding = "ANSI"
+        DetectEncoding = "ANSI"
+        T.Close
         Exit Function
     End If
     
@@ -1235,31 +1253,66 @@ Private Function GuessEncoding(FilePath As String)
     
     If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
         'File is probably encoded UTF-16 LE BOM (little endian, with Byte Option Marker)
-        GuessEncoding = "UTF-16-BOM"
+        DetectEncoding = "UTF-16"
         Exit Function
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
-        GuessEncoding = "UTF-16-BOM"
+        DetectEncoding = "UTF-16"
         Exit Function
     Else
         If T.atEndOfStream Then
-        GuessEncoding = "ANSI"
+            DetectEncoding = "ANSI"
             Exit Function
         End If
         intAsc3Chr = Asc(T.Read(1))
         If (intAsc1Chr = 239) And (intAsc2Chr = 187) And (intAsc3Chr = 191) Then
             'File is probably encoded UTF-8 with BOM
-            GuessEncoding = "UTF-8"
+            DetectEncoding = "UTF-8"
         Else
             'We don't know, assume ANSI but that may be incorrect.
-            GuessEncoding = "ANSI"
+            DetectEncoding = "ANSI"
         End If
     End If
 
     T.Close: Set T = Nothing
     Exit Function
 ErrHandler:
-    Throw "#GuessEncoding: " & Err.Description & "!"
+    Throw "#DetectEncoding: " & Err.Description & "!"
+End Function
+
+Private Function GetFileSize(FilePath As String)
+    On Error GoTo ErrHandler
+    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+    GetFileSize = m_FSO.GetFile(FilePath).Size
+
+    Exit Function
+ErrHandler:
+    Throw "Could not find file '" & FilePath & "'"
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : EstimateNumChars
+' Purpose    : Estimate the number of characters in a file. For Ansii files and UTF files with BOM and containing only
+'              ansi characters the estimate will be exact, otherwise when UTF files contain high codepoint characters
+'              the return will be an overestimate
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function EstimateNumChars(FileSize As Long, Encoding As String)
+    Select Case Encoding
+        Case "ANSI", "ASCII"
+             'will be exact
+            EstimateNumChars = FileSize
+        Case "UTF-16"
+            'Will be exact if the file has a BOM (2 bytes) and contains only _
+            ansi characters (2 bytes each). When file contains non-ansi characters _
+            this will overestimate the character count.
+            EstimateNumChars = (FileSize - 2) / 2
+        Case "UTF-8"
+            'Will be exact if the file has a BOM (3 bytes) and contains only ansi characters (1 byte each).
+            EstimateNumChars = (FileSize - 3)
+        Case Else
+            Throw "Unrecognised encoding '" & Encoding & "'"
+    End Select
+
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1341,7 +1394,7 @@ End Function
 '              But see also sub-routine AmendDelimiterIfFirstFieldIsDateTime.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As String, _
-    TriState As Long, DecimalSeparator As String, UseADODB As Boolean, CharSet As String) As String
+    TriState As Long, DecimalSeparator As String, ByVal UseADODB As Boolean, CharSet As String) As String
     
     Const CHUNK_SIZE As Long = 1000
     Const Err_SourceType As String = "Cannot infer delimiter directly from URL"
@@ -1360,6 +1413,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
 
     EvenQuotes = True
     If st = st_File Then
+
 
         If UseADODB Then
             Set Stream = CreateObject("ADODB.Stream")

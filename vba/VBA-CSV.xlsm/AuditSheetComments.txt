@@ -1,4 +1,7 @@
 Version	Date	Time	Author	Comment
+179	07-Nov-2022	11:03	Philip Swannell	Refactored recent changes to modCSVReadWrite.
+178	07-Nov-2022	10:10	Philip Swannell	Removed worksheet UnicodeTests, have replaced by tests 249 to 252.
+177	06-Nov-2022	18:21	Philip Swannell	Changes to method ReadAllFromStream - should give a performance improvement, but need to test whether that is the case.
 176	06-Nov-2022	11:07	Philip Swannell	Added worksheet UnicodeTests
 175	06-Nov-2022	09:09	Philip Swannell	Refactored method ParseEncoding. Previously there were two places in the code where we decided whether to use a TextStream or ADODB (according to whether the Encoding argument had been provided or had to be guessed\inferred), now only one place.
 174	06-Nov-2022	08:23	Philip Swannell	Reverted the 4 class modules (garcia code) to as they were in version 145. They had since been amended by MZTools\my AmendVBA code. Did so because my function wrap_ws_garcia has stopped working...
