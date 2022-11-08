@@ -270,8 +270,6 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
 
     Exit Function
 ErrHandler:
-Stop
-Resume
     Throw "#RandomString: " & Err.Description & "!"
 End Function
 

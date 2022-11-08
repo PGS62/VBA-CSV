@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+184	08-Nov-2022	16:12	Philip Swannell	Removed Stop statement.
 183	08-Nov-2022	15:54	Philip Swannell	Added timer functions tic and toc.
 182	08-Nov-2022	15:07	Philip Swannell	Optimised ReadAllFromStream - ChunkSize now set to 32,768.
 181	07-Nov-2022	19:48	Philip Swannell	Charset is now "windows-1252" for ANSI files.
