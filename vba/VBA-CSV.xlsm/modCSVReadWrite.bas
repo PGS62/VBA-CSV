@@ -1189,19 +1189,9 @@ Private Function Min4(N1 As Long, N2 As Long, N3 As Long, _
     End If
 End Function
 
-'TODO documentation below is out of date
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : DetectEncoding
-' Purpose    : Guesses whether a file needs to be opened with the "format" argument to File.OpenAsTextStream set to
-'              TriStateTrue or TriStateFalse.
-'              The documentation at
-'              https://docs.microsoft.com/en-us/office/vba/language/reference/user-interface-help/openastextstream-method
-'              is limited but I believe that:
-'            * TriStateTrue needs to passed for files which (as reported by NotePad++) are encoded as either
-'              "UTF-16 LE BOM" or "UTF-16 BE BOM"
-'            * TristateFalse needs to be passed for files encoded as "ANSI"
-'            * UTF-8 files are not correctly handled by OpenAsTextStream, instead we use ADODB.Stream, setting CharSet
-'              to "utf-8".
+' Purpose    : Attempt to detect the file's encoding by looking for a byte option mark
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function DetectEncoding(FilePath As String)
 
@@ -1209,43 +1199,34 @@ Private Function DetectEncoding(FilePath As String)
     Dim intAsc2Chr As Long
     Dim intAsc3Chr As Long
     Dim T As Scripting.TextStream
+    Dim CopyOfErr As String
 
     On Error GoTo ErrHandler
     
     If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
     
-    If (m_FSO.FileExists(FilePath) = False) Then
-        Throw "File not found!"
-    End If
-
-    ' 1=Read-only, False=do not create if not exist, -1=Unicode 0=ASCII
     Set T = m_FSO.OpenTextFile(FilePath, 1, False, 0)
     If T.AtEndOfStream Then
         DetectEncoding = "ANSI"
-        T.Close
-        Exit Function
+        GoTo EarlyExit
     End If
+    
     intAsc1Chr = Asc(T.Read(1))
     If T.AtEndOfStream Then
         DetectEncoding = "ANSI"
-        T.Close
-        Exit Function
+        GoTo EarlyExit
     End If
     
     intAsc2Chr = Asc(T.Read(1))
-    
     If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
         'File is probably encoded UTF-16 LE BOM (little endian, with Byte Option Marker)
         DetectEncoding = "UTF-16"
-        Exit Function
     ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
         'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
         DetectEncoding = "UTF-16"
-        Exit Function
     Else
         If T.AtEndOfStream Then
             DetectEncoding = "ANSI"
-            Exit Function
         End If
         intAsc3Chr = Asc(T.Read(1))
         If (intAsc1Chr = 239) And (intAsc2Chr = 187) And (intAsc3Chr = 191) Then
@@ -1257,10 +1238,13 @@ Private Function DetectEncoding(FilePath As String)
         End If
     End If
 
+EarlyExit:
     T.Close: Set T = Nothing
     Exit Function
 ErrHandler:
-    Throw "#DetectEncoding: " & Err.Description & "!"
+    CopyOfErr = Err.Description
+    T.Close
+    Throw "#DetectEncoding: " & CopyOfErr & "!"
 End Function
 
 Private Function GetFileSize(FilePath As String)
@@ -1410,7 +1394,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
                 End Select
             Next i
         Loop
-        Stream.Close
+        Stream.Close: Set Stream = Nothing: Set F = Nothing
     ElseIf st = st_String Then
         Contents = FileNameOrContents
         MaxChars = MAX_CHUNKS * CHUNK_SIZE
