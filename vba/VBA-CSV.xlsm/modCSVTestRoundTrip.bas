@@ -215,10 +215,8 @@ ErrHandler:
 End Sub
 
 Function ChrW_Wrap(CharCode As Long)
-ChrW_Wrap = ChrW$(CharCode)
+    ChrW_Wrap = ChrW$(CharCode)
 End Function
-
-
 
 Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL As String) As String
 
@@ -228,8 +226,20 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
     Dim i As Long
     Dim Length As Long
     Dim Res As String
+    Dim MaxCodePoint As Long
     
     On Error GoTo ErrHandler
+    
+    Select Case UCase(Encoding)
+        Case "ANSI"
+            MaxCodePoint = 255
+        Case "UTF-8"
+            MaxCodePoint = 55295
+        Case "UTF-16"
+            MaxCodePoint = 65535
+        Case Else
+            Throw "Unrecognised Encoding"
+    End Select
     
     Length = CLng(1 + Rnd() * maxlen)
     Res = String(Length, " ")
@@ -237,30 +247,12 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
     Select Case Encoding
         Case "ANSI"
             For i = 1 To Length
-                Mid$(Res, i, 1) = Chr$(34 + Rnd() * 88)
-            Next i
-
-        Case "UTF-8"
-            For i = 1 To Length
-                Mid$(Res, i, 1) = ChrW$(Rnd() * 55295)
-                If Not AllowLineFeed Then
-                    If Mid$(Res, i, 1) = vbLf Or Mid$(Res, i, 1) = vbCr Then
-                        Mid$(Res, i, 1) = " "
-                    End If
-                End If
-            Next i
-
-        Case "UTF-16"
-            For i = 1 To Length
-                Mid$(Res, i, 1) = ChrW$(Rnd() * 65535)
-                If Not AllowLineFeed Then
-                    If Mid$(Res, i, 1) = vbLf Or Mid$(Res, i, 1) = vbCr Then
-                        Mid$(Res, i, 1) = " "
-                    End If
-                End If
+                Mid$(Res, i, 1) = Chr$(Rnd() * MaxCodePoint)
             Next i
         Case Else
-            Stop
+            For i = 1 To Length
+                Mid$(Res, i, 1) = ChrW$(Rnd() * MaxCodePoint)
+            Next i
     End Select
 
     If AllowLineFeed Then
@@ -269,12 +261,17 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
                 Mid$(Res, Length / 2, Len(EOL)) = EOL
             End If
         End If
+    Else
+        Res = Replace(Res, vbLf, " ")
+        Res = Replace(Res, vbCr, " ")
     End If
     
     RandomString = Res
 
     Exit Function
 ErrHandler:
+Stop
+Resume
     Throw "#RandomString: " & Err.Description & "!"
 End Function
 

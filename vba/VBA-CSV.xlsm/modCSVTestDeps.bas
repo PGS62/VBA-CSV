@@ -20,6 +20,8 @@ Option Private Module
     Private Declare Function QueryPerformanceCounter Lib "kernel32" (lpPerformanceCount As Currency) As Long
 #End If
 
+Private m_tictime As Double
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : TestCSVRead
 ' Purpose    : Kernel of the method RunTests, uses sArryasIdentical to check that data read by function CSVRead is
@@ -256,17 +258,28 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function ElapsedTime() As Double
     Dim a As Currency
-    Dim b As Currency
+    Static b As Currency
     On Error GoTo ErrHandler
 
     QueryPerformanceCounter a
-    QueryPerformanceFrequency b
+    If b = 0 Then QueryPerformanceFrequency b
     ElapsedTime = a / b
 
     Exit Function
 ErrHandler:
     Throw "#ElapsedTime: " & Err.Description & "!"
 End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedures : tic and toc
+' Purpose    : Timer functions inspired by MATLAB functions of the same names.
+' -----------------------------------------------------------------------------------------------------------------------
+Sub tic()
+    m_tictime = ElapsedTime()
+End Sub
+Sub toc(Optional WhatWasTimed As String)
+    Debug.Print (IIf(m_tictime = 0, "Call tic() before calling toc()", IIf(WhatWasTimed = "", "Elapsed time: ", "Elapsed time for " & WhatWasTimed & ": ") & CStr(ElapsedTime() - m_tictime) & " seconds"))
+End Sub
 
 'Copy of identical function in modCSVReadWrite
 Public Function NumDimensions(x As Variant) As Long

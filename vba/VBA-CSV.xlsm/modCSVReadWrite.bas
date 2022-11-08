@@ -755,16 +755,19 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ReadAllFromStream
 ' Purpose    : Handles both ADODB.Stream and Scripting.TextStream. Note that ADODB.ReadText(-1) to read all of a stream
-'              in a single operation has _very_ poor performance for large files, but reading 10,000 characters at a time
-'              in a loop appears to solve that problem. In the case of ADODB stream, performance for large files is
-'              improved if we already know the number of characters in the file.
+'              in a single operation has _very_ poor performance for large files, but reading in chunks solves that.
+'              See Microsoft Knowledge Base 280067
+'              https://mskb.pkisolutions.com/kb/280067
+'              The article suggests a chunk size of 131072 (2^17), but my tests (on a 134Mb file) suggested 32768 (2^15).
+'              A further optimisation is to know the number of characters in the file, to avoid string concatenation
+'              inside the loop, hence the EstNumChars argument.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ReadAllFromStream(Stream As Object, Optional ByVal EstNumChars As Long) As String
       
+    Const ChunkSize As Long = 32768
     Dim Chunk As String
     Dim Contents As String
     Dim i As Long
-    Const ChunkSize As Long = 10000
 
     If EstNumChars = 0 Then EstNumChars = 10000
 
@@ -776,6 +779,7 @@ Private Function ReadAllFromStream(Stream As Object, Optional ByVal EstNumChars 
             Do While Not Stream.EOS
                 Chunk = Stream.ReadText(ChunkSize)
                 If i - 1 + Len(Chunk) > Len(Contents) Then
+                    'Increase length of Contents by a factor (at least) 2
                     Contents = Contents & String(i - 1 + Len(Chunk), " ")
                 End If
 
@@ -816,7 +820,6 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef TriState As Long, _
     ByRef CharSet As String, ByRef UseADODBToRead As Boolean, ByRef UseADODBToInferDelimiter As Boolean)
-
     Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding must be " & _
         "either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16"""
     
