@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+185	08-Nov-2022	19:29	Philip Swannell	CSVRead now always uses ADODB text stream (rather than ADODB for some encodings and Scripting.TextStream for other encodings). Refactored and simplified.
 184	08-Nov-2022	16:12	Philip Swannell	Removed Stop statement.
 183	08-Nov-2022	15:54	Philip Swannell	Added timer functions tic and toc.
 182	08-Nov-2022	15:07	Philip Swannell	Optimised ReadAllFromStream - ChunkSize now set to 32,768.

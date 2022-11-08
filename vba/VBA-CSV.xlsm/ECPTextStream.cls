@@ -79,9 +79,9 @@ End Enum
 '////////////////////////////////////////////////////////////////////////////////////////////
 '#
 ' PROPERTIES:
-Public Property Get atEndOfStream() As Boolean
-Attribute atEndOfStream.VB_Description = "Gets the pointer’s overall status over the text stream."
-    atEndOfStream = P_ATENDOFSTREAM
+Public Property Get AtEndOfStream() As Boolean
+Attribute AtEndOfStream.VB_Description = "Gets the pointer’s overall status over the text stream."
+    AtEndOfStream = P_ATENDOFSTREAM
 End Property
 Public Property Get bufferLength() As Long
 Attribute bufferLength.VB_Description = "Gets the number of string characters in the buffer."
