@@ -62,7 +62,7 @@ Function FileReadAll(FileName As String) As String
 
     Exit Function
 ErrHandler:
-    Throw "#FileReadAll (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "FileReadAll", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ Function VStack(ParamArray Arrays()) As Variant
     End If
     Exit Function
 ErrHandler:
-    VStack = "#VStack (line " & CStr(Erl) & "): " & Err.Description & "!"
+    VStack = ReThrow("VStack", Err, True)
 End Function
 
 Function FileSize(FileName As String)
@@ -170,7 +170,7 @@ Function FileSize(FileName As String)
 
     Exit Function
 ErrHandler:
-    Throw "#FileSize (line " & CStr(Erl) & "): " & Err.Description & "!"
+    FileSize = ReThrow("FileSize", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ Function Fill(ByVal x As Variant, ByVal NumRows As Long, ByVal NumCols As Long)
 
     Exit Function
 ErrHandler:
-    Fill = "#Fill: " & Err.Description & "!"
+    Fill = ReThrow("Fill", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -245,7 +245,7 @@ Function AllCombinations(Arg1 As Variant, Optional Arg2 As Variant, Optional Arg
 
     Exit Function
 ErrHandler:
-    AllCombinations = "#AllCombinations (line " & CStr(Erl) & "): " & Err.Description & "!"
+    AllCombinations = ReThrow("AllCombinations", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -282,7 +282,7 @@ Function MakeGoodStringsBad(GoodStrings As Variant, Optional InsertThis As Strin
 
     Exit Function
 ErrHandler:
-    MakeGoodStringsBad = "#MakeGoodStringsBad (line " & CStr(Erl) & "): " & Err.Description & "!"
+    MakeGoodStringsBad = ReThrow("MakeGoodStringsBad", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -304,7 +304,7 @@ Private Function InsertInString(InsertThis As String, ByVal InToThis As String, 
     InsertInString = InToThis
     Exit Function
 ErrHandler:
-    Throw "#InsertInString (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "InsertInString", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -416,8 +416,8 @@ EarlyExit:
 
     Exit Function
 ErrHandler:
-    IsRegMatch = "#IsRegMatch (line " & CStr(Erl) & "): " & Err.Description & "!"
-    Set rx = Nothing
+Set rx = Nothing
+    IsRegMatch = ReThrow("IsRegMatch", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

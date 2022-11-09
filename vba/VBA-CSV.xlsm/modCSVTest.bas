@@ -293,7 +293,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     
     Exit Sub
 ErrHandler:
-    Throw "#RunTests (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "RunTests", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -328,7 +328,7 @@ Public Sub RunTestsFromButton()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#RunTestsFromButton (line " & CStr(Erl) & "): " & Err.Description & "!", vbCritical
+    MsgBox ReThrow("RunTestsFromButton", Err, True), vbCritical
 End Sub
 
 Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
@@ -353,7 +353,7 @@ Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
 
     Exit Sub
 ErrHandler:
-    Throw "#PasteFailures (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "PasteFailures", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -433,7 +433,7 @@ Private Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test1 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test1", Err
 End Sub
 
 Private Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -453,7 +453,7 @@ Private Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test2 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test2", Err
 End Sub
 
 Private Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -475,7 +475,7 @@ Private Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test3 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test3", Err
 End Sub
 
 Private Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -495,7 +495,7 @@ Private Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test4 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test4", Err
 End Sub
 
 Private Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -519,7 +519,7 @@ Private Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test5 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test5", Err
 End Sub
 
 Private Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -539,7 +539,7 @@ Private Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test6 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test6", Err
 End Sub
 
 Private Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -565,7 +565,7 @@ Private Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test7 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test7", Err
 End Sub
 
 Private Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -585,7 +585,7 @@ Private Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test8 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test8", Err
 End Sub
 
 Private Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -605,7 +605,7 @@ Private Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
 
     Exit Sub
 ErrHandler:
-    Throw "#Test9 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test9", Err
 End Sub
 
 Private Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -630,7 +630,7 @@ Private Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test10 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test10", Err
 End Sub
 
 Private Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -656,7 +656,7 @@ Private Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test11 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test11", Err
 End Sub
 
 Private Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -681,7 +681,7 @@ Private Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test12 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test12", Err
 End Sub
 
 Private Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -701,7 +701,7 @@ Private Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test13 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test13", Err
 End Sub
 
 Private Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -721,7 +721,7 @@ Private Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test14 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test14", Err
 End Sub
 
 Private Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -741,7 +741,7 @@ Private Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test15 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test15", Err
 End Sub
 
 Private Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -761,7 +761,7 @@ Private Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test16 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test16", Err
 End Sub
 
 Private Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -781,7 +781,7 @@ Private Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test17 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test17", Err
 End Sub
 
 Private Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -801,7 +801,7 @@ Private Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test18 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test18", Err
 End Sub
 
 Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -829,7 +829,7 @@ Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test19 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test19", Err
 End Sub
 
 Private Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -849,7 +849,7 @@ Private Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test20 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test20", Err
 End Sub
 
 Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -873,7 +873,7 @@ Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test21 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test21", Err
 End Sub
 
 Private Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -893,7 +893,7 @@ Private Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test22 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test22", Err
 End Sub
 
 Private Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -913,7 +913,7 @@ Private Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test23 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test23", Err
 End Sub
 
 Private Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -934,7 +934,7 @@ Private Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test24 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test24", Err
 End Sub
 
 Private Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -954,7 +954,7 @@ Private Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test25 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test25", Err
 End Sub
 
 Private Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -980,7 +980,7 @@ Private Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test26 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test26", Err
 End Sub
 
 Private Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1000,7 +1000,7 @@ Private Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test27 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test27", Err
 End Sub
 
 Private Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1024,7 +1024,7 @@ Private Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test28 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test28", Err
 End Sub
 
 Private Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1045,7 +1045,7 @@ Private Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test29 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test29", Err
 End Sub
 
 Private Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1065,7 +1065,7 @@ Private Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test30 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test30", Err
 End Sub
 
 Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1092,7 +1092,7 @@ Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test31 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test31", Err
 End Sub
 
 Private Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1112,7 +1112,7 @@ Private Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test32 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test32", Err
 End Sub
 
 Private Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1132,7 +1132,7 @@ Private Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test33 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test33", Err
 End Sub
 
 Private Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1152,7 +1152,7 @@ Private Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test34 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test34", Err
 End Sub
 
 Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1175,7 +1175,7 @@ Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test35 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test35", Err
 End Sub
 
 Private Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1200,7 +1200,7 @@ Private Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test36 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test36", Err
 End Sub
 
 Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1228,7 +1228,7 @@ Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test37 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test37", Err
 End Sub
 
 Private Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1248,7 +1248,7 @@ Private Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test38 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test38", Err
 End Sub
 
 Private Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1275,7 +1275,7 @@ Private Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test39 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test39", Err
 End Sub
 
 Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1304,7 +1304,7 @@ Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test40 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test40", Err
 End Sub
 
 Private Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1326,7 +1326,7 @@ Private Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test41 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test41", Err
 End Sub
 
 Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1353,7 +1353,7 @@ Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test42 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test42", Err
 End Sub
 
 Private Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1378,7 +1378,7 @@ Private Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test43 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test43", Err
 End Sub
 
 Private Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1402,7 +1402,7 @@ Private Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test44 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test44", Err
 End Sub
 
 Private Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1426,7 +1426,7 @@ Private Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test45 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test45", Err
 End Sub
 
 Private Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1446,7 +1446,7 @@ Private Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test46 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test46", Err
 End Sub
 
 Private Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1474,7 +1474,7 @@ Private Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test47 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test47", Err
 End Sub
 
 Private Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1498,7 +1498,7 @@ Private Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test48 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test48", Err
 End Sub
 
 Private Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1519,7 +1519,7 @@ Private Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test49 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test49", Err
 End Sub
 
 Private Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1540,7 +1540,7 @@ Private Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test50 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test50", Err
 End Sub
 
 Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1572,7 +1572,7 @@ Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test51 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test51", Err
 End Sub
 
 Private Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1595,7 +1595,7 @@ Private Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test52 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test52", Err
 End Sub
 
 Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1628,7 +1628,7 @@ Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test53 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test53", Err
 End Sub
 
 Private Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1653,7 +1653,7 @@ Private Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test54 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test54", Err
 End Sub
 
 Private Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1683,7 +1683,7 @@ Private Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test55 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test55", Err
 End Sub
 
 Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1715,7 +1715,7 @@ Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test56 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test56", Err
 End Sub
 
 Private Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1742,7 +1742,7 @@ Private Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test57 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test57", Err
 End Sub
 
 Private Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1768,7 +1768,7 @@ Private Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test58 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test58", Err
 End Sub
 
 Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1802,7 +1802,7 @@ Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test59 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test59", Err
 End Sub
 
 Private Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1843,7 +1843,7 @@ Private Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test60 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test60", Err
 End Sub
 
 Private Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1874,7 +1874,7 @@ Private Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test61 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test61", Err
 End Sub
 
 Private Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1900,7 +1900,7 @@ Private Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test62 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test62", Err
 End Sub
 
 Private Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1936,7 +1936,7 @@ Private Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test63 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test63", Err
 End Sub
 
 Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1962,7 +1962,7 @@ Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test64 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test64", Err
 End Sub
 
 Private Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -1985,7 +1985,7 @@ Private Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test65 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test65", Err
 End Sub
 
 Private Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2008,7 +2008,7 @@ Private Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test66 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test66", Err
 End Sub
 
 Private Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2031,7 +2031,7 @@ Private Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test67 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test67", Err
 End Sub
 
 Private Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2054,7 +2054,7 @@ Private Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test68 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test68", Err
 End Sub
 
 Private Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2077,7 +2077,7 @@ Private Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test69 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test69", Err
 End Sub
 
 Private Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2100,7 +2100,7 @@ Private Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test70 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test70", Err
 End Sub
 
 Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2126,7 +2126,7 @@ Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test71 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test71", Err
 End Sub
 
 Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2149,7 +2149,7 @@ Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test72 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test72", Err
 End Sub
 
 Private Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2172,7 +2172,7 @@ Private Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test73 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test73", Err
 End Sub
 
 Private Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2195,7 +2195,7 @@ Private Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test74 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test74", Err
 End Sub
 
 Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2221,7 +2221,7 @@ Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test75 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test75", Err
 End Sub
 
 Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2253,7 +2253,7 @@ Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test76 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test76", Err
 End Sub
 
 Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2276,7 +2276,7 @@ Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test77 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test77", Err
 End Sub
 
 Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2318,7 +2318,7 @@ Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test78 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test78", Err
 End Sub
 
 Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2342,7 +2342,7 @@ Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test79 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test79", Err
 End Sub
 
 Private Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2364,7 +2364,7 @@ Private Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test80 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test80", Err
 End Sub
 
 Private Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2384,7 +2384,7 @@ Private Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test81 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test81", Err
 End Sub
 
 Private Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2404,7 +2404,7 @@ Private Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test82 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test82", Err
 End Sub
 
 Private Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2429,7 +2429,7 @@ Private Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test83 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test83", Err
 End Sub
 
 Private Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2449,7 +2449,7 @@ Private Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test84 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test84", Err
 End Sub
 
 Private Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2469,7 +2469,7 @@ Private Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test85 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test85", Err
 End Sub
 
 Private Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2494,7 +2494,7 @@ Private Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test86 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test86", Err
 End Sub
 
 Private Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2527,7 +2527,7 @@ Private Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test87 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test87", Err
 End Sub
 
 Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2556,7 +2556,7 @@ Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test88 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test88", Err
 End Sub
 
 Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2586,7 +2586,7 @@ Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test89 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test89", Err
 End Sub
 
 Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2607,7 +2607,7 @@ Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test90 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test90", Err
 End Sub
 
 Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2652,7 +2652,7 @@ Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test91 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test91", Err
 End Sub
 
 Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2692,7 +2692,7 @@ Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test92 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test92", Err
 End Sub
 Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
@@ -2719,7 +2719,7 @@ Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test93 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test93", Err
 End Sub
 
 Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2765,7 +2765,7 @@ Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test94 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test94", Err
 End Sub
 
 Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2792,7 +2792,7 @@ Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test95 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test95", Err
 End Sub
 
 Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2819,7 +2819,7 @@ Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test96 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test96", Err
 End Sub
 
 Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2846,7 +2846,7 @@ Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test97 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test97", Err
 End Sub
 
 Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2875,7 +2875,7 @@ Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test98 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test98", Err
 End Sub
 
 Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2891,7 +2891,7 @@ Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good ISO8601 with DateFormat = ISO"
     FileName = "test_good_ISO8601.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=3))
+    Expected = CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=3)
     CastDoublesToDates Expected
     TestRes = TestCSVRead(99, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -2905,7 +2905,7 @@ Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     Exit Sub
 ErrHandler:
-    Throw "#Test99 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test99", Err
 End Sub
 
 Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2921,7 +2921,7 @@ Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good ISO8601 with DateFormat = ISOZ"
     FileName = "test_good_ISO8601.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=4))
+    Expected = CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=4)
     CastDoublesToDates Expected
     TestRes = TestCSVRead(100, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -2935,7 +2935,7 @@ Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test100 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test100", Err
 End Sub
 
 Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2950,7 +2950,7 @@ Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct ISO8601 does not convert to dates
     TestDescription = "test bad ISO8601"
     FileName = "test_bad_ISO8601.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    Expected = CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
     TestRes = TestCSVRead(101, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
@@ -2962,7 +2962,7 @@ Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test101 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test101", Err
 End Sub
 
 Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -2978,7 +2978,7 @@ Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good Y-M-D"
     FileName = "test_good_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
+    Expected = CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
     CastDoublesToDates Expected
     TestRes = TestCSVRead(102, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -2992,7 +2992,7 @@ Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test102 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test102", Err
 End Sub
 
 Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3007,7 +3007,7 @@ Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct Y-M-D does not convert to dates
     TestDescription = "test bad Y-M-D"
     FileName = "test_bad_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    Expected = CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
     TestRes = TestCSVRead(103, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
@@ -3019,7 +3019,7 @@ Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test103 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test103", Err
 End Sub
 
 Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3035,7 +3035,7 @@ Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good D-M-Y"
     FileName = "test_good_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
+    Expected = CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
     CastDoublesToDates Expected
     TestRes = TestCSVRead(104, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -3049,7 +3049,7 @@ Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test104 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test104", Err
 End Sub
 
 Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3064,7 +3064,7 @@ Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct D-M-Y does not convert to dates
     TestDescription = "test bad D-M-Y"
     FileName = "test_bad_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    Expected = CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
     TestRes = TestCSVRead(105, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
@@ -3076,7 +3076,7 @@ Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test105 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test105", Err
 End Sub
 
 Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3092,7 +3092,7 @@ Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
      to within a very small (10 microsecond) tolerance to cope with floating point inaccuracies
     TestDescription = "test good M-D-Y"
     FileName = "test_good_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2))
+    Expected = CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, NumCols:=1, SkipToCol:=2)
     CastDoublesToDates Expected
     TestRes = TestCSVRead(106, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -3106,7 +3106,7 @@ Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test106 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test106", Err
 End Sub
 
 Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3121,7 +3121,7 @@ Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     'Test that parsing strings that almost but not correct M-D-Y does not convert to dates
     TestDescription = "test bad M-D-Y"
     FileName = "test_bad_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2))
+    Expected = CSVRead(Folder & FileName, False, ",", SkipToRow:=2, SkipToCol:=2)
     TestRes = TestCSVRead(107, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
         Delimiter:=",", _
@@ -3133,7 +3133,7 @@ Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test107 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test107", Err
 End Sub
 
 Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3173,7 +3173,7 @@ Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test108 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test108", Err
 End Sub
 
 Private Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3195,7 +3195,7 @@ Private Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test109 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test109", Err
 End Sub
 
 Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3220,7 +3220,7 @@ Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test110 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test110", Err
 End Sub
 
 Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3243,7 +3243,7 @@ Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test111 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test111", Err
 End Sub
 
 Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3267,7 +3267,7 @@ Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test112 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test112", Err
 End Sub
 
 Private Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3289,7 +3289,7 @@ Private Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test113 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test113", Err
 End Sub
 
 Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3312,7 +3312,7 @@ Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test114 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test114", Err
 End Sub
 
 Private Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3334,7 +3334,7 @@ Private Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test115 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test115", Err
 End Sub
 
 Private Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3361,7 +3361,7 @@ Private Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test116 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test116", Err
 End Sub
 
 Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3393,7 +3393,7 @@ Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test117 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test117", Err
 End Sub
 
 Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3418,7 +3418,7 @@ Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test118 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test118", Err
 End Sub
 
 Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3442,7 +3442,7 @@ Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test119 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test119", Err
 End Sub
 
 Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3465,7 +3465,7 @@ Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test120 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test120", Err
 End Sub
 
 Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3502,7 +3502,7 @@ Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test121 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test121", Err
 End Sub
 
 Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3526,7 +3526,7 @@ Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test122 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test122", Err
 End Sub
 
 Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3560,7 +3560,7 @@ Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test123 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test123", Err
 End Sub
 
 Private Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3581,7 +3581,7 @@ Private Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test124 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test124", Err
 End Sub
 
 Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3610,7 +3610,7 @@ Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test125 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test125", Err
 End Sub
 
 Private Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3632,7 +3632,7 @@ Private Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test126 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test126", Err
 End Sub
 
 Private Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3657,7 +3657,7 @@ Private Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test127 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test127", Err
 End Sub
 
 Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3681,7 +3681,7 @@ Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test128 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test128", Err
 End Sub
 
 Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3714,7 +3714,7 @@ Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test129 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test129", Err
 End Sub
 
 Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3739,7 +3739,7 @@ Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test130 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test130", Err
 End Sub
 
 Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3768,7 +3768,7 @@ Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test131 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test131", Err
 End Sub
 
 Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3797,7 +3797,7 @@ Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test132 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test132", Err
 End Sub
 
 Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3835,7 +3835,7 @@ Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test133 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test133", Err
 End Sub
 
 Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3860,7 +3860,7 @@ Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test134 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test134", Err
 End Sub
 
 Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3883,7 +3883,7 @@ Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test135 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test135", Err
 End Sub
 
 Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3906,7 +3906,7 @@ Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test136 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test136", Err
 End Sub
 
 Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3929,7 +3929,7 @@ Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test137 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test137", Err
 End Sub
 
 Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3952,7 +3952,7 @@ Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test138 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test138", Err
 End Sub
 
 Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -3975,7 +3975,7 @@ Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test139 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test139", Err
 End Sub
 
 Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4000,7 +4000,7 @@ Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test140 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test140", Err
 End Sub
 
 Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4023,7 +4023,7 @@ Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test141 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test141", Err
 End Sub
 
 Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4046,7 +4046,7 @@ Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test142 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test142", Err
 End Sub
 
 Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4069,7 +4069,7 @@ Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test143 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test143", Err
 End Sub
 
 Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4092,7 +4092,7 @@ Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test144 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test144", Err
 End Sub
 
 Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4115,7 +4115,7 @@ Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test145 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test145", Err
 End Sub
 
 Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4138,7 +4138,7 @@ Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test146 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test146", Err
 End Sub
 
 Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4161,7 +4161,7 @@ Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test147 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test147", Err
 End Sub
 
 Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4184,7 +4184,7 @@ Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test148 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test148", Err
 End Sub
 
 Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4207,7 +4207,7 @@ Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test149 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test149", Err
 End Sub
 
 Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4230,7 +4230,7 @@ Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test150 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test150", Err
 End Sub
 
 Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4254,7 +4254,7 @@ Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test151 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test151", Err
 End Sub
 
 Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4277,7 +4277,7 @@ Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test152 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test152", Err
 End Sub
 
 Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4300,7 +4300,7 @@ Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test153 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test153", Err
 End Sub
 
 Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4328,7 +4328,7 @@ Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test154 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test154", Err
 End Sub
 
 Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4364,7 +4364,7 @@ Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test155 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test155", Err
 End Sub
 
 Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4394,7 +4394,7 @@ Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test156 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test156", Err
 End Sub
 
 Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4417,7 +4417,7 @@ Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test157 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test157", Err
 End Sub
 
 Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4441,7 +4441,7 @@ Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test158 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test158", Err
 End Sub
 
 Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4478,7 +4478,7 @@ Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test159 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test159", Err
 End Sub
 
 Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4501,7 +4501,7 @@ Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test160 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test160", Err
 End Sub
 
 Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4538,7 +4538,7 @@ Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test161 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test161", Err
 End Sub
 
 Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4563,7 +4563,7 @@ Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test162 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test162", Err
 End Sub
 
 Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4588,7 +4588,7 @@ Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test163 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test163", Err
 End Sub
 
 Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4611,7 +4611,7 @@ Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test164 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test164", Err
 End Sub
 
 Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4634,7 +4634,7 @@ Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test165 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test165", Err
 End Sub
 
 Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4659,7 +4659,7 @@ Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test166 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test166", Err
 End Sub
 
 Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4686,7 +4686,7 @@ Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test167 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test167", Err
 End Sub
 
 Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4709,7 +4709,7 @@ Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test168 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test168", Err
 End Sub
 
 Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4732,7 +4732,7 @@ Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test169 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test169", Err
 End Sub
 
 Private Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4775,7 +4775,7 @@ Private Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test170 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test170", Err
 End Sub
 
 Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4816,7 +4816,7 @@ Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test171 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test171", Err
 End Sub
 
 Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4847,7 +4847,7 @@ Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test172 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test172", Err
 End Sub
 
 Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4870,7 +4870,7 @@ Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test173 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test173", Err
 End Sub
 
 Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4893,7 +4893,7 @@ Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test174 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test174", Err
 End Sub
 
 Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4916,7 +4916,7 @@ Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test175 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test175", Err
 End Sub
 
 Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4930,7 +4930,7 @@ Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test various time formats"
     FileName = "test_various_time_formats.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
     CastDoublesToDates Expected
     TestRes = TestCSVRead(176, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
@@ -4945,7 +4945,7 @@ Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test176 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test176", Err
 End Sub
 
 Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -4959,7 +4959,7 @@ Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test y-m-d dates with fractional seconds"
     FileName = "test_y-m-d_dates_with_fractional_seconds.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = CSVRead(Folder & FileName, ConvertTypes:="N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
     CastDoublesToDates Expected
     TestRes = TestCSVRead(177, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="D", _
@@ -4974,7 +4974,7 @@ Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test177 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test177", Err
 End Sub
 
 Private Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5007,7 +5007,7 @@ Private Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test178 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test178", Err
 End Sub
 
 Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5043,7 +5043,7 @@ Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test179 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test179", Err
 End Sub
 
 Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5074,7 +5074,7 @@ Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test180 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test180", Err
 End Sub
 
 Private Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5097,7 +5097,7 @@ Private Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test181 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test181", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -5124,7 +5124,7 @@ Function TwoFiveFiveChars() As Variant
 
     Exit Function
 ErrHandler:
-    Throw "#TwoFiveFiveChars (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "TwoFiveFiveChars", Err
 End Function
 
 Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5147,7 +5147,7 @@ Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test182 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test182", Err
 End Sub
 
 Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5170,7 +5170,7 @@ Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test183 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test183", Err
 End Sub
 
 Private Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5192,7 +5192,7 @@ Private Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test184 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test184", Err
 End Sub
 
 Private Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5213,7 +5213,7 @@ Private Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
     Exit Sub
 ErrHandler:
-    Throw "#Test185 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test185", Err
 End Sub
 
 Private Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5234,7 +5234,7 @@ Private Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
     Exit Sub
 ErrHandler:
-    Throw "#Test186 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test186", Err
 End Sub
 
 Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5259,7 +5259,7 @@ Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test187 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test187", Err
 End Sub
 
 Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5284,7 +5284,7 @@ Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test188 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test188", Err
 End Sub
 
 Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5310,7 +5310,7 @@ Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test189 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test189", Err
 End Sub
 
 Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5349,7 +5349,7 @@ Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test190 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test190", Err
 End Sub
 
 Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5376,7 +5376,7 @@ Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test191 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test191", Err
 End Sub
 
 Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5401,7 +5401,7 @@ Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test192 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test192", Err
 End Sub
 
 Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5461,7 +5461,7 @@ Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test193 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test193", Err
 End Sub
 
 Private Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5483,7 +5483,7 @@ Private Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test194 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test194", Err
 End Sub
 
 Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5497,7 +5497,7 @@ Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad D-M-Y"
     FileName = "test_bad_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, False))
+    Expected = CSVRead(Folder & FileName, False)
     TestRes = TestCSVRead(195, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=776, _
         NumColsExpected:=2, _
@@ -5508,7 +5508,7 @@ Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test195 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test195", Err
 End Sub
 
 Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5522,7 +5522,7 @@ Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad M-D-Y"
     FileName = "test_bad_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, False))
+    Expected = CSVRead(Folder & FileName, False)
     TestRes = TestCSVRead(196, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=776, _
         NumColsExpected:=2, _
@@ -5533,7 +5533,7 @@ Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test196 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test196", Err
 End Sub
 
 Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5547,7 +5547,7 @@ Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad Y-M-D"
     FileName = "test_bad_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, False))
+    Expected = CSVRead(Folder & FileName, False)
     TestRes = TestCSVRead(197, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         NumRowsExpected:=776, _
         NumColsExpected:=2, _
@@ -5558,7 +5558,7 @@ Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test197 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test197", Err
 End Sub
 
 Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5572,7 +5572,7 @@ Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test good D-M-Y"
     FileName = "test_good_D-M-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
     CastDoublesToDates Expected
     
     TestRes = TestCSVRead(198, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
@@ -5586,7 +5586,7 @@ Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test198 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test198", Err
 End Sub
 
 Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5600,7 +5600,7 @@ Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test good M-D-Y"
     FileName = "test_good_M-D-Y.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
     CastDoublesToDates Expected
     
     TestRes = TestCSVRead(199, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
@@ -5614,7 +5614,7 @@ Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test199 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test199", Err
 End Sub
 
 Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5628,7 +5628,7 @@ Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test good Y-M-D"
     FileName = "test_good_Y-M-D.csv"
-    Expected = ThrowIfError(CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1))
+    Expected = CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
     CastDoublesToDates Expected
     
     TestRes = TestCSVRead(200, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
@@ -5642,7 +5642,7 @@ Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test200 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test200", Err
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
@@ -5680,7 +5680,7 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test201 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test201", Err
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
@@ -5719,7 +5719,7 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test202 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test202", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -5749,7 +5749,7 @@ Private Sub Test203(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test203 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test203", Err
 End Sub
 
 Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5772,7 +5772,7 @@ Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test204 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test204", Err
 End Sub
 
 Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5820,9 +5820,7 @@ Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Stop
-    Resume
-    Throw "#Test205 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test205", Err
 End Sub
 
 Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5867,7 +5865,7 @@ Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test206 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test206", Err
 End Sub
 
 'Tests TrueString and FalseString (in this case yes and no) appearing in the file with quotes.
@@ -5902,7 +5900,7 @@ Private Sub Test207(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test207 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test207", Err
 End Sub
 
 Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5937,7 +5935,7 @@ Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test208 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test208", Err
 End Sub
 
 Private Sub Test209(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5961,7 +5959,7 @@ Private Sub Test209(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test209 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test209", Err
 End Sub
 
 Private Sub Test210(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -5985,7 +5983,7 @@ Private Sub Test210(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test210 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test210", Err
 End Sub
 
 Private Sub Test211(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6009,7 +6007,7 @@ Private Sub Test211(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test211 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test211", Err
 End Sub
 
 Private Sub Test212(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6033,7 +6031,7 @@ Private Sub Test212(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test212 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test212", Err
 End Sub
 
 Private Sub Test213(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6056,7 +6054,7 @@ Private Sub Test213(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test213 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test213", Err
 End Sub
 
 Private Sub Test214(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6079,7 +6077,7 @@ Private Sub Test214(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test214 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test214", Err
 End Sub
 
 Private Sub Test215(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6102,7 +6100,7 @@ Private Sub Test215(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test215 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test215", Err
 End Sub
 
 Private Sub Test216(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6126,7 +6124,7 @@ Private Sub Test216(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test216 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test216", Err
 End Sub
 
 Private Sub Test217(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6148,7 +6146,7 @@ Private Sub Test217(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test217 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test217", Err
 End Sub
 
 Private Sub Test218(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6170,7 +6168,7 @@ Private Sub Test218(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test218 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test218", Err
 End Sub
 
 Private Sub Test219(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6193,7 +6191,7 @@ Private Sub Test219(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test219 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test219", Err
 End Sub
 
 Private Sub Test220(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6214,7 +6212,7 @@ Private Sub Test220(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test220 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test220", Err
 End Sub
 
 Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6236,7 +6234,7 @@ Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test221 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test221", Err
 End Sub
 
 Private Sub Test222(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6259,7 +6257,7 @@ Private Sub Test222(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test222 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test222", Err
 End Sub
 
 Private Sub Test223(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6289,7 +6287,7 @@ Private Sub Test223(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test223 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test223", Err
 End Sub
 
 Private Sub Test224(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6313,7 +6311,7 @@ Private Sub Test224(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test224 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test224", Err
 End Sub
 
 'Test on non compliant input - odd number of double quotes
@@ -6336,7 +6334,7 @@ Private Sub Test225(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test225 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test225", Err
 End Sub
 
 Private Sub Test226(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6360,7 +6358,7 @@ Private Sub Test226(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test226 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test226", Err
 End Sub
 
 Private Sub Test227(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6385,7 +6383,7 @@ Private Sub Test227(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test227 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test227", Err
 End Sub
 
 ' x""y does not get unquoted since it's not correctly quoted in the first place.
@@ -6408,7 +6406,7 @@ Private Sub Test228(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test228 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test228", Err
 End Sub
 
 Private Sub Test229(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6431,7 +6429,7 @@ Private Sub Test229(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test229 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test229", Err
 End Sub
 
 Private Sub Test230(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6454,7 +6452,7 @@ Private Sub Test230(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test230 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test230", Err
 End Sub
 
 Private Sub Test231(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6477,7 +6475,7 @@ Private Sub Test231(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test231 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test231", Err
 End Sub
 
 Private Sub Test232(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6502,7 +6500,7 @@ Private Sub Test232(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test232 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test232", Err
 End Sub
 
 Private Sub Test233(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6526,7 +6524,7 @@ Private Sub Test233(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test233 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test233", Err
 End Sub
 
 Private Sub Test234(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6551,7 +6549,7 @@ Private Sub Test234(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test234 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test234", Err
 End Sub
 
 Private Sub Test235(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6575,7 +6573,7 @@ Private Sub Test235(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test235 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test235", Err
 End Sub
 
 Private Sub Test236(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6598,7 +6596,7 @@ Private Sub Test236(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test236 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test236", Err
 End Sub
 
 Private Sub Test237(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6621,7 +6619,7 @@ Private Sub Test237(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test237 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test237", Err
 End Sub
 
 Private Sub Test238(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6644,7 +6642,7 @@ Private Sub Test238(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test238 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test238", Err
 End Sub
 
 Private Sub Test239(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6667,7 +6665,7 @@ Private Sub Test239(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test239 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test239", Err
 End Sub
 
 Private Sub Test240(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6690,7 +6688,7 @@ Private Sub Test240(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test240 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test240", Err
 End Sub
 
 Private Sub Test241(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6713,7 +6711,7 @@ Private Sub Test241(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test241 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test241", Err
 End Sub
 
 Private Sub Test242(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6736,7 +6734,7 @@ Private Sub Test242(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test242 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test242", Err
 End Sub
 
 Private Sub Test243(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6759,7 +6757,7 @@ Private Sub Test243(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test243 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test243", Err
 End Sub
 
 Private Sub Test244(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6782,7 +6780,7 @@ Private Sub Test244(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test244 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test244", Err
 End Sub
 
 Private Sub Test245(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6805,7 +6803,7 @@ Private Sub Test245(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test245 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test245", Err
 End Sub
 
 Private Sub Test246(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6828,7 +6826,7 @@ Private Sub Test246(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test246 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test246", Err
 End Sub
 
 Private Sub Test247(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6851,7 +6849,7 @@ Private Sub Test247(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test247 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test247", Err
 End Sub
 
 Private Sub Test248(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -6874,7 +6872,7 @@ Private Sub Test248(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test248 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test248", Err
 End Sub
 
 
@@ -6904,7 +6902,7 @@ Private Sub Test249(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test249 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test249", Err
 End Sub
 
 
@@ -6933,7 +6931,7 @@ Private Sub Test250(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test250 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test250", Err
 End Sub
 
 
@@ -6962,7 +6960,7 @@ Private Sub Test251(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test251 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test251", Err
 End Sub
 
 
@@ -6991,7 +6989,7 @@ Private Sub Test252(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test252 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test252", Err
 End Sub
 
 Private Sub Test253(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
@@ -7019,7 +7017,7 @@ Private Sub Test253(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
-    Throw "#Test253 (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Test253", Err
 End Sub
 
 

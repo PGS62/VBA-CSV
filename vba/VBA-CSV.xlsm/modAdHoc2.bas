@@ -24,51 +24,9 @@ Function TestSpeed()
 
 End Function
 
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : ReThrow
-' Purpose    : Common error handling. For use in the error handler of all methods
-' Parameters :
-'  FunctionName: The name
-'  Error       : The Err error object
-'  TopLevel    : Set to True if the method is a "top level" method that's exposed to the user and we wish for the function
-'                to return an error string (starts with #, ends with !) rather than raise an error.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function ReThrow(FunctionName As String, Error As ErrObject, Optional TopLevel As Boolean = False)
-          Dim ErrorDescription As String
-          Dim LineDescription As String
-          Dim ErrorNumber As Long
-          
-1         ErrorDescription = Error.Description
-2         ErrorNumber = Err.Number
-          
-3         If ErrorNumber <> vbObjectError + 100 Or TopLevel Then
-              'Build up call stack, i.e. annotate error description by prepending with #FunctionName and appending !
-4             If Erl <> 0 Then
-                  'Code has line numbers, annotate with line number
-5                 LineDescription = " (line " & CStr(Erl) & "): "
-6             Else
-7                 LineDescription = ": "
-8             End If
-9             ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
-10        End If
 
-11        If TopLevel Then
-12            ReThrow = ErrorDescription
-13        Else
-14            Err.Raise ErrorNumber, , ErrorDescription
-15        End If
 
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : Throw
-' Purpose    : Simple error handling.
-' -----------------------------------------------------------------------------------------------------------------------
-Private Sub Throw(ByVal ErrorString As String, Optional WithCallStack As Boolean = False)
-1         Err.Raise vbObjectError + IIf(WithCallStack, 1, 100), , ErrorString
-End Sub
-
-Private Function Foo()
+Function Foo()
 1         On Error GoTo ErrHandler
 2         Foo = Bar()
 3         Exit Function

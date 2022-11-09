@@ -146,14 +146,14 @@ Function GenerateTestCode(TestNo As Long, FileName As String, ExpectedReturn As 
     Res = Res & vbLf
     Res = Res & vbLf & "    Exit Sub"
     Res = Res & vbLf & "ErrHandler:"
-    Res = Res & vbLf & "    Throw ""#Test" & TestNo & " (line "" & CStr(Erl) & ""): "" & Err.Description & ""!"""
+    Res = Res & vbLf & "    ReThrow ""Test" & TestNo & """, Err"
     Res = Res & vbLf & "End Sub"
 
     GenerateTestCode = Transpose(Split(Res, vbLf))
 
     Exit Function
 ErrHandler:
-    GenerateTestCode = "#GenerateTestCode (line " & CStr(Erl) & "): " & Err.Description & "!"
+    GenerateTestCode = ReThrow("GenerateTestCode", Err, True)
 End Function
 
 Function ElementToVBALitteral(x As Variant) As String
@@ -199,7 +199,7 @@ Function ElementToVBALitteral(x As Variant) As String
 
     Exit Function
 ErrHandler:
-    Throw "#ElementToVBALitteral (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "ElementToVBALitteral", Err
 End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ArrayToVBALitteral
@@ -256,7 +256,7 @@ Function ArrayToVBALitteral(TheData As Variant, Optional AssignTo As String, Opt
 
     Exit Function
 ErrHandler:
-    ArrayToVBALitteral = "#ArrayToVBALitteral (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ArrayToVBALitteral = ReThrow("ArrayToVBALitteral", Err, True)
 End Function
 
 Private Function HandleWideString(TheStr As String) As String
@@ -275,7 +275,7 @@ Private Function HandleWideString(TheStr As String) As String
 
     Exit Function
 ErrHandler:
-    Throw "#HandleWideString (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "HandleWideString", Err
 End Function
 
 Private Function IsWideString(TheStr As String) As Boolean
@@ -291,7 +291,7 @@ Private Function IsWideString(TheStr As String) As Boolean
 
     Exit Function
 ErrHandler:
-    Throw "#IsWideString (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "IsWideString", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

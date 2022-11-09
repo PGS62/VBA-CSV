@@ -42,7 +42,7 @@ Public Function Wrap_ws_garcia(FileName As String, Delimiter As String, ByVal EO
 
     Exit Function
 ErrHandler:
-    Wrap_ws_garcia = "#Wrap_ws_garcia: " & Err.Description & "!"
+    Wrap_ws_garcia = ReThrow("Wrap_ws_garcia", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ Public Function Wrap_sdkn104(FileName As String, Unicode As Boolean) As Variant
     
     Exit Function
 ErrHandler:
-    Wrap_sdkn104 = "#Wrap_sdkn104: " & Err.Description & "!"
+    Wrap_sdkn104 = ReThrow("Wrap_sdkn104", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ Private Sub RunSpeedTests()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#RunSpeedTests (line " & CStr(Erl) & "): " & Err.Description & "!", vbCritical
+    MsgBox ReThrow("RunSpeedTests", Err, True), vbCritical
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -281,7 +281,7 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
 
     Exit Function
 ErrHandler:
-    TimeParsers = "#TimeParsers (line " & CStr(Erl) & "): " & Err.Description & "!"
+    TimeParsers = ReThrow("TimeParsers", Err, True)
 End Function
 
 Sub AddChartsNoExport()
@@ -290,7 +290,7 @@ Sub AddChartsNoExport()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#AddChartsNoExport (line " & CStr(Erl) & "): " & Err.Description & "!"
+    MsgBox ReThrow("AddChartsNoExport", Err, True), vbCritical
 End Sub
 
 Sub AddCharts(Optional Export As Boolean = True)
@@ -345,7 +345,7 @@ Sub AddCharts(Optional Export As Boolean = True)
 
     Exit Sub
 ErrHandler:
-    MsgBox "#AddCharts (line " & CStr(Erl) & "): " & Err.Description & "!"
+    MsgBox ReThrow("AddCharts", Err, True), vbCritical
 End Sub
 
 Private Function NameRefersToRange(N As Name) As Boolean
@@ -367,7 +367,7 @@ Sub AddChartAtSelection()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#AddChartAtSelection (line " & CStr(Erl) & "): " & Err.Description & "!"
+    MsgBox ReThrow("AddChartAtSelection", Err, True), vbCritical
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -459,7 +459,7 @@ Sub AddChart(Optional xData As Range, Optional yData As Range, Optional Export A
 
     Exit Sub
 ErrHandler:
-    Throw "#AddChart (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "AddChart", Err
 
 End Sub
 

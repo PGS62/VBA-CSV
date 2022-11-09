@@ -109,7 +109,7 @@ Failed:
 
     Exit Function
 ErrHandler:
-    Throw "#TestCSVRead (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "TestCSVRead", Err
 End Function
 
 Function NameThatFile(Folder As String, ByVal OS As String, NumRows As Long, _
@@ -230,7 +230,7 @@ EarlyExit:
 
     Exit Function
 ErrHandler:
-    CreatePath = "#CreatePath: " & Err.Description & "!"
+    CreatePath = ReThrow("CreatePath", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ Public Function ElapsedTime() As Double
 
     Exit Function
 ErrHandler:
-    Throw "#ElapsedTime: " & Err.Description & "!"
+    ReThrow "ElapsedTime", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -301,11 +301,50 @@ ExitPoint:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ReThrow
+' Purpose    : Common error handling. For use in the error handler of all methods
+' Parameters :
+'  FunctionName: The name
+'  Error       : The Err error object
+'  TopLevel    : Pass in True if the method is a "top level" method that's exposed to the user and we wish for the function
+'                to return an error string (starts with #, ends with !).
+'                Pass in False if we want to (re)throw an error, anotated as long as ErrorNumber is not vbObjectError + 100
+' -----------------------------------------------------------------------------------------------------------------------
+Function ReThrow(FunctionName As String, Error As ErrObject, Optional TopLevel As Boolean = False)
+
+          Dim ErrorDescription As String
+          Dim ErrorNumber As Long
+          Dim LineDescription As String
+          Dim ShowCallStack As Boolean
+          
+1         ErrorDescription = Error.Description
+2         ErrorNumber = Err.Number
+3         ShowCallStack = ErrorNumber <> vbObjectError + 100
+          
+4         If ShowCallStack Or TopLevel Then
+              'Build up call stack, i.e. annotate error description by prepending #<FunctionName> and appending !
+5             If Erl <> 0 And ShowCallStack Then
+                  'Code has line numbers, annotate with line number
+6                 LineDescription = " (line " & CStr(Erl) & "): "
+7             Else
+8                 LineDescription = ": "
+9             End If
+10            ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
+11        End If
+
+12        If TopLevel Then
+13            ReThrow = ErrorDescription
+14        Else
+15            Err.Raise ErrorNumber, , ErrorDescription
+16        End If
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Throw
 ' Purpose    : Simple error handling.
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Sub Throw(ByVal ErrorString As String)
-    Err.Raise vbObjectError + 1, , ErrorString
+Sub Throw(ByVal ErrorString As String, Optional WithCallStack As Boolean = False)
+1         Err.Raise vbObjectError + IIf(WithCallStack, 1, 100), , ErrorString
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -357,7 +396,7 @@ Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, Optional 
 
     Exit Sub
 ErrHandler:
-    Throw "#Force2DArray (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "Force2DArray", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -552,7 +591,7 @@ Public Function Transpose(ByVal TheArray As Variant)
     Transpose = Result
     Exit Function
 ErrHandler:
-    Transpose = "#Transpose (line " & CStr(Erl) & "): " & Err.Description & "!"
+    Transpose = ReThrow("Transpose", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -650,7 +689,7 @@ Public Function HStack(ParamArray Arrays()) As Variant
 
     Exit Function
 ErrHandler:
-    HStack = "#HStack (line " & CStr(Erl) & "): " & Err.Description & "!"
+    HStack = ReThrow("HStack", Err, True)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -731,7 +770,7 @@ Public Function ArraysIdentical(ByVal Array1 As Variant, ByVal Array2 As Variant
 
     Exit Function
 ErrHandler:
-    ArraysIdentical = "#ArraysIdentical (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ArraysIdentical = ReThrow("ArraysIdentical", Err, True)
 End Function
 
 Public Sub FileCopy(SourceFile As String, TargetFile As String)
@@ -745,8 +784,6 @@ Public Sub FileCopy(SourceFile As String, TargetFile As String)
     Set FSO = Nothing: Set F = Nothing
     Exit Sub
 ErrHandler:
-    CopyOfErr = Err.Description
-    Set FSO = Nothing: Set F = Nothing
-    Throw "#" & CopyOfErr & "!"
+    ReThrow "FileCopy", Err
 End Sub
 

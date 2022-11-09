@@ -75,7 +75,7 @@ Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean
     
     Exit Sub
 ErrHandler:
-    MsgBox "#Worksheet_BeforeDoubleClick (line " & CStr(Erl) & "): " & Err.Description & "!", vbCritical
+    MsgBox ReThrow("Worksheet_BeforeDoubleClick", Err, True), vbCritical
 End Sub
 
 Sub ClearUsedRange()
@@ -132,5 +132,5 @@ Sub ClearUsedRange()
 
     Exit Sub
 ErrHandler:
-    Throw "#ClearUsedRange (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "ClearUsedRange", Err
 End Sub

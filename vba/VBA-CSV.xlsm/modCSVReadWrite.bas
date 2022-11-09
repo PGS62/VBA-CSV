@@ -34,11 +34,11 @@ Private Const DQ = """"
 Private Const DQ2 = """"""
 
 #If VBA7 And Win64 Then
-    'for 64-bit Excel
-    Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
+'for 64-bit Excel
+Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
 #Else
-    'for 32-bit Excel
-    Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
+'for 32-bit Excel
+Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
 #End If
 
 Private Enum enmErrorStyle
@@ -172,8 +172,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
     Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
     Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
     Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
         "Omit to guess from file contents"
@@ -347,11 +345,11 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
             
 
-            Set Stream = CreateObject("ADODB.Stream")
-            Stream.CharSet = CharSet
-            Stream.Open
-            Stream.LoadFromFile FileName
-            If Stream.EOS Then Throw Err_FileEmpty
+        Set Stream = CreateObject("ADODB.Stream")
+        Stream.CharSet = CharSet
+        Stream.Open
+        Stream.LoadFromFile FileName
+        If Stream.EOS Then Throw Err_FileEmpty
 
         If SkipToRow = 1 And NumRows = 0 Then
             CSVContents = ReadAllFromStream(Stream, EstNumChars)
@@ -1236,7 +1234,7 @@ EarlyExit:
     Exit Function
 ErrHandler:
 
-   If Not T Is Nothing Then T.Close
+    If Not T Is Nothing Then T.Close
     ReThrow "DetectEncoding", Err
 End Function
 
@@ -3008,11 +3006,11 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
     
     If isFile Then
 
-            Set Stream = CreateObject("ADODB.Stream")
-            Stream.CharSet = CharSet
-            Stream.Open
-            Stream.LoadFromFile FileNameOrContents
-            If Stream.EOS Then Throw Err_FileEmpty
+        Set Stream = CreateObject("ADODB.Stream")
+        Stream.CharSet = CharSet
+        Stream.Open
+        Stream.LoadFromFile FileNameOrContents
+        If Stream.EOS Then Throw Err_FileEmpty
     
         If NumLinesToReturn = 0 Then
             Buffer = ReadAllFromStream(Stream)
@@ -3161,46 +3159,59 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ReThrow
-' Purpose    : Common error handling. For use in the error handler of all methods
+' Purpose    : Common error handling to be used in the error handler of all methods.
 ' Parameters :
 '  FunctionName: The name
 '  Error       : The Err error object
-'  TopLevel    : Set to True if the method is a "top level" method that's exposed to the user and we wish for the function
-'                to return an error string (starts with #, ends with !) rather than raise an error.
+'  TopLevel    : Pass in True if the method is a "top level" method that's exposed to the user and we wish for the function
+'                to return an error string (starts with #, ends with !).
+'                Pass in False if we want to (re)throw an error, anotated as long as ErrorNumber is not vbObjectError + 100
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ReThrow(FunctionName As String, Error As ErrObject, Optional TopLevel As Boolean = False)
-          Dim ErrorDescription As String
-          Dim LineDescription As String
-          Dim ErrorNumber As Long
-          
-1         ErrorDescription = Error.Description
-2         ErrorNumber = Err.Number
-          
-3         If ErrorNumber <> vbObjectError + 100 Or TopLevel Then
-              'Build up call stack, i.e. annotate error description by prepending with #FunctionName and appending !
-4             If Erl <> 0 Then
-                  'Code has line numbers, annotate with line number
-5                 LineDescription = " (line " & CStr(Erl) & "): "
-6             Else
-7                 LineDescription = ": "
-8             End If
-9             ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
-10        End If
 
-11        If TopLevel Then
-12            ReThrow = ErrorDescription
-13        Else
-14            Err.Raise ErrorNumber, , ErrorDescription
-15        End If
+    Dim ErrorDescription As String
+    Dim ErrorNumber As Long
+    Dim LineDescription As String
+    Dim ShowCallStack As Boolean
+    
+    ErrorDescription = Error.Description
+    ErrorNumber = Err.Number
+    ShowCallStack = ErrorNumber <> vbObjectError + 100
+    
+    If ShowCallStack Or TopLevel Then
+        'Build up call stack, i.e. annotate error description by prepending #<FunctionName> and appending !
+        If Erl <> 0 And ShowCallStack Then
+            'Code has line numbers, annotate with line number
+            LineDescription = " (line " & CStr(Erl) & "): "
+        Else
+            LineDescription = ": "
+        End If
+        ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
+    End If
 
+    If TopLevel Then
+        ReThrow = ErrorDescription
+    Else
+        Err.Raise ErrorNumber, , ErrorDescription
+    End If
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Throw
-' Purpose    : Simple error handling.
+' Purpose    : Error handling - companion to ReThrow
+' Parameters :
+'  Description  : Description of what went wrong.
+'  WithCallStack: Should subsequent calls to ReThrow append the names of the functions and line numbers in the call
+'                 stack?
+'                 For anticipated errors (which Throw will be responsible for) this should (usually) be False (the
+'                 default)to avoid cluttering the error description.
+'                 But for unanticipated errors (probably not generated by Throw) it's very useful to see an error
+'                 description at the top of the call stack that includes information on the functions and line numbers,
+'                 since that greatly speeds up debugging.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub Throw(ByVal ErrorString As String, Optional WithCallStack As Boolean = False)
-1         Err.Raise vbObjectError + IIf(WithCallStack, 1, 100), , ErrorString
+Private Sub Throw(ByVal Description As String, Optional WithCallStack As Boolean = False)
+    'ErrorNumber being vbObjectError + 100 suppresses annotation in ReThrow
+    Err.Raise vbObjectError + IIf(WithCallStack, 1, 100), , Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3385,7 +3396,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function NCols(Optional TheArray As Variant) As Long
     On Error GoTo ErrHandler
-        If TypeName(TheArray) = "Range" Then
+    If TypeName(TheArray) = "Range" Then
         NCols = TheArray.Columns.count
     ElseIf IsMissing(TheArray) Then
         NCols = 0
@@ -3620,8 +3631,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
     Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
     Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
     Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
     Const Err_Delimiter1 = "Delimiter must have at least one character"
     Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _

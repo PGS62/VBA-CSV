@@ -97,7 +97,7 @@ Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As B
 
     Exit Function
 ErrHandler:
-    TestNonStandardInput = "#TestNonStandardInput (line " & CStr(Erl) & "): " & Err.Description & "!"
+    TestNonStandardInput = ReThrow("TestNonStandardInput", Err, True)
 End Function
 
 Function SaveNotCompliantFile(ByVal InputString As String, FileName As String)
@@ -131,6 +131,6 @@ Function SaveNotCompliantFile(ByVal InputString As String, FileName As String)
 
     Exit Function
 ErrHandler:
-    SaveNotCompliantFile = "#SaveNotCompliantFile (line " & CStr(Erl) & "): " & Err.Description & "!"
+    SaveNotCompliantFile = ReThrow("SaveNotCompliantFile", Err, True)
 End Function
 

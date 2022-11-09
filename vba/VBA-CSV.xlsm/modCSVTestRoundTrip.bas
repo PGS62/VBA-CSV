@@ -137,7 +137,7 @@ Public Sub RoundTripTest()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#RoundTripTest: " & Err.Description & "!", vbCritical
+    MsgBox ReThrow("RoundTripTest", Err, True), vbCritical
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     
     Exit Sub
 ErrHandler:
-    Throw "#RoundTripTestCore: " & Err.Description & "!"
+    ReThrow "RoundTripTestCore", Err
 End Sub
 
 Function ChrW_Wrap(CharCode As Long)
@@ -270,7 +270,7 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
 
     Exit Function
 ErrHandler:
-    Throw "#RandomString: " & Err.Description & "!"
+    ReThrow "RandomString", Err
 End Function
 
 Private Function RandomStrings(NumRows As Long, NumCols As Long, Encoding As String, AllowLineFeed As Boolean, EOL As String)
@@ -296,7 +296,7 @@ Private Function RandomStrings(NumRows As Long, NumCols As Long, Encoding As Str
     
     Exit Function
 ErrHandler:
-    Throw "#RandomStrings: " & Err.Description & "!"
+    ReThrow "RandomStrings", Err
 End Function
 
 Private Function RandomLong() As Long
@@ -320,7 +320,7 @@ Private Function RandomLongs(NumRows As Long, NumCols As Long)
     RandomLongs = Result
     Exit Function
 ErrHandler:
-    Throw "#RandomLongs: " & Err.Description & "!"
+    ReThrow "RandomLongs", Err
 End Function
 
 Private Function RandomDouble() As Double
@@ -329,7 +329,7 @@ Private Function RandomDouble() As Double
     RandomDouble = CDbl(CStr((Rnd() - 0.5) * 2 * 10 ^ ((Rnd() - 0.5) * 20)))
     Exit Function
 ErrHandler:
-    Throw "#RandomDouble: " & Err.Description & "!"
+    ReThrow "RandomDouble", Err
 End Function
 
 Private Function RandomDoubles(NumRows As Long, NumCols As Long)
@@ -350,7 +350,7 @@ Private Function RandomDoubles(NumRows As Long, NumCols As Long)
     Exit Function
     
 ErrHandler:
-    Throw "#RandomDoubles: " & Err.Description & "!"
+    ReThrow "RandomDoubles", Err
 End Function
 
 Private Function RandomBoolean() As Boolean
@@ -374,7 +374,7 @@ Private Function RandomBooleans(NumRows As Long, NumCols As Long)
     RandomBooleans = Result
     Exit Function
 ErrHandler:
-    Throw "#RandomBooleans: " & Err.Description & "!"
+    ReThrow "RandomBooleans", Err
 End Function
 
 Private Function RandomDateTime() As Date
@@ -385,7 +385,7 @@ Private Function RandomDateTime() As Date
 
     Exit Function
 ErrHandler:
-    Throw "#RandomDateTime (line " & CStr(Erl) & "): " & Err.Description & "!"
+    ReThrow "RandomDateTime", Err
 End Function
 
 Private Function RandomDate() As Date
@@ -393,7 +393,7 @@ Private Function RandomDate() As Date
     RandomDate = CDate(CLng(25569 + Rnd() * 36525)) 'Date in range 1 Jan 1970 to 1 Jan 2070
     Exit Function
 ErrHandler:
-    Throw "#RandomDate: " & Err.Description & "!"
+    ReThrow "RandomDate", Err
 End Function
 
 Private Function RandomDateTimes(NumRows As Long, NumCols As Long)
@@ -414,7 +414,7 @@ Private Function RandomDateTimes(NumRows As Long, NumCols As Long)
     Exit Function
     
 ErrHandler:
-    Throw "#RandomDateTimes: " & Err.Description & "!"
+    ReThrow "RandomDateTimes", Err
 End Function
 
 Private Function RandomDates(NumRows As Long, NumCols As Long)
@@ -435,7 +435,7 @@ Private Function RandomDates(NumRows As Long, NumCols As Long)
     Exit Function
     
 ErrHandler:
-    Throw "#RandomDates: " & Err.Description & "!"
+    ReThrow "RandomDates", Err
 End Function
 
 Private Function RandomErrorValue()
@@ -446,7 +446,7 @@ Private Function RandomErrorValue()
         xlErrNA, xlErrName, xlErrNull, xlErrNum, xlErrRef, xlErrSpill, xlErrUnknown, xlErrValue))
     Exit Function
 ErrHandler:
-    Throw "#RandomErrorValue: " & Err.Description & "!"
+    ReThrow "RandomErrorValue", Err
 End Function
 
 Private Function RandomErrorValues(NumRows As Long, NumCols As Long)
@@ -466,7 +466,7 @@ Private Function RandomErrorValues(NumRows As Long, NumCols As Long)
     Exit Function
     
 ErrHandler:
-    Throw "#RandomErrorValues: " & Err.Description & "!"
+    ReThrow "RandomErrorValues", Err
 End Function
 
 Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Encoding As String, EOL As String)
@@ -507,7 +507,7 @@ Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, E
 
     Exit Function
 ErrHandler:
-    Throw "#RandomVariant: " & Err.Description & "!"
+    ReThrow "RandomVariant", Err
 End Function
 
 'Copy of identical function in modCSVReadWrite so that copy there can be Private
@@ -529,7 +529,7 @@ Private Function OStoEOL(OS As String, ArgName As String) As String
 
     Exit Function
 ErrHandler:
-    Throw "#OStoEOL: " & Err.Description & "!"
+    ReThrow "OStoEOL", Err
 End Function
 
 'Public because called from worksheet "Demo"
@@ -562,6 +562,6 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
 
     Exit Function
 ErrHandler:
-    Throw "#RandomVariants: " & Err.Description & "!"
+    ReThrow "RandomVariants", Err
 End Function
 

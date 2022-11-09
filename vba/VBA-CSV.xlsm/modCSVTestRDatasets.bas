@@ -118,7 +118,7 @@ Sub TestAgainstRDatasets()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#TestAgainstRDatasets (line " & CStr(Erl) & "): " & Err.Description & "!"
+    MsgBox ReThrow("TestAgainstRDatasets", Err, True), vbCritical
 End Sub
 
 

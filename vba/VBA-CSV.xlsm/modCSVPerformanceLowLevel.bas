@@ -220,7 +220,7 @@ Private Sub SpeedTest_Sentinels()
 
     Exit Sub
 ErrHandler:
-    MsgBox "#SpeedTest_Sentinels: " & Err.Description & "!"
+    MsgBox ReThrow("SpeedTest_Sentinels", Err, True), vbCritical
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
