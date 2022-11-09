@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+196	09-Nov-2022	18:32	Philip Swannell	Bumped to v0.23
 195	09-Nov-2022	18:21	Philip Swannell	Early bind to ADODB. Will require change to installation instructions.
 194	09-Nov-2022	18:00	Philip Swannell	Changes on sheet CSVWriteTests.
 193	09-Nov-2022	17:56	Philip Swannell	Bumped to v0.22
