@@ -157,10 +157,20 @@ End Enum
 '             populated with the contents of the header row, with no type conversion, though leading and
 '             trailing spaces are removed.
 '
-' Notes     : See also companion function CSVRead.
+' Notes     : See also companion function CSVWrite.
 '
-'             For discussion of the CSV format see
-'             https://tools.ietf.org/html/rfc4180#section-2
+'             The function handles all csv files that conform to the standards described in RFC4180
+'             https://www.rfc-editor.org/rfc/rfc4180.txt including files with quoted fields.
+'
+'             In addition the function handles files which break some of those standards:
+'             * Not all lines of the file need have the same number of fields. The function "pads" with
+'             ShowMissingsAs values.
+'             * Fields which start with a double quote but do not end with a double quote are handled by
+'             being returned unchanged. Necessarily such fields have an even number of double quotes, or
+'             otherwise the field will be treated as the last field in the file.
+'             * The standard states that csv files should have Windows-style line endings, but the function
+'             supports files with Windows, Unix and (old) Mac line endings. Files may also have mixed line
+'             endings.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
@@ -1042,9 +1052,9 @@ Private Function EstimateNumChars(FileSize As Long, Encoding As String)
                   'will be exact
 2                 EstimateNumChars = FileSize
 3             Case "UTF-16"
-                  'Will be exact if the file has a BOM (2 bytes) and contains only _
-                   ansi characters (2 bytes each). When file contains non-ansi characters _
-                   this will overestimate the character count.
+                  'Will be exact if the file has a BOM (2 bytes) and contains only
+                  'ansi characters (2 bytes each). When file contains non-ansi characters
+                  'this will overestimate the character count.
 4                 EstimateNumChars = (FileSize - 2) / 2
 5             Case "UTF-8"
                   'Will be exact if the file has a BOM (3 bytes) and contains only ansi characters (1 byte each).
@@ -1194,9 +1204,9 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
 54            Throw Err_SourceType
 55        End If
 
-          'No commonly-used delimiter found in the file outside quoted regions _
-           and in the first MAX_CHUNKS * CHUNK_SIZE characters. Assume comma _
-           unless that's the decimal separator.
+          'No commonly-used delimiter found in the file outside quoted regions
+          'and in the first MAX_CHUNKS * CHUNK_SIZE characters. Assume comma
+          'unless that's the decimal separator.
           
 56        If DecimalSeparator = "," Then
 57            InferDelimiter = ";"
@@ -1244,8 +1254,8 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
 13        Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " & _
               "'M/D/Y', 'D/M/Y', 'Y/M/D', 'M D Y', 'D M Y' or 'Y M D'" & ". Omit to use the default date format of 'Y-M-D'"
               
-          'Replace repeated D's with a single D, etc since CastToDate only needs _
-           to know the order in which the three parts of the date appear.
+          'Replace repeated D's with a single D, etc since CastToDate only needs
+          'to know the order in which the three parts of the date appear.
 14        If Len(DateFormat) > 5 Then
 15            DateFormat = UCase$(DateFormat)
 16            ReplaceRepeats DateFormat, "D"
@@ -1557,9 +1567,9 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
 158               End If
                   
 159               If PosQC = 0 Then
-                      'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes. _
-                       If there are an odd number then all text after the last double quote in the file will be (part of) _
-                       the last field in the last line.
+                      'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes.
+                      'If there are an odd number then all text after the last double quote in the file will be (part of)
+                      'the last field in the last line.
 160                   Lengths(j) = OrigLen - Starts(j) + 1
 161                   ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
                       
@@ -1584,8 +1594,8 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
 178       End If
           
 179       If SkipToRow > NumRowsInFile Then
-180           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or _
-                                   a negative number of rows. So throw an error.
+180           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or
+                                  'a negative number of rows. So throw an error.
                   Dim RowDescription As String
 181               If IgnoreEmptyLines And Len(Comment) > 0 Then
 182                   RowDescription = "not commented, not empty "
@@ -1801,14 +1811,14 @@ End Function
 '              not needlessly scan the unupdated part of the buffer.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub GetMoreFromStream(Stream As ADODB.Stream, Delimiter As String, QuoteChar As String, _
-        ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
+          ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
 
-          Const ChunkSize As Long = 5000  ' The number of characters to read from the stream on each call. _
-                                            Set to a small number for testing logic and a bigger number for _
-                                            performance, but not too high since a common use case is reading _
-                                            just the first line of a file. Suggest 5000? Note that when reading _
-                                            an entire file (NumRows argument to CSVRead is zero) function _
-                                            GetMoreFromStream is not called.
+          Const ChunkSize As Long = 5000  ' The number of characters to read from the stream on each call.
+          ' Set to a small number for testing logic and a bigger number for
+          ' performance, but not too high since a common use case is reading
+          ' just the first line of a file. Suggest 5000? Note that when reading
+          ' an entire file (NumRows argument to CSVRead is zero) function
+          ' GetMoreFromStream is not called.
           Dim AtEndOfStream As Boolean
           Dim ExpandBufferBy As Long
           Dim FirstPass As Boolean
@@ -1863,8 +1873,8 @@ Private Sub GetMoreFromStream(Stream As ADODB.Stream, Delimiter As String, Quote
 36            If OKToExit Then Exit Do
 37        Loop
 
-          'Line below arranges that when calling Instr(Buffer,....) we don't pointlessly scan the space characters _
-           we can be sure that there is space in the buffer to write the extra characters thanks to
+          'Line below arranges that when calling Instr(Buffer,....) we don't pointlessly scan the space characters
+          'we can be sure that there is space in the buffer to write the extra characters thanks to
 38        Mid$(Buffer, BufferUpdatedTo + 1, 2 + Len(QuoteChar) + Len(Delimiter)) = vbCrLf & QuoteChar & Delimiter
 
 39        Exit Sub
@@ -2451,12 +2461,6 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
 ErrHandler:
           'Was not recognised as ISO8601 date
 103   End Sub
-
-      ' -----------------------------------------------------------------------------------------------------------------------
-      ' Procedure  : GetLocalOffsetToUTC
-      ' Purpose    : Get the PC's offset to UTC.
-      'See "gogeek"'s post at _
- https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseISO8601
@@ -3705,6 +3709,11 @@ ErrHandler:
 6         ReThrow "FunctionWizardActive", Err
 End Function
 
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : GetLocalOffsetToUTC
+' Purpose    : Get the PC's offset to UTC.
+' See "gogeek"'s post at
+' https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function GetLocalOffsetToUTC() As Double
           Dim dt As Object
