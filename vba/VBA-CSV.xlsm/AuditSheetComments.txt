@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+187	09-Nov-2022	10:25	Philip Swannell	Reformed error handling. Error handlers in all methods are now simpler just calling new method ReThrow. We now no longer see the "call stack" in the return from CSVRead if the error is "anticipated" (mostly input validation) but we do see the call stack for unanticipated errors.
 186	08-Nov-2022	19:43	Philip Swannell	Ansure streams are always closed.
 185	08-Nov-2022	19:29	Philip Swannell	CSVRead now always uses ADODB text stream (rather than ADODB for some encodings and Scripting.TextStream for other encodings). Refactored and simplified.
 184	08-Nov-2022	16:12	Philip Swannell	Removed Stop statement.

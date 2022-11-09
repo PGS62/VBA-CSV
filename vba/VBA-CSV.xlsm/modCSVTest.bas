@@ -2600,7 +2600,7 @@ Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     On Error GoTo ErrHandler
     TestDescription = "test empty file"
     FileName = "test_empty_file.csv"
-    Expected = "#CSVRead: #InferDelimiter: File is empty!!"
+    Expected = "#CSVRead: File is empty!"
     TestRes = TestCSVRead(90, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
@@ -3920,7 +3920,7 @@ Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: NumCols must be positive to read a given number of columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered.!"
+    Expected = "#CSVRead: NumCols must be positive to read a given number of columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered!"
     TestRes = TestCSVRead(137, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         NumCols:=-1, _
@@ -3943,7 +3943,7 @@ Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: NumRows must be positive to read a given number of rows, or zero or omitted to read all rows from SkipToRow to the end of the file.!"
+    Expected = "#CSVRead: NumRows must be positive to read a given number of rows, or zero or omitted to read all rows from SkipToRow to the end of the file!"
     TestRes = TestCSVRead(138, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         NumRows:=-1, _
@@ -4014,7 +4014,7 @@ Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: SkipToCol must be at least 1.!"
+    Expected = "#CSVRead: SkipToCol must be at least 1!"
     TestRes = TestCSVRead(141, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         SkipToCol:=-1, _
@@ -4105,7 +4105,7 @@ Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!!"
+    Expected = "#CSVRead: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(145, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
@@ -4129,7 +4129,7 @@ Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: #OneDArrayToTwoDArray: If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements!!!"
+    Expected = "#CSVRead: If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements!"
     TestRes = TestCSVRead(146, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
@@ -4152,7 +4152,7 @@ Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes is ambiguous, it can be interpreted as two rows, or as two columns!!"
+    Expected = "#CSVRead: ConvertTypes is ambiguous, it can be interpreted as two rows, or as two columns!"
     TestRes = TestCSVRead(147, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=Array(Array(1, "D"), Array("B", "N")), _
         IgnoreEmptyLines:=False, _
@@ -4175,7 +4175,7 @@ Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is of type Boolean!!"
+    Expected = "#CSVRead: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is of type Boolean!"
     TestRes = TestCSVRead(148, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=Array(Array(True, "D"), Array("B", "N"), Array(1, "D")), _
         IgnoreEmptyLines:=False, _
@@ -4198,7 +4198,7 @@ Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: #ParseCTString: ConvertTypes is incorrect, ""Q"" indicates that conversion should apply even to quoted fields, but none of ""N"", ""D"", ""B"" or ""E"" are present to indicate which type conversion to apply!!!"
+    Expected = "#CSVRead: ConvertTypes is incorrect, ""Q"" indicates that conversion should apply even to quoted fields, but none of ""N"", ""D"", ""B"" or ""E"" are present to indicate which type conversion to apply!"
     TestRes = TestCSVRead(149, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="Q", _
         IgnoreEmptyLines:=False, _
@@ -4244,7 +4244,7 @@ Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: TrueStrings must be omitted or provided as string or an array of strings that represent Boolean value True but '2' is of type Double!!!!"
+    Expected = "#CSVRead: TrueStrings must be omitted or provided as string or an array of strings that represent Boolean value True but '2' is of type Double!"
     TestRes = TestCSVRead(151, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
         IgnoreEmptyLines:=False, _
@@ -4268,7 +4268,7 @@ Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #MakeSentinels: TrueStrings has been provided, but type conversion for Booleans is not switched on for any column!!"
+    Expected = "#CSVRead: TrueStrings has been provided, but type conversion for Booleans is not switched on for any column!"
     TestRes = TestCSVRead(152, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         TrueStrings:="Bad", _
@@ -4291,7 +4291,7 @@ Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #MakeSentinels: FalseStrings has been provided, but type conversion for Booleans is not switched on for any column!!"
+    Expected = "#CSVRead: FalseStrings has been provided, but type conversion for Booleans is not switched on for any column!"
     TestRes = TestCSVRead(153, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         FalseStrings:="Bad", _
@@ -4492,7 +4492,7 @@ Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: #ParseCTString: ConvertTypes must be Boolean or string with allowed letters NDBETQ. ""N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans as Booleans, ""E"" show Excel errors as errors, ""T"" to trim leading and trailing spaces from fields, ""Q"" rules NDBE apply even to quoted fields, TRUE = ""NDB"" (convert unquoted numbers, dates and Booleans), FALSE = no conversion Found unrecognised character 'X'!!!"
+    Expected = "#CSVRead: ConvertTypes must be Boolean or string with allowed letters NDBETQ. ""N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans as Booleans, ""E"" show Excel errors as errors, ""T"" to trim leading and trailing spaces from fields, ""Q"" rules NDBE apply even to quoted fields, TRUE = ""NDB"" (convert unquoted numbers, dates and Booleans), FALSE = no conversion Found unrecognised character 'X'!"
     TestRes = TestCSVRead(160, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="XYZ", _
         IgnoreEmptyLines:=False, _
@@ -4553,7 +4553,6 @@ Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     'Error string varies according to date format on PC, so use simple regexp
-    'Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y' or 'Y/M/D'. Omit to use the default date format on this PC which is ""M/D/Y""!!"
     Expected = "DateFormat not valid"
     TestRes = TestCSVRead(162, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -4579,7 +4578,6 @@ Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
     'Error string varies according to date format on PC, so use simple regexp
-    'Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y' or 'Y/M/D'. Omit to use the default date format on this PC which is ""M/D/Y""!!"
     Expected = "DateFormat not valid"
     TestRes = TestCSVRead(163, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -4604,7 +4602,7 @@ Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: #OneDArrayToTwoDArray: If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements!!!"
+    Expected = "#CSVRead: If ConvertTypes is given as a 1-dimensional array, each element must be a 1-dimensional array with two elements!"
     TestRes = TestCSVRead(164, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=Array(1.5, "N"), _
         IgnoreEmptyLines:=False, _
@@ -4627,7 +4625,7 @@ Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is 1.5!!"
+    Expected = "#CSVRead: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is 1.5!"
     TestRes = TestCSVRead(165, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(1.5, 2#), Array("N", "N")), _
         IgnoreEmptyLines:=False, _
@@ -4725,7 +4723,7 @@ Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes is contradictory. Column 2 is specified to be converted using two different conversion rules: B and N!!"
+    Expected = "#CSVRead: ConvertTypes is contradictory. Column 2 is specified to be converted using two different conversion rules: B and N!"
     TestRes = TestCSVRead(169, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(1#, "NB"), Array(1#, "BN"), Array(2#, "N"), Array(2#, "B")), _
         IgnoreEmptyLines:=False, _
@@ -4832,7 +4830,7 @@ Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is -2!!"
+    Expected = "#CSVRead: Column identifiers in the left column (or top row) of ConvertTypes must be strings or non-negative whole numbers but ConvertTypes(1,1) is -2!"
     TestRes = TestCSVRead(172, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack( _
         Array(-2#, False), _
@@ -4863,7 +4861,7 @@ Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,2) is string ""XX""!!"
+    Expected = "#CSVRead: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,2) is string ""XX""!"
     TestRes = TestCSVRead(173, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(0#, False), Array(2#, "XX"), Array(3#, "B"), Array(4#, "D")), _
         IgnoreEmptyLines:=False, _
@@ -4886,7 +4884,7 @@ Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,1) is of type Error!!"
+    Expected = "#CSVRead: Type Conversion given in bottom row (or right column) of ConvertTypes must be Booleans or strings containing letters NDBETQ but ConvertTypes(2,1) is of type Error!"
     TestRes = TestCSVRead(174, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array(3#, CVErr(2007)), Array(4#, "D"), Array(5#, "E")), _
         IgnoreEmptyLines:=False, _
@@ -4909,7 +4907,7 @@ Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test column-by-column"
     FileName = "test_column-by-column.csv"
-    Expected = "#CSVRead: #ParseConvertTypes: ConvertTypes specifies columns by their header (instead of by number), but HeaderRowNum has not been specified!!"
+    Expected = "#CSVRead: ConvertTypes specifies columns by their header (instead of by number), but HeaderRowNum has not been specified!"
     TestRes = TestCSVRead(175, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=HStack(Array("Col A", "N"), Array("Col B", "N"), Array("Col C", "N")), _
         IgnoreEmptyLines:=False, _
@@ -5699,7 +5697,7 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test 32K limit"
-    Expected = "#CSVRead: #ParseTextFile: Line 2 of the file is of length 33,002. Excel cells cannot contain strings longer than 32,767!!"
+    Expected = "#CSVRead: Line 2 of the file is of length 33,002. Excel cells cannot contain strings longer than 32,767!"
     FileName = "test_32K_limit.csv"
     
     Formula = "=CSVRead(""" & Folder & FileName & """, FALSE,FALSE)"
@@ -5804,7 +5802,11 @@ Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     If Val(Application.Version) >= 16 Then
         Set R = shHiddenSheet.Cells(1, 1)
         R.Formula2 = Formula
-        Observed = R.SpillingToRange.value
+        If R.SpillingToRange Is Nothing Then
+            Observed = R.value
+        Else
+            Observed = R.SpillingToRange.value
+        End If
         TestRes = ArraysIdentical(Expected, Observed)
         If Not TestRes Then
             WhatDiffers = "File " & FileName & " not handled correctly - try inserting breakpoint in method Test205"
@@ -5818,6 +5820,8 @@ Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     Exit Sub
 ErrHandler:
+    Stop
+    Resume
     Throw "#Test205 (line " & CStr(Erl) & "): " & Err.Description & "!"
 End Sub
 
@@ -5946,7 +5950,7 @@ Private Sub Test209(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Boolean value 'True' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Boolean value 'True' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(209, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -5970,7 +5974,7 @@ Private Sub Test210(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'True' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'True' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(210, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -5994,7 +5998,7 @@ Private Sub Test211(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #AddKeyToDict: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(211, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -6018,7 +6022,7 @@ Private Sub Test212(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeyToDict: There is a conflicting definition of what the string '""foo""' should be converted to, both the Boolean value 'True' and the Boolean value 'False' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments.!!!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string '""foo""' should be converted to, both the Boolean value 'True' and the Boolean value 'False' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(212, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="BQ", _
@@ -6042,7 +6046,7 @@ Private Sub Test213(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""foo' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    Expected = "#CSVRead: Got '""foo' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(213, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -6065,7 +6069,7 @@ Private Sub Test214(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""foo' as FalseString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    Expected = "#CSVRead: Got '""foo' as FalseString, but that cannot be a field in a CSV file, since it is not correctly quoted!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(214, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -6088,7 +6092,7 @@ Private Sub Test215(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""foo' as MissingString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    Expected = "#CSVRead: Got '""foo' as MissingString, but that cannot be a field in a CSV file, since it is not correctly quoted!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(215, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -6179,7 +6183,7 @@ Private Sub Test219(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseDateFormat: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y', 'Y/M/D', 'M D Y', 'D M Y' or 'Y M D'. Omit to use the default date format of 'Y-M-D'!!"
+    Expected = "#CSVRead: DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', 'M/D/Y', 'D/M/Y', 'Y/M/D', 'M D Y', 'D M Y' or 'Y M D'. Omit to use the default date format of 'Y-M-D'!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(219, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -6223,7 +6227,7 @@ Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseEncoding: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!!"
+    Expected = "#CSVRead: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(221, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty, _
@@ -6298,7 +6302,7 @@ Private Sub Test224(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseCSVContents: SkipToRow (10) exceeds the number of not empty rows in the file (4)!!"
+    Expected = "#CSVRead: SkipToRow (10) exceeds the number of not empty rows in the file (4)!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(224, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -6345,7 +6349,7 @@ Private Sub Test226(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseCSVContents: SkipToRow (11) exceeds the number of not empty rows in the file (4)!!"
+    Expected = "#CSVRead: SkipToRow (11) exceeds the number of not empty rows in the file (4)!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(226, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -6369,7 +6373,7 @@ Private Sub Test227(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #ParseTextFile: SkipToLine (11) exceeds the number of lines in the file (4)!!"
+    Expected = "#CSVRead: SkipToLine (11) exceeds the number of lines in the file (4)!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(227, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -6417,7 +6421,7 @@ Private Sub Test229(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got 'foo""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    Expected = "#CSVRead: Got 'foo""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(229, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -6440,7 +6444,7 @@ Private Sub Test230(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""f""oo""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    Expected = "#CSVRead: Got '""f""oo""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(230, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
@@ -6463,7 +6467,7 @@ Private Sub Test231(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: #MakeSentinels: #AddKeysToDict: #ValidateCSVField: Got '""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!!!!"
+    Expected = "#CSVRead: Got '""' as TrueString, but that cannot be a field in a CSV file, since it is not correctly quoted!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(231, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _

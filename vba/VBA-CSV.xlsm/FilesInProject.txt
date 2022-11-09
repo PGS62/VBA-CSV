@@ -3,6 +3,7 @@ CSVinterface.cls
 ECPArrayList.cls
 ECPTextStream.cls
 modAdHoc.bas
+modAdHoc2.bas
 modCodeFromStackOverflow.bas
 modCSVNotRFC4180.bas
 modCSVPerformance.bas
@@ -14,7 +15,6 @@ modCSVTestRDatasets.bas
 modCSVTestRoundTrip.bas
 modCSVTestUtils.bas
 modCSVXLUtils.bas
-Module1.bas
 parserConfig.cls
 sdkn104_CSVUtils.bas
 shTest.cls

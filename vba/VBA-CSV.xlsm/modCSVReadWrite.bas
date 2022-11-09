@@ -182,14 +182,14 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Const Err_FileEmpty As String = "File is empty"
     Const Err_FunctionWizard  As String = "Disabled in Function Wizard"
     Const Err_NumCols As String = "NumCols must be positive to read a given number of columns, or zero or omitted " & _
-        "to read all columns from SkipToCol to the maximum column encountered."
+        "to read all columns from SkipToCol to the maximum column encountered"
     Const Err_NumRows As String = "NumRows must be positive to read a given number of rows, or zero or omitted to " & _
-        "read all rows from SkipToRow to the end of the file."
+        "read all rows from SkipToRow to the end of the file"
     Const Err_Seps1 As String = "DecimalSeparator must be a single character"
     Const Err_Seps2 As String = "DecimalSeparator must not be equal to the first character of Delimiter or to a " & _
         "line-feed or carriage-return"
-    Const Err_SkipToCol As String = "SkipToCol must be at least 1."
-    Const Err_SkipToRow As String = "SkipToRow must be at least 1."
+    Const Err_SkipToCol As String = "SkipToCol must be at least 1"
+    Const Err_SkipToRow As String = "SkipToRow must be at least 1"
     Const Err_Comment As String = "Comment must not contain double-quote, line feed or carriage return"
     Const Err_HeaderRowNum As String = "HeaderRowNum must be greater than or equal to zero and less than or equal to SkipToRow"
     
@@ -207,7 +207,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Dim CTDict As Scripting.Dictionary
     Dim DateOrder As Long
     Dim DateSeparator As String
-    Dim ErrRet As String
     Dim Err_StringTooLong As String
     Dim EstNumChars As Long
     Dim FileSize As Long
@@ -528,12 +527,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
     Exit Function
 
 ErrHandler:
-    ErrRet = "#CSVRead: " & Err.Description & "!"
-    If m_ErrorStyle = es_ReturnString Then
-        CSVRead = ErrRet
-    Else
-        Throw ErrRet
-    End If
+    CSVRead = ReThrow("CSVRead", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -628,7 +622,7 @@ Private Function InferSourceType(FileName As String) As enmSourceType
 
     Exit Function
 ErrHandler:
-    Throw "#InferSourceType: " & Err.Description & "!"
+    ReThrow "InferSourceType", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -689,7 +683,7 @@ Private Function Download(URLAddress As String, ByVal FileName As String) As Str
 
     Exit Function
 ErrHandler:
-    Throw "#Download: " & Err.Description & "!"
+    ReThrow "Download", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -793,7 +787,7 @@ Private Function ReadAllFromStream(Stream As Object, Optional ByVal EstNumChars 
 
     Exit Function
 ErrHandler:
-    Throw "#ReadAllFromStream: " & Err.Description & "!"
+    ReThrow "ReadAllFromStream", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -846,7 +840,7 @@ Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef C
 
     Exit Sub
 ErrHandler:
-    Throw "#ParseEncoding: " & Err.Description & "!"
+    ReThrow "ParseEncoding", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -877,7 +871,7 @@ Private Function IsCTValid(CT As Variant) As Boolean
 
     Exit Function
 ErrHandler:
-    Throw "#IsCTValid: " & Err.Description & "!"
+    ReThrow "IsCTValid", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -895,7 +889,7 @@ Private Function CTsEqual(CT1 As Variant, CT2 As Variant) As Boolean
     CTsEqual = StandardiseCT(CT1) = StandardiseCT(CT2)
     Exit Function
 ErrHandler:
-    Throw "#CTsEqual: " & Err.Description & "!"
+    ReThrow "CTsEqual", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -922,7 +916,7 @@ Private Function StandardiseCT(CT As Variant) As String
 
     Exit Function
 ErrHandler:
-    Throw "#StandardiseCT: " & Err.Description & "!"
+    ReThrow "StandardiseCT", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -950,7 +944,7 @@ Private Function OneDArrayToTwoDArray(x As Variant) As Variant
     OneDArrayToTwoDArray = TwoDArray
     Exit Function
 ErrHandler:
-    Throw "#OneDArrayToTwoDArray: " & Err.Description & "!"
+    ReThrow "OneDArrayToTwoDArray", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1091,7 +1085,7 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
     ColByColFormatting = True
     Exit Sub
 ErrHandler:
-    Throw "#ParseConvertTypes: " & Err.Description & "!"
+    ReThrow "ParseConvertTypes", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1160,7 +1154,7 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
 
     Exit Sub
 ErrHandler:
-    Throw "#ParseCTString: " & Err.Description & "!"
+    ReThrow "ParseCTString", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1199,7 +1193,6 @@ Private Function DetectEncoding(FilePath As String)
     Dim intAsc2Chr As Long
     Dim intAsc3Chr As Long
     Dim T As Scripting.TextStream
-    Dim CopyOfErr As String
 
     On Error GoTo ErrHandler
     
@@ -1242,9 +1235,9 @@ EarlyExit:
     T.Close: Set T = Nothing
     Exit Function
 ErrHandler:
-    CopyOfErr = Err.Description
-    T.Close
-    Throw "#DetectEncoding: " & CopyOfErr & "!"
+
+   If Not T Is Nothing Then T.Close
+    ReThrow "DetectEncoding", Err
 End Function
 
 Private Function GetFileSize(FilePath As String)
@@ -1334,7 +1327,7 @@ Private Sub AmendDelimiterIfFirstFieldIsDateTime(FirstChunk As String, ByRef Del
     
     Exit Sub
 ErrHandler:
-    Throw "#AmendDelimiterIfFirstFieldIsDateTime: " & Err.Description & "!"
+    ReThrow "AmendDelimiterIfFirstFieldIsDateTime", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1351,7 +1344,6 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
     Const Err_SourceType As String = "Cannot infer delimiter directly from URL"
     Const MAX_CHUNKS As Long = 10
     Dim Contents As String
-    Dim CopyOfErr As String
     Dim EvenQuotes As Boolean
     Dim F As Scripting.File
     Dim i As Long
@@ -1434,12 +1426,11 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
 
     Exit Function
 ErrHandler:
-    CopyOfErr = "#InferDelimiter: " & Err.Description & "!"
     If Not Stream Is Nothing Then
         Stream.Close
         Set Stream = Nothing: Set F = Nothing
     End If
-    Throw CopyOfErr
+    ReThrow "InferDelimiter", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1506,7 +1497,7 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
 
     Exit Sub
 ErrHandler:
-    Throw "#ParseDateFormat: " & Err.Description & "!"
+    ReThrow "ParseDateFormat", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1837,7 +1828,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
 
     Exit Function
 ErrHandler:
-    Throw "#ParseCSVContents: " & Err.Description & "!"
+    ReThrow "ParseCSVContents", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1866,7 +1857,7 @@ Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() 
 
     Exit Function
 ErrHandler:
-    Throw "#GetLastParsedRow: " & Err.Description & "!"
+    ReThrow "GetLastParsedRow", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1926,7 +1917,7 @@ Private Sub SkipLines(Streaming As Boolean, Comment As String, _
 
     Exit Sub
 ErrHandler:
-    Throw "#SkipLines: " & Err.Description & "!"
+    ReThrow "SkipLines", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1975,7 +1966,7 @@ Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Strea
 
     Exit Function
 ErrHandler:
-    Throw "#SearchInBuffer: " & Err.Description & "!"
+    ReThrow "SearchInBuffer", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2015,7 +2006,7 @@ Private Function InStrMulti(SearchFor() As String, SearchWithin As String, Start
 
     Exit Function
 ErrHandler:
-    Throw "#InStrMulti: " & Err.Description & "!"
+    ReThrow "InStrMulti", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2113,7 +2104,7 @@ Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As St
 
     Exit Sub
 ErrHandler:
-    Throw "#GetMoreFromStream: " & Err.Description & "!"
+    ReThrow "GetMoreFromStream", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2298,7 +2289,7 @@ Private Function Unquote(ByVal Field As String, QuoteChar As String, quoteCount 
 
     Exit Function
 ErrHandler:
-    Throw "#Unquote: " & Err.Description & "!"
+    ReThrow "Unquote", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2588,7 +2579,7 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
 
     Exit Sub
 ErrHandler:
-    Throw "#MakeSentinels: " & Err.Description & "!"
+    ReThrow "MakeSentinels", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2634,7 +2625,7 @@ Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As
     End Select
     Exit Sub
 ErrHandler:
-    Throw "#AddKeysToDict: " & Err.Description & "!"
+    ReThrow "AddKeysToDict", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2662,24 +2653,24 @@ Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant
             End If
         End If
     End If
-
+    
     If FoundRepeated Then
         Throw "There is a conflicting definition of what the string '" & Key & _
             "' should be converted to, both the " & TypeName(item) & " value '" & CStr(item) & _
             "' and the " & TypeName(Sentinels.item(Key)) & " value '" & CStr(Sentinels.item(Key)) & _
-            "' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments."
+            "' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments"
     End If
 
     Exit Sub
 ErrHandler:
-    Throw "#AddKeyToDict: " & Err.Description & "!"
+    ReThrow "AddKeyToDict", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseISO8601
 ' Purpose    : Test harness for calling from spreadsheets
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function ParseISO8601(strIn As String) As Variant
+Private Function ParseISO8601(strIn As String) As Variant
     Dim Converted As Boolean
     Dim DtOut As Date
 
@@ -2693,7 +2684,7 @@ Public Function ParseISO8601(strIn As String) As Variant
     End If
     Exit Function
 ErrHandler:
-    ParseISO8601 = "#ParseISO8601: " & Err.Description & "!"
+    ReThrow "ParseISO8601", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2947,7 +2938,7 @@ Private Function GetLocalOffsetToUTC() As Double
 
     Exit Function
 ErrHandler:
-    Throw "#GetLocalOffsetToUTC: " & Err.Description & "!"
+    ReThrow "GetLocalOffsetToUTC", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2974,7 +2965,7 @@ Private Function ISOZFormatString() As String
 
     Exit Function
 ErrHandler:
-    Throw "#ISOZFormatString: " & Err.Description & "!"
+    ReThrow "ISOZFormatString", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3148,7 +3139,7 @@ Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, 
 
     Exit Function
 ErrHandler:
-    Throw "#ParseTextFile: " & Err.Description & "!"
+    ReThrow "ParseTextFile", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3165,15 +3156,51 @@ Private Function FunctionWizardActive() As Boolean
 
     Exit Function
 ErrHandler:
-    Throw "#FunctionWizardActive: " & Err.Description & "!"
+    ReThrow "FunctionWizardActive", Err
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ReThrow
+' Purpose    : Common error handling. For use in the error handler of all methods
+' Parameters :
+'  FunctionName: The name
+'  Error       : The Err error object
+'  TopLevel    : Set to True if the method is a "top level" method that's exposed to the user and we wish for the function
+'                to return an error string (starts with #, ends with !) rather than raise an error.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function ReThrow(FunctionName As String, Error As ErrObject, Optional TopLevel As Boolean = False)
+          Dim ErrorDescription As String
+          Dim LineDescription As String
+          Dim ErrorNumber As Long
+          
+1         ErrorDescription = Error.Description
+2         ErrorNumber = Err.Number
+          
+3         If ErrorNumber <> vbObjectError + 100 Or TopLevel Then
+              'Build up call stack, i.e. annotate error description by prepending with #FunctionName and appending !
+4             If Erl <> 0 Then
+                  'Code has line numbers, annotate with line number
+5                 LineDescription = " (line " & CStr(Erl) & "): "
+6             Else
+7                 LineDescription = ": "
+8             End If
+9             ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
+10        End If
+
+11        If TopLevel Then
+12            ReThrow = ErrorDescription
+13        Else
+14            Err.Raise ErrorNumber, , ErrorDescription
+15        End If
+
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Throw
 ' Purpose    : Simple error handling.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub Throw(ByVal ErrorString As String)
-    Err.Raise vbObjectError + 1, , ErrorString
+Private Sub Throw(ByVal ErrorString As String, Optional WithCallStack As Boolean = False)
+1         Err.Raise vbObjectError + IIf(WithCallStack, 1, 100), , ErrorString
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3240,7 +3267,7 @@ Private Sub FileDelete(FileName As String)
 
     Exit Sub
 ErrHandler:
-    Throw "#FileDelete: " & Err.Description & "!"
+    ReThrow "FileDelete", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3311,7 +3338,7 @@ EarlyExit:
 
     Exit Sub
 ErrHandler:
-    Throw "#CreatePath: " & Err.Description & "!"
+    ReThrow "CreatePath", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3337,7 +3364,7 @@ Private Function FileFromPath(FullFileName As String, Optional ReturnFileName As
 
     Exit Function
 ErrHandler:
-    Throw "#FileFromPath: " & Err.Description & "!"
+    ReThrow "FileFromPath", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3357,7 +3384,8 @@ End Function
 '             have one row and the number of columns returned by this function.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function NCols(Optional TheArray As Variant) As Long
-    If TypeName(TheArray) = "Range" Then
+    On Error GoTo ErrHandler
+        If TypeName(TheArray) = "Range" Then
         NCols = TheArray.Columns.count
     ElseIf IsMissing(TheArray) Then
         NCols = 0
@@ -3371,6 +3399,10 @@ Private Function NCols(Optional TheArray As Variant) As Long
                 NCols = UBound(TheArray, 2) - LBound(TheArray, 2) + 1
         End Select
     End If
+
+    Exit Function
+ErrHandler:
+    ReThrow "NCols", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3378,6 +3410,7 @@ End Function
 ' Purpose   : Number of rows in an array. Missing has zero rows, 1-dimensional arrays have one row.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function NRows(Optional TheArray As Variant) As Long
+    On Error GoTo ErrHandler
     If TypeName(TheArray) = "Range" Then
         NRows = TheArray.Rows.count
     ElseIf IsMissing(TheArray) Then
@@ -3392,6 +3425,10 @@ Private Function NRows(Optional TheArray As Variant) As Long
                 NRows = UBound(TheArray, 1) - LBound(TheArray, 1) + 1
         End Select
     End If
+
+    Exit Function
+ErrHandler:
+    ReThrow "NRows", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3422,7 +3459,7 @@ Private Function Transpose(TheArray As Variant) As Variant
     Transpose = Result
     Exit Function
 ErrHandler:
-    Throw "#Transpose: " & Err.Description & "!"
+    ReThrow "Transpose", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3474,7 +3511,7 @@ Private Sub Force2DArray(ByRef TheArray As Variant, Optional ByRef NR As Long, O
 
     Exit Sub
 ErrHandler:
-    Throw "#Force2DArray: " & Err.Description & "!"
+    ReThrow "Force2DArray", Err
 End Sub
 
 Private Function MaxLngs(x As Long, y As Long) As Long
@@ -3594,7 +3631,6 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
     
     Dim EOLIsWindows As Boolean
-    Dim ErrRet As String
     Dim i As Long
     Dim j As Long
     Dim Lines() As String
@@ -3729,16 +3765,13 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
     
     Exit Function
 ErrHandler:
-    ErrRet = "#CSVWrite: " & Err.Description & "!"
+
     If Not Stream Is Nothing Then
         Stream.Close
         Set Stream = Nothing
     End If
-    If m_ErrorStyle = es_ReturnString Then
-        CSVWrite = ErrRet
-    Else
-        Throw ErrRet
-    End If
+    
+    CSVWrite = ReThrow("CSVWrite", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3876,7 +3909,7 @@ Private Sub ValidateCSVField(FieldValue As String, FieldName As String, Delimite
 
     Exit Sub
 ErrHandler:
-    Throw "#ValidateCSVField: " & Err.Description & "!"
+    ReThrow "ValidateCSVField", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3886,7 +3919,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function OStoEOL(OS As String, ArgName As String) As String
 
-    Const Err_Invalid As String = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters."
+    Const Err_Invalid As String = " must be one of ""Windows"", ""Unix"" or ""Mac"", or the associated end of line characters"
 
     On Error GoTo ErrHandler
     Select Case LCase$(OS)
@@ -3902,7 +3935,7 @@ Private Function OStoEOL(OS As String, ArgName As String) As String
 
     Exit Function
 ErrHandler:
-    Throw "#OStoEOL: " & Err.Description & "!"
+    ReThrow "OStoEOL", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3979,7 +4012,7 @@ Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, By
     End Select
     Exit Function
 ErrHandler:
-    Throw "#Encode: " & Err.Description & "!"
+    ReThrow "Encode", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4006,7 +4039,6 @@ Private Sub WriteLineWrap(T As TextStream, text As String, EOLIsWindows As Boole
 
 ErrHandler:
     ErrNum = Err.Number
-    ErrDesc = Err.Description
     If Not Unicode Then
         If ErrNum = 5 Then
             For i = 1 To Len(text)
@@ -4014,12 +4046,13 @@ ErrHandler:
                     ErrDesc = "Data contains characters that cannot be written to an ascii file (first found is '" & _
                         Mid$(text, i, 1) & "' with unicode character code " & AscW(Mid$(text, i, 1)) & _
                         "). Try calling CSVWrite with argument Encoding as ""UTF-8"" or ""UTF-16"""
+                    Throw ErrDesc
                     Exit For
                 End If
             Next i
         End If
     End If
-    Throw "#WriteLineWrap: " & ErrDesc & "!"
+    ReThrow "WriteLineWrap", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
