@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+190	09-Nov-2022	15:18	Philip Swannell	Re-ordered methods in modCSVReadWrite.
 189	09-Nov-2022	14:49	Philip Swannell	Added line numbers to modCSVReadWrite. These will appear in the call stack only for unanticipated errors, i.e. the kind we need to debug.
 188	09-Nov-2022	14:22	Philip Swannell	Reformed error handling in all the modules.
 187	09-Nov-2022	10:25	Philip Swannell	Reformed error handling. Error handlers in all methods are now simpler just calling new method ReThrow. We now no longer see the "call stack" in the return from CSVRead if the error is "anticipated" (mostly input validation) but we do see the call stack for unanticipated errors.
