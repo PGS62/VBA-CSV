@@ -565,13 +565,15 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ReadAllFromStream
-' Purpose    : Handles both ADODB.Stream and Scripting.TextStream. Note that ADODB.ReadText(-1) to read all of a stream
-'              in a single operation has _very_ poor performance for large files, but reading in chunks solves that.
-'              See Microsoft Knowledge Base 280067
-'              https://mskb.pkisolutions.com/kb/280067
-'              The article suggests a chunk size of 131072 (2^17), but my tests (on a 134Mb file) suggested 32768 (2^15).
-'              A further optimisation is to know the number of characters in the file, to avoid string concatenation
-'              inside the loop, hence the EstNumChars argument.
+' Purpose    : Read an entire Stream into a string. Replaces use of ADODB.ReadText(-1) since that has _very_ poor
+'              performance for large files. The solution is to read the stream in chunks. See Microsoft Knowledge Base
+'              280067 at https://mskb.pkisolutions.com/kb/280067. The article suggests a chunk size of 131072 (2^17),
+'              but my tests (on a 134Mb file) suggested 32768 (2^15). A further optimisation is to know the number of
+'              characters in the stream, to avoid string concatenation inside the loop, hence the EstNumChars argument.
+' Parameters :
+'  Stream     : An ADODB.Stream
+'  EstNumChars: An estimate of the number of characters in the stream. Performance is improved if this estimate is
+'               accurate.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ReadAllFromStream(Stream As Object, Optional ByVal EstNumChars As Long) As String
             
