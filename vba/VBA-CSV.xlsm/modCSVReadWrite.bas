@@ -237,7 +237,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
           Dim SourceType As enmSourceType
           Dim Starts() As Long
           Dim strDelimiter As String
-          Dim Stream As Object 'either ADODB.Stream or Scripting.TextStram
+          Dim Stream As ADODB.Stream
           Dim SysDateOrder As Long
           Dim SysDateSeparator As String
           Dim SysDecimalSeparator As String
@@ -346,7 +346,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 75        Else
 76            If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
                   
-77            Set Stream = CreateObject("ADODB.Stream")
+77            Set Stream = New ADODB.Stream
 78            Stream.CharSet = CharSet
 79            Stream.Open
 80            Stream.LoadFromFile FileName
@@ -355,7 +355,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 82            If SkipToRow = 1 And NumRows = 0 Then
 83                CSVContents = ReadAllFromStream(Stream, EstNumChars)
 84                Stream.Close
-                  
 85                ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                       IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
                       Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
@@ -575,7 +574,7 @@ End Function
 '  EstNumChars: An estimate of the number of characters in the stream. Performance is improved if this estimate is
 '               accurate.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ReadAllFromStream(Stream As Object, Optional ByVal EstNumChars As Long) As String
+Private Function ReadAllFromStream(Stream As ADODB.Stream, Optional ByVal EstNumChars As Long) As String
             
           Const ChunkSize As Long = 32768
           Dim Chunk As String
@@ -585,35 +584,28 @@ Private Function ReadAllFromStream(Stream As Object, Optional ByVal EstNumChars 
 1         If EstNumChars = 0 Then EstNumChars = 10000
 
 2         On Error GoTo ErrHandler
-3         Select Case TypeName(Stream)
-              Case "Stream"
-4                 Contents = String(EstNumChars, " ")
-5                 i = 1
-6                 Do While Not Stream.EOS
-7                     Chunk = Stream.ReadText(ChunkSize)
-8                     If i - 1 + Len(Chunk) > Len(Contents) Then
-                          'Increase length of Contents by a factor (at least) 2
-9                         Contents = Contents & String(i - 1 + Len(Chunk), " ")
-10                    End If
+3         Contents = String(EstNumChars, " ")
+4         i = 1
+5         Do While Not Stream.EOS
+6             Chunk = Stream.ReadText(ChunkSize)
+7             If i - 1 + Len(Chunk) > Len(Contents) Then
+                  'Increase length of Contents by a factor (at least) 2
+8                 Contents = Contents & String(i - 1 + Len(Chunk), " ")
+9             End If
 
-11                    Mid$(Contents, i, Len(Chunk)) = Chunk
-12                    i = i + Len(Chunk)
-13                Loop
+10            Mid$(Contents, i, Len(Chunk)) = Chunk
+11            i = i + Len(Chunk)
+12        Loop
 
-14                If (i - 1) < Len(Contents) Then
-15                    Contents = Left$(Contents, i - 1)
-16                End If
+13        If (i - 1) < Len(Contents) Then
+14            Contents = Left$(Contents, i - 1)
+15        End If
 
-17                ReadAllFromStream = Contents
-18            Case "TextStream"
-19                ReadAllFromStream = Stream.ReadAll
-20            Case Else
-21                Throw "Stream has unknown type: " & TypeName(Stream)
-22        End Select
+16        ReadAllFromStream = Contents
 
-23        Exit Function
+17        Exit Function
 ErrHandler:
-24        ReThrow "ReadAllFromStream", Err
+18        ReThrow "ReadAllFromStream", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1137,7 +1129,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
           Dim i As Long
           Dim j As Long
           Dim MaxChars As Long
-          Dim Stream As Object
+          Dim Stream As ADODB.Stream
           Const Err_FileEmpty As String = "File is empty"
 
 1         On Error GoTo ErrHandler
@@ -1145,7 +1137,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
 2         EvenQuotes = True
 3         If st = st_File Then
 
-4             Set Stream = CreateObject("ADODB.Stream")
+4             Set Stream = New ADODB.Stream
 5             Stream.CharSet = CharSet
 6             Stream.Open
 7             Stream.LoadFromFile FileNameOrContents
@@ -1799,7 +1791,7 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : GetMoreFromStream, Sub-routine of ParseCSVContents
-' Purpose    : Write CHUNKSIZE characters from the TextStream T into the buffer, modifying the passed-by-reference
+' Purpose    : Write CHUNKSIZE characters from the Stream into the buffer, modifying the passed-by-reference
 '              arguments  Buffer, BufferUpdatedTo and Streaming.
 '              Complexities:
 '           a) We have to be careful not to update the buffer to a point part-way through a two-character end-of-line
@@ -1808,8 +1800,8 @@ End Function
 '              QuoteChar and vbCrLf. This ensures that the calls to Instr that search the buffer for these strings do
 '              not needlessly scan the unupdated part of the buffer.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As String, _
-    ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
+Private Sub GetMoreFromStream(Stream As ADODB.Stream, Delimiter As String, QuoteChar As String, _
+        ByRef Buffer As String, ByRef BufferUpdatedTo As Long)
 
           Const ChunkSize As Long = 5000  ' The number of characters to read from the stream on each call. _
                                             Set to a small number for testing logic and a bigger number for _
@@ -1821,78 +1813,63 @@ Private Sub GetMoreFromStream(T As Variant, Delimiter As String, QuoteChar As St
           Dim ExpandBufferBy As Long
           Dim FirstPass As Boolean
           Dim i As Long
-          Dim IsScripting As Boolean
           Dim NCharsToWriteToBuffer As Long
           Dim NewChars As String
           Dim OKToExit As Boolean
 
 1         On Error GoTo ErrHandler
           
-2         Select Case TypeName(T)
-              Case "TextStream"
-3                 IsScripting = True
-4             Case "Stream"
-5                 IsScripting = False
-6             Case Else
-7                 Throw "T must be of type Scripting.TextStream or ADODB.Stream"
-8         End Select
-          
-9         FirstPass = True
-10        Do
-11            If IsScripting Then
-12                NewChars = T.Read(IIf(FirstPass, ChunkSize, 1))
-13                AtEndOfStream = T.AtEndOfStream
-14            Else
-15                NewChars = T.ReadText(IIf(FirstPass, ChunkSize, 1))
-16                AtEndOfStream = T.EOS
-17            End If
-18            FirstPass = False
-19            If AtEndOfStream Then
+2         FirstPass = True
+3         Do
+4             NewChars = Stream.ReadText(IIf(FirstPass, ChunkSize, 1))
+5             AtEndOfStream = Stream.EOS
+6             FirstPass = False
+7             If AtEndOfStream Then
                   'Ensure NewChars terminates with vbCrLf
-20                If Right$(NewChars, 1) <> vbCr And Right$(NewChars, 1) <> vbLf Then
-21                    NewChars = NewChars & vbCrLf
-22                ElseIf Right$(NewChars, 1) = vbCr Then
-23                    NewChars = NewChars & vbLf
-24                End If
-25            End If
+8                 If Right$(NewChars, 1) <> vbCr And Right$(NewChars, 1) <> vbLf Then
+9                     NewChars = NewChars & vbCrLf
+10                ElseIf Right$(NewChars, 1) = vbCr Then
+11                    NewChars = NewChars & vbLf
+12                End If
+13            End If
 
-26            NCharsToWriteToBuffer = Len(NewChars) + Len(Delimiter) + 3
+14            NCharsToWriteToBuffer = Len(NewChars) + Len(Delimiter) + 3
 
-27            If BufferUpdatedTo + NCharsToWriteToBuffer > Len(Buffer) Then
-28                ExpandBufferBy = MaxLngs(Len(Buffer), NCharsToWriteToBuffer)
-29                Buffer = Buffer & String(ExpandBufferBy, "?")
-30            End If
+15            If BufferUpdatedTo + NCharsToWriteToBuffer > Len(Buffer) Then
+16                ExpandBufferBy = MaxLngs(Len(Buffer), NCharsToWriteToBuffer)
+17                Buffer = Buffer & String(ExpandBufferBy, "?")
+18            End If
               
-31            Mid$(Buffer, BufferUpdatedTo + 1, Len(NewChars)) = NewChars
-32            BufferUpdatedTo = BufferUpdatedTo + Len(NewChars)
+19            Mid$(Buffer, BufferUpdatedTo + 1, Len(NewChars)) = NewChars
+20            BufferUpdatedTo = BufferUpdatedTo + Len(NewChars)
 
-33            OKToExit = True
+21            OKToExit = True
               'Ensure we don't leave the buffer updated to part way through a two-character end of line marker.
-34            If Right$(NewChars, 1) = vbCr Then
-35                OKToExit = False
-36            End If
+22            If Right$(NewChars, 1) = vbCr Then
+23                OKToExit = False
+24            End If
               'Ensure we don't leave the buffer updated to a point part-way through a multi-character delimiter
-37            If Len(Delimiter) > 1 Then
-38                For i = 1 To Len(Delimiter) - 1
-39                    If Mid$(Buffer, BufferUpdatedTo - i + 1, i) = Left$(Delimiter, i) Then
-40                        OKToExit = False
-41                        Exit For
-42                    End If
-43                Next i
-44                If Mid$(Buffer, BufferUpdatedTo - Len(Delimiter) + 1, Len(Delimiter)) = Delimiter Then
-45                    OKToExit = True
-46                End If
-47            End If
-48            If OKToExit Then Exit Do
-49        Loop
+25            If Len(Delimiter) > 1 Then
+26                For i = 1 To Len(Delimiter) - 1
+27                    If Mid$(Buffer, BufferUpdatedTo - i + 1, i) = Left$(Delimiter, i) Then
+28                        OKToExit = False
+29                        Exit For
+30                    End If
+31                Next i
+32                If Mid$(Buffer, BufferUpdatedTo - Len(Delimiter) + 1, Len(Delimiter)) = Delimiter Then
+33                    OKToExit = True
+34                End If
+35            End If
+36            If OKToExit Then Exit Do
+37        Loop
 
           'Line below arranges that when calling Instr(Buffer,....) we don't pointlessly scan the space characters _
            we can be sure that there is space in the buffer to write the extra characters thanks to
-50        Mid$(Buffer, BufferUpdatedTo + 1, 2 + Len(QuoteChar) + Len(Delimiter)) = vbCrLf & QuoteChar & Delimiter
+38        Mid$(Buffer, BufferUpdatedTo + 1, 2 + Len(QuoteChar) + Len(Delimiter)) = vbCrLf & QuoteChar & Delimiter
 
-51        Exit Sub
+39        Exit Sub
 ErrHandler:
-52        ReThrow "GetMoreFromStream", Err
+40        ReThrow "GetMoreFromStream", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------

@@ -2,8 +2,6 @@ AuditSheetComments.txt
 CSVinterface.cls
 ECPArrayList.cls
 ECPTextStream.cls
-modAdHoc.bas
-modAdHoc2.bas
 modCodeFromStackOverflow.bas
 modCSVNotRFC4180.bas
 modCSVPerformance.bas
