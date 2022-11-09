@@ -24,8 +24,6 @@ Function TestSpeed()
 
 End Function
 
-
-
 Function Foo()
 1         On Error GoTo ErrHandler
 2         Foo = Bar()
@@ -57,6 +55,3 @@ Private Function Grumpy()
 ErrHandler:
 4         ReThrow "Grumpy", Err
 End Function
-
-
-

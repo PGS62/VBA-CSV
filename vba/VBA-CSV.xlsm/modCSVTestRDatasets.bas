@@ -120,5 +120,3 @@ Sub TestAgainstRDatasets()
 ErrHandler:
     MsgBox ReThrow("TestAgainstRDatasets", Err, True), vbCritical
 End Sub
-
-

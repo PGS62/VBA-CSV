@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+191	09-Nov-2022	17:07	Philip Swannell	Ran a new set of performance tests. See sheet 'Performance (10)'.
 190	09-Nov-2022	15:18	Philip Swannell	Re-ordered methods in modCSVReadWrite.
 189	09-Nov-2022	14:49	Philip Swannell	Added line numbers to modCSVReadWrite. These will appear in the call stack only for unanticipated errors, i.e. the kind we need to debug.
 188	09-Nov-2022	14:22	Philip Swannell	Reformed error handling in all the modules.
