@@ -501,8 +501,10 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 184               ElseIf CTDict.Exists(0) Then
 185                   CT = CTDict.item(0)
 186               Else
-187                   CT = False
+187                   CT = vbNullString
 188               End If
+                  
+                  If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
                   
 189               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
                       ShowErrorsAsErrors, ConvertQuoted, TrimFields
@@ -798,94 +800,96 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
           Dim Transposed As Boolean
           
 1         On Error GoTo ErrHandler
-2         If VarType(ConvertTypes) = vbString Or VarType(ConvertTypes) = vbBoolean Or IsEmpty(ConvertTypes) Then
-3             ParseCTString CStr(ConvertTypes), ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
+2         If VarType(ConvertTypes) = vbBoolean Then ConvertTypes = StandardiseCT(ConvertTypes)
+
+3         If VarType(ConvertTypes) = vbString Or IsEmpty(ConvertTypes) Then
+4             ParseCTString CStr(ConvertTypes), ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
                   ShowErrorsAsErrors, ConvertQuoted, TrimFields
-4             ColByColFormatting = False
-5             Exit Sub
-6         End If
+5             ColByColFormatting = False
+6             Exit Sub
+7         End If
 
-7         If TypeName(ConvertTypes) = "Range" Then ConvertTypes = ConvertTypes.Value2
-8         ND = NumDimensions(ConvertTypes)
-9         If ND = 1 Then
-10            ConvertTypes = OneDArrayToTwoDArray(ConvertTypes)
-11        ElseIf ND = 2 Then
-12            If LBound(ConvertTypes, 1) <> 1 Or LBound(ConvertTypes, 2) <> 1 Then
-13                Throw Err_2D
-14            End If
-15        End If
+8         If TypeName(ConvertTypes) = "Range" Then ConvertTypes = ConvertTypes.Value2
+9         ND = NumDimensions(ConvertTypes)
+10        If ND = 1 Then
+11            ConvertTypes = OneDArrayToTwoDArray(ConvertTypes)
+12        ElseIf ND = 2 Then
+13            If LBound(ConvertTypes, 1) <> 1 Or LBound(ConvertTypes, 2) <> 1 Then
+14                Throw Err_2D
+15            End If
+16        End If
 
-16        NR = NRows(ConvertTypes)
-17        NC = NCols(ConvertTypes)
-18        If NR = 2 And NC = 2 Then
+17        NR = NRows(ConvertTypes)
+18        NC = NCols(ConvertTypes)
+19        If NR = 2 And NC = 2 Then
               'Tricky - have we been given two rows or two columns?
-19            If Not IsCTValid(ConvertTypes(2, 2)) Then Throw Err_ConvertTypes
-20            If IsCTValid(ConvertTypes(1, 2)) And IsCTValid(ConvertTypes(2, 1)) Then
-21                If StandardiseCT(ConvertTypes(1, 2)) <> StandardiseCT(ConvertTypes(2, 1)) Then
-22                    Throw Err_Ambiguous
-23                End If
-24            End If
-25            If IsCTValid(ConvertTypes(2, 1)) Then
-26                ConvertTypes = Transpose(ConvertTypes)
-27                Transposed = True
-28            End If
-29        ElseIf NR = 2 Then
-30            ConvertTypes = Transpose(ConvertTypes)
-31            Transposed = True
-32            NR = NC
-33        ElseIf NC <> 2 Then
-34            Throw Err_ConvertTypes
-35        End If
-36        LCN = LBound(ConvertTypes, 2)
-37        RCN = LCN + 1
-38        For i = LBound(ConvertTypes, 1) To UBound(ConvertTypes, 1)
-39            ColIdentifier = ConvertTypes(i, LCN)
-40            CT = ConvertTypes(i, RCN)
-41            If IsNumber(ColIdentifier) Then
-42                If ColIdentifier <> CLng(ColIdentifier) Then
-43                    Throw Err_BadColumnIdentifier & _
+20            If Not IsCTValid(ConvertTypes(2, 2)) Then Throw Err_ConvertTypes
+21            If IsCTValid(ConvertTypes(1, 2)) And IsCTValid(ConvertTypes(2, 1)) Then
+22                If StandardiseCT(ConvertTypes(1, 2)) <> StandardiseCT(ConvertTypes(2, 1)) Then
+23                    Throw Err_Ambiguous
+24                End If
+25            End If
+26            If IsCTValid(ConvertTypes(2, 1)) Then
+27                ConvertTypes = Transpose(ConvertTypes)
+28                Transposed = True
+29            End If
+30        ElseIf NR = 2 Then
+31            ConvertTypes = Transpose(ConvertTypes)
+32            Transposed = True
+33            NR = NC
+34        ElseIf NC <> 2 Then
+35            Throw Err_ConvertTypes
+36        End If
+37        LCN = LBound(ConvertTypes, 2)
+38        RCN = LCN + 1
+39        For i = LBound(ConvertTypes, 1) To UBound(ConvertTypes, 1)
+40            ColIdentifier = ConvertTypes(i, LCN)
+41            CT = ConvertTypes(i, RCN)
+42            If IsNumber(ColIdentifier) Then
+43                If ColIdentifier <> CLng(ColIdentifier) Then
+44                    Throw Err_BadColumnIdentifier & _
                           " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & _
                           ") is " & CStr(ColIdentifier)
-44                ElseIf ColIdentifier < 0 Then
-45                    Throw Err_BadColumnIdentifier & " but ConvertTypes(" & _
+45                ElseIf ColIdentifier < 0 Then
+46                    Throw Err_BadColumnIdentifier & " but ConvertTypes(" & _
                           IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & ") is " & CStr(ColIdentifier)
-46                End If
-47            ElseIf VarType(ColIdentifier) <> vbString Then
-48                Throw Err_BadColumnIdentifier & " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & _
+47                End If
+48            ElseIf VarType(ColIdentifier) <> vbString Then
+49                Throw Err_BadColumnIdentifier & " but ConvertTypes(" & IIf(Transposed, "1," & CStr(i), CStr(i) & ",1") & _
                       ") is of type " & TypeName(ColIdentifier)
-49            End If
-50            If Not IsCTValid(CT) Then
-51                If VarType(CT) = vbString Then
-52                    Throw Err_BadCT & " but ConvertTypes(" & IIf(Transposed, "2," & CStr(i), CStr(i) & ",2") & _
+50            End If
+51            If Not IsCTValid(CT) Then
+52                If VarType(CT) = vbString Then
+53                    Throw Err_BadCT & " but ConvertTypes(" & IIf(Transposed, "2," & CStr(i), CStr(i) & ",2") & _
                           ") is string """ & CStr(CT) & """"
-53                Else
-54                    Throw Err_BadCT & " but ConvertTypes(" & IIf(Transposed, "2," & CStr(i), CStr(i) & ",2") & _
+54                Else
+55                    Throw Err_BadCT & " but ConvertTypes(" & IIf(Transposed, "2," & CStr(i), CStr(i) & ",2") & _
                           ") is of type " & TypeName(CT)
-55                End If
-56            End If
+56                End If
+57            End If
 
-57            If CTDict.Exists(ColIdentifier) Then
-58                If Not CTsEqual(CTDict.item(ColIdentifier), CT) Then
-59                    Throw "ConvertTypes is contradictory. Column " & CStr(ColIdentifier) & _
+58            If CTDict.Exists(ColIdentifier) Then
+59                If Not CTsEqual(CTDict.item(ColIdentifier), CT) Then
+60                    Throw "ConvertTypes is contradictory. Column " & CStr(ColIdentifier) & _
                           " is specified to be converted using two different conversion rules: " & CStr(CT) & _
                           " and " & CStr(CTDict.item(ColIdentifier))
-60                End If
-61            Else
-62                CT = StandardiseCT(CT)
+61                End If
+62            Else
+63                CT = StandardiseCT(CT)
                   'Need this line to ensure that we parse the DateFormat provided when doing Col-by-col type conversion
-63                If InStr(CT, "D") > 0 Then ShowDatesAsDates = True
-64                If VarType(ColIdentifier) = vbString Then
-65                    If HeaderRowNum = 0 Then
-66                        Throw Err_HeaderRowNum
-67                    End If
-68                End If
-69                CTDict.Add ColIdentifier, CT
-70            End If
-71        Next i
-72        ColByColFormatting = True
-73        Exit Sub
+64                If InStr(CT, "D") > 0 Then ShowDatesAsDates = True
+65                If VarType(ColIdentifier) = vbString Then
+66                    If HeaderRowNum = 0 Then
+67                        Throw Err_HeaderRowNum
+68                    End If
+69                End If
+70                CTDict.Add ColIdentifier, CT
+71            End If
+72        Next i
+73        ColByColFormatting = True
+74        Exit Sub
 ErrHandler:
-74        ReThrow "ParseConvertTypes", Err
+75        ReThrow "ParseConvertTypes", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -917,44 +921,40 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
 
 1         On Error GoTo ErrHandler
 
-2         If ConvertTypes = "True" Or ConvertTypes = "False" Then
-3             ConvertTypes = StandardiseCT(CBool(ConvertTypes))
-4         End If
-
-5         ShowNumbersAsNumbers = False
-6         ShowDatesAsDates = False
-7         ShowBooleansAsBooleans = False
-8         ShowErrorsAsErrors = False
-9         ConvertQuoted = False
-10        For i = 1 To Len(ConvertTypes)
+2         ShowNumbersAsNumbers = False
+3         ShowDatesAsDates = False
+4         ShowBooleansAsBooleans = False
+5         ShowErrorsAsErrors = False
+6         ConvertQuoted = False
+7         For i = 1 To Len(ConvertTypes)
               'Adding another letter? Also change method IsCTValid!
-11            Select Case UCase$(Mid$(ConvertTypes, i, 1))
+8             Select Case UCase$(Mid$(ConvertTypes, i, 1))
                   Case "N"
-12                    ShowNumbersAsNumbers = True
-13                Case "D"
-14                    ShowDatesAsDates = True
-15                Case "B"
-16                    ShowBooleansAsBooleans = True
-17                Case "E"
-18                    ShowErrorsAsErrors = True
-19                Case "Q"
-20                    ConvertQuoted = True
-21                Case "T"
-22                    TrimFields = True
-23                Case Else
-24                    Throw Err_ConvertTypes & " Found unrecognised character '" _
+9                     ShowNumbersAsNumbers = True
+10                Case "D"
+11                    ShowDatesAsDates = True
+12                Case "B"
+13                    ShowBooleansAsBooleans = True
+14                Case "E"
+15                    ShowErrorsAsErrors = True
+16                Case "Q"
+17                    ConvertQuoted = True
+18                Case "T"
+19                    TrimFields = True
+20                Case Else
+21                    Throw Err_ConvertTypes & " Found unrecognised character '" _
                           & Mid$(ConvertTypes, i, 1) & "'"
-25            End Select
-26        Next i
+22            End Select
+23        Next i
           
-27        If ConvertQuoted And Not (ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+24        If ConvertQuoted And Not (ShowNumbersAsNumbers Or ShowDatesAsDates Or _
               ShowBooleansAsBooleans Or ShowErrorsAsErrors) Then
-28            Throw Err_Quoted
-29        End If
+25            Throw Err_Quoted
+26        End If
 
-30        Exit Sub
+27        Exit Sub
 ErrHandler:
-31        ReThrow "ParseCTString", Err
+28        ReThrow "ParseCTString", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1020,24 +1020,25 @@ Private Function DetectEncoding(FilePath As String)
 18        Else
 19            If T.AtEndOfStream Then
 20                DetectEncoding = "ANSI"
-21            End If
-22            intAsc3Chr = Asc(T.Read(1))
-23            If (intAsc1Chr = 239) And (intAsc2Chr = 187) And (intAsc3Chr = 191) Then
+21                GoTo EarlyExit
+22            End If
+23            intAsc3Chr = Asc(T.Read(1))
+24            If (intAsc1Chr = 239) And (intAsc2Chr = 187) And (intAsc3Chr = 191) Then
                   'File is probably encoded UTF-8 with BOM
-24                DetectEncoding = "UTF-8"
-25            Else
+25                DetectEncoding = "UTF-8"
+26            Else
                   'We don't know, assume ANSI but that may be incorrect.
-26                DetectEncoding = "ANSI"
-27            End If
-28        End If
+27                DetectEncoding = "ANSI"
+28            End If
+29        End If
 
 EarlyExit:
-29        T.Close: Set T = Nothing
-30        Exit Function
+30        T.Close: Set T = Nothing
+31        Exit Function
 
 ErrHandler:
-31        If Not T Is Nothing Then T.Close
-32        ReThrow "DetectEncoding", Err
+32        If Not T Is Nothing Then T.Close
+33        ReThrow "DetectEncoding", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

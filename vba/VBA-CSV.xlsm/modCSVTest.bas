@@ -288,6 +288,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test251 Folder, NumPassed, NumFailed, Failures
     Test252 Folder, NumPassed, NumFailed, Failures
     Test253 Folder, NumPassed, NumFailed, Failures
+    Test254 Folder, NumPassed, NumFailed, Failures
 
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -7015,3 +7016,27 @@ Private Sub Test253(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     ReThrow "Test253", Err
 End Sub
+
+Private Sub Test254(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "one empty line windows"
+    Expected = Empty
+    FileName = "one_empty_line_windows.csv"
+    TestRes = TestCSVRead(254, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test254", Err
+End Sub
+
+
