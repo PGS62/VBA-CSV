@@ -19,12 +19,14 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 # Installation
 1. Download `modCSVReadWrite.bas` from the [latest release](https://github.com/PGS62/VBA-CSV/releases).
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
-3. Add two references (In VBA Editor Tools > References)
-   * `Microsoft Scripting Runtime`
-   * `Microsoft VBScript Regular Expressions 5.5` (or the latest version available)  
-   &nbsp;&nbsp;
-   <img src="https://github.com/PGS62/VBA-CSV/blob/main/images/VBAReferences.png" width=50% height = 50%>
+3. Add three references (In VBA Editor Tools > References)
+   * `Microsoft Scripting Runtime`  
+   * `Microsoft VBScript Regular Expressions 5.5`  
+   * `Microsoft ActiveX Data Objects 6.1 Library`  
+   &nbsp;&nbsp;  
    
+   <img src="https://user-images.githubusercontent.com/18028484/202697906-283c287f-9c8c-49cb-8818-cde58c1d9bb0.png" width=60% height=60%>
+
 4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
 Private Sub Workbook_Open()
