@@ -33,6 +33,10 @@ Option Explicit
 Private m_FSO As Scripting.FileSystemObject
 Private Const DQ = """"
 Private Const DQ2 = """"""
+' If m_ErrorStringsEmbedCallStack is True then errors returned by CSVRead and CSVWrite are more
+' verbose as they contain information about function names and line numbers in the call stack,
+' which is useful for debugging.
+Private Const m_ErrorStringsEmbedCallStack As Boolean = False
 
 #If VBA7 And Win64 Then
     'for 64-bit Excel
@@ -505,40 +509,40 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 187                   CT = vbNullString
 188               End If
                   
-                  If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
+189               If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
                   
-189               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
+190               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
                       ShowErrorsAsErrors, ConvertQuoted, TrimFields
                   
-190               AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+191               AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
                       ShowBooleansAsBooleans Or ShowErrorsAsErrors
                       
-191               Set Sentinels = New Scripting.Dictionary
+192               Set Sentinels = New Scripting.Dictionary
                   
-192               MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
+193               MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
                       ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
 
-193               For i = 1 To NR
-194                   If Not IsEmpty(ReturnArray(i + Adj, j + Adj)) Then
-195                       Field = CStr(ReturnArray(i + Adj, j + Adj))
-196                       QC = CountQuotes(Field, DQ)
-197                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
+194               For i = 1 To NR
+195                   If Not IsEmpty(ReturnArray(i + Adj, j + Adj)) Then
+196                       Field = CStr(ReturnArray(i + Adj, j + Adj))
+197                       QC = CountQuotes(Field, DQ)
+198                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
                               Len(ReturnArray(i + Adj, j + Adj)), TrimFields, DQ, QC, ConvertQuoted, _
                               ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
                               ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone, DateOrder, _
                               DateSeparator, SysDateOrder, SysDateSeparator, AnySentinels, Sentinels, _
                               MaxSentinelLength, ShowMissingsAs)
-198                   End If
-199               Next i
-200           Next j
-201       End If
+199                   End If
+200               Next i
+201           Next j
+202       End If
 
-202       CSVRead = ReturnArray
+203       CSVRead = ReturnArray
 
-203       Exit Function
+204       Exit Function
 
 ErrHandler:
-204       CSVRead = ReThrow("CSVRead", Err, m_ErrorStyle = es_ReturnString)
+205       CSVRead = ReThrow("CSVRead", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3764,18 +3768,25 @@ Private Function ReThrow(FunctionName As String, Error As ErrObject, Optional Re
 2         ErrorNumber = Err.Number
 
           'Build up call stack, i.e. annotate error description by prepending #<FunctionName> and appending !
-3         If Erl = 0 Then
-4             LineDescription = " (line unknown): "
-5         Else
-6             LineDescription = " (line " & CStr(Erl) & "): "
-7         End If
-8         ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
+3         If m_ErrorStringsEmbedCallStack Then
+4             If Erl = 0 Then
+5                 LineDescription = " (line unknown): "
+6             Else
+7                 LineDescription = " (line " & CStr(Erl) & "): "
+8             End If
+9         Else
+10            LineDescription = ": "
+11        End If
 
-9         If ReturnString Then
-10            ReThrow = ErrorDescription
-11        Else
-12            Err.Raise ErrorNumber, , ErrorDescription
-13        End If
+12        If ReturnString Or m_ErrorStringsEmbedCallStack Then
+13            ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
+14        End If
+
+15        If ReturnString Then
+16            ReThrow = ErrorDescription
+17        Else
+18            Err.Raise ErrorNumber, , ErrorDescription
+19        End If
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
