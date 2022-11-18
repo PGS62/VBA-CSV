@@ -247,15 +247,6 @@ Public Function TimeParsers(ByVal ParserNames As Variant, EachFieldContains As V
             Loop
             timeTaken = ElapsedTime - Tstart
             NumCalls = k
-        ElseIf InStr(ParserNames(1, j), "ArrayFromCSV") > 0 Then
-            Tstart = ElapsedTime()
-            Do
-                DataReread = ThrowIfError(ArrayFromCSVfile(FileName))
-                k = k + 1
-                If ElapsedTime() - Tstart > Timeout Then Exit Do
-            Loop
-            timeTaken = ElapsedTime - Tstart
-            NumCalls = k
         ElseIf InStr(ParserNames(1, j), "CSV.jl") > 0 Then
             DataReread = Empty
             NumCalls = "Not found"

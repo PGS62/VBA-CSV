@@ -187,7 +187,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     End Select
     
     'The Call to CSVRead has to infer both Encoding and EOL, and in most cases must infer the delimiter
-    DataReadBack = CSVRead(FileName, ConvertTypes, DelimiterForRead, DateFormat:=DateFormat, ShowMissingsAs:=Empty)
+    DataReadBack = CSVRead(FileName, ConvertTypes, DelimiterForRead, DateFormat:=DateFormat, ShowMissingsAs:=Empty, TrueStrings:=CStr(True), FalseStrings:=CStr(False))
     
     'Code to test the test
     'If Rnd() < 0.001 Then
@@ -221,8 +221,6 @@ End Function
 Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL As String) As String
 
     Const maxlen As Long = 20
-    Dim utf8 As Boolean
-    
     Dim i As Long
     Dim Length As Long
     Dim Res As String

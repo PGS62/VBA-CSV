@@ -102,14 +102,6 @@ End Function
 
 Function SaveNotCompliantFile(ByVal InputString As String, FileName As String)
 
-    Dim i As Long
-    Dim j As Long
-    Dim NC As Long
-    Dim NR As Long
-    Dim OneDArray() As String
-    Dim Out As String
-    Dim ParserRes As Variant
-
     On Error GoTo ErrHandler
     On Error GoTo ErrHandler
 

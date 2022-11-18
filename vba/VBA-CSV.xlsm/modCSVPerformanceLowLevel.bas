@@ -161,7 +161,6 @@ End Sub
 Private Sub SpeedTest_Sentinels()
     
     Const N As Long = 10000000
-    Dim AnySentinels As Boolean
     Dim Comment As String
     Dim Field As String
     Dim i As Long
@@ -173,8 +172,6 @@ Private Sub SpeedTest_Sentinels()
     Dim t2 As Double
 
     On Error GoTo ErrHandler
-    
-    Const ConvertQuoted As Boolean = False
     
         Set Sentinels = New Scripting.Dictionary
       '  MakeSentinels Sentinels, ConvertQuoted, MaxLength, AnySentinels, _
@@ -250,7 +247,6 @@ End Sub
 Private Sub SpeedTest_CastISO8601()
 
     Const N As Long = 5000000
-    Dim Converted As Boolean
     Dim DtOut As Date
     Dim Expected As Date
     Dim i As Long

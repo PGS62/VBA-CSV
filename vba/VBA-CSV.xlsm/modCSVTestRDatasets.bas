@@ -35,13 +35,12 @@ Sub TestAgainstLargestFileInRDatasets()
     Dim t1 As Double
     Dim t2 As Double
     Dim t3 As Double
-    Const RemoveQuotes As Boolean = True
     Dim WhatDiffers As String
 
     t1 = ElapsedTime
     res1 = CSVRead(FileName)
     t2 = ElapsedTime
-    res2 = ArrayFromCSVfile(FileName, , , RemoveQuotes)
+  '  res2 = ArrayFromCSVfile(FileName, , , RemoveQuotes)
     t3 = ElapsedTime
 
     Debug.Print "CSVRead", t2 - t1, "ArrayFromCSVfile", t3 - t2, ArraysIdentical(res1, res2, , True, WhatDiffers)

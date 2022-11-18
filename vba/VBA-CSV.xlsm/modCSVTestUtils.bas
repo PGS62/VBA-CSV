@@ -87,9 +87,9 @@ Function GenerateTestCode(TestNo As Long, FileName As String, ExpectedReturn As 
     If Comment <> vbNullString Then
         Res = Res & ", _" & vbLf & Indent2 & "Comment := " & ElementToVBALitteral(Comment)
     End If
-    If IgnoreEmptyLines <> False Then
+'    If IgnoreEmptyLines <> False Then
         Res = Res & ", _" & vbLf & Indent2 & "IgnoreEmptyLines := " & ElementToVBALitteral(IgnoreEmptyLines)
-    End If
+'    End If
     If SkipToRow <> (HeaderRowNum & 1) And (SkipToRow <> 0) Then
         Res = Res & ", _" & vbLf & Indent2 & "SkipToRow := " & CStr(SkipToRow)
     End If

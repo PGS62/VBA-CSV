@@ -69,6 +69,10 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
             If Observed = Expected Then
                 TestCSVRead = True
                 Exit Function
+            ElseIf ErrorStringsHaveSameRootCause(CStr(Observed), CStr(Expected)) Then
+                Debug.Print "Warning, for test " & CStr(TestNo) & " Observed and Expected differ but are both error strings with the same root cause"
+                TestCSVRead = True
+                Exit Function
             ElseIf RegExSyntaxValid(CStr(Expected)) Then
                 If IsRegMatch(CStr(Expected), CStr(Observed)) Then
                     TestCSVRead = True
@@ -120,6 +124,155 @@ If Encoding = "False" Then Encoding = "Ascii" 'backward-compatibility hack
         IIf(OS = vbNullString, vbNullString, OS & "_") & Format$(NumRows, "0000") & "_x_" & Format$(NumCols, "000") & _
         "_" & Encoding & IIf(Ragged, "_Ragged", vbNullString) & ".csv")
 End Function
+
+Function ErrorStringsHaveSameRootCause(ErrorA As String, ErrorB As String) As Boolean
+    Dim RootCauseA As String
+    Dim RootCauseB As String
+
+    On Error GoTo ErrHandler
+
+    If Left(ErrorA, 1) = "#" Then
+        If Right(ErrorA, 1) = "!" Then
+            If Left(ErrorB, 1) = "#" Then
+                If Right(ErrorB, 1) = "!" Then
+                    ParseErrorString ErrorA, RootCauseA, ""
+                    ParseErrorString ErrorB, RootCauseB, ""
+                    ErrorStringsHaveSameRootCause = RootCauseA = RootCauseB
+                    If Not ErrorStringsHaveSameRootCause Then Stop
+                    
+                End If
+            End If
+        End If
+    End If
+
+    Exit Function
+ErrHandler:
+    ReThrow "ErrorStringsHaveSameRootCause", Err
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ParseErrorString
+' Purpose    : Parses an error string that has been built up by successive calls to ReThrow (as an error unwound).
+' Parameters :
+'  ErrorWithCallStack: Here is an example:
+'                      #CSVRead (line 44): #MakeSentinels (line 18): #AddKeysToDict (line 12): #AddKeyToDict (line 2): TrueStrings must be omitted or provided as string or an array of strings that represent Boolean value True but '1' is of type Double!!!!
+'  RootCause         : Set to the inner-most error, i.e. what went wrong at the deepest point in the call stack, In
+'                      the example above this would be:
+'                      #TrueStrings must be omitted or provided as string or an array of strings that represent Boolean value True but '1' is of type Double!
+'  CallStack         : Set to a vbLf delimited string containg the names of the functions in the call stack, each annoted
+'                      with line number. In the example above this would be:
+'                      CSVRead (line 44)
+'                      MakeSentinels (line 18)
+'                      AddKeysToDict (line 12)
+'                      AddKeyToDict (line 2)
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function ParseErrorString(ByVal ErrorWithCallStack As String, ByRef RootCause As String, ByRef CallStack As String)
+          
+          Dim MethodName As String
+          Const LDelim As String = "#"
+          Const RDelim As String = ":"
+          
+1         On Error GoTo ErrHandler
+2         RootCause = ErrorWithCallStack
+
+3         Do While InStr(InStr(RootCause, LDelim) + 1, RootCause, RDelim) > 0
+4             MethodName = StringBetweenStrings(RootCause, LDelim, RDelim) & ")"
+5             If Len(CallStack) = 0 Then
+6                 CallStack = MethodName
+7             Else
+8                 CallStack = CallStack & vbLf & MethodName
+9             End If
+10            RootCause = Trim$(StringBetweenStrings(RootCause, RDelim, vbNullString))
+11            If Right$(RootCause, 1) = "!" Then RootCause = Left$(RootCause, Len(RootCause) - 1)
+12        Loop
+13        If Left$(RootCause, 1) <> LDelim Then
+14            RootCause = LDelim & RootCause
+15        End If
+16        If Right$(RootCause, 1) <> "!" Then
+17            RootCause = RootCause & "!"
+18        End If
+
+19        Exit Function
+ErrHandler:
+20        ReThrow "ParseErrorString", Err
+End Function
+
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure : StringBetweenStrings
+' Purpose   : The function returns the substring of the input TheString which lies between LeftString
+'             and RightString.
+' Arguments
+' TheString : The input string to be searched.
+' LeftString: The returned string will start immediately after the first occurrence of LeftString in
+'             TheString. If LeftString is not found or is the null string or missing, then
+'             the return will start at the first character of TheString.
+' RightString: The return will stop immediately before the first subsequent occurrence of RightString. If
+'             such occurrrence is not found or if RightString is the null string or
+'             missing, then the return will stop at the last character of TheString.
+' IncludeLeftString: If TRUE, then if LeftString appears in TheString, the return will include LeftString. This
+'             argument is optional and defaults to FALSE.
+' IncludeRightString: If TRUE, then if RightString appears in TheString (and appears after the first occurance
+'             of LeftString) then the return will include RightString. This argument is
+'             optional and defaults to FALSE.
+' -----------------------------------------------------------------------------------------------------------------------
+Function StringBetweenStrings(TheString, LeftString, RightString, Optional IncludeLeftString As Boolean, Optional IncludeRightString As Boolean)
+          Dim MatchPoint1 As Long        ' the position of the first character to return
+          Dim MatchPoint2 As Long        ' the position of the last character to return
+          Dim FoundLeft As Boolean
+          Dim FoundRight As Boolean
+          
+1         On Error GoTo ErrHandler
+          
+2         If VarType(TheString) <> vbString Or VarType(LeftString) <> vbString Or VarType(RightString) <> vbString Then Throw "Inputs must be strings"
+3         If LeftString = vbNullString Then
+4             MatchPoint1 = 0
+5         Else
+6             MatchPoint1 = InStr(1, TheString, LeftString, vbTextCompare)
+7         End If
+
+8         If MatchPoint1 = 0 Then
+9             FoundLeft = False
+10            MatchPoint1 = 1
+11        Else
+12            FoundLeft = True
+13        End If
+
+14        If RightString = vbNullString Then
+15            MatchPoint2 = 0
+16        ElseIf FoundLeft Then
+17            MatchPoint2 = InStr(MatchPoint1 + Len(LeftString), TheString, RightString, vbTextCompare)
+18        Else
+19            MatchPoint2 = InStr(1, TheString, RightString, vbTextCompare)
+20        End If
+
+21        If MatchPoint2 = 0 Then
+22            FoundRight = False
+23            MatchPoint2 = Len(TheString)
+24        Else
+25            FoundRight = True
+26            MatchPoint2 = MatchPoint2 - 1
+27        End If
+
+28        If Not IncludeLeftString Then
+29            If FoundLeft Then
+30                MatchPoint1 = MatchPoint1 + Len(LeftString)
+31            End If
+32        End If
+
+33        If IncludeRightString Then
+34            If FoundRight Then
+35                MatchPoint2 = MatchPoint2 + Len(RightString)
+36            End If
+37        End If
+
+38        StringBetweenStrings = Mid$(TheString, MatchPoint1, MatchPoint2 - MatchPoint1 + 1)
+
+39        Exit Function
+ErrHandler:
+40        StringBetweenStrings = ReThrow("StringBetweenStrings", Err, True)
+End Function
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NCols
@@ -301,51 +454,48 @@ ExitPoint:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : ReThrow
-' Purpose    : Common error handling. For use in the error handler of all methods
+' Procedure  : Throw
+' Purpose    : Error handling - companion to ReThrow
 ' Parameters :
-'  FunctionName: The name
-'  Error       : The Err error object
-'  TopLevel    : Pass in True if the method is a "top level" method that's exposed to the user and we wish for the function
-'                to return an error string (starts with #, ends with !).
-'                Pass in False if we want to (re)throw an error, anotated as long as ErrorNumber is not vbObjectError + 100
+'  Description  : Description of what went wrong.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function ReThrow(FunctionName As String, Error As ErrObject, Optional TopLevel As Boolean = False)
+Sub Throw(ByVal Description As String)
+1         Err.Raise vbObjectError + 1, "Throw", Description
+End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : ReThrow
+' Purpose    : Common error handling to be used in the error handler of all methods.
+' Parameters :
+'  FunctionName: The name of the function from which ReThrow is called, typically in the function's error handler.
+'  Error       : Err, the error object.
+'  ReturnString: Pass in True if the method is a "top level" method that's exposed to the user and we wish for the
+'                function to return an error string (starts with #, ends with !).
+'                Pass in False if we want to (re)throw an error, with annotated Description.
+' -----------------------------------------------------------------------------------------------------------------------
+Function ReThrow(FunctionName As String, Error As ErrObject, Optional ReturnString As Boolean = False)
 
           Dim ErrorDescription As String
           Dim ErrorNumber As Long
           Dim LineDescription As String
-          Dim ShowCallStack As Boolean
           
 1         ErrorDescription = Error.Description
 2         ErrorNumber = Err.Number
-3         ShowCallStack = ErrorNumber <> vbObjectError + 100
-          
-4         If ShowCallStack Or TopLevel Then
-              'Build up call stack, i.e. annotate error description by prepending #<FunctionName> and appending !
-5             If Erl <> 0 And ShowCallStack Then
-                  'Code has line numbers, annotate with line number
-6                 LineDescription = " (line " & CStr(Erl) & "): "
-7             Else
-8                 LineDescription = ": "
-9             End If
-10            ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
-11        End If
 
-12        If TopLevel Then
-13            ReThrow = ErrorDescription
-14        Else
-15            Err.Raise ErrorNumber, , ErrorDescription
-16        End If
+          'Build up call stack, i.e. annotate error description by prepending #<FunctionName> and appending !
+3         If Erl = 0 Then
+4             LineDescription = " (line unknown): "
+5         Else
+6             LineDescription = " (line " & CStr(Erl) & "): "
+7         End If
+8         ErrorDescription = "#" & FunctionName & LineDescription & ErrorDescription & "!"
+
+9         If ReturnString Then
+10            ReThrow = ErrorDescription
+11        Else
+12            Err.Raise ErrorNumber, , ErrorDescription
+13        End If
 End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : Throw
-' Purpose    : Simple error handling.
-' -----------------------------------------------------------------------------------------------------------------------
-Sub Throw(ByVal ErrorString As String, Optional WithCallStack As Boolean = False)
-1         Err.Raise vbObjectError + IIf(WithCallStack, 1, 100), , ErrorString
-End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CreateMissing
@@ -774,7 +924,6 @@ ErrHandler:
 End Function
 
 Public Sub FileCopy(SourceFile As String, TargetFile As String)
-    Dim CopyOfErr As String
     Dim F As Scripting.File
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler

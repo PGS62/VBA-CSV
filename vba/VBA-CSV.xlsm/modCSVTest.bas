@@ -5652,6 +5652,7 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
+    Dim strObserved As String
     Dim R As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
@@ -5660,7 +5661,7 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test 32K limit"
-    Expected = "#CSVRead: The file has a field (row 2, column 2) of length 33,000. Excel cells cannot contain strings longer than 32,767!"
+    Expected = "The file has a field (row 2, column 2) of length 33,000. Excel cells cannot contain strings longer than 32,767"
     FileName = "test_32K_limit.csv"
     
     Formula = "=CSVRead(""" & Folder & FileName & """, TRUE)"
@@ -5674,8 +5675,16 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         R.FormulaArray = Formula
     End If
     Observed = R.value
-    TestRes = Observed = Expected
-    If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
+    If VarType(Observed) = vbString Then
+        TestRes = InStr(Observed, Expected) > 0
+    End If
+    If VarType(Observed) = vbString Then
+        strObserved = CStr(Observed)
+    Else
+        strObserved = "variable of type " & TypeName(Observed)
+    End If
+     
+    If Not TestRes Then WhatDiffers = "Test201 Observed = '" & strObserved & "' Expected = '" & Expected & "'"
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
     shHiddenSheet.UsedRange.Clear
 
@@ -5690,6 +5699,7 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
+    Dim strObserved As String
     Dim R As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
@@ -5698,7 +5708,7 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test 32K limit"
-    Expected = "#CSVRead: Line 2 of the file is of length 33,002. Excel cells cannot contain strings longer than 32,767!"
+    Expected = "Line 2 of the file is of length 33,002. Excel cells cannot contain strings longer than 32,767"
     FileName = "test_32K_limit.csv"
     
     Formula = "=CSVRead(""" & Folder & FileName & """, FALSE,FALSE)"
@@ -5711,10 +5721,17 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Else
         R.FormulaArray = Formula
     End If
-
     Observed = R.value
-    TestRes = Observed = Expected
-    If Not TestRes Then WhatDiffers = "Observed = '" & Observed & "' Expected = '" & Expected & "'"
+    If VarType(Observed) = vbString Then
+        TestRes = InStr(Observed, Expected) > 0
+    End If
+    If VarType(Observed) = vbString Then
+        strObserved = CStr(Observed)
+    Else
+        strObserved = "variable of type " & TypeName(Observed)
+    End If
+     
+    If Not TestRes Then WhatDiffers = "Test202 Observed = '" & strObserved & "' Expected = '" & Expected & "'"
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
     shHiddenSheet.UsedRange.Clear
 
@@ -5840,7 +5857,7 @@ Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test 32K limit quote handling 2"
-    Expected = "#CSVRead: The file has a field (row 2, column 2) of length 32,768. Excel cells cannot contain strings longer than 32,767!"
+    Expected = "The file has a field (row 2, column 2) of length 32,768. Excel cells cannot contain strings longer than 32,767"
 
     FileName = "test_32K_limit_quote_handling_2.csv"
     
@@ -5853,7 +5870,7 @@ Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Set R = shHiddenSheet.Cells(1, 1)
         R.Formula2 = Formula
         Observed = R.value
-        TestRes = ArraysIdentical(Expected, Observed)
+        TestRes = InStr(Observed, Expected) > 0
         If Not TestRes Then
             WhatDiffers = "File " & FileName & " not handled correctly - try inserting breakpoint in method Test206"
         End If
@@ -7027,10 +7044,11 @@ Private Sub Test254(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "one empty line windows"
-    Expected = Empty
+    Expected = VStack(Empty) '2-d array, 1-based, single element is Empty
     FileName = "one_empty_line_windows.csv"
     TestRes = TestCSVRead(254, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 

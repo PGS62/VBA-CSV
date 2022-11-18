@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+200	18-Nov-2022	10:27	Philip Swannell	a) Removed module modCodeFromStackOverflow.<LF>b) Simplified methods Throw and ReThrow, as a consequence error string now include the "call stack".<LF>c) Changes to tests such that if observed and expected are both error strings that differ but have the same "root cause" then the test passes but with a warning printed to the VBA immediate window.<LF>d) Removed declared-but-unused variables (via MZTools).<LF>e) Changes to round trip testing to pass in TrueStrings and FalseStrings such that tests should work on non English-language PC.
 199	17-Nov-2022	18:33	Philip Swannell	Added Test254 for a file containing only two characters - a carriage return and a line feed, but test currently fails - need to investigate.
 198	17-Nov-2022	18:15	Philip Swannell	Change to (hopefully) fix bug on non English-language version of Excel. Passing ConvertTypes as True failed on PC with display language of German. Not yet tested though.
 197	09-Nov-2022	22:43	Philip Swannell	Code comments only.
