@@ -138,8 +138,6 @@ Function ErrorStringsHaveSameRootCause(ErrorA As String, ErrorB As String) As Bo
                     ParseErrorString ErrorA, RootCauseA, ""
                     ParseErrorString ErrorB, RootCauseB, ""
                     ErrorStringsHaveSameRootCause = RootCauseA = RootCauseB
-                    If Not ErrorStringsHaveSameRootCause Then Stop
-                    
                 End If
             End If
         End If

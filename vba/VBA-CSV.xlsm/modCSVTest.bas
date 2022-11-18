@@ -5966,7 +5966,7 @@ Private Sub Test209(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Boolean value 'True' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value '" & CStr(False) & "' and the Boolean value '" & CStr(True) & "' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(209, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -5990,7 +5990,7 @@ Private Sub Test210(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'True' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value '" & CStr(True) & "' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(210, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -6014,7 +6014,7 @@ Private Sub Test211(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value 'False' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string 'foo' should be converted to, both the Boolean value '" & CStr(False) & "' and the Empty value '' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(211, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="B", _
@@ -6038,7 +6038,7 @@ Private Sub Test212(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: There is a conflicting definition of what the string '""foo""' should be converted to, both the Boolean value 'True' and the Boolean value 'False' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
+    Expected = "#CSVRead: There is a conflicting definition of what the string '""foo""' should be converted to, both the Boolean value '" & CStr(True) & "' and the Boolean value '" & CStr(False) & "' have been specified. Please check the TrueStrings, FalseStrings and MissingStrings arguments!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(212, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="BQ", _
