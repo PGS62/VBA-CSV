@@ -19,12 +19,14 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 # Installation
 1. Download `modCSVReadWrite.bas` from the [latest release](https://github.com/PGS62/VBA-CSV/releases).
 2. Import `modCSVReadWrite.bas` into your project (Open VBA Editor, `Alt + F11`; File > Import File).
-3. Add two references (In VBA Editor Tools > References)
-   * `Microsoft Scripting Runtime`
-   * `Microsoft VBScript Regular Expressions 5.5` (or the latest version available)  
-   &nbsp;&nbsp;
-   <img src="https://github.com/PGS62/VBA-CSV/blob/main/images/VBAReferences.png" width=50% height = 50%>
+3. Add three references (In VBA Editor Tools > References)
+   * `Microsoft Scripting Runtime`  
+   * `Microsoft VBScript Regular Expressions 5.5`  
+   * `Microsoft ActiveX Data Objects 6.1 Library`  
+   &nbsp;&nbsp;  
    
+   <img src="https://user-images.githubusercontent.com/18028484/202697906-283c287f-9c8c-49cb-8818-cde58c1d9bb0.png" width=60% height=60%>
+
 4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
 Private Sub Workbook_Open()
@@ -220,7 +222,9 @@ In summary, the performance tests show:
 <a name="myfootnote3">Footnote 3</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
 
 # Compatibility
-VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available), and not iOS or Android (since VBA is not available). It has been tested on Excel 365, both 64-bit and 32-bit, and on Excel 2010, 32 bit. It _should_ work on all other Office versions (2007 or later) but has not yet been tested on them.
+VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available), and not iOS or Android (since VBA is not available). It has been tested on Excel 365, both 64-bit and 32-bit, and on Excel 2010, 32 bit. It _should_ work on all other Office versions (2007 or later) but has not yet been tested on them. 
+
+If the PC you are using does not have English as the [Office Display language](https://support.microsoft.com/en-us/office/change-the-language-office-uses-in-its-menus-and-proofing-tools-f5c54ff9-a6fa-4348-a43c-760e7ef148f8) then you need version v0.23 or later; earlier versions did not work correctly on such PCs.
 
 # About
 Author: Philip Swannell  
