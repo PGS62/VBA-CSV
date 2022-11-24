@@ -3249,7 +3249,7 @@ End Function
 ' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, ByVal DateFormat As String, _
-    ByVal DateTimeFormat As String, ByVal Delim As String, TrueString As String, FalseString As String) As String
+        ByVal DateTimeFormat As String, ByVal Delim As String, TrueString As String, FalseString As String) As String
           
 1         On Error GoTo ErrHandler
 2         Select Case VarType(x)
@@ -3281,44 +3281,81 @@ Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, By
 26            Case vbNull
 27                Encode = "NULL"
 28            Case vbError
-29                Select Case CStr(x) 'Editing this case statement? Edit also its inverse, see method MakeSentinels
-                      Case "Error 2000"
-30                        Encode = "#NULL!"
-31                    Case "Error 2007"
-32                        Encode = "#DIV/0!"
-33                    Case "Error 2015"
-34                        Encode = "#VALUE!"
-35                    Case "Error 2023"
-36                        Encode = "#REF!"
-37                    Case "Error 2029"
-38                        Encode = "#NAME?"
-39                    Case "Error 2036"
-40                        Encode = "#NUM!"
-41                    Case "Error 2042"
-42                        Encode = "#N/A"
-43                    Case "Error 2043"
-44                        Encode = "#GETTING_DATA!"
-45                    Case "Error 2045"
-46                        Encode = "#SPILL!"
-47                    Case "Error 2046"
-48                        Encode = "#CONNECT!"
-49                    Case "Error 2047"
-50                        Encode = "#BLOCKED!"
-51                    Case "Error 2048"
-52                        Encode = "#UNKNOWN!"
-53                    Case "Error 2049"
-54                        Encode = "#FIELD!"
-55                    Case "Error 2050"
-56                        Encode = "#CALC!"
-57                    Case Else
-58                        Encode = CStr(x)        'should never hit this line...
-59                End Select
-60            Case Else
-61                Throw "Cannot convert variant of type " & TypeName(x) & " to String"
-62        End Select
-63        Exit Function
+                  'Code in this section written to ensure that round-tripping works whatever the display
+                  'languages of Excel and VBA. Excel error values are represented in the file as the text
+                  'that appears in an Excel cell when the display language of Excel is English.
+                  Static SetStatics As Boolean
+                  Static Error2000 As String
+                  Static Error2007 As String
+                  Static Error2015 As String
+                  Static Error2023 As String
+                  Static Error2029 As String
+                  Static Error2036 As String
+                  Static Error2042 As String
+                  Static Error2043 As String
+                  Static Error2045 As String
+                  Static Error2046 As String
+                  Static Error2047 As String
+                  Static Error2048 As String
+                  Static Error2049 As String
+                  Static Error2050 As String
+
+29                If Not SetStatics Then
+30                    Error2000 = CStr(CVErr(2000))
+31                    Error2007 = CStr(CVErr(2007))
+32                    Error2015 = CStr(CVErr(2015))
+33                    Error2023 = CStr(CVErr(2023))
+34                    Error2029 = CStr(CVErr(2029))
+35                    Error2036 = CStr(CVErr(2036))
+36                    Error2042 = CStr(CVErr(2042))
+37                    Error2043 = CStr(CVErr(2043))
+38                    Error2045 = CStr(CVErr(2045))
+39                    Error2046 = CStr(CVErr(2046))
+40                    Error2047 = CStr(CVErr(2047))
+41                    Error2048 = CStr(CVErr(2048))
+42                    Error2049 = CStr(CVErr(2049))
+43                    Error2050 = CStr(CVErr(2050))
+44                    SetStatics = True
+45                End If
+
+46                Select Case CStr(x) 'Editing this case statement? Edit also its inverse, see method MakeSentinels
+                      Case Error2000
+47                        Encode = "#NULL!"
+48                    Case Error2007
+49                        Encode = "#DIV/0!"
+50                    Case Error2015
+51                        Encode = "#VALUE!"
+52                    Case Error2023
+53                        Encode = "#REF!"
+54                    Case Error2029
+55                        Encode = "#NAME?"
+56                    Case Error2036
+57                        Encode = "#NUM!"
+58                    Case Error2042
+59                        Encode = "#N/A"
+60                    Case Error2043
+61                        Encode = "#GETTING_DATA!"
+62                    Case Error2045
+63                        Encode = "#SPILL!"
+64                    Case Error2046
+65                        Encode = "#CONNECT!"
+66                    Case Error2047
+67                        Encode = "#BLOCKED!"
+68                    Case Error2048
+69                        Encode = "#UNKNOWN!"
+70                    Case Error2049
+71                        Encode = "#FIELD!"
+72                    Case Error2050
+73                        Encode = "#CALC!"
+74                    Case Else
+75                        Encode = CStr(x)        'should never hit this line...
+76                End Select
+77            Case Else
+78                Throw "Cannot convert variant of type " & TypeName(x) & " to String"
+79        End Select
+80        Exit Function
 ErrHandler:
-64        ReThrow "Encode", Err
+81        ReThrow "Encode", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
