@@ -1,8 +1,9 @@
 Version	Date	Time	Author	Comment
-205	26-Nov-2022	17:58	Philip Swannell	Simplified method Encode, which now uses a disctionary to handle encoding of Booleans and errors.
+206	26-Nov-2022	18:17	Philip Swannell	Spell-checked this Audit sheet.
+205	26-Nov-2022	17:58	Philip Swannell	Simplified method Encode, which now uses a dictionary to handle encoding of Booleans and errors.
 204	24-Nov-2022	14:05	Philip Swannell	Bumped to v0.24
 203	24-Nov-2022	13:49	Philip Swannell	Changed CSVWrite so that when called on PC for which the display language of VBA is not English, then errors are written to file using the English-language representation (e.g. #SPILL!). This makes round-tripping work correctly.
-202	18-Nov-2022	12:22	Philip Swannell	Further changes to ReThrow. Error strings from CSVRead and CSVWrite are now consise unless m_ErrorStringsEmbedCallStack is set to True.
+202	18-Nov-2022	12:22	Philip Swannell	Further changes to ReThrow. Error strings from CSVRead and CSVWrite are now concise unless m_ErrorStringsEmbedCallStack is set to True.
 201	18-Nov-2022	11:13	Philip Swannell	Change to expected results for tests to soft code the string representation of True and False, so that tests pass on non English language PCs.
 200	18-Nov-2022	10:27	Philip Swannell	a) Removed module modCodeFromStackOverflow.<LF>b) Simplified methods Throw and ReThrow, as a consequence error string now include the "call stack".<LF>c) Changes to tests such that if observed and expected are both error strings that differ but have the same "root cause" then the test passes but with a warning printed to the VBA immediate window.<LF>d) Removed declared-but-unused variables (via MZTools).<LF>e) Changes to round trip testing to pass in TrueStrings and FalseStrings such that tests should work on non English-language PC.
 199	17-Nov-2022	18:33	Philip Swannell	Added Test254 for a file containing only two characters - a carriage return and a line feed, but test currently fails - need to investigate.
@@ -18,7 +19,7 @@ Version	Date	Time	Author	Comment
 189	09-Nov-2022	14:49	Philip Swannell	Added line numbers to modCSVReadWrite. These will appear in the call stack only for unanticipated errors, i.e. the kind we need to debug.
 188	09-Nov-2022	14:22	Philip Swannell	Reformed error handling in all the modules.
 187	09-Nov-2022	10:25	Philip Swannell	Reformed error handling. Error handlers in all methods are now simpler just calling new method ReThrow. We now no longer see the "call stack" in the return from CSVRead if the error is "anticipated" (mostly input validation) but we do see the call stack for unanticipated errors.
-186	08-Nov-2022	19:43	Philip Swannell	Ansure streams are always closed.
+186	08-Nov-2022	19:43	Philip Swannell	Ensure streams are always closed.
 185	08-Nov-2022	19:29	Philip Swannell	CSVRead now always uses ADODB text stream (rather than ADODB for some encodings and Scripting.TextStream for other encodings). Refactored and simplified.
 184	08-Nov-2022	16:12	Philip Swannell	Removed Stop statement.
 183	08-Nov-2022	15:54	Philip Swannell	Added timer functions tic and toc.
@@ -58,7 +59,7 @@ Version	Date	Time	Author	Comment
 149	22-Oct-2022	10:17	Philip Swannell	Tested on Excel 2010, with necessary changes to test code.
 148	21-Oct-2022	16:41	Philip Swannell	Bumped tag to 16.
 147	21-Oct-2022	16:39	Philip Swannell	Added arguments TrueString and FalseString to CSVWrite.
-146	21-Oct-2022	16:16	Philip Swannell	1) Bug fix to method ParseCSVContents for case ConvertTypes <> FALSE _and_ SkipToRow > 1 _and_ HeaderRow > 1 _and_ SkipToRow = HeaderRow. Test = 203<LF>2) Argument DateFormat can now use the space character as the deparator. e.g. "D M Y" is allowed. Test = 204.
+146	21-Oct-2022	16:16	Philip Swannell	1) Bug fix to method ParseCSVContents for case ConvertTypes <> FALSE _and_ SkipToRow > 1 _and_ HeaderRow > 1 _and_ SkipToRow = HeaderRow. Test = 203<LF>2) Argument DateFormat can now use the space character as the separator. e.g. "D M Y" is allowed. Test = 204.
 145	01-Nov-2021	16:18	Philip Swannell	Now use SolumAddin for exporting VBA code.
 144	01-Nov-2021	16:06	Philip Swannell	Vba code is now exported to folder c:\Projects\<ProjectName>\vba\<WorkbookName>
 143	14-Oct-2021	17:09	Philip Swannell	Moved performance testing methods out of modCSVReadWrite. 331 fewer loc.
@@ -81,7 +82,7 @@ Version	Date	Time	Author	Comment
 126	30-Sep-2021	14:27	Philip Swannell	Changes prompted by RubberDuck analysis.
 125	30-Sep-2021	13:47	Philip Swannell	Changes prompted by RubberDuck analysis.
 124	30-Sep-2021	08:32	Philip Swannell	Re-imported sdkn104 code also.
-123	30-Sep-2021	08:28	Philip Swannell	Re-imported ws_garcia code - I must have inadvertantly changed it when making the Rubberduck-prompted changes and somehow broke it.
+123	30-Sep-2021	08:28	Philip Swannell	Re-imported ws_garcia code - I must have inadvertently changed it when making the Rubberduck-prompted changes and somehow broke it.
 122	29-Sep-2021	19:38	Philip Swannell	Changes prompted by RubberDuck analysis.
 121	29-Sep-2021	18:17	Philip Swannell	Changes prompted by RubberDuck analysis.
 120	29-Sep-2021	16:59	Philip Swannell	Changes prompted by RubberDuck analysis.
@@ -95,7 +96,7 @@ Version	Date	Time	Author	Comment
 112	27-Sep-2021	18:54	Philip Swannell	Changes to sheet GIF.
 111	27-Sep-2021	18:27	Philip Swannell	Changes to sheet GIF.
 110	27-Sep-2021	17:30	Philip Swannell	Changes to sheet GIF.
-109	25-Sep-2021	19:33	Philip Swannell	Added sheet GIF that works in conjuction with workbook VBA-CSV-GIFMaker.xlsm
+109	25-Sep-2021	19:33	Philip Swannell	Added sheet GIF that works in conjunction with workbook VBA-CSV-GIFMaker.xlsm
 108	24-Sep-2021	17:34	Philip Swannell	Added code to generate CSVReadTitanic.gif.
 107	24-Sep-2021	13:05	Philip Swannell	Added tests for breach of 32k limit on field length when calling from Excel.
 106	24-Sep-2021	12:46	Philip Swannell	Sorted methods in module modCSVReadWrite
@@ -106,7 +107,7 @@ Version	Date	Time	Author	Comment
 101	22-Sep-2021	11:58	Philip Swannell	Deleted older of the two Performance sheets.
 100	22-Sep-2021	11:56	Philip Swannell	Added tests for date-time parsing, including decimal fractions of a second for D-M-Y, M-D-Y and Y-M-D.
 99	21-Sep-2021	17:39	Philip Swannell	Reduced the number of lines> 122 in length
-98	21-Sep-2021	16:07	Philip Swannell	Simplified declaraion of CSVRead by not providing unncessary defaults.
+98	21-Sep-2021	16:07	Philip Swannell	Simplified declaration of CSVRead by not providing unnecessary defaults.
 97	21-Sep-2021	15:59	Philip Swannell	More tests using files from the Julia CSV.jl test suite.
 96	21-Sep-2021	15:24	Philip Swannell	Fixed bug that SkipToRow was not defaulting to HeaderRowNum+1 when omitted.
 95	21-Sep-2021	14:45	Philip Swannell	Corrected typos on worksheet "Test".
@@ -120,7 +121,7 @@ Version	Date	Time	Author	Comment
 87	20-Sep-2021	09:43	Philip Swannell	Added five more tests to be sure we interpret ANSI, UTF-8, UTF-8-BOM, UTF-16-LE-BOM and UTF-16-BE-BOM correctly.
 86	19-Sep-2021	19:14	Philip Swannell	Now use ADODB.Stream for UTF-8 files and Scripting.Stream for ASCII, ANSI and UTF-16.
 85	19-Sep-2021	18:31	Philip Swannell	ReadTextWrapper mostly solves the performance problem.
-84	19-Sep-2021	16:33	Philip Swannell	Performance turned out to be terrible thanks to bad perfromance of ADODB.ReadText on large files. Wrote method ReadTextWrapper to (hopefully) solve the problem.
+84	19-Sep-2021	16:33	Philip Swannell	Performance turned out to be terrible thanks to bad performance of ADODB.ReadText on large files. Wrote method ReadTextWrapper to (hopefully) solve the problem.
 83	19-Sep-2021	11:16	Philip Swannell	All tests pass with ADODB.Stream, need to check performance.
 82	19-Sep-2021	10:16	Philip Swannell	Experimenting with using ADODB.Stream in place of Scripting.TextStream
 81	11-Sep-2021	11:30	Philip Swannell	Code comments only.
@@ -149,7 +150,7 @@ Version	Date	Time	Author	Comment
 58	31-Aug-2021	09:52	Philip Swannell	Workbook now more "portable" i.e. folder locations all relative to the path of the workbook itself.
 57	30-Aug-2021	19:35	Philip Swannell	Reinstated conditional formatting on sheet Demo.
 56	30-Aug-2021	18:30	Philip Swannell	Deal with times with fractional seconds - CDate does not cope with them.
-55	30-Aug-2021	13:46	Philip Swannell	Now test all possible reponses to bad inputs.
+55	30-Aug-2021	13:46	Philip Swannell	Now test all possible responses to bad inputs.
 54	30-Aug-2021	07:54	Philip Swannell	Reworked performance testing to include comparison with Julia.
 53	28-Aug-2021	15:49	Philip Swannell	More tests and fixes to column-by-column formatting.
 52	27-Aug-2021	20:29	Philip Swannell	Implemented Column-by-column type conversion
@@ -157,7 +158,7 @@ Version	Date	Time	Author	Comment
 50	26-Aug-2021	19:14	Philip Swannell	More refactoring.
 49	26-Aug-2021	18:29	Philip Swannell	Refactoring
 48	26-Aug-2021	13:47	Philip Swannell	Got rid of RetainQuotes option for ConvertTypes. ConvertTypes TRUE is now NDB rather than NDBE as previously.
-47	26-Aug-2021	13:44	Philip Swannell	Now have two possibilities for DateFormat: ISO and ISOZ, the latter handles datetime with timezone.
+47	26-Aug-2021	13:44	Philip Swannell	Now have two possibilities for DateFormat: ISO and ISOZ, the latter handles datetime with time zone.
 46	25-Aug-2021	00:15	Philip Swannell	Added more tests.
 45	24-Aug-2021	19:41	Philip Swannell	Added sheet "RegExp".
 44	24-Aug-2021	19:11	Philip Swannell	Work on ISOO8601 date recognition.
@@ -198,9 +199,9 @@ Version	Date	Time	Author	Comment
 9	09-Aug-2021	13:06	Philip Swannell	CSVRead_V2 now supports SkipToCol and NumCols, not yet SkipToRow and NumRows though.
 8	08-Aug-2021	13:11	Philip Swannell	Now have two functions CSVRead_V1 and CSVRead_V2
 7	07-Aug-2021	23:04	Philip Swannell	Settled on fastest algo.
-6	06-Aug-2021	15:59	Philip Swannell	Addd sheet "TimingResults" and module modCompareAgainstAlternatives.
+6	06-Aug-2021	15:59	Philip Swannell	Add sheet "TimingResults" and module modCompareAgainstAlternatives.
 5	04-Aug-2021	08:22	Philip Swannell	Added code to compare against https://github.com/sdkn104/VBA-CSV
 4	03-Aug-2021	09:02	Philip Swannell	Rewrote code to split a string, rather than examining each character in VBA code, use InStr in a while loop to push the character examination down to C code.
 3	29-Jul-2021	14:21	Philip Swannell	Code now compiles.
-2	29-Jul-2021	13:50	Philip Swannell	Reimported sFileSaveCSV and sFileShow from SolumAddin verison 2199. Code does not yet compile
+2	29-Jul-2021	13:50	Philip Swannell	Reimported sFileSaveCSV and sFileShow from SolumAddin version 2199. Code does not yet compile
 1	23-Jul-2021	14:07	Philip Swannell	First version. Start with SolumAddin's sFileShow to create CSVParse.
