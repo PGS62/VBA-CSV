@@ -2917,12 +2917,10 @@ End Function
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
-        Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
-        Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
-        Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
-        Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
+          Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
+          Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
+          Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
+          Optional TrueString As String = "True", Optional FalseString As String = "False") As String
 
           Const Err_Delimiter1 = "Delimiter must have at least one character"
           Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _
@@ -2931,6 +2929,7 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
           Const Err_Dimensions As String = "Data has more than two dimensions, which is not supported"
           Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
           
+          Dim Encoder As Scripting.Dictionary
           Dim EOLIsWindows As Boolean
           Dim i As Long
           Dim j As Long
@@ -3009,75 +3008,77 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 49            Case Is > 2
 50                Throw Err_Dimensions
 51        End Select
-          
-52        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
-          
-53        If WriteToFile Then
-54            If UCase$(Encoding) = "UTF-8" Then
-55                Set Stream = CreateObject("ADODB.Stream")
-56                Stream.Open
-57                Stream.Type = 2 'Text
-58                Stream.CharSet = "utf-8"
-          
-59                For i = LBound(Data) To UBound(Data)
-60                    For j = LBound(Data, 2) To UBound(Data, 2)
-61                        OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, TrueString, FalseString)
-62                    Next j
-63                    OneLineJoined = VBA.Join(OneLine, Delimiter) & EOL
-64                    Stream.WriteText OneLineJoined
-65                Next i
-66                Stream.SaveToFile FileName, 2 'adSaveCreateOverWrite
 
-67                CSVWrite = FileName
-68            Else
-69                Unicode = UCase$(Encoding) = "UTF-16"
-70                If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+52        Set Encoder = MakeEncoder(TrueString, FalseString)
+          
+53        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
+          
+54        If WriteToFile Then
+55            If UCase$(Encoding) = "UTF-8" Then
+56                Set Stream = CreateObject("ADODB.Stream")
+57                Stream.Open
+58                Stream.Type = 2 'Text
+59                Stream.CharSet = "utf-8"
+          
+60                For i = LBound(Data) To UBound(Data)
+61                    For j = LBound(Data, 2) To UBound(Data, 2)
+62                        OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
+63                    Next j
+64                    OneLineJoined = VBA.Join(OneLine, Delimiter) & EOL
+65                    Stream.WriteText OneLineJoined
+66                Next i
+67                Stream.SaveToFile FileName, 2 'adSaveCreateOverWrite
+
+68                CSVWrite = FileName
+69            Else
+70                Unicode = UCase$(Encoding) = "UTF-16"
+71                If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
                   Dim EN As Long, ED As String
-71                On Error Resume Next
-72                Set Stream = m_FSO.CreateTextFile(FileName, True, Unicode)
-73                EN = Err.Number: ED = Err.Description
-74                On Error GoTo ErrHandler
-75                If EN <> 0 Then Throw "Error '" & ED & "' when attempting to create file '" + FileName + "'"
+72                On Error Resume Next
+73                Set Stream = m_FSO.CreateTextFile(FileName, True, Unicode)
+74                EN = Err.Number: ED = Err.Description
+75                On Error GoTo ErrHandler
+76                If EN <> 0 Then Throw "Error '" & ED & "' when attempting to create file '" + FileName + "'"
         
-76                For i = LBound(Data) To UBound(Data)
-77                    For j = LBound(Data, 2) To UBound(Data, 2)
-78                        OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, TrueString, FalseString)
-79                    Next j
-80                    OneLineJoined = VBA.Join(OneLine, Delimiter)
-81                    WriteLineWrap Stream, OneLineJoined, EOLIsWindows, EOL, Unicode
-82                Next i
+77                For i = LBound(Data) To UBound(Data)
+78                    For j = LBound(Data, 2) To UBound(Data, 2)
+79                        OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
+80                    Next j
+81                    OneLineJoined = VBA.Join(OneLine, Delimiter)
+82                    WriteLineWrap Stream, OneLineJoined, EOLIsWindows, EOL, Unicode
+83                Next i
 
-83                Stream.Close: Set Stream = Nothing
-84                CSVWrite = FileName
-85            End If
-86        Else
+84                Stream.Close: Set Stream = Nothing
+85                CSVWrite = FileName
+86            End If
+87        Else
 
-87            ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
+88            ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
         
-88            For i = LBound(Data) To UBound(Data)
-89                For j = LBound(Data, 2) To UBound(Data, 2)
-90                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, TrueString, FalseString)
-91                Next j
-92                Lines(i) = VBA.Join(OneLine, Delimiter)
-93            Next i
-94            CSVWrite = VBA.Join(Lines, EOL)
-95            If Len(CSVWrite) > 32767 Then
-96                If TypeName(Application.Caller) = "Range" Then
-97                    Throw "Cannot return string of length " & Format$(CStr(Len(CSVWrite)), "#,###") & _
+89            For i = LBound(Data) To UBound(Data)
+90                For j = LBound(Data, 2) To UBound(Data, 2)
+91                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
+92                Next j
+93                Lines(i) = VBA.Join(OneLine, Delimiter)
+94            Next i
+95            CSVWrite = VBA.Join(Lines, EOL)
+96            If Len(CSVWrite) > 32767 Then
+97                If TypeName(Application.Caller) = "Range" Then
+98                    Throw "Cannot return string of length " & Format$(CStr(Len(CSVWrite)), "#,###") & _
                           " to a cell of an Excel worksheet"
-98                End If
-99            End If
-100       End If
+99                End If
+100           End If
+101       End If
           
-101       Exit Function
+102       Exit Function
 ErrHandler:
 
-102       If Not Stream Is Nothing Then
-103           Stream.Close
-104           Set Stream = Nothing
-105       End If
+103       If Not Stream Is Nothing Then
+104           Stream.Close
+105           Set Stream = Nothing
+106       End If
           
-106       CSVWrite = ReThrow("CSVWrite", Err, m_ErrorStyle = es_ReturnString)
+107       CSVWrite = ReThrow("CSVWrite", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3245,11 +3246,48 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : MakeEncoder
+' Author     : Philip Swannell
+' Date       : 26-Nov-2022
+' Purpose    : Returns a Dictionary for use in method Encode and which contains (as keys) the sentinel values (Booleans,
+'              null, errors) and (as values) the strings to which those sentinels are converted.
+'              This arrangement means that Excel errors are converted to their English-language representation even when
+'              the Excel display language is not Excel.
+' -----------------------------------------------------------------------------------------------------------------------
+Function MakeEncoder(TrueString As String, FalseString As String) As Scripting.Dictionary
+
+          Dim D As New Scripting.Dictionary
+1         On Error GoTo ErrHandler
+2         D.Add True, TrueString
+3         D.Add False, FalseString
+4         D.Add Null, "NULL"
+5         D.Add CVErr(2000), "#NULL!"
+6         D.Add CVErr(2007), "#DIV/0!"
+7         D.Add CVErr(2015), "#VALUE!"
+8         D.Add CVErr(2023), "#REF!"
+9         D.Add CVErr(2029), "#NAME?"
+10        D.Add CVErr(2036), "#NUM!"
+11        D.Add CVErr(2042), "#N/A"
+12        D.Add CVErr(2043), "#GETTING_DATA!"
+13        D.Add CVErr(2045), "#SPILL!"
+14        D.Add CVErr(2046), "#CONNECT!"
+15        D.Add CVErr(2047), "#BLOCKED!"
+16        D.Add CVErr(2048), "#UNKNOWN!"
+17        D.Add CVErr(2049), "#FIELD!"
+18        D.Add CVErr(2050), "#CALC!"
+19        Set MakeEncoder = D
+
+20        Exit Function
+ErrHandler:
+21        ReThrow "MakeEncoder", Err
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Encode
 ' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, ByVal DateFormat As String, _
-        ByVal DateTimeFormat As String, ByVal Delim As String, TrueString As String, FalseString As String) As String
+        ByVal DateTimeFormat As String, ByVal Delim As String, Encoder As Scripting.Dictionary) As String
           
 1         On Error GoTo ErrHandler
 2         Select Case VarType(x)
@@ -3268,94 +3306,22 @@ Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, By
 13                Else
 14                    Encode = x
 15                End If
-16            Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty  'vbLongLong - not available on 16 bit.
+16            Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty, 20 '20 = vbLongLong - not available on 32 bit.
 17                Encode = CStr(x)
-18            Case vbBoolean
-19                Encode = IIf(x, TrueString, FalseString)
+18            Case vbBoolean, vbError, vbNull
+19                Encode = Encoder(x)
 20            Case vbDate
-21                If CLng(x) = CDbl(x) Then
+21                If CLng(x) = x Then
 22                    Encode = Format$(x, DateFormat)
 23                Else
 24                    Encode = Format$(x, DateTimeFormat)
 25                End If
-26            Case vbNull
-27                Encode = "NULL"
-28            Case vbError
-                  'Code in this section written to ensure that round-tripping works whatever the display
-                  'languages of Excel and VBA. Excel error values are represented in the file as the text
-                  'that appears in an Excel cell when the display language of Excel is English.
-                  Static SetStatics As Boolean
-                  Static Error2000 As String
-                  Static Error2007 As String
-                  Static Error2015 As String
-                  Static Error2023 As String
-                  Static Error2029 As String
-                  Static Error2036 As String
-                  Static Error2042 As String
-                  Static Error2043 As String
-                  Static Error2045 As String
-                  Static Error2046 As String
-                  Static Error2047 As String
-                  Static Error2048 As String
-                  Static Error2049 As String
-                  Static Error2050 As String
-
-29                If Not SetStatics Then
-30                    Error2000 = CStr(CVErr(2000))
-31                    Error2007 = CStr(CVErr(2007))
-32                    Error2015 = CStr(CVErr(2015))
-33                    Error2023 = CStr(CVErr(2023))
-34                    Error2029 = CStr(CVErr(2029))
-35                    Error2036 = CStr(CVErr(2036))
-36                    Error2042 = CStr(CVErr(2042))
-37                    Error2043 = CStr(CVErr(2043))
-38                    Error2045 = CStr(CVErr(2045))
-39                    Error2046 = CStr(CVErr(2046))
-40                    Error2047 = CStr(CVErr(2047))
-41                    Error2048 = CStr(CVErr(2048))
-42                    Error2049 = CStr(CVErr(2049))
-43                    Error2050 = CStr(CVErr(2050))
-44                    SetStatics = True
-45                End If
-
-46                Select Case CStr(x) 'Editing this case statement? Edit also its inverse, see method MakeSentinels
-                      Case Error2000
-47                        Encode = "#NULL!"
-48                    Case Error2007
-49                        Encode = "#DIV/0!"
-50                    Case Error2015
-51                        Encode = "#VALUE!"
-52                    Case Error2023
-53                        Encode = "#REF!"
-54                    Case Error2029
-55                        Encode = "#NAME?"
-56                    Case Error2036
-57                        Encode = "#NUM!"
-58                    Case Error2042
-59                        Encode = "#N/A"
-60                    Case Error2043
-61                        Encode = "#GETTING_DATA!"
-62                    Case Error2045
-63                        Encode = "#SPILL!"
-64                    Case Error2046
-65                        Encode = "#CONNECT!"
-66                    Case Error2047
-67                        Encode = "#BLOCKED!"
-68                    Case Error2048
-69                        Encode = "#UNKNOWN!"
-70                    Case Error2049
-71                        Encode = "#FIELD!"
-72                    Case Error2050
-73                        Encode = "#CALC!"
-74                    Case Else
-75                        Encode = CStr(x)        'should never hit this line...
-76                End Select
-77            Case Else
-78                Throw "Cannot convert variant of type " & TypeName(x) & " to String"
-79        End Select
-80        Exit Function
+26            Case Else
+27                Throw "Cannot convert variant of type " & TypeName(x) & " to String"
+28        End Select
+29        Exit Function
 ErrHandler:
-81        ReThrow "Encode", Err
+30        ReThrow "Encode", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

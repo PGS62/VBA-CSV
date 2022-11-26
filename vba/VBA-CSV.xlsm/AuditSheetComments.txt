@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+205	26-Nov-2022	17:58	Philip Swannell	Simplified method Encode, which now uses a disctionary to handle encoding of Booleans and errors.
 204	24-Nov-2022	14:05	Philip Swannell	Bumped to v0.24
 203	24-Nov-2022	13:49	Philip Swannell	Changed CSVWrite so that when called on PC for which the display language of VBA is not English, then errors are written to file using the English-language representation (e.g. #SPILL!). This makes round-tripping work correctly.
 202	18-Nov-2022	12:22	Philip Swannell	Further changes to ReThrow. Error strings from CSVRead and CSVWrite are now consise unless m_ErrorStringsEmbedCallStack is set to True.
