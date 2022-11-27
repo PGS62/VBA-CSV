@@ -11,6 +11,7 @@ modCSVTestDeps.bas
 modCSVTestRDatasets.bas
 modCSVTestRoundTrip.bas
 modCSVTestUtils.bas
+modCSVWritePerformance.bas
 modCSVXLUtils.bas
 parserConfig.cls
 sdkn104_CSVUtils.bas

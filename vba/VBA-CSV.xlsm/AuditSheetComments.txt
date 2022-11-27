@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+207	27-Nov-2022	15:22	Philip Swannell	Added module modCSVWritePerformance, in order to benchmark changes to CSVWrite.
 206	26-Nov-2022	18:17	Philip Swannell	Spell-checked this Audit sheet.
 205	26-Nov-2022	17:58	Philip Swannell	Simplified method Encode, which now uses a dictionary to handle encoding of Booleans and errors.
 204	24-Nov-2022	14:05	Philip Swannell	Bumped to v0.24
