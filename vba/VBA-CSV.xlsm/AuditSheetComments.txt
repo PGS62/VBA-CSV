@@ -1,4 +1,6 @@
 Version	Date	Time	Author	Comment
+209	27-Nov-2022	16:13	Philip Swannell	Changes in release 208 seem to have more than doubled the speed for CSVWrite for large files. Average time to execute CSVWrite(Data, FileName) when Data is obtained from RDataSets file military.csv (1.4 million rows, 7 cols) falls from 24 seconds to 11 seconds.
+208	27-Nov-2022	15:39	Philip Swannell	Changes to CSVWrite, with hope of improved performance, but not yet tested.
 207	27-Nov-2022	15:22	Philip Swannell	Added module modCSVWritePerformance, in order to benchmark changes to CSVWrite.
 206	26-Nov-2022	18:17	Philip Swannell	Spell-checked this Audit sheet.
 205	26-Nov-2022	17:58	Philip Swannell	Simplified method Encode, which now uses a dictionary to handle encoding of Booleans and errors.

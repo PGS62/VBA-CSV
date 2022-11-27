@@ -21,6 +21,24 @@ Option Explicit
 'Elapsed time for CSVWrite UTF-16: 28.2433342998847 seconds
 'Elapsed time for CSVWrite UTF-16: 27.3908504000865 seconds
 
+'27/11/2022 15:46:11
+'VersionNumber 208
+'Elapsed time for CSVRead: 13.6756363001186 seconds
+'Elapsed time for CSVWrite ANSI: 11.0888602000196 seconds
+'Elapsed time for CSVWrite ANSI: 10.5916883000173 seconds
+'Elapsed time for CSVWrite ANSI: 11.331025699852 seconds
+'Elapsed time for CSVWrite ANSI: 11.0151514001191 seconds
+'Elapsed time for CSVWrite ANSI: 11.0596908999141 seconds
+'Elapsed time for CSVWrite UTF-8: 10.6685319000389 seconds
+'Elapsed time for CSVWrite UTF-8: 10.5587436000351 seconds
+'Elapsed time for CSVWrite UTF-8: 10.6614930001087 seconds
+'Elapsed time for CSVWrite UTF-8: 10.7582542998716 seconds
+'Elapsed time for CSVWrite UTF-8: 11.1152926001232 seconds
+'Elapsed time for CSVWrite UTF-16: 11.0943058999255 seconds
+'Elapsed time for CSVWrite UTF-16: 11.284852599958 seconds
+'Elapsed time for CSVWrite UTF-16: 11.7004682000261 seconds
+'Elapsed time for CSVWrite UTF-16: 11.5732845000457 seconds
+'Elapsed time for CSVWrite UTF-16: 11.3086764998734 seconds
 
 Sub TestWriteSpeedUsingMilitary()
 
