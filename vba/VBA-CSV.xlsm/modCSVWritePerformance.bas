@@ -47,20 +47,27 @@ Sub TestWriteSpeedUsingMilitary()
           Dim Res As String
           Dim i As Long, j As Long
           Dim Data
-          
-          Debug.Print Now
-          Debug.Print "VersionNumber", shAudit.Range("B6").value
-1         tic
-2         Data = CSVRead("C:\Projects\RDatasets\csv\openintro\military.csv", True)
-3         toc "CSVRead"
+1         On Error GoTo ErrHandler
+2         Debug.Print String(80, "-")
+3         Debug.Print "Time:         ", Now
+4         Debug.Print "ComputerName: ", Environ$("ComputerName")
+5         Debug.Print "VersionNumber:", shAudit.Range("B6").value
+6         tic
+7         Data = ThrowIfError(CSVRead("C:\Projects\RDatasets\csv\openintro\military.csv", True))
+8         toc "CSVRead"
 
-4         For j = 1 To 3
-5             Encoding = Choose(j, "ANSI", "UTF-8", "UTF-16")
-6             For i = 1 To 5
-7                 tic
-8                 Res = CSVWrite(Data, FileToWrite, , , , , Encoding)
-9                 toc "CSVWrite " & Encoding
-10            Next i
-11        Next j
+9         For j = 1 To 3
+10            Encoding = Choose(j, "ANSI", "UTF-8", "UTF-16")
+11            For i = 1 To 5
+12                tic
+13                Res = CSVWrite(Data, FileToWrite, , , , , Encoding)
+14                toc "CSVWrite " & Encoding
+15            Next i
+16        Next j
+17        Debug.Print String(80, "-")
+
+18        Exit Sub
+ErrHandler:
+19        MsgBox ReThrow("TestWriteSpeedUsingMilitary", Err, True), vbCritical
 End Sub
 

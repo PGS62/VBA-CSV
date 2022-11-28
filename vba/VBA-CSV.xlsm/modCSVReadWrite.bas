@@ -2921,23 +2921,20 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
           Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter1 = "Delimiter must have at least one character"
           Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _
               "double quote, line feed or carriage return"
               
           Const Err_Dimensions As String = "Data has more than two dimensions, which is not supported"
-          Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
           
+          Dim FileContents As String
           Dim Encoder As Scripting.Dictionary
           Dim EOLIsWindows As Boolean
           Dim i As Long
           Dim j As Long
           Dim Lines() As String
           Dim OneLine() As String
-          Dim Stream As Object
           Dim WriteToFile As Boolean
 
 1         On Error GoTo ErrHandler
@@ -3000,77 +2997,82 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 43        End Select
 
 44        Set Encoder = MakeEncoder(TrueString, FalseString)
-          
+
 45        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
-          
-46        If WriteToFile Then
-47            ReDim Lines(LBound(Data) To UBound(Data))
-48            Select Case UCase(Encoding)
-                  Case "UTF-8", "UTF-16"
-49                    Set Stream = CreateObject("ADODB.Stream")
-50                    Stream.Open
-51                    Stream.Type = 2 'Text
-52                    Stream.CharSet = LCase(Encoding)
-          
-53                    For i = LBound(Data) To UBound(Data)
-54                        For j = LBound(Data, 2) To UBound(Data, 2)
-55                            OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
-56                        Next j
-57                        Lines(i) = VBA.Join(OneLine, Delimiter) & EOL
-58                    Next i
-59                    Stream.WriteText VBA.Join(Lines, "")
-60                    Stream.SaveToFile FileName, 2 'adSaveCreateOverWrite
-61                    CSVWrite = FileName
-62                Case "ANSI", ""
-63                    If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-                      Dim EN As Long, ED As String
-64                    On Error Resume Next
-65                    Set Stream = m_FSO.CreateTextFile(FileName, True, False)
-66                    EN = Err.Number: ED = Err.Description
-67                    On Error GoTo ErrHandler
-68                    If EN <> 0 Then Throw "Error '" & ED & "' when attempting to create file '" + FileName + "'"
+46        ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
         
-69                    For i = LBound(Data) To UBound(Data)
-70                        For j = LBound(Data, 2) To UBound(Data, 2)
-71                            OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
-72                        Next j
-73                        Lines(i) = VBA.Join(OneLine, Delimiter) & EOL
-
-74                    Next i
-75                    WriteWrap Stream, VBA.Join(Lines, "")
-76                    Stream.Close: Set Stream = Nothing
-77                    CSVWrite = FileName
-78                Case Else
-79                    Throw Err_Encoding
-80            End Select
-81        Else
-
-82            ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
-        
-83            For i = LBound(Data) To UBound(Data)
-84                For j = LBound(Data, 2) To UBound(Data, 2)
-85                    OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
-86                Next j
-87                Lines(i) = VBA.Join(OneLine, Delimiter)
-88            Next i
-89            CSVWrite = VBA.Join(Lines, EOL)
-90            If Len(CSVWrite) > 32767 Then
-91                If TypeName(Application.Caller) = "Range" Then
-92                    Throw "Cannot return string of length " & Format$(CStr(Len(CSVWrite)), "#,###") & _
+47        For i = LBound(Data) To UBound(Data)
+48            For j = LBound(Data, 2) To UBound(Data, 2)
+49                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
+50            Next j
+51            Lines(i) = VBA.Join(OneLine, Delimiter)
+52        Next i
+53        FileContents = VBA.Join(Lines, EOL)
+          
+54        If WriteToFile Then
+55            CSVWrite = SaveTextFile(FileName, FileContents, Encoding)
+56        Else
+57            If Len(FileContents) > MaxStringLengthInArray() Then
+58                If TypeName(Application.Caller) = "Range" Then
+59                    Throw "Cannot return string of length " & Format$(CStr(Len(FileContents)), "#,###") & _
                           " to a cell of an Excel worksheet"
-93                End If
-94            End If
-95        End If
+60                End If
+61            End If
+62            CSVWrite = FileContents
+63        End If
           
-96        Exit Function
+64        Exit Function
 ErrHandler:
+65        CSVWrite = ReThrow("CSVWrite", Err, m_ErrorStyle = es_ReturnString)
+End Function
 
-97        If Not Stream Is Nothing Then
-98            Stream.Close
-99            Set Stream = Nothing
-100       End If
-          
-101       CSVWrite = ReThrow("CSVWrite", Err, m_ErrorStyle = es_ReturnString)
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : SaveTextFile
+' Author     : Philip Swannell
+' Date       : 28-Nov-2022
+' Purpose    : Save a text file, overwriting any existing file of the same name. For ANSI encoding uses
+'              Scripting.FileStream so that an error occurs if FileContents contains unsupported characters. Alternative
+'              would be to use ADODB.Stream with CharSet = "windows-1252" but in that case unsupported characters get
+'              written to file as question marks, resulting in loss of data.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function SaveTextFile(FileName As String, FileContents As String, Encoding As String)
+          Dim Stream As Object
+          Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
+
+1         On Error GoTo ErrHandler
+2         Select Case UCase(Encoding)
+              Case "UTF-8", "UTF-16"
+3                 Set Stream = CreateObject("ADODB.Stream")
+4                 Stream.Open
+5                 Stream.Type = 2 'Text
+6                 Stream.CharSet = LCase(Encoding)
+7                 Stream.WriteText FileContents
+8                 Stream.SaveToFile FileName, 2 'adSaveCreateOverWrite
+9                 Stream.Close: Set Stream = Nothing
+10                SaveTextFile = FileName
+11            Case "ANSI", ""
+12                If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+                  Dim ED As String
+                  Dim EN As Long
+13                On Error Resume Next
+14                Set Stream = m_FSO.CreateTextFile(FileName, True, False)
+15                EN = Err.Number: ED = Err.Description
+16                On Error GoTo ErrHandler
+17                If EN <> 0 Then Throw "Error '" & ED & "' when attempting to create file '" + FileName + "'"
+18                WriteWrap Stream, FileContents
+19                Stream.Close: Set Stream = Nothing
+20                SaveTextFile = FileName
+21            Case Else
+22                Throw Err_Encoding
+23        End Select
+
+24        Exit Function
+ErrHandler:
+25        If Not Stream Is Nothing Then
+26            Stream.Close
+27            Set Stream = Nothing
+28        End If
+29        ReThrow "SaveTextFile", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
