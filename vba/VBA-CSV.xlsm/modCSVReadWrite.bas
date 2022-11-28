@@ -3,7 +3,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.24
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.25
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -25,7 +25,7 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.24/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.25/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 Option Explicit
@@ -2921,6 +2921,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
           Optional TrueString As String = "True", Optional FalseString As String = "False") As String
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter1 = "Delimiter must have at least one character"
           Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _
