@@ -1,9 +1,10 @@
 Attribute VB_Name = "modCSVWritePerformance"
 Option Explicit
 
-
-'27/11/2022 15:14:08
-'VersionNumber 206
+'--------------------------------------------------------------------------------
+'Time:                       27/11/2022 15:14:08
+'ComputerName:               PHILIP-LAPTOP
+'VersionNumber:               206
 'Elapsed time for CSVRead: 17.5810412999708 seconds
 'Elapsed time for CSVWrite ANSI: 25.1498529999517 seconds
 'Elapsed time for CSVWrite ANSI: 26.987809299957 seconds
@@ -20,9 +21,12 @@ Option Explicit
 'Elapsed time for CSVWrite UTF-16: 26.9824278000742 seconds
 'Elapsed time for CSVWrite UTF-16: 28.2433342998847 seconds
 'Elapsed time for CSVWrite UTF-16: 27.3908504000865 seconds
+'--------------------------------------------------------------------------------
 
-'27/11/2022 15:46:11
-'VersionNumber 208
+'--------------------------------------------------------------------------------
+'Time:                       27/11/2022 15:46:11
+'ComputerName:               PHILIP-LAPTOP
+'VersionNumber:               208
 'Elapsed time for CSVRead: 13.6756363001186 seconds
 'Elapsed time for CSVWrite ANSI: 11.0888602000196 seconds
 'Elapsed time for CSVWrite ANSI: 10.5916883000173 seconds
@@ -39,6 +43,30 @@ Option Explicit
 'Elapsed time for CSVWrite UTF-16: 11.7004682000261 seconds
 'Elapsed time for CSVWrite UTF-16: 11.5732845000457 seconds
 'Elapsed time for CSVWrite UTF-16: 11.3086764998734 seconds
+'--------------------------------------------------------------------------------
+
+'--------------------------------------------------------------------------------
+'Time:                       28/11/2022 13:38:49
+'ComputerName:               DESKTOP-0VD2AF0
+'VersionNumber:               212
+'Elapsed time for CSVRead: 12.6903092000284 seconds
+'Elapsed time for CSVWrite ANSI: 9.0200504999957 seconds
+'Elapsed time for CSVWrite ANSI: 8.97261259995867 seconds
+'Elapsed time for CSVWrite ANSI: 8.83159349998459 seconds
+'Elapsed time for CSVWrite ANSI: 8.94957689999137 seconds
+'Elapsed time for CSVWrite ANSI: 8.87800550000975 seconds
+'Elapsed time for CSVWrite UTF-8: 9.05053659999976 seconds
+'Elapsed time for CSVWrite UTF-8: 9.07855340000242 seconds
+'Elapsed time for CSVWrite UTF-8: 8.94219269999303 seconds
+'Elapsed time for CSVWrite UTF-8: 8.96188490005443 seconds
+'Elapsed time for CSVWrite UTF-8: 8.95847179996781 seconds
+'Elapsed time for CSVWrite UTF-16: 9.29401939996751 seconds
+'Elapsed time for CSVWrite UTF-16: 9.64014640002279 seconds
+'Elapsed time for CSVWrite UTF-16: 9.23568999994313 seconds
+'Elapsed time for CSVWrite UTF-16: 9.18535220000194 seconds
+'Elapsed time for CSVWrite UTF-16: 9.20971269998699 seconds
+'--------------------------------------------------------------------------------
+
 
 Sub TestWriteSpeedUsingMilitary()
 

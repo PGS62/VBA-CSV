@@ -28,23 +28,14 @@ Attribute VB_Name = "modCSVReadWrite"
 '      https://github.com/PGS62/VBA-CSV/releases/download/v0.25/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
+'5) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
+'   then consider changing constant m_ErrorStyle to be es_RaiseError.
+'   https://github.com/PGS62/VBA-CSV#errors
+
+'6) If you would prefer that the arrays returned by CSVRead be zero-based rather than one-based
+'   then change constant m_LBound to 0.
+
 Option Explicit
-
-Private m_FSO As Scripting.FileSystemObject
-Private Const DQ = """"
-Private Const DQ2 = """"""
-' If m_ErrorStringsEmbedCallStack is True then errors returned by CSVRead and CSVWrite are more
-' verbose as they contain information about function names and line numbers in the call stack,
-' which is useful for debugging.
-Private Const m_ErrorStringsEmbedCallStack As Boolean = False
-
-#If VBA7 And Win64 Then
-    'for 64-bit Excel
-    Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
-#Else
-    'for 32-bit Excel
-    Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
-#End If
 
 Private Enum enmErrorStyle
     es_ReturnString = 0
@@ -53,8 +44,24 @@ End Enum
 
 Private Const m_ErrorStyle As Long = es_ReturnString
 
-Private Const m_LBound As Long = 1 'Sets the array lower bounds of the return from CSVRead.
-'To return zero-based arrays, change the value of this constant to 0.
+Private Const m_LBound As Long = 1
+
+' If m_ErrorStringsEmbedCallStack is True then errors returned by CSVRead and CSVWrite are more
+' verbose as they contain information about function names and line numbers in the call stack,
+' which is useful for debugging.
+Private Const m_ErrorStringsEmbedCallStack As Boolean = False
+
+Private m_FSO As Scripting.FileSystemObject
+Private Const DQ = """"
+Private Const DQ2 = """"""
+
+#If VBA7 And Win64 Then
+    'for 64-bit Excel
+    Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
+#Else
+    'for 32-bit Excel
+    Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
+#End If
 
 Private Enum enmSourceType
     st_File = 0
@@ -1313,7 +1320,7 @@ End Sub
 ' Purpose    : Parse the contents of a CSV file. Returns a string Buffer together with arrays which assist splitting
 '              Buffer into a two-dimensional array.
 ' Parameters :
-'  ContentsOrStream: The contents of a CSV file as a string, or else a Scripting.TextStream.
+'  ContentsOrStream: The contents of a CSV file as either a string, a Scripting.TextStream or an ADODB.Stream.
 '  QuoteChar       : The quote character, usually ascii 34 ("), which allow fields to contain characters that would
 '                    otherwise be significant to parsing, such as delimiters or new line characters.
 '  Delimiter       : The string that separates fields within each line. Typically a single character, but needn't be.
@@ -3085,22 +3092,26 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ValidateTrueAndFalseStrings(TrueString As String, FalseString As String, Delimiter As String)
              
-1         If LCase$(TrueString) = "true" Then
-2             If LCase$(FalseString) = "false" Then
-3                 Exit Function
-4             End If
-5         End If
+1         On Error GoTo ErrHandler
+2         If LCase$(TrueString) = "true" Then
+3             If LCase$(FalseString) = "false" Then
+4                 Exit Function
+5             End If
+6         End If
           
-6         If LCase$(TrueString) = "false" Then Throw "TrueString cannot take the value '" & TrueString & "'"
-7         If LCase$(FalseString) = "true" Then Throw "FalseString cannot take the value '" & FalseString & "'"
+7         If LCase$(TrueString) = "false" Then Throw "TrueString cannot take the value '" & TrueString & "'"
+8         If LCase$(FalseString) = "true" Then Throw "FalseString cannot take the value '" & FalseString & "'"
 
-8         If TrueString = FalseString Then
-9             Throw "Got '" & TrueString & "' for both TrueString and FalseString, but these cannot be equal to one another"
-10        End If
+9         If TrueString = FalseString Then
+10            Throw "Got '" & TrueString & "' for both TrueString and FalseString, but these cannot be equal to one another"
+11        End If
           
-11        ValidateBooleanRepresentation TrueString, "TrueString", Delimiter
-12        ValidateBooleanRepresentation FalseString, "FalseString", Delimiter
-          
+12        ValidateBooleanRepresentation TrueString, "TrueString", Delimiter
+13        ValidateBooleanRepresentation FalseString, "FalseString", Delimiter
+
+14        Exit Function
+ErrHandler:
+15        ReThrow "ValidateTrueAndFalseStrings", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3123,34 +3134,38 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
           Dim SysDateOrder As Long
           Dim SysDateSeparator As String
               
-1         SysDateOrder = Application.International(xlDateOrder)
-2         SysDateSeparator = Application.International(xlDateSeparator)
+1         On Error GoTo ErrHandler
+2         SysDateOrder = Application.International(xlDateOrder)
+3         SysDateSeparator = Application.International(xlDateSeparator)
 
-3         If strValue = "" Then Throw strName & " cannot be the zero-length string"
+4         If strValue = "" Then Throw strName & " cannot be the zero-length string"
 
-4         If InStr(strValue, vbLf) > 0 Then Throw strName & " contains a line feed character (ascii 10), which is not permitted"
-5         If InStr(strValue, vbCr) > 0 Then Throw strName & " contains a carriage return character (ascii 13), which is not permitted"
-6         If InStr(strValue, Delimiter) > 0 Then Throw strName & " contains Delimiter '" & Delimiter & "' which is not permitted"
-7         If InStr(strValue, DQ) > 0 Then
-8             DQCount = Len(strValue) - Len(Replace(strValue, DQ, vbNullString))
-9             If DQCount <> 2 Or Left$(strValue, 1) <> DQ Or Right$(strValue, 1) <> DQ Then
-10                Throw "When " & strName & " contains any double quote characters they must be at the start, the end and nowhere else"
-11            End If
-12        End If
+5         If InStr(strValue, vbLf) > 0 Then Throw strName & " contains a line feed character (ascii 10), which is not permitted"
+6         If InStr(strValue, vbCr) > 0 Then Throw strName & " contains a carriage return character (ascii 13), which is not permitted"
+7         If InStr(strValue, Delimiter) > 0 Then Throw strName & " contains Delimiter '" & Delimiter & "' which is not permitted"
+8         If InStr(strValue, DQ) > 0 Then
+9             DQCount = Len(strValue) - Len(Replace(strValue, DQ, vbNullString))
+10            If DQCount <> 2 Or Left$(strValue, 1) <> DQ Or Right$(strValue, 1) <> DQ Then
+11                Throw "When " & strName & " contains any double quote characters they must be at the start, the end and nowhere else"
+12            End If
+13        End If
               
-13        If IsNumeric(strValue) Then Throw "Got '" & strValue & "' as " & strName & " but that's not valid because it represents a number"
+14        If IsNumeric(strValue) Then Throw "Got '" & strValue & "' as " & strName & " but that's not valid because it represents a number"
               
-14        For i = 1 To 3
-15            For Each DateSeparator In Array("/", "-", " ")
-16                CastToDate strValue, DtOut, i, _
+15        For i = 1 To 3
+16            For Each DateSeparator In Array("/", "-", " ")
+17                CastToDate strValue, DtOut, i, _
                       CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
-17                If Converted Then
-18                    Throw "Got '" & strValue & "' as " & _
+18                If Converted Then
+19                    Throw "Got '" & strValue & "' as " & _
                           strName & " but that's not valid because it represents a date"
-19                End If
-20            Next
-21        Next
+20                End If
+21            Next
+22        Next
 
+23        Exit Function
+ErrHandler:
+24        ReThrow "ValidateBooleanRepresentation", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3690,23 +3705,6 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : FunctionWizardActive
-' Purpose    : Test if Excel's Function Wizard is active to allow early exit in slow functions.
-' https://stackoverflow.com/questions/20866484/can-i-disable-a-vba-udf-calculation-when-the-insert-function-function-arguments
-' -----------------------------------------------------------------------------------------------------------------------
-Private Function FunctionWizardActive() As Boolean
-          
-1         On Error GoTo ErrHandler
-2         If Not Application.CommandBars.item("Standard").Controls.item(1).Enabled Then
-3             FunctionWizardActive = True
-4         End If
-
-5         Exit Function
-ErrHandler:
-6         ReThrow "FunctionWizardActive", Err
-End Function
-
-' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : GetLocalOffsetToUTC
 ' Purpose    : Get the PC's offset to UTC.
 ' See "gogeek"'s post at
@@ -3727,6 +3725,23 @@ Private Function GetLocalOffsetToUTC() As Double
 7         Exit Function
 ErrHandler:
 8         ReThrow "GetLocalOffsetToUTC", Err
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : FunctionWizardActive
+' Purpose    : Test if Excel's Function Wizard is active to allow early exit in slow functions.
+' https://stackoverflow.com/questions/20866484/can-i-disable-a-vba-udf-calculation-when-the-insert-function-function-arguments
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function FunctionWizardActive() As Boolean
+          
+1         On Error GoTo ErrHandler
+2         If Not Application.CommandBars.item("Standard").Controls.item(1).Enabled Then
+3             FunctionWizardActive = True
+4         End If
+
+5         Exit Function
+ErrHandler:
+6         ReThrow "FunctionWizardActive", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4067,4 +4082,3 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
 15        Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
 End Sub
-
