@@ -54,11 +54,11 @@ Private Const DQ = """"
 Private Const DQ2 = """"""
 
 #If VBA7 And Win64 Then
-    'for 64-bit Excel
-    Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
+'for 64-bit Excel
+Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As LongPtr, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As LongPtr, ByVal lpfnCB As LongPtr) As Long
 #Else
-    'for 32-bit Excel
-    Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
+'for 32-bit Excel
+Private Declare Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
 #End If
 
 Private Enum enmSourceType
@@ -183,17 +183,15 @@ End Enum
 '             endings.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
-    Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
-    Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
-    Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
-    Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
-    Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
-    Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
+          Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
+          Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
+          Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+          Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
+          Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
+          Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
+          Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+          Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
+          Optional ByRef HeaderRow As Variant) As Variant
 
           Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
               "Omit to guess from file contents"
@@ -777,9 +775,9 @@ End Function
 '                          each element containing the corresponding right (or bottom) element.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
-    ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
-    ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean, _
-    ByRef ColByColFormatting As Boolean, HeaderRowNum As Long, ByRef CTDict As Scripting.Dictionary)
+          ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
+          ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean, _
+          ByRef ColByColFormatting As Boolean, HeaderRowNum As Long, ByRef CTDict As Scripting.Dictionary)
           
           Const Err_2D As String = "If ConvertTypes is given as a two dimensional array then the " & _
               " lower bounds in each dimension must be 1"
@@ -909,8 +907,8 @@ End Sub
 '  TrimFields            : Should leading and trailing spaces be trimmed from fields?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbers As Boolean, _
-    ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
-    ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean)
+          ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
+          ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean)
 
           Const Err_ConvertTypes As String = "ConvertTypes must be Boolean or string with allowed letters NDBETQ. " & _
               """N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans " & _
@@ -964,7 +962,7 @@ End Sub
 ' Purpose    : Returns the minimum of four inputs and an indicator of which of the four was the minimum
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function Min4(N1 As Long, N2 As Long, N3 As Long, _
-    N4 As Long, ByRef Which As Long) As Long
+          N4 As Long, ByRef Which As Long) As Long
 
 1         If N1 < N2 Then
 2             Min4 = N1
@@ -1131,7 +1129,7 @@ End Sub
 '              But see also sub-routine AmendDelimiterIfFirstFieldIsDateTime.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As String, _
-    DecimalSeparator As String, CharSet As String) As String
+          DecimalSeparator As String, CharSet As String) As String
           
           Const CHUNK_SIZE As Long = 1000
           Const Err_SourceType As String = "Cannot infer delimiter directly from URL"
@@ -1236,7 +1234,7 @@ End Function
 '  DateSeparator: ByRef argument is set to the DateSeparator, typically "-" or "/", but can also be space character.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long, ByRef DateSeparator As String, _
-    ByRef ISO8601 As Boolean, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
+          ByRef ISO8601 As Boolean, ByRef AcceptWithoutTimeZone As Boolean, ByRef AcceptWithTimeZone As Boolean)
 
           Dim Err_DateFormat As String
 
@@ -1341,11 +1339,11 @@ End Sub
 '                    unquoted and leading and trailing spaces are removed.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As String, _
-    Delimiter As String, Comment As String, IgnoreEmptyLines As Boolean, _
-    IgnoreRepeated As Boolean, SkipToRow As Long, HeaderRowNum As Long, NumRows As Long, _
-    ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, _
-    ByRef Starts() As Long, ByRef Lengths() As Long, ByRef RowIndexes() As Long, ByRef ColIndexes() As Long, _
-    ByRef QuoteCounts() As Long, ByRef HeaderRow As Variant) As String
+          Delimiter As String, Comment As String, IgnoreEmptyLines As Boolean, _
+          IgnoreRepeated As Boolean, SkipToRow As Long, HeaderRowNum As Long, NumRows As Long, _
+          ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, _
+          ByRef Starts() As Long, ByRef Lengths() As Long, ByRef RowIndexes() As Long, ByRef ColIndexes() As Long, _
+          ByRef QuoteCounts() As Long, ByRef HeaderRow As Variant) As String
 
           Const Err_Delimiter As String = "Delimiter must not be the null string"
           Dim Buffer As String
@@ -1598,7 +1596,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
           
 179       If SkipToRow > NumRowsInFile Then
 180           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or
-                                  'a negative number of rows. So throw an error.
+                  'a negative number of rows. So throw an error.
                   Dim RowDescription As String
 181               If IgnoreEmptyLines And Len(Comment) > 0 Then
 182                   RowDescription = "not commented, not empty "
@@ -1631,7 +1629,7 @@ End Function
 '              field in the header row
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() As Long, _
-    ColIndexes() As Long, QuoteCounts() As Long, j As Long) As Variant
+          ColIndexes() As Long, QuoteCounts() As Long, j As Long) As Variant
           Dim NC As Long
 
           Dim Field As String
@@ -1659,9 +1657,9 @@ End Function
 '              the line feed just before the next not-commented line.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SkipLines(Streaming As Boolean, Comment As String, _
-    LComment As Long, IgnoreEmptyLines As Boolean, Stream As Object, ByVal Delimiter As String, _
-    ByRef Buffer As String, ByRef i As Long, QuoteChar As String, ByVal PosLF As Long, ByVal PosCR As Long, _
-    ByRef BufferUpdatedTo As Long)
+          LComment As Long, IgnoreEmptyLines As Boolean, Stream As Object, ByVal Delimiter As String, _
+          ByRef Buffer As String, ByRef i As Long, QuoteChar As String, ByVal PosLF As Long, ByVal PosCR As Long, _
+          ByRef BufferUpdatedTo As Long)
           
           Dim AtEndOfStream As Boolean
           Dim LookAheadBy As Long
@@ -1722,8 +1720,8 @@ End Sub
 '              SearchFor was the first to be found.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function SearchInBuffer(SearchFor() As String, StartingAt As Long, Stream As Object, _
-    Delimiter As String, QuoteChar As String, ByRef Which As Long, _
-    ByRef Buffer As String, ByRef BufferUpdatedTo As Long) As Long
+          Delimiter As String, QuoteChar As String, ByRef Which As Long, _
+          ByRef Buffer As String, ByRef BufferUpdatedTo As Long) As Long
 
           Dim InstrRes As Long
           Dim PrevBufferUpdatedTo As Long
@@ -1769,7 +1767,7 @@ End Function
 '              index identifying which was the first of the strings to be found.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function InStrMulti(SearchFor() As String, SearchWithin As String, StartingAt As Long, _
-    EndingAt As Long, ByRef Which As Long) As Long
+          EndingAt As Long, ByRef Which As Long) As Long
 
           Const Inf As Long = 2147483647
           Dim i As Long
@@ -1948,13 +1946,13 @@ End Function
 '                         ShowMissingsAs, thanks to method MakeSentinels.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, _
-    TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, _
-    ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
-    SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
-    AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
-    DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
-    AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
-    ShowMissingsAs As Variant) As Variant
+          TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, _
+          ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
+          SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
+          AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
+          DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+          AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
+          ShowMissingsAs As Variant) As Variant
 
           Dim Converted As Boolean
           Dim dblResult As Double
@@ -2075,7 +2073,7 @@ End Function
 ' Purpose    : Casts strIn to double where strIn has specified decimals separator.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastToDouble(strIn As String, ByRef dblOut As Double, SepStandard As Boolean, _
-    DecimalSeparator As String, SysDecimalSeparator As String, ByRef Converted As Boolean)
+          DecimalSeparator As String, SysDecimalSeparator As String, ByRef Converted As Boolean)
           
 1         On Error GoTo ErrHandler
 2         If SepStandard Then
@@ -2103,8 +2101,8 @@ End Sub
 '  Converted       : Boolean flipped to TRUE if conversion takes place
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, _
-    DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
-    ByRef Converted As Boolean)
+          DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+          ByRef Converted As Boolean)
 
           Dim D As String
           Dim m As String
@@ -2315,7 +2313,7 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Converted As Boolean, _
-    AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
+          AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
 
           Dim L As Long
           Dim LocalTime As Double
@@ -2518,9 +2516,9 @@ End Function
 '              that field should be converted to the associated item value. Handles Booleans, Missings and Excel errors.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted As Boolean, Delimiter As String, ByRef MaxLength As Long, _
-    ByRef AnySentinels As Boolean, ShowBooleansAsBooleans As Boolean, ShowErrorsAsErrors As Boolean, _
-    ByRef ShowMissingsAs As Variant, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
-    Optional MissingStrings As Variant)
+          ByRef AnySentinels As Boolean, ShowBooleansAsBooleans As Boolean, ShowErrorsAsErrors As Boolean, _
+          ByRef ShowMissingsAs As Variant, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
+          Optional MissingStrings As Variant)
 
           Const Err_FalseStrings As String = "FalseStrings must be omitted or provided as a string or an array of " & _
               "strings that represent Boolean value False"
@@ -2620,7 +2618,7 @@ End Sub
 ' Purpose    : Broadcast AddKeyToDict over an array of keys.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As Variant, item As Variant, _
-    FriendlyErrorString As String, KeyType As String, Delimiter As String)
+          FriendlyErrorString As String, KeyType As String, Delimiter As String)
 
           Dim i As Long
           Dim j As Long
@@ -2666,7 +2664,7 @@ End Sub
 ' Purpose    : Wrap .Add method to have more helpful error message if things go awry.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub AddKeyToDict(ByRef Sentinels As Scripting.Dictionary, Key As Variant, item As Variant, _
-    Optional FriendlyErrorString As String)
+          Optional FriendlyErrorString As String)
 
           Dim FoundRepeated As Boolean
 
@@ -2711,8 +2709,8 @@ End Sub
 '  NumLinesToReturn   : This many lines are returned. Pass zero for all lines from SkipToLine.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ParseTextFile(FileNameOrContents As String, isFile As Boolean, _
-    CharSet As String, SkipToLine As Long, NumLinesToReturn As Long, _
-    CallingFromWorksheet As Boolean) As Variant
+          CharSet As String, SkipToLine As Long, NumLinesToReturn As Long, _
+          CallingFromWorksheet As Boolean) As Variant
 
           Const Err_FileEmpty As String = "File is empty"
           Dim Buffer As String
@@ -3287,7 +3285,7 @@ End Function
 ' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, ByVal DateFormat As String, _
-        ByVal DateTimeFormat As String, ByVal Delim As String, Encoder As Scripting.Dictionary) As String
+          ByVal DateTimeFormat As String, ByVal Delim As String, Encoder As Scripting.Dictionary) As String
           
 1         On Error GoTo ErrHandler
 2         Select Case VarType(x)
@@ -4070,3 +4068,4 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
 15        Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
 End Sub
+
