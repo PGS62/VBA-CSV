@@ -3,7 +3,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.25
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.26
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -25,14 +25,14 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.25/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.26/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 '5) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
 '   then consider changing constant m_ErrorStyle to be es_RaiseError.
 '   https://github.com/PGS62/VBA-CSV#errors
 
-'6) If you would prefer that the arrays returned by CSVRead be zero-based rather than one-based
+'6) If you would prefer the arrays returned by CSVRead to be zero-based rather than one-based
 '   then change constant m_LBound to 0.
 
 Option Explicit
@@ -46,9 +46,7 @@ Private Const m_ErrorStyle As Long = es_ReturnString
 
 Private Const m_LBound As Long = 1
 
-' If m_ErrorStringsEmbedCallStack is True then errors returned by CSVRead and CSVWrite are more
-' verbose as they contain information about function names and line numbers in the call stack,
-' which is useful for debugging.
+'Set to True when debugging for more informative error description (i.e. with call stack).
 Private Const m_ErrorStringsEmbedCallStack As Boolean = False
 
 Private m_FSO As Scripting.FileSystemObject
@@ -361,7 +359,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                 
 72        If SourceType = st_String Then
 73            CSVContents = FileName
-              
 74            ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                   IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, _
                   NumFields, Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
@@ -443,7 +440,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                           AcceptWithTimeZone, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, AnySentinels, _
                           Sentinels, MaxSentinelLength, ShowMissingsAs)
 131               End If
-                  
 132           End If
 133       Next k
           
@@ -656,17 +652,13 @@ Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef C
                   Case "ASCII"
 7                     Encoding = "ASCII"
 8                     CharSet = "us-ascii"
-                     
 9                 Case "ANSI"
                       'Unfortunately "ANSI" is not well defined. See
                       'https://stackoverflow.com/questions/701882/what-is-ansi-format
-                      
                       'For a list of the character set names that are known by a system, see the subkeys of
                       'HKEY_CLASSES_ROOT\MIME\Database\Charset in the Windows Registry.
-
 10                    Encoding = "ANSI"
 11                    CharSet = "windows-1252"
-                      
 12                Case "UTF8"
 13                    Encoding = "UTF-8"
 14                    CharSet = "utf-8"
@@ -755,7 +747,6 @@ Private Function StandardiseCT(CT As Variant) As String
                   IIf(InStr(1, CT, "Q", vbTextCompare), "Q", vbNullString) & _
                   IIf(InStr(1, CT, "T", vbTextCompare), "T", vbNullString)
 11        End If
-
 12        Exit Function
 ErrHandler:
 13        ReThrow "StandardiseCT", Err
@@ -879,7 +870,6 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
                           ") is of type " & TypeName(CT)
 56                End If
 57            End If
-
 58            If CTDict.Exists(ColIdentifier) Then
 59                If Not CTsEqual(CTDict.item(ColIdentifier), CT) Then
 60                    Throw "ConvertTypes is contradictory. Column " & CStr(ColIdentifier) & _
@@ -2256,7 +2246,6 @@ Private Sub CastToTime(strIn As String, ByRef DtOut As Date, ByRef Converted As 
 3         If DtOut <= 1 Then
 4             Converted = True
 5         End If
-          
 6         Exit Sub
 ErrHandler:
           'Do nothing, was not a valid time (e.g. h,m or s out of range)
@@ -3759,7 +3748,6 @@ End Sub
 ' Purpose    : Common error handling to be used in the error handler of all methods.
 ' Parameters :
 '  FunctionName: The name of the function from which ReThrow is called, typically in the function's error handler.
-'  Error       : Err, the error object.
 '  ReturnString: Pass in True if the method is a "top level" method that's exposed to the user and we wish for the
 '                function to return an error string (starts with #, ends with !).
 '                Pass in False if we want to (re)throw an error, with annotated Description.
@@ -3771,7 +3759,7 @@ Private Function ReThrow(FunctionName As String, Error As ErrObject, Optional Re
           Dim LineDescription As String
           
 1         ErrorDescription = Error.Description
-2         ErrorNumber = Err.Number
+2         ErrorNumber = Error.Number
 
           'Build up call stack, i.e. annotate error description by prepending #<FunctionName> and appending !
 3         If m_ErrorStringsEmbedCallStack Then

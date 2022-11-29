@@ -38,6 +38,9 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
     Optional NumRowsExpected As Long, Optional NumColsExpected As Long, Optional ByRef HeaderRow As Variant, Optional ExpectedHeaderRow As Variant) As Boolean
 
     On Error GoTo ErrHandler
+    
+    Debug.Print "Running test " & CStr(TestNo)
+    
     Const PermitBaseDifference As Boolean = True
 
     WhatDiffers = vbNullString

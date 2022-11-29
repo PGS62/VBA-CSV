@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+215	29-Nov-2022	14:29	Philip Swannell	Bumped to v0.26
 214	28-Nov-2022	14:25	Philip Swannell	Updated ToDo list.
 213	28-Nov-2022	13:45	Philip Swannell	Recorded performance of CSVWrite. Edits to rubric at top of modCSVReadWrite.
 212	28-Nov-2022	12:29	Philip Swannell	Added error handlers to a couple of methods.
