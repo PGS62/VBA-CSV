@@ -192,6 +192,8 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
           Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
           Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
           Optional ByRef HeaderRow As Variant) As Variant
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
               "Omit to guess from file contents"
@@ -3252,7 +3254,7 @@ End Function
 '              This arrangement means that Excel errors are converted to their English-language representation even when
 '              the Excel display language is not Excel.
 ' -----------------------------------------------------------------------------------------------------------------------
-Function MakeEncoder(TrueString As String, FalseString As String) As Scripting.Dictionary
+Private Function MakeEncoder(TrueString As String, FalseString As String) As Scripting.Dictionary
 
           Dim D As New Scripting.Dictionary
 1         On Error GoTo ErrHandler
