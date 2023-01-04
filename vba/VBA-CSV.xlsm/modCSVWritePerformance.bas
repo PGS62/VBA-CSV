@@ -67,7 +67,27 @@ Option Explicit
 'Elapsed time for CSVWrite UTF-16: 9.20971269998699 seconds
 '--------------------------------------------------------------------------------
 
-
+'--------------------------------------------------------------------------------
+'Time:                       04/01/2023 16:06:04
+'ComputerName:               DESKTOP -HSGAM5S
+'VersionNumber:               216
+'Elapsed time for CSVRead: 8.40554780000093 seconds
+'Elapsed time for CSVWrite ANSI: 5.72161549999873 seconds
+'Elapsed time for CSVWrite ANSI: 5.73175289999926 seconds
+'Elapsed time for CSVWrite ANSI: 5.67613829999755 seconds
+'Elapsed time for CSVWrite ANSI: 5.66072480000003 seconds
+'Elapsed time for CSVWrite ANSI: 5.74036770000021 seconds
+'Elapsed time for CSVWrite UTF-8: 5.70110969999951 seconds
+'Elapsed time for CSVWrite UTF-8: 5.75665819999995 seconds
+'Elapsed time for CSVWrite UTF-8: 5.90536229999998 seconds
+'Elapsed time for CSVWrite UTF-8: 5.89822220000133 seconds
+'Elapsed time for CSVWrite UTF-8: 5.93974149999849 seconds
+'Elapsed time for CSVWrite UTF-16: 6.00605799999903 seconds
+'Elapsed time for CSVWrite UTF-16: 5.93665500000134 seconds
+'Elapsed time for CSVWrite UTF-16: 5.90333740000278 seconds
+'Elapsed time for CSVWrite UTF-16: 5.8423709000017 seconds
+'Elapsed time for CSVWrite UTF-16: 5.87104679999902 seconds
+'--------------------------------------------------------------------------------
 Sub TestWriteSpeedUsingMilitary()
 
           Const FileToWrite = "c:\Temp\military.csv"

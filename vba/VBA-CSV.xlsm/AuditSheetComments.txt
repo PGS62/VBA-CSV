@@ -1,5 +1,6 @@
 Version	Date	Time	Author	Comment
-217	04-Jan-2023	15:29	Philip Swannell	Method MakeEncoder is now Private - avoids exposing as a worksheet function.
+218	04-Jan-2023	16:21	Philip Swannell	Recorded performance of CSVWrite.
+217	04-Jan-2023	16:20	Philip Swannell	Method MakeEncoder is now Private - avoids exposing as a worksheet function.
 216	29-Nov-2022	14:40	Philip Swannell	Whitespace only.
 215	29-Nov-2022	14:29	Philip Swannell	Bumped to v0.26
 214	28-Nov-2022	14:25	Philip Swannell	Updated ToDo list.
