@@ -10,9 +10,7 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 &nbsp;&nbsp;&nbsp;&nbsp;[CSVWrite](#csvwrite)  
 [Errors](#errors)  
 [Testing](#testing)  
-<!--- [Alternatives](#alternatives)  -->
 [Notes](#notes)  
-<!--- [Performance](#performance)  -->
 [Compatibility](#compatibility)  
 [About](#about)  
 
