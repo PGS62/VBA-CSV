@@ -10,9 +10,9 @@ Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, insp
 &nbsp;&nbsp;&nbsp;&nbsp;[CSVWrite](#csvwrite)  
 [Errors](#errors)  
 [Testing](#testing)  
-[Alternatives](#alternatives)  
+<!--- [Alternatives](#alternatives)  -->
 [Notes](#notes)  
-[Performance](#performance)  
+<!--- [Performance](#performance)  -->
 [Compatibility](#compatibility)  
 [About](#about)  
 
@@ -39,7 +39,7 @@ End Sub
 # Acknowledgements
 I re-worked the parsing code of `CSVRead` after examining [sdkn104](https://github.com/sdkn104)'s code available [here](https://github.com/sdkn104/VBA-CSV); my approach is now similar to the one employed there, and the performance is similar too.
 
-The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. More on performance [here](#performance). For testing `CSVRead`, I also use many of the test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
+The documentation borrows freely from that of Julia's [CSV.jl](https://csv.juliadata.org/stable/), though sadly VBA is not capable of Julia's extremely high performance. <!--- More on performance [here](#performance). --> For testing `CSVRead`, I also use many of the test files that the authors of CSV.jl have created [here](https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles).
 
 # Examples
 
@@ -150,12 +150,14 @@ An alternative approach is to change the constant `m_ErrorStyle` (at the top of 
 # Testing
 `CSVRead` is tested prior to release against a large collection of [test files](https://github.com/PGS62/VBA-CSV/tree/main/testfiles) with comparisons carried out between expected and observed results. You can look at the test code [here](https://github.com/PGS62/VBA-CSV/blob/main/vba/VBA-CSV.xlsm/modCSVTest.bas), or run it yourself if you download and unzip the source code from the [latest version](https://github.com/PGS62/VBA-CSV/releases), open the workbook VBA-CSV.xlsm from the workbooks folder, and click the "Run Tests" button on the "Tests" worksheet. The tests cover almost 100% of the code in modCSVReadWrite.bas.
 
+<!---
 # Alternatives
 Other CSV parsers are available for VBA:  
 https://github.com/ws-garcia/VBA-CSV-interface  
 https://github.com/sdkn104/VBA-CSV  
 https://github.com/Senipah/VBA-Better-Array (method [FromCSVFile](https://senipah.github.io/VBA-Better-Array/api/methods/FromCSVFile.html))  
 https://github.com/pchemguy/CSVParser  
+-->
 
 # Notes
 ### Line endings
@@ -172,6 +174,7 @@ The return from `CSVRead` is an array with lower bounds of one. If you prefer ar
 ### Excel limits on string length
 There is a [limit](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3) on the total number of characters that an Excel cell can contain of 32,767. Therefore, when `CSVWrite` is called from a worksheet formula with the `FileName` argument omitted, the function will return an error string if the return would otherwise be longer than 32,767 characters. Similarly `CSVRead`, when called from a worksheet formula, will return an error string if any individual field to be returned is longer than 32,767.
 
+<!---
 # Performance
 On a test machine<sup>[3](#myfootnote3)</sup> `CSVRead` parses files at speeds of up to 14Mb per second, so a 140Mb file might take 10 seconds to parse. However, parse time is determined by factors such as the number of rows, number of columns, field length and contents, and the arguments to `CSVRead`, such as whether type conversion is to be carried out.
 
@@ -217,9 +220,12 @@ In summary, the performance tests show:
 - `CSVRead` is generally (but not always) faster than `ws_garcia`.
 - For realistic structures of input files, such as those provided by Rdatasets, `CSVRead` is about twice as fast as `ws_garcia`. 
 - All three VBA parsers are much slower than a parser written in a compiled language such as Julia. If your data files are of GB size, then VBA and Excel might be the wrong tool for the job.
+-->
 
 --------------------------------
+<!---
 <a name="myfootnote3">Footnote 3</a>: Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 16GB RAM
+-->
 
 # Compatibility
 VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available), and not iOS or Android (since VBA is not available). It has been tested on Excel 365, both 64-bit and 32-bit, and on Excel 2010, 32 bit. It _should_ work on all other Office versions (2007 or later) but has not yet been tested on them. 
