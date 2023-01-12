@@ -66,7 +66,7 @@ In the GIF below, strings, numbers, dates and Booleans in the input `Data` range
 ![CSVReadWrite](images/CSVReadWrite.gif)
 
 -----------------------------
-<a name="myfootnote1">Footnote 1</a>: Assumes you're using Excel 365 with its [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
+<a name="myfootnote1">Footnote 1</a>: Assumes you're using Excel 365 or Excel 2021 with [dynamic array formulas](https://support.microsoft.com/en-us/office/dynamic-array-formulas-and-spilled-array-behavior-205c6b06-03ba-4151-89a1-87a7eb36e531). If you're using an older version of Excel, [this page](https://support.microsoft.com/en-us/office/create-an-array-formula-e43e12e0-afc6-4a12-bc7f-48361075954d) explains how to enter a formula that returns an array.
 
 # Documentation
 #### _CSVRead_
