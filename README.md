@@ -73,15 +73,15 @@ In the GIF below, strings, numbers, dates and Booleans in the input `Data` range
 Returns the contents of a comma-separated file on disk as an array.
 ```vba
 Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
-    Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
-    Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
-    Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
-    Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Long = 1, _
-    Optional ByVal NumRows As Long, Optional ByVal NumCols As Long, _
-    Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
-    Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
-    Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
-    Optional ByRef HeaderRow As Variant) As Variant
+          Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
+          Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
+          Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
+          Optional ByVal SkipToRow As Long, Optional ByVal SkipToCol As Variant = 1, _
+          Optional ByVal NumRows As Long, Optional ByVal NumCols As Variant = 0, _
+          Optional ByVal TrueStrings As Variant, Optional ByVal FalseStrings As Variant, _
+          Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
+          Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
+          Optional ByRef HeaderRow As Variant) As Variant
 ```
 
 |Argument|Description|
@@ -95,9 +95,9 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 |`IgnoreEmptyLines`|Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column will be assigned `ShowMissingsAs` for that empty row).|
 |`HeaderRowNum`|The row in the file containing headers. Type conversion is not applied to fields in the header row, though leading and trailing spaces are trimmed.<br/><br/>This argument is most useful when calling from VBA, with `SkipToRow` set to one more than `HeaderRowNum`. In that case the function returns the rows starting from `SkipToRow`, and the header row is returned via the by-reference argument `HeaderRow`. Optional and defaults to 0.|
 |`SkipToRow`|The first row in the file that's included in the return. Optional and defaults to one more than `HeaderRowNum`.|
-|`SkipToCol`|The column in the file at which reading starts. Optional and defaults to 1 to read from the first column.|
+|`SkipToCol`|The column in the file at which reading starts, as a number or a string matching one of the file's headers. Optional and defaults to 1 to read from the first column.|
 |`NumRows`|The number of rows to read from the file. If omitted (or zero), all rows from `SkipToRow` to the end of the file are read.|
-|`NumCols`|The number of columns to read from the file. If omitted (or zero), all columns from `SkipToCol` are read.|
+|`NumCols`|If a number, sets the number of columns to read from the file. If a string matching one of the file's headers, sets the last column to be read. If omitted (or zero), all columns from `SkipToCol` are read.|
 |`TrueStrings`|Indicates how `TRUE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `TRUE`, `True` and `true` are recognised.|
 |`FalseStrings`|Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `FALSE`, `False` and `false` are recognised.|
 |`MissingStrings`|Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default, only an empty field (consecutive delimiters) is considered missing.|
@@ -105,6 +105,7 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 |`Encoding`|Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work, then it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte option mark to identify the encoding. Experiment with `Encoding` as each of `UTF-8` and `UTF-16`.<br/><br/>`ANSI` is taken to mean [`Windows-1252`](https://en.wikipedia.org/wiki/Windows-1252) encoding.|
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
+
 
 
 [source](https://github.com/PGS62/VBA-CSV/blob/c318365294420006e60f6dca3ca264eab3b02904/vba/VBA-CSV.xlsm/modCSVReadWrite.bas#L53-L552)
