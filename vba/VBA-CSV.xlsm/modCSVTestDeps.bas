@@ -31,8 +31,8 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
     ByRef WhatDiffers As String, Optional AbsTol As Double, Optional RelTol As Double, Optional ConvertTypes As Variant = False, _
     Optional ByVal Delimiter As Variant, Optional IgnoreRepeated As Boolean, _
     Optional DateFormat As String, Optional Comment As String, Optional IgnoreEmptyLines As Boolean = True, Optional ByVal SkipToRow As Long = 0, _
-    Optional ByVal SkipToCol As Long = 1, Optional ByVal NumRows As Long = 0, _
-    Optional ByVal NumCols As Long = 0, Optional HeaderRowNum As Long, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
+    Optional ByVal SkipToCol As Variant = 1, Optional ByVal NumRows As Long = 0, _
+    Optional ByVal NumCols As Variant = 0, Optional HeaderRowNum As Long, Optional TrueStrings As Variant, Optional FalseStrings As Variant, _
     Optional MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant = vbNullString, _
     Optional ByVal Encoding As Variant, Optional DecimalSeparator As String = vbNullString, _
     Optional NumRowsExpected As Long, Optional NumColsExpected As Long, Optional ByRef HeaderRow As Variant, Optional ExpectedHeaderRow As Variant) As Boolean
@@ -197,7 +197,6 @@ Private Function ParseErrorString(ByVal ErrorWithCallStack As String, ByRef Root
 ErrHandler:
 20        ReThrow "ParseErrorString", Err
 End Function
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : StringBetweenStrings
@@ -936,4 +935,12 @@ Public Sub FileCopy(SourceFile As String, TargetFile As String)
 ErrHandler:
     ReThrow "FileCopy", Err
 End Sub
+
+Public Function IsNumber(x As Variant) As Boolean
+1         Select Case VarType(x)
+              Case vbDouble, vbInteger, vbSingle, vbLong ', vbCurrency, vbDecimal
+2                 IsNumber = True
+3         End Select
+End Function
+
 

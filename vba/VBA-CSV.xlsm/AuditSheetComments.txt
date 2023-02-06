@@ -1,4 +1,8 @@
 Version	Date	Time	Author	Comment
+222	06-Feb-2023	16:11	Philip Swannell	Added line numbers.
+221	06-Feb-2023	16:09	Philip Swannell	Updated RegisterCSVWrite and docstring for CSVWrite.
+220	06-Feb-2023	15:54	Philip Swannell	Removed redundant code.
+219	06-Feb-2023	15:43	Philip Swannell	SkipToCol and NumCols arguments to CSVRead can now be provided as strings that match into the header row.
 218	04-Jan-2023	16:21	Philip Swannell	Recorded performance of CSVWrite.
 217	04-Jan-2023	16:20	Philip Swannell	Method MakeEncoder is now Private - avoids exposing as a worksheet function.
 216	29-Nov-2022	14:40	Philip Swannell	Whitespace only.

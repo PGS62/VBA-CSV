@@ -289,6 +289,17 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test252 Folder, NumPassed, NumFailed, Failures
     Test253 Folder, NumPassed, NumFailed, Failures
     Test254 Folder, NumPassed, NumFailed, Failures
+    Test255 Folder, NumPassed, NumFailed, Failures
+    Test256 Folder, NumPassed, NumFailed, Failures
+    Test257 Folder, NumPassed, NumFailed, Failures
+    Test258 Folder, NumPassed, NumFailed, Failures
+    Test259 Folder, NumPassed, NumFailed, Failures
+    Test260 Folder, NumPassed, NumFailed, Failures
+    Test261 Folder, NumPassed, NumFailed, Failures
+    Test262 Folder, NumPassed, NumFailed, Failures
+    Test263 Folder, NumPassed, NumFailed, Failures
+    Test264 Folder, NumPassed, NumFailed, Failures
+    Test265 Folder, NumPassed, NumFailed, Failures
 
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -3921,7 +3932,7 @@ Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: NumCols must be positive to read a given number of columns, or zero or omitted to read all columns from SkipToCol to the maximum column encountered!"
+    Expected = "#CSVRead: NumCols must be a positive integer or a string matching a header in the file!"
     TestRes = TestCSVRead(137, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         NumCols:=-1, _
@@ -4015,7 +4026,7 @@ Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
     FileName = "test_bad_inputs.csv"
-    Expected = "#CSVRead: SkipToCol must be at least 1!"
+    Expected = "#CSVRead: SkipToCol must be a positive integer or a string matching a header in the file!"
     TestRes = TestCSVRead(141, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         SkipToCol:=-1, _
@@ -7057,4 +7068,277 @@ ErrHandler:
     ReThrow "Test254", Err
 End Sub
 
+
+Private Sub Test255(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol is string not found in header row"
+    Expected = HStack(Array("bb", 2#, 6#), Array("cc", 3#, 7#))
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(255, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:="bb", _
+        NumCols:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test255", Err
+End Sub
+
+Private Sub Test256(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol is string"
+    Expected = "#CSVRead: Argument SkipToCol was given as the string 'xx', but that cannot be found in the header row (row 1) of the file.!"
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(256, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:="xx", _
+        NumCols:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test256", Err
+End Sub
+
+Private Sub Test257(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numcols is string"
+    Expected = HStack(Array("aa", 1#, 5#), Array("bb", 2#, 6#))
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(257, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        NumCols:="bb", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test257", Err
+End Sub
+
+
+Private Sub Test258(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol and numcols both strings"
+    Expected = HStack(Array("bb", 2#, 6#), Array("cc", 3#, 7#))
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(258, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:="bb", _
+        NumCols:="cc", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test258", Err
+End Sub
+
+Private Sub Test259(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol and numcols both strings in reverse order"
+    Expected = HStack(Array("bb", 2#, 6#), Array("cc", 3#, 7#))
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(259, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:="cc", _
+        NumCols:="bb", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test259", Err
+End Sub
+
+Private Sub Test260(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numcols is error"
+    Expected = "#CSVRead: NumCols must be a positive integer or a string matching a header in the file!"
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(260, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        NumCols:=CVErr(2007), _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test260", Err
+End Sub
+
+Private Sub Test261(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol is string with empty rows"
+    Expected = HStack(Array("bb", 2#, 6#), Array("cc", 3#, 7#))
+    FileName = "test_skiptocol_is_string_with_empty_rows.csv"
+    TestRes = TestCSVRead(261, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=True, _
+        SkipToCol:="bb", _
+        NumCols:=2, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test261", Err
+End Sub
+
+Private Sub Test262(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol is string with empty rows and commented rows"
+    Expected = HStack(Array("aa", 1#, 5#), Array("bb", 2#, 6#))
+    FileName = "test_skiptocol_is_string_with_empty_rows_and_commented_rows.csv"
+    TestRes = TestCSVRead(262, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        Comment:="Comment", _
+        IgnoreEmptyLines:=True, _
+        NumCols:="bb", _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test262", Err
+End Sub
+
+Private Sub Test263(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol not integer"
+    Expected = "#CSVRead: SkipToCol must be a positive integer or a string matching a header in the file!"
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(263, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=1.5, _
+        NumCols:=Empty, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test263", Err
+End Sub
+
+Private Sub Test264(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test skiptocol is error"
+    Expected = "#CSVRead: SkipToCol must be a positive integer or a string matching a header in the file!"
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(264, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=CVErr(2007), _
+        NumCols:=Empty, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test264", Err
+End Sub
+
+Private Sub Test265(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numcols is not integer"
+    Expected = "#CSVRead: NumCols must be a positive integer or a string matching a header in the file!"
+    FileName = "test_skiptocol_is_string.csv"
+    TestRes = TestCSVRead(265, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        NumCols:=2.5, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test265", Err
+End Sub
 
