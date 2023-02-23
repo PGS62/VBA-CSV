@@ -3,7 +3,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.26
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.27
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -25,7 +25,7 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.26/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.27/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 '5) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
@@ -52,6 +52,10 @@ Private Const m_ErrorStringsEmbedCallStack As Boolean = False
 Private m_FSO As Scripting.FileSystemObject
 Private Const DQ = """"
 Private Const DQ2 = """"""
+
+'The two constants below set the range of years to which date strings with two-digit years are converted.
+Private Const m_2DigitYearIsFrom As Long = 1930
+Private Const m_2DigitYearIsTo As Long = 2029
 
 #If VBA7 And Win64 Then
 'for 64-bit Excel
@@ -336,9 +340,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
 56        If SkipToCol = 0 Then SkipToCol = 1
 57        If SkipToRow < 1 Then Throw Err_SkipToRow
-       '   If SkipToCol < 1 Then Throw Err_SkipToCol
 58        If NumRows < 0 Then Throw Err_NumRows
-        '  If NumCols < 0 Then Throw Err_NumCols
 
 59        If HeaderRowNum > SkipToRow Then Throw Err_HeaderRowNum
              
@@ -2092,6 +2094,47 @@ ErrHandler:
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : TwoToFourDigitYear
+' Author     : Philip Swannell
+' Date       : 23-Feb-2023
+' Purpose    : Amend in-place a two-digit "year part" of a date, paying attention to module-level constants
+'              m_2DigitYearIsFrom and m_2DigitYearIsTo
+' -----------------------------------------------------------------------------------------------------------------------
+Sub TwoToFourDigitYear(ByRef y As String)
+          Dim y_lng As Long
+1         On Error GoTo ErrHandler
+
+          Static rx As VBScript_RegExp_55.RegExp
+          
+2         On Error GoTo ErrHandler
+
+3         Select Case Len(y)
+              Case 4
+                  'Leave as is
+4             Case 2
+5                 If rx Is Nothing Then
+6                     Set rx = New RegExp
+7                     With rx
+8                         .IgnoreCase = True
+9                         .Pattern = "^[0-9][0-9]$"
+10                        .Global = False
+11                    End With
+12                End If
+13                If Not rx.Test(y) Then Throw "Bad year part"
+14                y_lng = (m_2DigitYearIsFrom \ 100) * 100 + CLng(y)
+15                If y_lng > m_2DigitYearIsTo Then y_lng = y_lng - 100
+16                If y_lng < m_2DigitYearIsFrom Then y_lng = y_lng + 100
+17                y = CStr(y_lng)
+18            Case Else 'We only allow 2 digit and 4 digit years
+19                Throw "Bad year part"
+20        End Select
+
+21        Exit Sub
+ErrHandler:
+          'Do nothing
+End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastToDate, sub-routine of ConvertField
 ' Purpose    : In-place conversion of a string that looks like a date into a Long or Date. No error if string cannot be
 '              converted to date. Converts Dates, DateTimes and Times. Times in very simple format hh:mm:ss
@@ -2123,7 +2166,7 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
           Dim y As String
           
 1         On Error GoTo ErrHandler
-          
+
 2         pos1 = InStr(strIn, DateSeparator)
 3         If pos1 = 0 Then Exit Sub
 4         pos2 = InStr(pos1 + 1, strIn, DateSeparator)
@@ -2139,100 +2182,74 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
 12                    Converted = True
 13                    Exit Sub
 14                End If
-15            ElseIf DateOrder = SysDateOrder Then
-16                DtOut = CDate(strIn)
-17                Converted = True
-18                Exit Sub
-19            End If
-20            If DateOrder = 0 Then 'M-D-Y
-21                m = Left$(strIn, pos1 - 1)
-22                D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+15            End If
+16            If DateOrder = 0 Then 'M-D-Y
+17                m = Left$(strIn, pos1 - 1)
+18                D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+19                y = Mid$(strIn, pos2 + 1)
+20            ElseIf DateOrder = 1 Then 'D-M-Y
+21                D = Left$(strIn, pos1 - 1)
+22                m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
 23                y = Mid$(strIn, pos2 + 1)
-24            ElseIf DateOrder = 1 Then 'D-M-Y
-25                D = Left$(strIn, pos1 - 1)
+24            ElseIf DateOrder = 2 Then 'Y-M-D
+25                y = Left$(strIn, pos1 - 1)
 26                m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-27                y = Mid$(strIn, pos2 + 1)
-28            ElseIf DateOrder = 2 Then 'Y-M-D
-29                y = Left$(strIn, pos1 - 1)
-30                m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-31                D = Mid$(strIn, pos2 + 1)
-32            Else
-33                Throw "DateOrder must be 0, 1, or 2"
-34            End If
-35            If SysDateOrder = 0 Then
-36                DtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y)
-37                Converted = True
-38            ElseIf SysDateOrder = 1 Then
-39                DtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y)
-40                Converted = True
-41            ElseIf SysDateOrder = 2 Then
-42                DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D)
-43                Converted = True
-44            End If
-45            Exit Sub
-46        End If
+27                D = Mid$(strIn, pos2 + 1)
+28            Else
+29                Throw "DateOrder must be 0, 1, or 2"
+30            End If
+31            TwoToFourDigitYear y
+32            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D)
+33            Converted = True
+34            Exit Sub
+35        End If
 
-47        pos4 = InStr(pos3 + 1, strIn, ".")
-48        HasFractionalSecond = pos4 > 0
+36        pos4 = InStr(pos3 + 1, strIn, ".")
+37        HasFractionalSecond = pos4 > 0
 
-49        If DateOrder = 0 Then 'M-D-Y
-50            m = Left$(strIn, pos1 - 1)
-51            D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-52            y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-53            TimePart = Mid$(strIn, pos3)
-54        ElseIf DateOrder = 1 Then 'D-M-Y
-55            D = Left$(strIn, pos1 - 1)
-56            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-57            y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-58            TimePart = Mid$(strIn, pos3)
-59        ElseIf DateOrder = 2 Then 'Y-M-D
-60            y = Left$(strIn, pos1 - 1)
-61            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-62            D = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-63            TimePart = Mid$(strIn, pos3)
-64        Else
-65            Throw "DateOrder must be 0, 1, or 2"
-66        End If
-67        If Not HasFractionalSecond Then
-68            If DateOrder = 2 Then 'Y-M-D is unambiguous as long as year given as 4 digits
-69                If pos1 = 5 Then
-70                    DtOut = CDate(strIn)
-71                    Converted = True
-72                    Exit Sub
-73                End If
-74            ElseIf DateOrder = SysDateOrder Then
-75                DtOut = CDate(strIn)
-76                Converted = True
-77                Exit Sub
-78            End If
-          
-79            If SysDateOrder = 0 Then
-80                DtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y & TimePart)
-81                Converted = True
-82            ElseIf SysDateOrder = 1 Then
-83                DtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y & TimePart)
-84                Converted = True
-85            ElseIf SysDateOrder = 2 Then
-86                DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
-87                Converted = True
-88            End If
-89        Else 'CDate does not cope with fractional seconds, so use CastToTimeB
-90            CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
-91            If Converted2 Then
-92                If SysDateOrder = 0 Then
-93                    DtOut = CDate(m & SysDateSeparator & D & SysDateSeparator & y) + TimePartConverted
-94                    Converted = True
-95                ElseIf SysDateOrder = 1 Then
-96                    DtOut = CDate(D & SysDateSeparator & m & SysDateSeparator & y) + TimePartConverted
-97                    Converted = True
-98                ElseIf SysDateOrder = 2 Then
-99                    DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
-100                   Converted = True
-101               End If
-102           End If
-103       End If
+38        If DateOrder = 0 Then 'M-D-Y
+39            m = Left$(strIn, pos1 - 1)
+40            D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+41            y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
+42            TimePart = Mid$(strIn, pos3)
+43        ElseIf DateOrder = 1 Then 'D-M-Y
+44            D = Left$(strIn, pos1 - 1)
+45            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+46            y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
+47            TimePart = Mid$(strIn, pos3)
+48        ElseIf DateOrder = 2 Then 'Y-M-D
+49            y = Left$(strIn, pos1 - 1)
+50            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+51            D = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
+52            TimePart = Mid$(strIn, pos3)
+53        Else
+54            Throw "DateOrder must be 0, 1, or 2"
+55        End If
+56        TwoToFourDigitYear y
 
-104       Exit Sub
+57        If Not HasFractionalSecond Then
+58            If DateOrder = 2 Then 'Y-M-D is unambiguous as long as year given as 4 digits
+59                If pos1 = 5 Then
+60                    DtOut = CDate(strIn)
+61                    Converted = True
+62                    Exit Sub
+63                End If
+64            ElseIf DateOrder = SysDateOrder Then
+65                DtOut = CDate(strIn)
+66                Converted = True
+67                Exit Sub
+68            End If
+69            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
+70            Converted = True
+71        Else 'CDate does not cope with fractional seconds, so use CastToTimeB
+72            CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
+73            If Converted2 Then
+74                DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
+75                Converted = True
+76            End If
+77        End If
+
+78        Exit Sub
 ErrHandler:
           'Do nothing - was not a string representing a date with the specified date order and date separator.
 End Sub
@@ -3144,7 +3161,7 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
               
 14        If IsNumeric(strValue) Then Throw "Got '" & strValue & "' as " & strName & " but that's not valid because it represents a number"
               
-15        For i = 1 To 3
+15        For i = 0 To 2
 16            For Each DateSeparator In Array("/", "-", " ")
 17                CastToDate strValue, DtOut, i, _
                       CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted

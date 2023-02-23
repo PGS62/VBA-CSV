@@ -116,7 +116,6 @@ Private Sub RunSpeedTests()
                     c.Resize(1, NumColsInTFPRet).value = TestResults
                     ws.Calculate
                     DoEvents
-                  '  Stop
                     Application.ScreenUpdating = True
                 Next
                 ThisWorkbook.Save

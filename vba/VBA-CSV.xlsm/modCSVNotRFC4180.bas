@@ -11,7 +11,7 @@ Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As B
     Dim NC As Long
     Dim NR As Long
     Dim OneDArray() As String
-    Dim Out As String
+    Dim out As String
     Dim ParserRes As Variant
 
     On Error GoTo ErrHandler
@@ -88,12 +88,12 @@ Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As B
         Next j
     Next i
 
-    Out = VBA.Join(OneDArray, NewRowSymbol)
-    Out = Replace(Out, vbLf, LFSymbol)
-    Out = Replace(Out, vbCr, CRSymbol)
-    Out = Replace(Out, " ", SpaceSymbol)
-    If Out = ExpectedResult Then Out = CorrectResultSymbol
-    TestNonStandardInput = Out
+    out = VBA.Join(OneDArray, NewRowSymbol)
+    out = Replace(out, vbLf, LFSymbol)
+    out = Replace(out, vbCr, CRSymbol)
+    out = Replace(out, " ", SpaceSymbol)
+    If out = ExpectedResult Then out = CorrectResultSymbol
+    TestNonStandardInput = out
 
     Exit Function
 ErrHandler:

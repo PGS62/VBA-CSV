@@ -300,6 +300,9 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test263 Folder, NumPassed, NumFailed, Failures
     Test264 Folder, NumPassed, NumFailed, Failures
     Test265 Folder, NumPassed, NumFailed, Failures
+    Test266 Folder, NumPassed, NumFailed, Failures
+    Test267 Folder, NumPassed, NumFailed, Failures
+    Test268 Folder, NumPassed, NumFailed, Failures
 
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -2128,7 +2131,7 @@ Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_converttypes_arg.csv"
     Expected = HStack( _
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
-        Array("44424", CDate("2021-Aug-18"), "True", "#DIV/0!", "1", CDate("2021-Aug-16"), "TRUE", "#DIV/0!", "abc", "abc""def"))
+        Array("44424", CDate("2021-Aug-18"), "True", "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(71, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="DQ", _
@@ -2151,12 +2154,14 @@ Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
-    FileName = "test_converttypes_arg.csv"
     Expected = HStack( _
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
         Array("44424", "2021-08-18", True, "#DIV/0!", "1", "16-Aug-2021", True, "#DIV/0!", "abc", "abc""def"))
-
-    TestRes = TestCSVRead(72, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="BQ", ShowMissingsAs:=Empty)
+    FileName = "test_converttypes_arg.csv"
+    TestRes = TestCSVRead(72, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="BQ", _
+        IgnoreEmptyLines:=True, _
+        ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
     Exit Sub
@@ -2220,14 +2225,13 @@ Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
 
     On Error GoTo ErrHandler
     TestDescription = "test converttypes arg"
-    FileName = "test_converttypes_arg.csv"
     Expected = HStack( _
         Array("Number", "Date", "Boolean", "Error", "String", "String", "String", "String", "String", "String"), _
-        Array(44424#, CDate("2021-Aug-18"), True, CVErr(2007), 1#, CDate("2021-Aug-16"), True, CVErr(2007), "abc", "abc""def"))
-
+        Array(44424#, CDate("2021-Aug-18"), True, CVErr(2007), 1#, "16-Aug-2021", True, CVErr(2007), "abc", "abc""def"))
+    FileName = "test_converttypes_arg.csv"
     TestRes = TestCSVRead(75, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="NDBEQ", _
-        DateFormat:="Y-M-D", _
+        IgnoreEmptyLines:=True, _
         ShowMissingsAs:=Empty)
     AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
 
@@ -7341,4 +7345,84 @@ Private Sub Test265(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     ReThrow "Test265", Err
 End Sub
+
+Private Sub Test266(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test two digit DMY dates"
+    FileName = "test_two_digit_DMY_dates.csv"
+    Expected = CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
+    TestRes = TestCSVRead(266, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="D-M-Y", _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        NumCols:=1, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test266", Err
+End Sub
+
+Private Sub Test267(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test two digit DMY dates"
+    FileName = "test_two_digit_MDY_dates.csv"
+    Expected = CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
+    TestRes = TestCSVRead(267, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="M-D-Y", _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        NumCols:=1, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test267", Err
+End Sub
+
+Private Sub Test268(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test two digit DMY dates"
+    FileName = "test_two_digit_YMD_dates.csv"
+    Expected = CSVRead(Folder & FileName, "N", SkipToRow:=2, SkipToCol:=2, NumCols:=1)
+    TestRes = TestCSVRead(268, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        DateFormat:="Y-M-D", _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        NumCols:=1, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test268", Err
+End Sub
+
+
 
