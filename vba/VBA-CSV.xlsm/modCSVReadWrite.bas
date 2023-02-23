@@ -2102,12 +2102,9 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Sub TwoToFourDigitYear(ByRef y As String)
           Dim y_lng As Long
-1         On Error GoTo ErrHandler
 
           Static rx As VBScript_RegExp_55.RegExp
           
-2         On Error GoTo ErrHandler
-
 3         Select Case Len(y)
               Case 4
                   'Leave as is
@@ -2128,10 +2125,6 @@ Sub TwoToFourDigitYear(ByRef y As String)
 18            Case Else 'We only allow 2 digit and 4 digit years
 19                Throw "Bad year part"
 20        End Select
-
-21        Exit Sub
-ErrHandler:
-          'Do nothing
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
