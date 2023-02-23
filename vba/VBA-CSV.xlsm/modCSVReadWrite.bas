@@ -2227,22 +2227,18 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
 61                    Converted = True
 62                    Exit Sub
 63                End If
-64            ElseIf DateOrder = SysDateOrder Then
-65                DtOut = CDate(strIn)
-66                Converted = True
-67                Exit Sub
-68            End If
-69            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
-70            Converted = True
-71        Else 'CDate does not cope with fractional seconds, so use CastToTimeB
-72            CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
-73            If Converted2 Then
-74                DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
-75                Converted = True
-76            End If
-77        End If
+64            End If
+65            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
+66            Converted = True
+67        Else 'CDate does not cope with fractional seconds, so use CastToTimeB
+68            CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
+69            If Converted2 Then
+70                DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
+71                Converted = True
+72            End If
+73        End If
 
-78        Exit Sub
+74        Exit Sub
 ErrHandler:
           'Do nothing - was not a string representing a date with the specified date order and date separator.
 End Sub
