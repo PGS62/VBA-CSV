@@ -168,6 +168,15 @@ https://github.com/pchemguy/CSVParser
 During type conversion, `CSVRead` accepts dates and times where the number of seconds includes a decimal fraction. For example the time`10:13:20.500` is half a second later than the time `10:13:20`. This contrasts with the VBA function [`CDate`](https://docs.microsoft.com/en-us/office/vba/language/concepts/getting-started/type-conversion-functions) where executing
 `CDate("10:13:20.500")` results in an error.
 
+### Two-digit-dates
+If you use `CSVRead` to parse files that represent dates with only two digits for the year then you might wish to change the values of two constants in
+`modCSVReadWrite` that determine how such dates are interpreted:
+```vba
+'The two constants below set the range of years to which date strings with two-digit years are converted.
+Private Const m_2DigitYearIsFrom As Long = 1930
+Private Const m_2DigitYearIsTo As Long = 2029
+```
+
 ### Array lower bounds
 The return from `CSVRead` is an array with lower bounds of one. If you prefer array lower bounds to be zero, then edit the constant `m_LBound` (at the top of `modCSVReadWrite.bas`) to be 0 rather than 1.  
 [source](https://github.com/PGS62/VBA-CSV/blob/f9cabb4f2038fdf79ded33e872d5f886fb9f0a72/src/modCSVReadWrite.bas#L44-L45)
