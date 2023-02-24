@@ -260,7 +260,6 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
           Dim Starts() As Long
           Dim strDelimiter As String
           Dim Stream As ADODB.Stream
-          Dim SysDateOrder As Long
           Dim SysDateSeparator As String
           Dim SysDecimalSeparator As String
           Dim TempFile As String
@@ -326,166 +325,165 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
           
 45        If ShowDatesAsDates Then
 46            ParseDateFormat DateFormat, DateOrder, DateSeparator, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone
-47            SysDateOrder = Application.International(xlDateOrder)
-48            SysDateSeparator = Application.International(xlDateSeparator)
-49        End If
+47            SysDateSeparator = Application.International(xlDateSeparator)
+48        End If
 
-50        If HeaderRowNum < 0 Then Throw Err_HeaderRowNum
-51        If SkipToRow = 0 Then SkipToRow = HeaderRowNum + 1
-52        If HeaderRowNum > SkipToRow Then Throw Err_HeaderRowNum
+49        If HeaderRowNum < 0 Then Throw Err_HeaderRowNum
+50        If SkipToRow = 0 Then SkipToRow = HeaderRowNum + 1
+51        If HeaderRowNum > SkipToRow Then Throw Err_HeaderRowNum
 
-53        If Not IsOneAndZero(SkipToCol, NumCols) Then
-54            AmendSkipToColAndNumCols FileName, SkipToCol, NumCols, Delimiter, IgnoreRepeated, Comment, IgnoreEmptyLines, HeaderRowNum
-55        End If
+52        If Not IsOneAndZero(SkipToCol, NumCols) Then
+53            AmendSkipToColAndNumCols FileName, SkipToCol, NumCols, Delimiter, IgnoreRepeated, Comment, IgnoreEmptyLines, HeaderRowNum
+54        End If
 
-56        If SkipToCol = 0 Then SkipToCol = 1
-57        If SkipToRow < 1 Then Throw Err_SkipToRow
-58        If NumRows < 0 Then Throw Err_NumRows
+55        If SkipToCol = 0 Then SkipToCol = 1
+56        If SkipToRow < 1 Then Throw Err_SkipToRow
+57        If NumRows < 0 Then Throw Err_NumRows
 
-59        If HeaderRowNum > SkipToRow Then Throw Err_HeaderRowNum
+58        If HeaderRowNum > SkipToRow Then Throw Err_HeaderRowNum
              
-60        If InStr(Comment, DQ) > 0 Or InStr(Comment, vbLf) > 0 Or InStr(Comment, vbCrLf) > 0 Then Throw Err_Comment
+59        If InStr(Comment, DQ) > 0 Or InStr(Comment, vbLf) > 0 Or InStr(Comment, vbCrLf) > 0 Then Throw Err_Comment
           'End of input validation
           
-61        CallingFromWorksheet = TypeName(Application.Caller) = "Range"
+60        CallingFromWorksheet = TypeName(Application.Caller) = "Range"
           
-62        If CallingFromWorksheet Then
-63            If FunctionWizardActive() Then
-64                CSVRead = "#" & Err_FunctionWizard & "!"
-65                Exit Function
-66            End If
-67        End If
+61        If CallingFromWorksheet Then
+62            If FunctionWizardActive() Then
+63                CSVRead = "#" & Err_FunctionWizard & "!"
+64                Exit Function
+65            End If
+66        End If
           
-68        If NotDelimited Then
-69            HeaderRow = Empty
-70            CSVRead = ParseTextFile(FileName, SourceType <> st_String, CharSet, SkipToRow, NumRows, CallingFromWorksheet)
-71            Exit Function
-72        End If
+67        If NotDelimited Then
+68            HeaderRow = Empty
+69            CSVRead = ParseTextFile(FileName, SourceType <> st_String, CharSet, SkipToRow, NumRows, CallingFromWorksheet)
+70            Exit Function
+71        End If
                 
-73        If SourceType = st_String Then
-74            CSVContents = FileName
-75            ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+72        If SourceType = st_String Then
+73            CSVContents = FileName
+74            ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                   IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, _
                   NumFields, Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
-76        Else
-77            If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+75        Else
+76            If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
                   
-78            Set Stream = New ADODB.Stream
-79            Stream.CharSet = CharSet
-80            Stream.Open
-81            Stream.LoadFromFile FileName
-82            If Stream.EOS Then Throw Err_FileEmpty
+77            Set Stream = New ADODB.Stream
+78            Stream.CharSet = CharSet
+79            Stream.Open
+80            Stream.LoadFromFile FileName
+81            If Stream.EOS Then Throw Err_FileEmpty
 
-83            If SkipToRow = 1 And NumRows = 0 Then
-84                CSVContents = ReadAllFromStream(Stream, EstNumChars)
-85                Stream.Close
-86                ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+82            If SkipToRow = 1 And NumRows = 0 Then
+83                CSVContents = ReadAllFromStream(Stream, EstNumChars)
+84                Stream.Close
+85                ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                       IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
                       Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
-87            Else
-88                CSVContents = ParseCSVContents(Stream, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
+86            Else
+87                CSVContents = ParseCSVContents(Stream, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                       IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
                       Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow)
-89                Stream.Close
-90            End If
-91        End If
+88                Stream.Close
+89            End If
+90        End If
                            
-92        If NumCols = 0 Then
-93            NumColsInReturn = NumColsFound - SkipToCol + 1
-94            If NumColsInReturn <= 0 Then
-95                Throw "SkipToCol (" & CStr(SkipToCol) & _
+91        If NumCols = 0 Then
+92            NumColsInReturn = NumColsFound - SkipToCol + 1
+93            If NumColsInReturn <= 0 Then
+94                Throw "SkipToCol (" & CStr(SkipToCol) & _
                       ") exceeds the number of columns in the file (" & CStr(NumColsFound) & ")"
-96            End If
-97        Else
-98            NumColsInReturn = NumCols
-99        End If
-100       If NumRows = 0 Then
-101           NumRowsInReturn = NumRowsFound
-102       Else
-103           NumRowsInReturn = NumRows
-104       End If
+95            End If
+96        Else
+97            NumColsInReturn = NumCols
+98        End If
+99        If NumRows = 0 Then
+100           NumRowsInReturn = NumRowsFound
+101       Else
+102           NumRowsInReturn = NumRows
+103       End If
               
-105       AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+104       AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
               ShowBooleansAsBooleans Or ShowErrorsAsErrors Or TrimFields
               
-106       Adj = m_LBound - 1
-107       ReDim ReturnArray(1 + Adj To NumRowsInReturn + Adj, 1 + Adj To NumColsInReturn + Adj)
-108       MSLIA = MaxStringLengthInArray()
-109       ShowMissingsAsEmpty = IsEmpty(ShowMissingsAs)
+105       Adj = m_LBound - 1
+106       ReDim ReturnArray(1 + Adj To NumRowsInReturn + Adj, 1 + Adj To NumColsInReturn + Adj)
+107       MSLIA = MaxStringLengthInArray()
+108       ShowMissingsAsEmpty = IsEmpty(ShowMissingsAs)
               
-110       For k = 1 To NumFields
-111           i = RowIndexes(k)
-112           j = ColIndexes(k) - SkipToCol + 1
-113           If j >= 1 And j <= NumColsInReturn Then
-114               If CallingFromWorksheet Then
-115                   If Lengths(k) > MSLIA Then
+109       For k = 1 To NumFields
+110           i = RowIndexes(k)
+111           j = ColIndexes(k) - SkipToCol + 1
+112           If j >= 1 And j <= NumColsInReturn Then
+113               If CallingFromWorksheet Then
+114                   If Lengths(k) > MSLIA Then
                           Dim UnquotedLength As Long
-116                       UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), DQ, 4))
-117                       If UnquotedLength > MSLIA Then
-118                           Err_StringTooLong = "The file has a field (row " & CStr(i + SkipToRow - 1) & _
+115                       UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), DQ, 4))
+116                       If UnquotedLength > MSLIA Then
+117                           Err_StringTooLong = "The file has a field (row " & CStr(i + SkipToRow - 1) & _
                                   ", column " & CStr(j + SkipToCol - 1) & ") of length " & Format$(UnquotedLength, "###,###")
-119                           If MSLIA >= 32767 Then
-120                               Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " & Format$(MSLIA, "####,####")
-121                           Else 'Excel 2013 and earlier
-122                               Err_StringTooLong = Err_StringTooLong & _
+118                           If MSLIA >= 32767 Then
+119                               Err_StringTooLong = Err_StringTooLong & ". Excel cells cannot contain strings longer than " & Format$(MSLIA, "####,####")
+120                           Else 'Excel 2013 and earlier
+121                               Err_StringTooLong = Err_StringTooLong & _
                                       ". An array containing a string longer than " & Format$(MSLIA, "###,###") & _
                                       " cannot be returned from VBA to an Excel worksheet"
-123                           End If
-124                           Throw Err_StringTooLong
-125                       End If
-126                   End If
-127               End If
+122                           End If
+123                           Throw Err_StringTooLong
+124                       End If
+125                   End If
+126               End If
               
-128               If ColByColFormatting Then
-129                   ReturnArray(i + Adj, j + Adj) = Mid$(CSVContents, Starts(k), Lengths(k))
-130               Else
-131                   ReturnArray(i + Adj, j + Adj) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
+127               If ColByColFormatting Then
+128                   ReturnArray(i + Adj, j + Adj) = Mid$(CSVContents, Starts(k), Lengths(k))
+129               Else
+130                   ReturnArray(i + Adj, j + Adj) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
                           Lengths(k), TrimFields, DQ, QuoteCounts(k), ConvertQuoted, ShowNumbersAsNumbers, SepStandard, _
                           DecimalSeparator, SysDecimalSeparator, ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, _
-                          AcceptWithTimeZone, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, AnySentinels, _
+                          AcceptWithTimeZone, DateOrder, DateSeparator, SysDateSeparator, AnySentinels, _
                           Sentinels, MaxSentinelLength, ShowMissingsAs)
-132               End If
-133           End If
-134       Next k
+131               End If
+132           End If
+133       Next k
           
-135       If Ragged Then
-136           If Not ShowMissingsAsEmpty Then
-137               For i = 1 + Adj To NumRowsInReturn + Adj
-138                   For j = 1 + Adj To NumColsInReturn + Adj
-139                       If IsEmpty(ReturnArray(i, j)) Then
-140                           ReturnArray(i, j) = ShowMissingsAs
-141                       End If
-142                   Next j
-143               Next i
-144           End If
-145           If Not IsEmpty(HeaderRow) Then
-146               If NCols(HeaderRow) < NCols(ReturnArray) + SkipToCol - 1 Then
-147                   ReDim Preserve HeaderRow(1 To 1, 1 To NCols(ReturnArray) + SkipToCol - 1)
-148               End If
-149           End If
-150       End If
+134       If Ragged Then
+135           If Not ShowMissingsAsEmpty Then
+136               For i = 1 + Adj To NumRowsInReturn + Adj
+137                   For j = 1 + Adj To NumColsInReturn + Adj
+138                       If IsEmpty(ReturnArray(i, j)) Then
+139                           ReturnArray(i, j) = ShowMissingsAs
+140                       End If
+141                   Next j
+142               Next i
+143           End If
+144           If Not IsEmpty(HeaderRow) Then
+145               If NCols(HeaderRow) < NCols(ReturnArray) + SkipToCol - 1 Then
+146                   ReDim Preserve HeaderRow(1 To 1, 1 To NCols(ReturnArray) + SkipToCol - 1)
+147               End If
+148           End If
+149       End If
 
-151       If SkipToCol > 1 Then
-152           If Not IsEmpty(HeaderRow) Then
+150       If SkipToCol > 1 Then
+151           If Not IsEmpty(HeaderRow) Then
                   Dim HeaderRowTruncated() As String
-153               ReDim HeaderRowTruncated(1 To 1, 1 To NumColsInReturn)
-154               For i = 1 To NumColsInReturn
-155                   HeaderRowTruncated(1, i) = HeaderRow(1, i + SkipToCol - 1)
-156               Next i
-157               HeaderRow = HeaderRowTruncated
-158           End If
-159       End If
+152               ReDim HeaderRowTruncated(1 To 1, 1 To NumColsInReturn)
+153               For i = 1 To NumColsInReturn
+154                   HeaderRowTruncated(1, i) = HeaderRow(1, i + SkipToCol - 1)
+155               Next i
+156               HeaderRow = HeaderRowTruncated
+157           End If
+158       End If
           
           'In this case no type conversion should be applied to the top row of the return
-160       If HeaderRowNum = SkipToRow Then
-161           If AnyConversion Then
-162               For i = 1 To MinLngs(NCols(HeaderRow), NumColsInReturn)
-163                   ReturnArray(1 + Adj, i + Adj) = HeaderRow(1, i)
-164               Next
-165           End If
-166       End If
+159       If HeaderRowNum = SkipToRow Then
+160           If AnyConversion Then
+161               For i = 1 To MinLngs(NCols(HeaderRow), NumColsInReturn)
+162                   ReturnArray(1 + Adj, i + Adj) = HeaderRow(1, i)
+163               Next
+164           End If
+165       End If
 
-167       If ColByColFormatting Then
+166       If ColByColFormatting Then
               Dim CT As Variant
               Dim Field As String
               Dim NC As Long
@@ -493,64 +491,64 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
               Dim NR As Long
               Dim QC As Long
               Dim UnQuotedHeader As String
-168           NR = NRows(ReturnArray)
-169           NC = NCols(ReturnArray)
-170           If IsEmpty(HeaderRow) Then
-171               NCH = 0
-172           Else
-173               NCH = NCols(HeaderRow) 'possible that headers has fewer than expected columns if file is ragged
-174           End If
+167           NR = NRows(ReturnArray)
+168           NC = NCols(ReturnArray)
+169           If IsEmpty(HeaderRow) Then
+170               NCH = 0
+171           Else
+172               NCH = NCols(HeaderRow) 'possible that headers has fewer than expected columns if file is ragged
+173           End If
 
-175           For j = 1 To NC
-176               If j + SkipToCol - 1 <= NCH Then
-177                   UnQuotedHeader = HeaderRow(1, j + SkipToCol - 1)
-178               Else
-179                   UnQuotedHeader = -1 'Guaranteed not to be a key of the Dictionary
-180               End If
-181               If CTDict.Exists(j + SkipToCol - 1) Then
-182                   CT = CTDict.item(j + SkipToCol - 1)
-183               ElseIf CTDict.Exists(UnQuotedHeader) Then
-184                   CT = CTDict.item(UnQuotedHeader)
-185               ElseIf CTDict.Exists(0) Then
-186                   CT = CTDict.item(0)
-187               Else
-188                   CT = vbNullString
-189               End If
+174           For j = 1 To NC
+175               If j + SkipToCol - 1 <= NCH Then
+176                   UnQuotedHeader = HeaderRow(1, j + SkipToCol - 1)
+177               Else
+178                   UnQuotedHeader = -1 'Guaranteed not to be a key of the Dictionary
+179               End If
+180               If CTDict.Exists(j + SkipToCol - 1) Then
+181                   CT = CTDict.item(j + SkipToCol - 1)
+182               ElseIf CTDict.Exists(UnQuotedHeader) Then
+183                   CT = CTDict.item(UnQuotedHeader)
+184               ElseIf CTDict.Exists(0) Then
+185                   CT = CTDict.item(0)
+186               Else
+187                   CT = vbNullString
+188               End If
                   
-190               If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
+189               If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
                   
-191               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
+190               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
                       ShowErrorsAsErrors, ConvertQuoted, TrimFields
                   
-192               AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+191               AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
                       ShowBooleansAsBooleans Or ShowErrorsAsErrors
                       
-193               Set Sentinels = New Scripting.Dictionary
+192               Set Sentinels = New Scripting.Dictionary
                   
-194               MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
+193               MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
                       ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
 
-195               For i = 1 To NR
-196                   If Not IsEmpty(ReturnArray(i + Adj, j + Adj)) Then
-197                       Field = CStr(ReturnArray(i + Adj, j + Adj))
-198                       QC = CountQuotes(Field, DQ)
-199                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
+194               For i = 1 To NR
+195                   If Not IsEmpty(ReturnArray(i + Adj, j + Adj)) Then
+196                       Field = CStr(ReturnArray(i + Adj, j + Adj))
+197                       QC = CountQuotes(Field, DQ)
+198                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
                               Len(ReturnArray(i + Adj, j + Adj)), TrimFields, DQ, QC, ConvertQuoted, _
                               ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
                               ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone, DateOrder, _
-                              DateSeparator, SysDateOrder, SysDateSeparator, AnySentinels, Sentinels, _
+                              DateSeparator, SysDateSeparator, AnySentinels, Sentinels, _
                               MaxSentinelLength, ShowMissingsAs)
-200                   End If
-201               Next i
-202           Next j
-203       End If
+199                   End If
+200               Next i
+201           Next j
+202       End If
 
-204       CSVRead = ReturnArray
+203       CSVRead = ReturnArray
 
-205       Exit Function
+204       Exit Function
 
 ErrHandler:
-206       CSVRead = ReThrow("CSVRead", Err, m_ErrorStyle = es_ReturnString)
+205       CSVRead = ReThrow("CSVRead", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1088,7 +1086,6 @@ Private Sub AmendDelimiterIfFirstFieldIsDateTime(FirstChunk As String, ByRef Del
           Dim DelimAt As Long
           Dim DtOut As Date
           Dim FirstField As String
-          Dim SysDateOrder As Long
           Dim SysDateSeparator As String
           Dim TrialDelim As Variant
           
@@ -1099,33 +1096,32 @@ Private Sub AmendDelimiterIfFirstFieldIsDateTime(FirstChunk As String, ByRef Del
 5                 FirstField = Left$(FirstChunk, DelimAt - 1)
 6                 If InStr(FirstField, "-") > 0 Or InStr(FirstField, "/") > 0 Or InStr(FirstField, " ") > 0 Then
 
-7                     SysDateOrder = Application.International(xlDateOrder)
-8                     SysDateSeparator = Application.International(xlDateSeparator)
+7                     SysDateSeparator = Application.International(xlDateSeparator)
 
-9                     For Each DateSeparator In Array("/", "-", " ")
-10                        For DateOrder = 0 To 2
-11                            CastToDate FirstField, DtOut, DateOrder, CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
-12                            If Not Converted Then
-13                                CastISO8601 FirstField, DtOut, Converted, True, True
-14                            End If
-15                            If Converted Then
-16                                Select Case TrialDelim
+8                     For Each DateSeparator In Array("/", "-", " ")
+9                         For DateOrder = 0 To 2
+10                            CastToDate FirstField, DtOut, DateOrder, CStr(DateSeparator), SysDateSeparator, Converted
+11                            If Not Converted Then
+12                                CastISO8601 FirstField, DtOut, Converted, True, True
+13                            End If
+14                            If Converted Then
+15                                Select Case TrialDelim
                                       Case vbCr, vbLf
-17                                        Delimiter = ","
-18                                    Case Else
-19                                        Delimiter = TrialDelim
-20                                End Select
-21                                Exit Sub
-22                            End If
-23                        Next DateOrder
-24                    Next
-25                End If
-26            End If
-27        Next TrialDelim
+16                                        Delimiter = ","
+17                                    Case Else
+18                                        Delimiter = TrialDelim
+19                                End Select
+20                                Exit Sub
+21                            End If
+22                        Next DateOrder
+23                    Next
+24                End If
+25            End If
+26        Next TrialDelim
           
-28        Exit Sub
+27        Exit Sub
 ErrHandler:
-29        ReThrow "AmendDelimiterIfFirstFieldIsDateTime", Err
+28        ReThrow "AmendDelimiterIfFirstFieldIsDateTime", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1942,7 +1938,6 @@ End Function
 '  DateOrder            : If Field is a string representation what order of parts must it respect (not relevant if
 '                         ISO8601 is True) 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
 '  DateSeparator        : The date separator, must be either "-" or "/".
-'  SysDateOrder         : The Windows system date order. 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D.
 '  SysDateSeparator     : The Windows system date separator.
 'Booleans, Errors, Missings
 '  AnySentinels         : Does the sentinel dictionary have any elements?
@@ -1957,7 +1952,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
           ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
           SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
           AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
-          DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+          DateSeparator As String, SysDateSeparator As String, _
           AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
           ShowMissingsAs As Variant) As Variant
 
@@ -2032,7 +2027,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
 58            If ISO8601 Then
 59                CastISO8601 Field, dtResult, Converted, AcceptWithoutTimeZone, AcceptWithTimeZone
 60            Else
-61                CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+61                CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateSeparator, Converted
 62            End If
 63            If Not Converted Then
 64                If InStr(Field, ":") > 0 Then
@@ -2105,26 +2100,39 @@ Sub TwoToFourDigitYear(ByRef y As String)
 
           Static rx As VBScript_RegExp_55.RegExp
           
-3         Select Case Len(y)
+1         Select Case Len(y)
               Case 4
                   'Leave as is
-4             Case 2
-5                 If rx Is Nothing Then
-6                     Set rx = New RegExp
-7                     With rx
-8                         .IgnoreCase = True
-9                         .Pattern = "^[0-9][0-9]$"
-10                        .Global = False
-11                    End With
-12                End If
-13                If Not rx.Test(y) Then Throw "Bad year part"
-14                y_lng = (m_2DigitYearIsFrom \ 100) * 100 + CLng(y)
-15                If y_lng > m_2DigitYearIsTo Then y_lng = y_lng - 100
-16                If y_lng < m_2DigitYearIsFrom Then y_lng = y_lng + 100
-17                y = CStr(y_lng)
-18            Case Else 'We only allow 2 digit and 4 digit years
-19                Throw "Bad year part"
-20        End Select
+2             Case 2
+3                 If rx Is Nothing Then
+4                     Set rx = New RegExp
+5                     With rx
+6                         .IgnoreCase = True
+7                         .Pattern = "^[0-9][0-9]$"
+8                         .Global = False
+9                     End With
+10                End If
+11                If Not rx.Test(y) Then Throw "Bad year part"
+12                y_lng = (m_2DigitYearIsFrom \ 100) * 100 + CLng(y)
+13                If y_lng > m_2DigitYearIsTo Then y_lng = y_lng - 100
+14                If y_lng < m_2DigitYearIsFrom Then y_lng = y_lng + 100
+15                y = CStr(y_lng)
+16            Case Else 'We only allow 2 digit and 4 digit years
+17                Throw "Bad year part"
+18        End Select
+End Sub
+
+Private Sub quicktest()
+          Const strIn As String = "2021-09-07"
+          Dim DtOut As Date
+          Const DateOrder As Long = 2
+          Const DateSeparator As String = "-"
+          Dim SysDateSeparator As String
+          Dim Converted As Boolean
+
+1         SysDateSeparator = Application.International(xlDateSeparator)
+
+2         CastToDate strIn, DtOut, DateOrder, DateSeparator, SysDateSeparator, Converted
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2137,12 +2145,11 @@ End Sub
 '  dtOut           : Result of cast
 '  DateOrder       : The date order respected by the contents of strIn. 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D
 '  DateSeparator   : The date separator used by the input
-'  SysDateOrder    : The Windows system date order. 0 = M-D-Y, 1= D-M-Y, 2 = Y-M-D
 '  SysDateSeparator: The Windows system date separator
 '  Converted       : Boolean flipped to TRUE if conversion takes place
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, _
-          DateSeparator As String, SysDateOrder As Long, SysDateSeparator As String, _
+          DateSeparator As String, SysDateSeparator As String, _
           ByRef Converted As Boolean)
 
           Dim D As String
@@ -2167,78 +2174,66 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
 6         pos3 = InStr(pos2 + 1, strIn, " ")
           
 7         HasTimePart = pos3 > 0
+8         If HasTimePart Then
+9             pos4 = InStr(pos3 + 1, strIn, ".")
+10            HasFractionalSecond = pos4 > 0
+11            TimePart = Mid$(strIn, pos3)
+12            If HasFractionalSecond Then
+13                CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
+14                If Not Converted2 Then Exit Sub
+15                TimePart = ""
+16            End If
+17        End If
           
-8         If Not HasTimePart Then
-9             If DateOrder = 2 Then 'Y-M-D is unambiguous as long as year given as 4 digits
-10                If pos1 = 5 Then
-11                    DtOut = CDate(strIn)
-12                    Converted = True
-13                    Exit Sub
-14                End If
-15            End If
-16            If DateOrder = 0 Then 'M-D-Y
-17                m = Left$(strIn, pos1 - 1)
-18                D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-19                y = Mid$(strIn, pos2 + 1)
-20            ElseIf DateOrder = 1 Then 'D-M-Y
-21                D = Left$(strIn, pos1 - 1)
-22                m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-23                y = Mid$(strIn, pos2 + 1)
-24            ElseIf DateOrder = 2 Then 'Y-M-D
-25                y = Left$(strIn, pos1 - 1)
-26                m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-27                D = Mid$(strIn, pos2 + 1)
-28            Else
-29                Throw "DateOrder must be 0, 1, or 2"
-30            End If
-31            TwoToFourDigitYear y
-32            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D)
-33            Converted = True
-34            Exit Sub
-35        End If
+18        If DateOrder = 2 Then 'Y-M-D
+19            y = Left$(strIn, pos1 - 1)
+20            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+21            If HasTimePart Then
+22                D = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
+23            Else
+24                D = Mid$(strIn, pos2 + 1)
+25            End If
+26            If pos1 = 5 Then 'Len(y)=4
+27                If Not HasFractionalSecond Then
+28                    DtOut = CDate(strIn)
+29                    Converted = True
+30                    Exit Sub
+31                End If
+32            End If
+33        ElseIf DateOrder = 1 Then 'D-M-Y
+34            D = Left$(strIn, pos1 - 1)
+35            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+36            If HasTimePart Then
+37                y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
+38            Else
+39                y = Mid$(strIn, pos2 + 1)
+40            End If
+41        ElseIf DateOrder = 0 Then 'M-D-Y
+42            m = Left$(strIn, pos1 - 1)
+43            D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
+44            If HasTimePart Then
+45                y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
+46            Else
+47                y = Mid$(strIn, pos2 + 1)
+48            End If
+49        Else
+50            Throw "DateOrder must be 0, 1, or 2"
+51        End If
 
-36        pos4 = InStr(pos3 + 1, strIn, ".")
-37        HasFractionalSecond = pos4 > 0
-
-38        If DateOrder = 0 Then 'M-D-Y
-39            m = Left$(strIn, pos1 - 1)
-40            D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-41            y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-42            TimePart = Mid$(strIn, pos3)
-43        ElseIf DateOrder = 1 Then 'D-M-Y
-44            D = Left$(strIn, pos1 - 1)
-45            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-46            y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-47            TimePart = Mid$(strIn, pos3)
-48        ElseIf DateOrder = 2 Then 'Y-M-D
-49            y = Left$(strIn, pos1 - 1)
-50            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-51            D = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-52            TimePart = Mid$(strIn, pos3)
-53        Else
-54            Throw "DateOrder must be 0, 1, or 2"
-55        End If
-56        TwoToFourDigitYear y
-
-57        If Not HasFractionalSecond Then
-58            If DateOrder = 2 Then 'Y-M-D is unambiguous as long as year given as 4 digits
-59                If pos1 = 5 Then
-60                    DtOut = CDate(strIn)
-61                    Converted = True
-62                    Exit Sub
-63                End If
-64            End If
-65            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
-66            Converted = True
-67        Else 'CDate does not cope with fractional seconds, so use CastToTimeB
-68            CastToTimeB Mid$(TimePart, 2), TimePartConverted, Converted2
-69            If Converted2 Then
-70                DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D) + TimePartConverted
-71                Converted = True
-72            End If
-73        End If
-
-74        Exit Sub
+52        If Not IsNumeric(D) Then
+53            Converted = False
+54            Exit Sub
+55        ElseIf Not IsNumeric(y) Then
+56            Converted = False
+57            Exit Sub
+58        End If
+59        TwoToFourDigitYear y
+60        DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
+61        If HasFractionalSecond Then
+62            DtOut = DtOut + TimePartConverted
+63        End If
+64        Converted = True
+65        Exit Sub
 ErrHandler:
           'Do nothing - was not a string representing a date with the specified date order and date separator.
 End Sub
@@ -3129,41 +3124,39 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
           Dim DQCount As Long
           Dim DtOut As Date
           Dim i As Long
-          Dim SysDateOrder As Long
           Dim SysDateSeparator As String
               
 1         On Error GoTo ErrHandler
-2         SysDateOrder = Application.International(xlDateOrder)
-3         SysDateSeparator = Application.International(xlDateSeparator)
+2         SysDateSeparator = Application.International(xlDateSeparator)
 
-4         If strValue = "" Then Throw strName & " cannot be the zero-length string"
+3         If strValue = "" Then Throw strName & " cannot be the zero-length string"
 
-5         If InStr(strValue, vbLf) > 0 Then Throw strName & " contains a line feed character (ascii 10), which is not permitted"
-6         If InStr(strValue, vbCr) > 0 Then Throw strName & " contains a carriage return character (ascii 13), which is not permitted"
-7         If InStr(strValue, Delimiter) > 0 Then Throw strName & " contains Delimiter '" & Delimiter & "' which is not permitted"
-8         If InStr(strValue, DQ) > 0 Then
-9             DQCount = Len(strValue) - Len(Replace(strValue, DQ, vbNullString))
-10            If DQCount <> 2 Or Left$(strValue, 1) <> DQ Or Right$(strValue, 1) <> DQ Then
-11                Throw "When " & strName & " contains any double quote characters they must be at the start, the end and nowhere else"
-12            End If
-13        End If
+4         If InStr(strValue, vbLf) > 0 Then Throw strName & " contains a line feed character (ascii 10), which is not permitted"
+5         If InStr(strValue, vbCr) > 0 Then Throw strName & " contains a carriage return character (ascii 13), which is not permitted"
+6         If InStr(strValue, Delimiter) > 0 Then Throw strName & " contains Delimiter '" & Delimiter & "' which is not permitted"
+7         If InStr(strValue, DQ) > 0 Then
+8             DQCount = Len(strValue) - Len(Replace(strValue, DQ, vbNullString))
+9             If DQCount <> 2 Or Left$(strValue, 1) <> DQ Or Right$(strValue, 1) <> DQ Then
+10                Throw "When " & strName & " contains any double quote characters they must be at the start, the end and nowhere else"
+11            End If
+12        End If
               
-14        If IsNumeric(strValue) Then Throw "Got '" & strValue & "' as " & strName & " but that's not valid because it represents a number"
+13        If IsNumeric(strValue) Then Throw "Got '" & strValue & "' as " & strName & " but that's not valid because it represents a number"
               
-15        For i = 0 To 2
-16            For Each DateSeparator In Array("/", "-", " ")
-17                CastToDate strValue, DtOut, i, _
-                      CStr(DateSeparator), SysDateOrder, SysDateSeparator, Converted
-18                If Converted Then
-19                    Throw "Got '" & strValue & "' as " & _
+14        For i = 0 To 2
+15            For Each DateSeparator In Array("/", "-", " ")
+16                CastToDate strValue, DtOut, i, _
+                      CStr(DateSeparator), SysDateSeparator, Converted
+17                If Converted Then
+18                    Throw "Got '" & strValue & "' as " & _
                           strName & " but that's not valid because it represents a date"
-20                End If
-21            Next
-22        Next
+19                End If
+20            Next
+21        Next
 
-23        Exit Function
+22        Exit Function
 ErrHandler:
-24        ReThrow "ValidateBooleanRepresentation", Err
+23        ReThrow "ValidateBooleanRepresentation", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

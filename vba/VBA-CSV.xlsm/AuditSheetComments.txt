@@ -1,4 +1,7 @@
 Version	Date	Time	Author	Comment
+228	24-Feb-2023	12:15	Philip Swannell	Work on date parsing, including new worksheet DateParsingTest
+227	24-Feb-2023	11:34	Philip Swannell	Work on date parsing, including new worksheet DateParsingTest
+226	24-Feb-2023	10:34	Philip Swannell	Work on date parsing, including new worksheet DateParsingTest
 225	23-Feb-2023	19:12	Philip Swannell	Correction to previous release.
 224	23-Feb-2023	18:50	Philip Swannell	Correction to previous release.
 223	23-Feb-2023	17:59	Philip Swannell	Improved parsing of dates: a) Now have constants defining the range of years to which 2-digit years are converted. b) Fixed the possibility for strings to be interpreted as dates even though they did not match the specified DateFormat.

@@ -41,20 +41,17 @@ Private Sub SpeedTest_CastToDate()
     Dim j As Long
     Dim k As Long
     Dim strIn As String
-    Dim SysDateOrder As Long
     Dim SysDateSeparator As String
     Dim t1 As Double
     Dim t2 As Double
 
-    '0 = month-day-year, 1 = day-month-year, 2 = year-month-day
-    SysDateOrder = Application.International(xlDateOrder)
     SysDateSeparator = Application.International(xlDateSeparator)
 
     Debug.Print String(100, "=")
     Debug.Print "Running SpeedTest_CastToDate " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
-    Debug.Print "SysDateOrder = " & SysDateOrder
     Debug.Print "SysDateSeparator = " & SysDateSeparator
     Debug.Print "N = " & Format$(N, "###,###")
+    Debug.Print "ComputerName = " & Environ("ComputerName")
     
     For k = 1 To 12
         For j = 1 To 1 'Maybe do multiple times to test for variability or results.
@@ -125,7 +122,7 @@ Private Sub SpeedTest_CastToDate()
 
             t1 = ElapsedTime()
             For i = 1 To N
-                'CastToDate strIn, dtOut, DateOrder, DateSeparator, SysDateOrder, SysDateSeparator, Converted
+            '    CastToDate strIn, DtOut, DateOrder, DateSeparator, SysDateSeparator, Converted
             Next i
             t2 = ElapsedTime()
             Dim PrintThis As String
