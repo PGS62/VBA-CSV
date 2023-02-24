@@ -1100,28 +1100,29 @@ Private Sub AmendDelimiterIfFirstFieldIsDateTime(FirstChunk As String, ByRef Del
 
 8                     For Each DateSeparator In Array("/", "-", " ")
 9                         For DateOrder = 0 To 2
-10                            CastToDate FirstField, DtOut, DateOrder, CStr(DateSeparator), SysDateSeparator, Converted
-11                            If Not Converted Then
-12                                CastISO8601 FirstField, DtOut, Converted, True, True
-13                            End If
-14                            If Converted Then
-15                                Select Case TrialDelim
+10                            Converted = False
+11                            CastToDate FirstField, DtOut, DateOrder, CStr(DateSeparator), SysDateSeparator, Converted
+12                            If Not Converted Then
+13                                CastISO8601 FirstField, DtOut, Converted, True, True
+14                            End If
+15                            If Converted Then
+16                                Select Case TrialDelim
                                       Case vbCr, vbLf
-16                                        Delimiter = ","
-17                                    Case Else
-18                                        Delimiter = TrialDelim
-19                                End Select
-20                                Exit Sub
-21                            End If
-22                        Next DateOrder
-23                    Next
-24                End If
-25            End If
-26        Next TrialDelim
+17                                        Delimiter = ","
+18                                    Case Else
+19                                        Delimiter = TrialDelim
+20                                End Select
+21                                Exit Sub
+22                            End If
+23                        Next DateOrder
+24                    Next
+25                End If
+26            End If
+27        Next TrialDelim
           
-27        Exit Sub
+28        Exit Sub
 ErrHandler:
-28        ReThrow "AmendDelimiterIfFirstFieldIsDateTime", Err
+29        ReThrow "AmendDelimiterIfFirstFieldIsDateTime", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2099,40 +2100,20 @@ Sub TwoToFourDigitYear(ByRef y As String)
           Dim y_lng As Long
 
           Static rx As VBScript_RegExp_55.RegExp
-          
-1         Select Case Len(y)
-              Case 4
-                  'Leave as is
-2             Case 2
-3                 If rx Is Nothing Then
-4                     Set rx = New RegExp
-5                     With rx
-6                         .IgnoreCase = True
-7                         .Pattern = "^[0-9][0-9]$"
-8                         .Global = False
-9                     End With
-10                End If
-11                If Not rx.Test(y) Then Throw "Bad year part"
-12                y_lng = (m_2DigitYearIsFrom \ 100) * 100 + CLng(y)
-13                If y_lng > m_2DigitYearIsTo Then y_lng = y_lng - 100
-14                If y_lng < m_2DigitYearIsFrom Then y_lng = y_lng + 100
-15                y = CStr(y_lng)
-16            Case Else 'We only allow 2 digit and 4 digit years
-17                Throw "Bad year part"
-18        End Select
-End Sub
 
-Private Sub quicktest()
-          Const strIn As String = "2021-09-07"
-          Dim DtOut As Date
-          Const DateOrder As Long = 2
-          Const DateSeparator As String = "-"
-          Dim SysDateSeparator As String
-          Dim Converted As Boolean
-
-1         SysDateSeparator = Application.International(xlDateSeparator)
-
-2         CastToDate strIn, DtOut, DateOrder, DateSeparator, SysDateSeparator, Converted
+1         If rx Is Nothing Then
+2             Set rx = New RegExp
+3             With rx
+4                 .IgnoreCase = True
+5                 .Pattern = "^[0-9][0-9]$"
+6                 .Global = False
+7             End With
+8         End If
+9         If Not rx.Test(y) Then Throw "Bad year part"
+10        y_lng = (m_2DigitYearIsFrom \ 100) * 100 + CLng(y)
+11        If y_lng > m_2DigitYearIsTo Then y_lng = y_lng - 100
+12        If y_lng < m_2DigitYearIsFrom Then y_lng = y_lng + 100
+13        y = CStr(y_lng)
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2152,12 +2133,15 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
           DateSeparator As String, SysDateSeparator As String, _
           ByRef Converted As Boolean)
 
-          Dim D As String
+          Dim d As String
           Dim m As String
           Dim pos1 As Long 'First date separator
           Dim pos2 As Long 'Second date separator
           Dim pos3 As Long 'Space to separate date from time
           Dim pos4 As Long 'decimal point for fractions of a second
+          Dim ly As Long
+          Dim lm As Long
+          Dim ld As Long
           Dim Converted2 As Boolean
           Dim HasFractionalSecond As Boolean
           Dim HasTimePart As Boolean
@@ -2165,12 +2149,14 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
           Dim TimePartConverted As Date
           Dim y As String
           
-1         On Error GoTo ErrHandler
+          'Can reject most input before switching on error handling - for speed
+1         pos1 = InStr(strIn, DateSeparator)
+2         If pos1 = 0 Then Exit Sub
+3         pos2 = InStr(pos1 + 1, strIn, DateSeparator)
+4         If pos2 = 0 Then Exit Sub
 
-2         pos1 = InStr(strIn, DateSeparator)
-3         If pos1 = 0 Then Exit Sub
-4         pos2 = InStr(pos1 + 1, strIn, DateSeparator)
-5         If pos2 = 0 Then Exit Sub
+5         On Error GoTo ErrHandler
+
 6         pos3 = InStr(pos2 + 1, strIn, " ")
           
 7         HasTimePart = pos3 > 0
@@ -2186,57 +2172,103 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
 17        End If
           
 18        If DateOrder = 2 Then 'Y-M-D
-19            y = Left$(strIn, pos1 - 1)
-20            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-21            If HasTimePart Then
-22                D = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-23            Else
-24                D = Mid$(strIn, pos2 + 1)
-25            End If
-26            If pos1 = 5 Then 'Len(y)=4
-27                If Not HasFractionalSecond Then
-28                    DtOut = CDate(strIn)
-29                    Converted = True
-30                    Exit Sub
-31                End If
-32            End If
-33        ElseIf DateOrder = 1 Then 'D-M-Y
-34            D = Left$(strIn, pos1 - 1)
-35            m = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-36            If HasTimePart Then
-37                y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-38            Else
-39                y = Mid$(strIn, pos2 + 1)
-40            End If
-41        ElseIf DateOrder = 0 Then 'M-D-Y
-42            m = Left$(strIn, pos1 - 1)
-43            D = Mid$(strIn, pos1 + 1, pos2 - pos1 - 1)
-44            If HasTimePart Then
-45                y = Mid$(strIn, pos2 + 1, pos3 - pos2 - 1)
-46            Else
+19            ly = pos1 - 1
+20            y = Left$(strIn, ly)
+21            lm = pos2 - pos1 - 1
+22            m = Mid$(strIn, pos1 + 1, lm)
+23            If HasTimePart Then
+24                ld = pos3 - pos2 - 1
+25                d = Mid$(strIn, pos2 + 1, ld)
+26            Else
+27                ld = Len(strIn) - pos2
+28                d = Mid$(strIn, pos2 + 1)
+29            End If
+30            If pos1 = 5 Then 'Len(y)=4
+31                If Not HasFractionalSecond Then
+32                    DtOut = CDate(strIn)
+33                    Converted = True
+34                    Exit Sub
+35                End If
+36            End If
+37        ElseIf DateOrder = 1 Then 'D-M-Y
+38            ld = pos1 - 1
+39            d = Left$(strIn, ld)
+40            lm = pos2 - pos1 - 1
+41            m = Mid$(strIn, pos1 + 1, lm)
+42            If HasTimePart Then
+43                ly = pos3 - pos2 - 1
+44                y = Mid$(strIn, pos2 + 1, ly)
+45            Else
+46                ly = Len(strIn) - pos2
 47                y = Mid$(strIn, pos2 + 1)
 48            End If
-49        Else
-50            Throw "DateOrder must be 0, 1, or 2"
-51        End If
-
-52        If Not IsNumeric(D) Then
-53            Converted = False
-54            Exit Sub
-55        ElseIf Not IsNumeric(y) Then
-56            Converted = False
-57            Exit Sub
-58        End If
-59        TwoToFourDigitYear y
-60        DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & D & TimePart)
-61        If HasFractionalSecond Then
-62            DtOut = DtOut + TimePartConverted
+49        ElseIf DateOrder = 0 Then 'M-D-Y
+50            lm = pos1 - 1
+51            m = Left$(strIn, pos1 - 1)
+52            ld = pos2 - pos1 - 1
+53            d = Mid$(strIn, pos1 + 1, ld)
+54            If HasTimePart Then
+55                ly = pos3 - pos2 - 1
+56                y = Mid$(strIn, pos2 + 1, ly)
+57            Else
+58                ly = Len(strIn) - pos2
+59                y = Mid$(strIn, pos2 + 1)
+60            End If
+61        Else
+62            Throw "DateOrder must be 0, 1, or 2"
 63        End If
-64        Converted = True
-65        Exit Sub
+
+64        If Not IsNumeric(d) Then Exit Sub
+65        If Not IsNumeric(y) Then Exit Sub
+66        If ld > 2 Then Exit Sub
+67        If ly = 2 Then
+68            TwoToFourDigitYear y
+69        ElseIf ly <> 4 Then
+70            Exit Sub
+71        End If
+
+72        If HasTimePart Then
+73            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & d & TimePart)
+74            If HasFractionalSecond Then
+75                DtOut = DtOut + TimePartConverted
+76            End If
+77        Else
+78            DtOut = MyCDate("    -  -  ", y, m, d, lm, ld)
+79        End If
+
+80        Converted = True
+81        Exit Sub
 ErrHandler:
           'Do nothing - was not a string representing a date with the specified date order and date separator.
 End Sub
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : MyCDate
+' Author     : Philip Swannell
+' Date       : 24-Feb-2023
+' Purpose    : Wrapper to CDate, and avoiding string concatenation if possible.
+' Parameters :
+'  Buffer: Must be this: "    -  -  ", not sure if there's an advantage to declaring outside the function, or outside
+'          the loop - optimising VBA is guesswork compared to optimising Julia.
+'  y     : The year - MUST BE OF LENGTH FOUR
+'  m     : The month
+'  d     : The Day
+'  lm    : The length of m
+'  ld    : The length of d
+' -----------------------------------------------------------------------------------------------------------------------
+Function MyCDate(Buffer As String, y As String, m As String, d As String, lm As Long, ld As Long)
+
+1         If lm <= 2 Then
+2             If ld <= 2 Then
+3                 Mid(Buffer, 1, 4) = y
+4                 Mid(Buffer, 6, 2) = m
+5                 Mid(Buffer, 9, 2) = d
+6                 MyCDate = CDate(Buffer)
+7                 Exit Function
+8             End If
+9         End If
+10        MyCDate = CDate(y & "-" & m & "-" & d)
+End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : CastToTime
@@ -3145,6 +3177,7 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
               
 14        For i = 0 To 2
 15            For Each DateSeparator In Array("/", "-", " ")
+                  Converted = False
 16                CastToDate strValue, DtOut, i, _
                       CStr(DateSeparator), SysDateSeparator, Converted
 17                If Converted Then
@@ -3258,26 +3291,26 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function MakeEncoder(TrueString As String, FalseString As String) As Scripting.Dictionary
 
-          Dim D As New Scripting.Dictionary
+          Dim d As New Scripting.Dictionary
 1         On Error GoTo ErrHandler
-2         D.Add True, TrueString
-3         D.Add False, FalseString
-4         D.Add Null, "NULL"
-5         D.Add CVErr(2000), "#NULL!"
-6         D.Add CVErr(2007), "#DIV/0!"
-7         D.Add CVErr(2015), "#VALUE!"
-8         D.Add CVErr(2023), "#REF!"
-9         D.Add CVErr(2029), "#NAME?"
-10        D.Add CVErr(2036), "#NUM!"
-11        D.Add CVErr(2042), "#N/A"
-12        D.Add CVErr(2043), "#GETTING_DATA!"
-13        D.Add CVErr(2045), "#SPILL!"
-14        D.Add CVErr(2046), "#CONNECT!"
-15        D.Add CVErr(2047), "#BLOCKED!"
-16        D.Add CVErr(2048), "#UNKNOWN!"
-17        D.Add CVErr(2049), "#FIELD!"
-18        D.Add CVErr(2050), "#CALC!"
-19        Set MakeEncoder = D
+2         d.Add True, TrueString
+3         d.Add False, FalseString
+4         d.Add Null, "NULL"
+5         d.Add CVErr(2000), "#NULL!"
+6         d.Add CVErr(2007), "#DIV/0!"
+7         d.Add CVErr(2015), "#VALUE!"
+8         d.Add CVErr(2023), "#REF!"
+9         d.Add CVErr(2029), "#NAME?"
+10        d.Add CVErr(2036), "#NUM!"
+11        d.Add CVErr(2042), "#N/A"
+12        d.Add CVErr(2043), "#GETTING_DATA!"
+13        d.Add CVErr(2045), "#SPILL!"
+14        d.Add CVErr(2046), "#CONNECT!"
+15        d.Add CVErr(2047), "#BLOCKED!"
+16        d.Add CVErr(2048), "#UNKNOWN!"
+17        d.Add CVErr(2049), "#FIELD!"
+18        d.Add CVErr(2050), "#CALC!"
+19        Set MakeEncoder = d
 
 20        Exit Function
 ErrHandler:
@@ -4070,47 +4103,47 @@ Public Sub RegisterCSVRead()
 
 2         ReDim ArgDescs(1 To 19)
 3         ArgDescs(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV " & _
-                        "format."
+              "format."
 4         ArgDescs(2) = "Type conversion: Boolean or string. Allowed letters NDBETQ. N = convert Numbers, D = convert " & _
-                        "Dates, B = convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = " & _
-                        "quoted fields also converted. TRUE = NDB, FALSE = no conversion."
+              "Dates, B = convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = " & _
+              "quoted fields also converted. TRUE = NDB, FALSE = no conversion."
 5         ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found " & _
-                        "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
-                        "contents as would be displayed in a text editor."
+              "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
+              "contents as would be displayed in a text editor."
 6         ArgDescs(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after " & _
-                        "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
-                        "padding between fields."
+              "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
+              "padding between fields."
 7         ArgDescs(5) = "The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO` " & _
-                        "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
-                        "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
+              "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
+              "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
 8         ArgDescs(6) = "Rows that start with this string will be skipped while parsing."
 9         ArgDescs(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column " & _
-                        "will be assigned ShowMissingsAs for that empty row)."
+              "will be assigned ShowMissingsAs for that empty row)."
 10        ArgDescs(8) = "The row in the file containing headers. Optional and defaults to 0. Type conversion is not " & _
-                        "applied to fields in the header row, though leading and trailing spaces are trimmed."
+              "applied to fields in the header row, though leading and trailing spaces are trimmed."
 11        ArgDescs(9) = "The first row in the file that's included in the return. Optional and defaults to one more than " & _
-                        "HeaderRowNum."
+              "HeaderRowNum."
 12        ArgDescs(10) = "The column in the file at which reading starts, as a number or a string matching one of the " & _
-                         "file's headers. Optional and defaults to 1 to read from the first column."
+              "file's headers. Optional and defaults to 1 to read from the first column."
 13        ArgDescs(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the " & _
-                         "end of the file are read."
+              "end of the file are read."
 14        ArgDescs(12) = "If a number, sets the number of columns to read from the file. If a string matching one of the " & _
-                         "file's headers, sets the last column to be read. If omitted (or zero), all columns from " & _
-                         "SkipToCol are read."
+              "file's headers, sets the last column to be read. If omitted (or zero), all columns from " & _
+              "SkipToCol are read."
 15        ArgDescs(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings " & _
-                         "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
+              "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
 16        ArgDescs(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings " & _
-                         "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
+              "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
 17        ArgDescs(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings " & _
-                         "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
-                         "considered missing."
+              "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
+              "considered missing."
 18        ArgDescs(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the " & _
-                         "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
-                         "string or `#N/A!` error value can be good alternatives."
+              "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
+              "string or `#N/A!` error value can be good alternatives."
 19        ArgDescs(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be " & _
-                         "omitted and CSVRead will detect the file's encoding."
+              "omitted and CSVRead will detect the file's encoding."
 20        ArgDescs(18) = "The character that represents a decimal point. If omitted, then the value from Windows " & _
-                         "regional settings is used."
+              "regional settings is used."
 21        ArgDescs(19) = "For use from VBA only."
 22        Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgDescs
 23        Exit Sub
@@ -4164,5 +4197,3 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
 15        Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
 End Sub
-
-

@@ -28,6 +28,27 @@ Option Explicit
 'Calls per second = 375,057    strIn = "2021-08-24 15:18:01"      DateOrder = 2  Result as expected? True
 'Calls per second = 207,064    strIn = "2021-08-24 15:18:01.123"  DateOrder = 2  Result as expected? True
 'Calls per second = 475,397    strIn = "2021-08-24 15:18:01.123x" DateOrder = 2  Result as expected? True
+
+
+'This after improved rejection of datestrings that conform to the "wrong" date format. Speed up to case "foo"
+'(case of cell does not contain date separator) due to moving error handler a little later within CastToDate
+'====================================================================================================
+'Running SpeedTest_CastToDate 2023-Feb-24 16:36:56
+'SysDateSeparator = /
+'N = 1,000,000
+'ComputerName = PHILIP - LAPTOP
+'Calls per second = 6,047,584  strIn = "foo"                      DateOrder = 2  Result as expected? True
+'Calls per second = 4,894,329  strIn = "foo-bar"                  DateOrder = 2  Result as expected? True
+'Calls per second = 428,692    strIn = "09-07-2021"               DateOrder = 0  Result as expected? True
+'Calls per second = 480,587    strIn = "07-09-2021"               DateOrder = 1  Result as expected? True
+'Calls per second = 776,257    strIn = "2021-09-07"               DateOrder = 2  Result as expected? True
+'Calls per second = 357,532    strIn = "08-24-2021 15:18:01"      DateOrder = 0  Result as expected? True
+'Calls per second = 225,028    strIn = "08-24-2021 15:18:01.123"  DateOrder = 0  Result as expected? True
+'Calls per second = 333,270    strIn = "24-08-2021 15:18:01"      DateOrder = 1  Result as expected? True
+'Calls per second = 237,835    strIn = "24-08-2021 15:18:01.123"  DateOrder = 1  Result as expected? True
+'Calls per second = 511,861    strIn = "2021-08-24 15:18:01"      DateOrder = 2  Result as expected? True
+'Calls per second = 245,579    strIn = "2021-08-24 15:18:01.123"  DateOrder = 2  Result as expected? True
+'Calls per second = 848,108    strIn = "2021-08-24 15:18:01.123x" DateOrder = 2  Result as expected? True
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastToDate()
 
@@ -122,7 +143,7 @@ Private Sub SpeedTest_CastToDate()
 
             t1 = ElapsedTime()
             For i = 1 To N
-            '    CastToDate strIn, DtOut, DateOrder, DateSeparator, SysDateSeparator, Converted
+                'CastToDate strIn, DtOut, DateOrder, DateSeparator, SysDateSeparator, Converted
             Next i
             t2 = ElapsedTime()
             Dim PrintThis As String
