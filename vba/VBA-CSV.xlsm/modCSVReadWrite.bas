@@ -1256,43 +1256,45 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
 11            Exit Sub
 12        End If
           
-13        Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " & _
+13        ISO8601 = False
+          
+14        Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " & _
               "'M/D/Y', 'D/M/Y', 'Y/M/D', 'M D Y', 'D M Y' or 'Y M D'" & ". Omit to use the default date format of 'Y-M-D'"
               
-14        DateFormat = UCase$(DateFormat)
+15        DateFormat = UCase$(DateFormat)
           'Replace repeated D's with a single D, etc since CastToDate only needs
           'to know the order in which the three parts of the date appear.
-15        If Len(DateFormat) > 5 Then
-16            ReplaceRepeats DateFormat, "D"
-17            ReplaceRepeats DateFormat, "M"
-18            ReplaceRepeats DateFormat, "Y"
-19        End If
+16        If Len(DateFormat) > 5 Then
+17            ReplaceRepeats DateFormat, "D"
+18            ReplaceRepeats DateFormat, "M"
+19            ReplaceRepeats DateFormat, "Y"
+20        End If
              
-20        If Len(DateFormat) = 0 Then 'use "Y-M-D"
-21            DateOrder = 2
-22            DateSeparator = "-"
-23        ElseIf Len(DateFormat) <> 5 Then
-24            Throw Err_DateFormat
-25        ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
-26            Throw Err_DateFormat
-27        Else
-28            DateSeparator = Mid$(DateFormat, 2, 1)
-29            If DateSeparator <> "/" And DateSeparator <> "-" And DateSeparator <> " " Then Throw Err_DateFormat
-30            Select Case UCase$(Left$(DateFormat, 1) & Mid$(DateFormat, 3, 1) & Right$(DateFormat, 1))
+21        If Len(DateFormat) = 0 Then 'use "Y-M-D"
+22            DateOrder = 2
+23            DateSeparator = "-"
+24        ElseIf Len(DateFormat) <> 5 Then
+25            Throw Err_DateFormat
+26        ElseIf Mid$(DateFormat, 2, 1) <> Mid$(DateFormat, 4, 1) Then
+27            Throw Err_DateFormat
+28        Else
+29            DateSeparator = Mid$(DateFormat, 2, 1)
+30            If DateSeparator <> "/" And DateSeparator <> "-" And DateSeparator <> " " Then Throw Err_DateFormat
+31            Select Case UCase$(Left$(DateFormat, 1) & Mid$(DateFormat, 3, 1) & Right$(DateFormat, 1))
                   Case "MDY"
-31                    DateOrder = 0
-32                Case "DMY"
-33                    DateOrder = 1
-34                Case "YMD"
-35                    DateOrder = 2
-36                Case Else
-37                    Throw Err_DateFormat
-38            End Select
-39        End If
+32                    DateOrder = 0
+33                Case "DMY"
+34                    DateOrder = 1
+35                Case "YMD"
+36                    DateOrder = 2
+37                Case Else
+38                    Throw Err_DateFormat
+39            End Select
+40        End If
 
-40        Exit Sub
+41        Exit Sub
 ErrHandler:
-41        ReThrow "ParseDateFormat", Err
+42        ReThrow "ParseDateFormat", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
