@@ -113,8 +113,7 @@ Function GenerateTestCode(TestNo As Long, FileName As String, ExpectedReturn As 
     Else
         Res = Res & ", _" & vbLf & Indent2 & "NumCols := " & ElementToVBALiteral(NumCols)
     End If
-    
-    
+
     If TrueStrings <> vbNullString Then
         If InStr(TrueStrings, ",") = 0 Then
             Res = Res & ", _" & vbLf & Indent2 & "TrueStrings := " & ElementToVBALiteral(TrueStrings)
@@ -319,3 +318,4 @@ Public Function UnPack(Str As Variant)
         End If
     End If
 End Function
+

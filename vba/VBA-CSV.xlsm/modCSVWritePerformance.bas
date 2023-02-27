@@ -91,10 +91,11 @@ Option Explicit
 Sub TestWriteSpeedUsingMilitary()
 
           Const FileToWrite = "c:\Temp\military.csv"
-          Dim Encoding As String
-          Dim Res As String
-          Dim i As Long, j As Long
           Dim Data
+          Dim Encoding As String
+          Dim i As Long
+          Dim j As Long
+          Dim Res As String
 1         On Error GoTo ErrHandler
 2         Debug.Print String(80, "-")
 3         Debug.Print "Time:         ", Now

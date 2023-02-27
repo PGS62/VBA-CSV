@@ -5667,8 +5667,8 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim strObserved As String
     Dim R As Range
+    Dim strObserved As String
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim wb As Workbook
@@ -5714,8 +5714,8 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim strObserved As String
     Dim R As Range
+    Dim strObserved As String
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim wb As Workbook
@@ -6911,11 +6911,11 @@ End Sub
 Private Sub Test249(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected() As String
     Dim FileName As String
+    Dim i As Long
     Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
-    Dim i As Long
 
     On Error GoTo ErrHandler
     TestDescription = "Chars 14 to 55295 UTF-8"
@@ -6940,11 +6940,11 @@ End Sub
 Private Sub Test250(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected() As String
     Dim FileName As String
+    Dim i As Long
     Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
-    Dim i As Long
 
     On Error GoTo ErrHandler
     TestDescription = "Chars 14 to 55295 UTF-8-BOM"
@@ -6968,11 +6968,11 @@ End Sub
 Private Sub Test251(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected() As String
     Dim FileName As String
+    Dim i As Long
     Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
-    Dim i As Long
 
     On Error GoTo ErrHandler
     TestDescription = "Chars 14 to 55295 UTF-16 BE BOM"
@@ -6996,11 +6996,11 @@ End Sub
 Private Sub Test252(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected() As String
     Dim FileName As String
+    Dim i As Long
     Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
-    Dim i As Long
 
     On Error GoTo ErrHandler
     TestDescription = "Chars 14 to 55295 UTF-16 LE BOM"
@@ -7024,11 +7024,11 @@ End Sub
 Private Sub Test253(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected() As String
     Dim FileName As String
+    Dim i As Long
     Dim Observed As Variant
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
-    Dim i As Long
 
     On Error GoTo ErrHandler
     TestDescription = "Chars 1 to 65535 UTF-16 LE BOM"
@@ -7071,7 +7071,6 @@ Private Sub Test254(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     ReThrow "Test254", Err
 End Sub
-
 
 Private Sub Test255(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
@@ -7146,7 +7145,6 @@ Private Sub Test257(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     ReThrow "Test257", Err
 End Sub
-
 
 Private Sub Test258(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
     Dim Expected As Variant
@@ -7423,6 +7421,4 @@ Private Sub Test268(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 ErrHandler:
     ReThrow "Test268", Err
 End Sub
-
-
 

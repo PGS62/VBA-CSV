@@ -273,7 +273,6 @@ ErrHandler:
 40        StringBetweenStrings = ReThrow("StringBetweenStrings", Err, True)
 End Function
 
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : NCols
 ' Purpose   : Number of columns in an array. Missing has zero rows, 1-dimensional arrays
@@ -942,5 +941,4 @@ Public Function IsNumber(x As Variant) As Boolean
 2                 IsNumber = True
 3         End Select
 End Function
-
 

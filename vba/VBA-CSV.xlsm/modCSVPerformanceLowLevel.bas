@@ -29,7 +29,6 @@ Option Explicit
 'Calls per second = 207,064    strIn = "2021-08-24 15:18:01.123"  DateOrder = 2  Result as expected? True
 'Calls per second = 475,397    strIn = "2021-08-24 15:18:01.123x" DateOrder = 2  Result as expected? True
 
-
 'This after improved rejection of datestrings that conform to the "wrong" date format. Speed up to case "foo"
 '(case of cell does not contain date separator) due to moving error handler a little later within CastToDate
 '====================================================================================================
@@ -67,7 +66,6 @@ Option Explicit
 'Calls per second = 850,998     strIn = "2021-08-24 15:18:01"     DateOrder = 2  Result as expected? True
 'Calls per second = 420,610     strIn = "2021-08-24 15:18:01.123" DateOrder = 2  Result as expected? True
 'Calls per second = 1,440,736   strIn = "2021-08-24 15:18:01.123x"DateOrder = 2  Result as expected? True
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastToDate()
@@ -180,7 +178,6 @@ Private Sub SpeedTest_CastToDate()
     Next k
 End Sub
 
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : SpeedTestCDateVDateSerial
 ' Author     : Philip Swannell
@@ -201,7 +198,6 @@ Sub SpeedTestCDateVDateSerial()
           Dim TheOutput As Date
           Const N As Long = 10000000
           Dim i As Long
-            
 
 1         Debug.Print String(80, "-")
 2         Debug.Print "Time:         ", Now
@@ -324,7 +320,6 @@ End Sub
 'Calls per second = 247,093    strIn = "2021-08-23T08:47:21.123"         Result as expected? True
 'Calls per second = 221,942    strIn = "2021-08-24T15:18:01+05:00"       Result as expected? True
 'Calls per second = 191,331    strIn = "2021-08-24T15:18:01.123+05:00"   Result as expected? True
-
 
 '====================================================================================================
 'Running SpeedTest_CastISO8601 2023-Feb-27 12:48:41

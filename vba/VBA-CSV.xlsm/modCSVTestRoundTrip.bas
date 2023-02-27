@@ -223,8 +223,8 @@ Private Function RandomString(AllowLineFeed As Boolean, Encoding As String, EOL 
     Const maxlen As Long = 20
     Dim i As Long
     Dim Length As Long
-    Dim Res As String
     Dim MaxCodePoint As Long
+    Dim Res As String
     
     On Error GoTo ErrHandler
     
@@ -562,4 +562,5 @@ Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Bo
 ErrHandler:
     ReThrow "RandomVariants", Err
 End Function
+
 
