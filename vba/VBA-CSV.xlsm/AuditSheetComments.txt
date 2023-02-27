@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+233	27-Feb-2023	19:09	Philip Swannell	Tweak to CastToDouble.
 232	27-Feb-2023	16:48	Philip Swannell	Tweak to CastISO8601.
 231	27-Feb-2023	16:44	Philip Swannell	Tweak to ParseDateFormat.
 230	27-Feb-2023	12:47	Philip Swannell	Performance improvements for date parsing.

@@ -2082,9 +2082,13 @@ Private Sub CastToDouble(strIn As String, ByRef dblOut As Double, SepStandard As
 2         If SepStandard Then
 3             dblOut = CDbl(strIn)
 4         Else
-5             dblOut = CDbl(Replace(strIn, DecimalSeparator, SysDecimalSeparator))
-6         End If
-7         Converted = True
+5             If InStr(strIn, DecimalSeparator) > 0 Then
+6                 dblOut = CDbl(Replace(strIn, DecimalSeparator, SysDecimalSeparator))
+7             Else
+8                 dblOut = CDbl(strIn)
+9             End If
+10        End If
+11        Converted = True
 ErrHandler:
           'Do nothing - strIn was not a string representing a number.
 End Sub
