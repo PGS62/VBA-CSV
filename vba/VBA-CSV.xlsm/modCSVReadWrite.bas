@@ -197,6 +197,8 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
           Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
           Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
           Optional ByRef HeaderRow As Variant) As Variant
+Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
+Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
               "Omit to guess from file contents"
@@ -1257,10 +1259,10 @@ Private Sub ParseDateFormat(ByVal DateFormat As String, ByRef DateOrder As Long,
 13        Err_DateFormat = "DateFormat not valid should be one of 'ISO', 'ISOZ', 'M-D-Y', 'D-M-Y', 'Y-M-D', " & _
               "'M/D/Y', 'D/M/Y', 'Y/M/D', 'M D Y', 'D M Y' or 'Y M D'" & ". Omit to use the default date format of 'Y-M-D'"
               
+14        DateFormat = UCase$(DateFormat)
           'Replace repeated D's with a single D, etc since CastToDate only needs
           'to know the order in which the three parts of the date appear.
-14        If Len(DateFormat) > 5 Then
-15            DateFormat = UCase$(DateFormat)
+15        If Len(DateFormat) > 5 Then
 16            ReplaceRepeats DateFormat, "D"
 17            ReplaceRepeats DateFormat, "M"
 18            ReplaceRepeats DateFormat, "Y"
@@ -2970,6 +2972,8 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
           Optional TrueString As String = "True", Optional FalseString As String = "False") As String
+Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
+Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter1 = "Delimiter must have at least one character"
           Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _
