@@ -197,8 +197,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
           Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
           Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
           Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
               "Omit to guess from file contents"
@@ -2139,12 +2137,12 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
           Dim pos2 As Long 'Second date separator
           Dim pos3 As Long 'Space to separate date from time
           Dim pos4 As Long 'decimal point for fractions of a second
-          Dim ly As Long
-          Dim lm As Long
-          Dim ld As Long
           Dim Converted2 As Boolean
           Dim HasFractionalSecond As Boolean
           Dim HasTimePart As Boolean
+          Dim ld As Long
+          Dim lm As Long
+          Dim ly As Long
           Dim TimePart As String
           Dim TimePartConverted As Date
           Dim y As String
@@ -2182,62 +2180,67 @@ Private Sub CastToDate(strIn As String, ByRef DtOut As Date, DateOrder As Long, 
 26            Else
 27                ld = Len(strIn) - pos2
 28                d = Mid$(strIn, pos2 + 1)
-29            End If
-30            If pos1 = 5 Then 'Len(y)=4
-31                If Not HasFractionalSecond Then
-32                    DtOut = CDate(strIn)
-33                    Converted = True
-34                    Exit Sub
-35                End If
-36            End If
-37        ElseIf DateOrder = 1 Then 'D-M-Y
-38            ld = pos1 - 1
-39            d = Left$(strIn, ld)
-40            lm = pos2 - pos1 - 1
-41            m = Mid$(strIn, pos1 + 1, lm)
-42            If HasTimePart Then
-43                ly = pos3 - pos2 - 1
-44                y = Mid$(strIn, pos2 + 1, ly)
-45            Else
-46                ly = Len(strIn) - pos2
-47                y = Mid$(strIn, pos2 + 1)
-48            End If
-49        ElseIf DateOrder = 0 Then 'M-D-Y
-50            lm = pos1 - 1
-51            m = Left$(strIn, pos1 - 1)
-52            ld = pos2 - pos1 - 1
-53            d = Mid$(strIn, pos1 + 1, ld)
-54            If HasTimePart Then
-55                ly = pos3 - pos2 - 1
-56                y = Mid$(strIn, pos2 + 1, ly)
-57            Else
-58                ly = Len(strIn) - pos2
-59                y = Mid$(strIn, pos2 + 1)
-60            End If
-61        Else
-62            Throw "DateOrder must be 0, 1, or 2"
-63        End If
+29                If pos1 = 5 Then
+30                    DtOut = MyCDate(y, m, d, lm, ld)
+31                    Converted = True
+32                    Exit Sub
+33                End If
+34            End If
+35            If pos1 = 5 Then 'Len(y)=4
+36                If Not HasFractionalSecond Then
+37                    DtOut = CDate(strIn)
+38                    Converted = True
+39                    Exit Sub
+40                End If
+41            End If
+42        ElseIf DateOrder = 1 Then 'D-M-Y
+43            ld = pos1 - 1
+44            d = Left$(strIn, ld)
+45            lm = pos2 - pos1 - 1
+46            m = Mid$(strIn, pos1 + 1, lm)
+47            If HasTimePart Then
+48                ly = pos3 - pos2 - 1
+49                y = Mid$(strIn, pos2 + 1, ly)
+50            Else
+51                ly = Len(strIn) - pos2
+52                y = Mid$(strIn, pos2 + 1)
+53            End If
+54        ElseIf DateOrder = 0 Then 'M-D-Y
+55            lm = pos1 - 1
+56            m = Left$(strIn, pos1 - 1)
+57            ld = pos2 - pos1 - 1
+58            d = Mid$(strIn, pos1 + 1, ld)
+59            If HasTimePart Then
+60                ly = pos3 - pos2 - 1
+61                y = Mid$(strIn, pos2 + 1, ly)
+62            Else
+63                ly = Len(strIn) - pos2
+64                y = Mid$(strIn, pos2 + 1)
+65            End If
+66        Else
+67            Throw "DateOrder must be 0, 1, or 2"
+68        End If
 
-64        If Not IsNumeric(d) Then Exit Sub
-65        If Not IsNumeric(y) Then Exit Sub
-66        If ld > 2 Then Exit Sub
-67        If ly = 2 Then
-68            TwoToFourDigitYear y
-69        ElseIf ly <> 4 Then
-70            Exit Sub
-71        End If
+69        If Not IsNumeric(d) Then Exit Sub
+70        If Not IsNumeric(y) Then Exit Sub
+71        If ld > 2 Then Exit Sub
+72        If ly = 2 Then
+73            TwoToFourDigitYear y
+74        ElseIf ly <> 4 Then
+75            Exit Sub
+76        End If
 
-72        If HasTimePart Then
-73            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & d & TimePart)
-74            If HasFractionalSecond Then
-75                DtOut = DtOut + TimePartConverted
-76            End If
-77        Else
-78            DtOut = MyCDate("    -  -  ", y, m, d, lm, ld)
-79        End If
+77        If HasTimePart Then
+78            DtOut = CDate(y & SysDateSeparator & m & SysDateSeparator & d & TimePart)
+79            If HasFractionalSecond Then
+80                DtOut = DtOut + TimePartConverted
+81            End If
+82        Else
+83            DtOut = MyCDate(y, m, d, lm, ld)
+84        End If
 
-80        Converted = True
-81        Exit Sub
+85        Converted = True
+86        Exit Sub
 ErrHandler:
           'Do nothing - was not a string representing a date with the specified date order and date separator.
 End Sub
@@ -2246,28 +2249,31 @@ End Sub
 ' Procedure  : MyCDate
 ' Author     : Philip Swannell
 ' Date       : 24-Feb-2023
-' Purpose    : Wrapper to CDate, and avoiding string concatenation if possible.
+' Purpose    : Replacement for CDate. Where possible, avoids string concatenation and uses DateSerial for better speed.
 ' Parameters :
-'  Buffer: Must be this: "    -  -  ", not sure if there's an advantage to declaring outside the function, or outside
-'          the loop - optimising VBA is guesswork compared to optimising Julia.
-'  y     : The year - MUST BE OF LENGTH FOUR
+'  y     : The year - MUST BE OF LENGTH FOUR.
 '  m     : The month
 '  d     : The Day
 '  lm    : The length of m
 '  ld    : The length of d
 ' -----------------------------------------------------------------------------------------------------------------------
-Function MyCDate(Buffer As String, y As String, m As String, d As String, lm As Long, ld As Long)
+Function MyCDate(y As String, m As String, d As String, lm As Long, ld As Long)
 
 1         If lm <= 2 Then
 2             If ld <= 2 Then
-3                 Mid(Buffer, 1, 4) = y
-4                 Mid(Buffer, 6, 2) = m
-5                 Mid(Buffer, 9, 2) = d
-6                 MyCDate = CDate(Buffer)
-7                 Exit Function
-8             End If
-9         End If
-10        MyCDate = CDate(y & "-" & m & "-" & d)
+3                 If m <= 12 Then
+4                     If d <= 28 Then
+5                         If m > 0 Then
+6                             If d > 0 Then
+7                                 MyCDate = DateSerial(y, m, d)
+8                                 Exit Function
+9                             End If
+10                        End If
+11                    End If
+12                End If
+13            End If
+14        End If
+15        MyCDate = CDate(y & "-" & m & "-" & d)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2353,12 +2359,15 @@ End Sub
 Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Converted As Boolean, _
           AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
 
+          Dim d As Long
           Dim L As Long
           Dim LocalTime As Double
+          Dim m As Long
           Dim MilliPart As Double
           Dim MinusPos As Long
           Dim PlusPos As Long
           Dim Sign As Long
+          Dim y As Long
           Dim ZAtEnd As Boolean
           
           Static rxNoNo As VBScript_RegExp_55.RegExp
@@ -2408,97 +2417,105 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
 
 30        If L = 10 Then
 31            If rxNoNo.Test(strIn) Then
-                  'This works irrespective of Windows regional settings
-32                DtOut = CDate(strIn)
-33                Converted = True
-34                Exit Sub
-35            End If
-36        ElseIf L < 10 Then
-37            Converted = False
-38            Exit Sub
-39        ElseIf L > 40 Then
-40            Converted = False
-41            Exit Sub
-42        End If
+32                y = Left$(strIn, 4)
+33                m = Mid$(strIn, 6, 2)
+34                d = Mid$(strIn, 9, 2)
+                  'Use DateSerial for speed, but carefully
+35                If m > 0 And m < 12 And d > 0 And d <= 28 Then
+36                    DtOut = DateSerial(y, m, d)
+37                Else
+38                    DtOut = CDate(strIn)
+39                End If
+40                Converted = True
+41                Exit Sub
+42            End If
+43        ElseIf L < 10 Then
+44            Converted = False
+45            Exit Sub
+46        ElseIf L > 40 Then
+47            Converted = False
+48            Exit Sub
+49        End If
 
-43        Converted = False
+50        Converted = False
           
-44        If AcceptWithoutTimeZone Then
-45            If AcceptWithTimeZone Then
-46                If Not rxYesYes.Test(strIn) Then Exit Sub
-47            Else
-48                If Not RxYesNo.Test(strIn) Then Exit Sub
-49            End If
-50        Else
-51            If AcceptWithTimeZone Then
-52                If Not RxNoYes.Test(strIn) Then Exit Sub
-53            Else
-54                If Not rxNoNo.Test(strIn) Then Exit Sub
-55            End If
-56        End If
+51        If AcceptWithoutTimeZone Then
+52            If AcceptWithTimeZone Then
+53                If Not rxYesYes.Test(strIn) Then Exit Sub
+54            Else
+55                If Not RxYesNo.Test(strIn) Then Exit Sub
+56            End If
+57        Else
+58            If AcceptWithTimeZone Then
+59                If Not RxNoYes.Test(strIn) Then Exit Sub
+60            Else
+61                If Not rxNoNo.Test(strIn) Then Exit Sub
+62            End If
+63        End If
           
           'Replace the "T" separator
-57        Mid$(strIn, 11, 1) = " "
+64        Mid$(strIn, 11, 1) = " "
           
-58        If L = 19 Then
-59            DtOut = CDate(strIn)
-60            Converted = True
-61            Exit Sub
-62        End If
+65        If L = 19 Then
+              'Tests show that CDate is faster than DateSerial(Mid$(... + TimeSerial(Mid$(...
+66            DtOut = CDate(strIn)
+67            Converted = True
+68            Exit Sub
+69        End If
 
-63        If Right$(strIn, 1) = "Z" Then
-64            Sign = 0
-65            ZAtEnd = True
-66        Else
-67            PlusPos = InStr(20, strIn, "+")
-68            If PlusPos > 0 Then
-69                Sign = 1
-70            Else
-71                MinusPos = InStr(20, strIn, "-")
-72                If MinusPos > 0 Then
-73                    Sign = -1
-74                End If
-75            End If
-76        End If
+70        If Right$(strIn, 1) = "Z" Then
+71            Sign = 0
+72            ZAtEnd = True
+73        Else
+74            PlusPos = InStr(20, strIn, "+")
+75            If PlusPos > 0 Then
+76                Sign = 1
+77            Else
+78                MinusPos = InStr(20, strIn, "-")
+79                If MinusPos > 0 Then
+80                    Sign = -1
+81                End If
+82            End If
+83        End If
 
-77        If Mid$(strIn, 20, 1) = "." Then 'Have fraction of a second
-78            Select Case Sign
+84        If Mid$(strIn, 20, 1) = "." Then 'Have fraction of a second
+85            Select Case Sign
                   Case 0
                       'Example: "2021-08-23T08:47:20.920Z"
-79                    MilliPart = CDbl(Mid$(strIn, 20, IIf(ZAtEnd, L - 20, L - 19)))
-80                Case 1
+86                    MilliPart = CDbl(Mid$(strIn, 20, IIf(ZAtEnd, L - 20, L - 19)))
+87                Case 1
                       'Example: "2021-08-23T08:47:20.920+05:00"
-81                    MilliPart = CDbl(Mid$(strIn, 20, PlusPos - 20))
-82                Case -1
+88                    MilliPart = CDbl(Mid$(strIn, 20, PlusPos - 20))
+89                Case -1
                       'Example: "2021-08-23T08:47:20.920-05:00"
-83                    MilliPart = CDbl(Mid$(strIn, 20, MinusPos - 20))
-84            End Select
-85        End If
+90                    MilliPart = CDbl(Mid$(strIn, 20, MinusPos - 20))
+91            End Select
+92        End If
           
-86        LocalTime = CDate(Left$(strIn, 19)) + MilliPart / 86400
+93        LocalTime = CDate(Left$(strIn, 19)) + MilliPart / 86400
 
           Dim Adjust As Date
-87        Select Case Sign
+94        Select Case Sign
               Case 0
-88                DtOut = LocalTime
-89                Converted = True
-90                Exit Sub
-91            Case 1
-92                If L <> PlusPos + 5 Then Exit Sub
-93                Adjust = CDate(Right$(strIn, 5))
-94                DtOut = LocalTime - Adjust
-95                Converted = True
-96            Case -1
-97                If L <> MinusPos + 5 Then Exit Sub
-98                Adjust = CDate(Right$(strIn, 5))
-99                DtOut = LocalTime + Adjust
-100               Converted = True
-101       End Select
+95                DtOut = LocalTime
+96                Converted = True
+97                Exit Sub
+98            Case 1
+99                If L <> PlusPos + 5 Then Exit Sub
+100               Adjust = CDate(Right$(strIn, 5))
+101               DtOut = LocalTime - Adjust
+102               Converted = True
+103           Case -1
+104               If L <> MinusPos + 5 Then Exit Sub
+105               Adjust = CDate(Right$(strIn, 5))
+106               DtOut = LocalTime + Adjust
+107               Converted = True
+108       End Select
 
-102       Exit Sub
+109       Exit Sub
 ErrHandler:
           'Was not recognised as ISO8601 date
-103   End Sub
+End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseISO8601
@@ -2953,8 +2970,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
           Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter1 = "Delimiter must have at least one character"
           Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _
@@ -2962,9 +2977,9 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
               
           Const Err_Dimensions As String = "Data has more than two dimensions, which is not supported"
           
-          Dim FileContents As String
           Dim Encoder As Scripting.Dictionary
           Dim EOLIsWindows As Boolean
+          Dim FileContents As String
           Dim i As Long
           Dim j As Long
           Dim Lines() As String
@@ -3999,7 +4014,6 @@ Private Function MinLngs(x As Long, y As Long) As Long
 5         End If
 End Function
 
-
 Private Function IsOneAndZero(a As Variant, b As Variant) As Boolean
 1         If IsNumber(a) Then
 2             If a = 1 Then
@@ -4197,3 +4211,4 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
 15        Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
 End Sub
+

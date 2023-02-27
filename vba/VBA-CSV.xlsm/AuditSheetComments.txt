@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+230	27-Feb-2023	12:47	Philip Swannell	Performance improvements for date parsing.
 229	24-Feb-2023	18:17	Philip Swannell	Work on date parsing, including new worksheet DateParsingTest
 228	24-Feb-2023	12:15	Philip Swannell	Work on date parsing, including new worksheet DateParsingTest
 227	24-Feb-2023	11:34	Philip Swannell	Work on date parsing, including new worksheet DateParsingTest

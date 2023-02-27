@@ -49,6 +49,26 @@ Option Explicit
 'Calls per second = 511,861    strIn = "2021-08-24 15:18:01"      DateOrder = 2  Result as expected? True
 'Calls per second = 245,579    strIn = "2021-08-24 15:18:01.123"  DateOrder = 2  Result as expected? True
 'Calls per second = 848,108    strIn = "2021-08-24 15:18:01.123x" DateOrder = 2  Result as expected? True
+
+'====================================================================================================
+'Running SpeedTest_CastToDate 2023-Feb-27 11:42:47
+'SysDateSeparator = /
+'N = 1,000,000
+'ComputerName = DESKTOP - HSGAM5S
+'Calls per second = 10,123,722  strIn = "foo"                     DateOrder = 2  Result as expected? True
+'Calls per second = 8,909,257   strIn = "foo-bar"                 DateOrder = 2  Result as expected? True
+'Calls per second = 1,462,615   strIn = "09-07-2021"              DateOrder = 0  Result as expected? True
+'Calls per second = 1,466,331   strIn = "07-09-2021"              DateOrder = 1  Result as expected? True
+'Calls per second = 1,706,292   strIn = "2021-09-07"              DateOrder = 2  Result as expected? True
+'Calls per second = 645,595     strIn = "08-24-2021 15:18:01"     DateOrder = 0  Result as expected? True
+'Calls per second = 422,385     strIn = "08-24-2021 15:18:01.123" DateOrder = 0  Result as expected? True
+'Calls per second = 654,780     strIn = "24-08-2021 15:18:01"     DateOrder = 1  Result as expected? True
+'Calls per second = 420,353     strIn = "24-08-2021 15:18:01.123" DateOrder = 1  Result as expected? True
+'Calls per second = 850,998     strIn = "2021-08-24 15:18:01"     DateOrder = 2  Result as expected? True
+'Calls per second = 420,610     strIn = "2021-08-24 15:18:01.123" DateOrder = 2  Result as expected? True
+'Calls per second = 1,440,736   strIn = "2021-08-24 15:18:01.123x"DateOrder = 2  Result as expected? True
+
+
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastToDate()
 
@@ -68,11 +88,11 @@ Private Sub SpeedTest_CastToDate()
 
     SysDateSeparator = Application.International(xlDateSeparator)
 
-    Debug.Print String(100, "=")
-    Debug.Print "Running SpeedTest_CastToDate " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
-    Debug.Print "SysDateSeparator = " & SysDateSeparator
-    Debug.Print "N = " & Format$(N, "###,###")
-    Debug.Print "ComputerName = " & Environ("ComputerName")
+    Debug.Print "'" & String(100, "=")
+    Debug.Print "'Running SpeedTest_CastToDate " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
+    Debug.Print "'SysDateSeparator = " & SysDateSeparator
+    Debug.Print "'N = " & Format$(N, "###,###")
+    Debug.Print "'ComputerName = " & Environ("ComputerName")
     
     For k = 1 To 12
         For j = 1 To 1 'Maybe do multiple times to test for variability or results.
@@ -146,10 +166,11 @@ Private Sub SpeedTest_CastToDate()
                 'CastToDate strIn, DtOut, DateOrder, DateSeparator, SysDateSeparator, Converted
             Next i
             t2 = ElapsedTime()
+
             Dim PrintThis As String
-            PrintThis = "Calls per second = " & Format$(N / (t2 - t1), "###,###")
+            PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
             If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
-            PrintThis = PrintThis & "strIn = """ & strIn & """"
+            PrintThis = PrintThis & " strIn = """ & strIn & """"
             If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
             PrintThis = PrintThis & "DateOrder = " & DateOrder & "  Result as expected? " & (Expected = DtOut)
             
@@ -157,6 +178,47 @@ Private Sub SpeedTest_CastToDate()
             DoEvents 'kick Immediate window to life
         Next j
     Next k
+End Sub
+
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : SpeedTestCDateVDateSerial
+' Author     : Philip Swannell
+' Date       : 27-Feb-2023
+' Purpose    : Test that shows that parsing an Iso date using DateSerial & Mid$ is faster than parsing using CDate.
+
+'Example:
+'--------------------------------------------------------------------------------
+'Time:                       27/02/2023 10:03:22
+'ComputerName:               DESKTOP -HSGAM5S
+'VersionNumber:               229
+'Elapsed time for 10,000,000 calls to CDate: 4.3078174000002 seconds
+'Elapsed time for 10,000,000 calls to DateSerial: 2.51074429999971 seconds
+' -----------------------------------------------------------------------------------------------------------------------
+Sub SpeedTestCDateVDateSerial()
+
+          Const TheInput As String = "2023-02-13"
+          Dim TheOutput As Date
+          Const N As Long = 10000000
+          Dim i As Long
+            
+
+1         Debug.Print String(80, "-")
+2         Debug.Print "Time:         ", Now
+3         Debug.Print "ComputerName: ", Environ$("ComputerName")
+4         Debug.Print "VersionNumber:", shAudit.Range("B6").value
+
+5         tic
+6         For i = 1 To N
+7             TheOutput = CDate(TheInput)
+8         Next
+9         toc Format(N, "#,###") & " calls to CDate"
+10        tic
+11        For i = 1 To N
+12            TheOutput = DateSerial(Mid$(TheInput, 1, 4), Mid$(TheInput, 6, 2), Mid$(TheInput, 9, 2))
+13        Next
+14        toc Format(N, "#,###") & " calls to DateSerial"
+
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -249,6 +311,7 @@ End Sub
 
 'Example output: (Surface Book 2, Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz   2.11 GHz, 16GB RAM)
 
+'====================================================================================================
 'Running SpeedTest_CastISO8601 2021-Sep-07 22:03:27
 'N = 5,000,000
 'Calls per second = 1,052,769  strIn = "xxxxxxxxxxxxxxxxxxxxxxxxxxx..."  Result as expected? True
@@ -261,10 +324,27 @@ End Sub
 'Calls per second = 247,093    strIn = "2021-08-23T08:47:21.123"         Result as expected? True
 'Calls per second = 221,942    strIn = "2021-08-24T15:18:01+05:00"       Result as expected? True
 'Calls per second = 191,331    strIn = "2021-08-24T15:18:01.123+05:00"   Result as expected? True
+
+
+'====================================================================================================
+'Running SpeedTest_CastISO8601 2023-Feb-27 12:48:41
+'N = 5,000,000
+'ComputerName = DESKTOP-HSGAM5S
+'Calls per second = 3,770,571 strIn = "xxxxxxxxxxxxxxxxxxxxxxxxxxx..."  Result as expected? True
+'Calls per second = 6,544,999 strIn = "Foo"                             Result as expected? True
+'Calls per second = 4,355,957 strIn = "xxxxxxxxxxxx"                    Result as expected? True
+'Calls per second = 4,400,869 strIn = "xxxx-xxxxxxx"                    Result as expected? True
+'Calls per second = 1,381,468 strIn = "2021-08-24T15:18:01.123+05:0x"   Result as expected? True
+'Calls per second = 1,895,714 strIn = "2021-08-23"                      Result as expected? True
+'Calls per second = 812,601   strIn = "2021-08-24T15:18:01"             Result as expected? True
+'Calls per second = 565,381   strIn = "2021-08-23T08:47:21.123"         Result as expected? True
+'Calls per second = 513,451   strIn = "2021-08-24T15:18:01+05:00"       Result as expected? True
+'Calls per second = 472,148   strIn = "2021-08-24T15:18:01.123+05:00"   Result as expected? True
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastISO8601()
 
     Const N As Long = 5000000
+    Dim Converted As Boolean
     Dim DtOut As Date
     Dim Expected As Date
     Dim i As Long
@@ -275,9 +355,11 @@ Private Sub SpeedTest_CastISO8601()
     Dim t1 As Double
     Dim t2 As Double
 
-    Debug.Print String(100, "=")
-    Debug.Print "Running SpeedTest_CastISO8601 " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
-    Debug.Print "N = " & Format$(N, "###,###")
+    Debug.Print "'" & String(100, "=")
+    Debug.Print "'Running SpeedTest_CastISO8601 " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
+    Debug.Print "'N = " & Format$(N, "###,###")
+    Debug.Print "'ComputerName = " & Environ("ComputerName")
+    
     For k = 0 To 9
         For j = 1 To 1
             DtOut = 0
@@ -316,11 +398,11 @@ Private Sub SpeedTest_CastISO8601()
 
             t1 = ElapsedTime()
             For i = 1 To N
-                'CastISO8601 strIn, dtOut, Converted, True, True
+                'CastISO8601 strIn, DtOut, Converted, True, True
             Next i
             t2 = ElapsedTime()
             
-            PrintThis = "Calls per second = " & Format$(N / (t2 - t1), "###,###")
+            PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
             If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
             If Len(strIn) > 30 Then
                 PrintThis = PrintThis & "strIn = """ & Left$(strIn, 27) & "..."""
