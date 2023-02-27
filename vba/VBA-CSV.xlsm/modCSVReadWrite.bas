@@ -2423,7 +2423,7 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
 33                m = Mid$(strIn, 6, 2)
 34                d = Mid$(strIn, 9, 2)
                   'Use DateSerial for speed, but carefully
-35                If m > 0 And m < 12 And d > 0 And d <= 28 Then
+35                If m > 0 And m <= 12 And d > 0 And d <= 28 Then
 36                    DtOut = DateSerial(y, m, d)
 37                Else
 38                    DtOut = CDate(strIn)
