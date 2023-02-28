@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+236	28-Feb-2023	10:45	Philip Swannell	Re-wrote method CastToDouble for better speed.
 235	27-Feb-2023	20:42	Philip Swannell	Fix to method ParseDateFromat.
 234	27-Feb-2023	19:15	Philip Swannell	Ran "AmendVBA" script.
 233	27-Feb-2023	19:09	Philip Swannell	Tweak to CastToDouble.

@@ -220,6 +220,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
           Dim Adj As Long
           Dim AnyConversion As Boolean
           Dim AnySentinels As Boolean
+          Dim AscSeparator As Long
           Dim CallingFromWorksheet As Boolean
           Dim CharSet As String
           Dim ColByColFormatting As Boolean
@@ -305,6 +306,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
 32        SysDecimalSeparator = Application.DecimalSeparator
 33        If DecimalSeparator = vbNullString Then DecimalSeparator = SysDecimalSeparator
+
 34        If DecimalSeparator = SysDecimalSeparator Then
 35            SepStandard = True
 36        ElseIf Len(DecimalSeparator) <> 1 Then
@@ -441,7 +443,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                           Lengths(k), TrimFields, DQ, QuoteCounts(k), ConvertQuoted, ShowNumbersAsNumbers, SepStandard, _
                           DecimalSeparator, SysDecimalSeparator, ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, _
                           AcceptWithTimeZone, DateOrder, DateSeparator, SysDateSeparator, AnySentinels, _
-                          Sentinels, MaxSentinelLength, ShowMissingsAs)
+                          Sentinels, MaxSentinelLength, ShowMissingsAs, AscSeparator)
 131               End If
 132           End If
 133       Next k
@@ -537,7 +539,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
                               ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
                               ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone, DateOrder, _
                               DateSeparator, SysDateSeparator, AnySentinels, Sentinels, _
-                              MaxSentinelLength, ShowMissingsAs)
+                              MaxSentinelLength, ShowMissingsAs, AscSeparator)
 199                   End If
 200               Next i
 201           Next j
@@ -1957,7 +1959,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
           AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
           DateSeparator As String, SysDateSeparator As String, _
           AnySentinels As Boolean, Sentinels As Dictionary, MaxSentinelLength As Long, _
-          ShowMissingsAs As Variant) As Variant
+          ShowMissingsAs As Variant, AscSeparator As Long) As Variant
 
           Dim Converted As Boolean
           Dim dblResult As Double
@@ -2019,7 +2021,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
 49        End If
 
 50        If ShowNumbersAsNumbers Then
-51            CastToDouble Field, dblResult, SepStandard, DecimalSeparator, SysDecimalSeparator, Converted
+51            CastToDouble Field, dblResult, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
 52            If Converted Then
 53                ConvertField = dblResult
 54                Exit Function
@@ -2077,20 +2079,26 @@ End Function
 ' Procedure  : CastToDouble, sub-routine of ConvertField
 ' Purpose    : Casts strIn to double where strIn has specified decimals separator.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub CastToDouble(strIn As String, ByRef dblOut As Double, SepStandard As Boolean, _
-          DecimalSeparator As String, SysDecimalSeparator As String, ByRef Converted As Boolean)
+Public Sub CastToDouble(strIn As String, ByRef DblOut As Double, SepStandard As Boolean, _
+          DecimalSeparator As String, AscSeparator As Long, SysDecimalSeparator As String, ByRef Converted As Boolean)
           
 1         On Error GoTo ErrHandler
-2         If SepStandard Then
-3             dblOut = CDbl(strIn)
-4         Else
-5             If InStr(strIn, DecimalSeparator) > 0 Then
-6                 dblOut = CDbl(Replace(strIn, DecimalSeparator, SysDecimalSeparator))
-7             Else
-8                 dblOut = CDbl(strIn)
-9             End If
-10        End If
-11        Converted = True
+          'Checking the first character makes this function approx 12 times faster at rejecting non-numeric strings at the cost of about a 20% slowdown in converting numeric strings so worth it
+
+
+2         Select Case Asc(strIn)
+              Case 32, 43, 45, 46, 48 To 57, AscSeparator 'Characters " +-.0123456789" and also the decimal separator that may be different from "."
+3                 If SepStandard Then
+4                     DblOut = CDbl(strIn)
+5                 Else
+6                     If InStr(strIn, DecimalSeparator) > 0 Then
+7                         DblOut = CDbl(Replace(strIn, DecimalSeparator, SysDecimalSeparator))
+8                     Else
+9                         DblOut = CDbl(strIn)
+10                    End If
+11                End If
+12                Converted = True
+13        End Select
 ErrHandler:
           'Do nothing - strIn was not a string representing a number.
 End Sub

@@ -303,6 +303,7 @@ Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFai
     Test266 Folder, NumPassed, NumFailed, Failures
     Test267 Folder, NumPassed, NumFailed, Failures
     Test268 Folder, NumPassed, NumFailed, Failures
+    Test269 Folder, NumPassed, NumFailed, Failures
 
     shHiddenSheet.UsedRange.EntireRow.Delete
     
@@ -438,9 +439,9 @@ Private Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
-    TestDescription = "test one row of data.cscv"
+    TestDescription = "test one row of data.csv"
     Expected = HStack(1#, 2#, 3#)
-    FileName = "test_one_row_of_data.cscv"
+    FileName = "test_one_row_of_data.csv"
     TestRes = TestCSVRead(1, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
@@ -7420,5 +7421,30 @@ Private Sub Test268(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Exit Sub
 ErrHandler:
     ReThrow "Test268", Err
+End Sub
+
+Private Sub Test269(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test strange number formats"
+    Expected = HStack(1000000#, 0.1, 2#, 3#, ",000", 1000000#, -1000000#, 4#, "1 1")
+    FileName = "test_strange_number_formats.csv"
+    TestRes = TestCSVRead(269, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        Delimiter:=";", _
+        IgnoreEmptyLines:=False, _
+        NumCols:=9, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test269", Err
 End Sub
 

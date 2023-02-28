@@ -414,3 +414,127 @@ Private Sub SpeedTest_CastISO8601()
 
 End Sub
 
+'Before changes to CastToDouble
+'====================================================================================================
+'Running SpeedTest_CastToDouble 2023-Feb-28 09:53:32
+'N = 10,000,000
+'ComputerName = DESKTOP-HSGAM5S
+'Calls per second = 1,299,440  strIn = "a random string", Separator = "." Result as expected? True
+'Calls per second = 12,704,398 strIn = "1", Separator = "."      Result as expected? True
+'Calls per second = 12,775,171 strIn = "9", Separator = "."      Result as expected? True
+'Calls per second = 11,256,508 strIn = "-4", Separator = "."     Result as expected? True
+'Calls per second = 12,164,803 strIn = "1e6", Separator = "."    Result as expected? True
+'Calls per second = 11,258,459 strIn = ".5", Separator = "."     Result as expected? True
+'Calls per second = 2,445,940  strIn = "123,4", Separator = ","  Result as expected? True
+'Calls per second = 2,444,934  strIn = ",4", Separator = ","     Result as expected? True
+
+'After changes - about 11 times faster at rejecting bad input, about 20% slower at accepting good input
+'====================================================================================================
+'Running SpeedTest_CastToDouble 2023-Feb-28 09:55:40
+'N = 10,000,000
+'ComputerName = DESKTOP-HSGAM5S
+'Calls per second = 15,301,814 strIn = "a random string", Separator = "." Result as expected? True
+'Calls per second = 10,090,514 strIn = "1", Separator = "."      Result as expected? True
+'Calls per second = 10,169,321 strIn = "9", Separator = "."      Result as expected? True
+'Calls per second = 9,706,174  strIn = "-4", Separator = "."     Result as expected? True
+'Calls per second = 9,670,801  strIn = "1e6", Separator = "."    Result as expected? True
+'Calls per second = 9,356,131  strIn = ".5", Separator = "."     Result as expected? True
+'Calls per second = 2,367,018  strIn = "123,4", Separator = ","  Result as expected? True
+'Calls per second = 2,362,177  strIn = ",4", Separator = ","     Result as expected? True
+Private Sub SpeedTest_CastToDouble()
+
+          Const N As Long = 10000000
+          Dim Converted As Boolean
+          Dim DblOut As Double
+          Dim Expected As Date
+          Dim i As Long
+          Dim j As Long
+          Dim k As Long
+          Dim strIn As String
+          Dim t1 As Double
+          Dim t2 As Double
+          Dim SepStandard As Boolean
+          Dim DecimalSeparator As String
+          Dim SysDecimalSeparator As String
+          Dim AscSeparator As Long
+
+1         Debug.Print "'" & String(100, "=")
+2         Debug.Print "'Running SpeedTest_CastToDouble " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
+3         Debug.Print "'N = " & Format$(N, "###,###")
+4         Debug.Print "'ComputerName = " & Environ("ComputerName")
+5         SysDecimalSeparator = Application.DecimalSeparator
+          
+6         For k = 1 To 8
+7             For j = 1 To 1
+8                 DblOut = 0
+9                 Converted = False
+10                Select Case k
+                      Case 1
+11                        strIn = "a random string"
+12                        DecimalSeparator = "."
+13                        SepStandard = DecimalSeparator = SysDecimalSeparator
+14                        AscSeparator = Asc(DecimalSeparator)
+15                        Expected = CDbl(0)
+16                    Case 2
+17                        strIn = "1"
+18                        DecimalSeparator = "."
+19                        SepStandard = DecimalSeparator = SysDecimalSeparator
+20                        AscSeparator = Asc(DecimalSeparator)
+21                        Expected = CDbl(1)
+22                    Case 3
+23                        strIn = "9"
+24                        DecimalSeparator = "."
+25                        SepStandard = DecimalSeparator = SysDecimalSeparator
+26                        AscSeparator = Asc(DecimalSeparator)
+27                        Expected = CDbl(9)
+28                    Case 4
+29                        strIn = "-4"
+30                        DecimalSeparator = "."
+31                        SepStandard = DecimalSeparator = SysDecimalSeparator
+32                        AscSeparator = Asc(DecimalSeparator)
+33                        Expected = CDbl(-4)
+34                    Case 5
+35                        strIn = "1e6"
+36                        DecimalSeparator = "."
+37                        SepStandard = DecimalSeparator = SysDecimalSeparator
+38                        AscSeparator = Asc(DecimalSeparator)
+39                        Expected = CDbl(1000000)
+40                    Case 6
+41                        strIn = ".5"
+42                        DecimalSeparator = "."
+43                        SepStandard = DecimalSeparator = SysDecimalSeparator
+44                        AscSeparator = Asc(DecimalSeparator)
+45                        Expected = 0.5
+46                    Case 7
+47                        strIn = "123,4"
+48                        DecimalSeparator = ","
+49                        SepStandard = DecimalSeparator = SysDecimalSeparator
+50                        AscSeparator = Asc(DecimalSeparator)
+51                        Expected = 123.4
+52                    Case 8
+53                        strIn = ",4"
+54                        DecimalSeparator = ","
+55                        SepStandard = DecimalSeparator = SysDecimalSeparator
+56                        AscSeparator = Asc(DecimalSeparator)
+57                        Expected = 0.4
+58                End Select
+
+59                t1 = ElapsedTime()
+60                For i = 1 To N
+61                    CastToDouble strIn, DblOut, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
+62                Next i
+63                t2 = ElapsedTime()
+
+                  Dim PrintThis As String
+64                PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
+65                If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
+66                PrintThis = PrintThis & " strIn = """ & strIn & """, Separator = " & """" & DecimalSeparator & """ "
+67                If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
+68                PrintThis = PrintThis & "Result as expected? " & (Expected = DblOut)
+                  
+69                Debug.Print PrintThis
+70                DoEvents 'kick Immediate window to life
+71            Next j
+72        Next k
+End Sub
+
