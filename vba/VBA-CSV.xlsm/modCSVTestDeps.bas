@@ -62,6 +62,8 @@ Function TestCSVRead(TestNo As Long, ByVal TestDescription As String, Expected A
                 ", " & CStr(NumColsExpected) & " observed dimensions: " & CStr(NRows(Observed)) & ", " & CStr(NCols(Observed))
             GoTo Failed
         ElseIf IsEmpty(Expected) Then
+            'PGS 1-Mar-23 For certain tests we only check that the number of rows and columns is as expected: _
+             79, 92, 119, 120, 122, 128, 130, 190, 191, 192
             TestCSVRead = True
             Exit Function
         End If

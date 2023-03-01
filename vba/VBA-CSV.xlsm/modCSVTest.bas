@@ -7175,3 +7175,61 @@ ErrHandler:
     ReThrow "Test269", Err
 End Sub
 
+Private Sub Test270(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test date format conflict"
+    FileName = "test_date_format_conflict.csv"
+    Expected = CSVRead(Folder & FileName, ConvertTypes:=True, SkipToRow:=2, NumCols:=1, SkipToCol:=2)
+    TestRes = TestCSVRead(270, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        NumRowsExpected:=730, _
+        NumColsExpected:=1, _
+        ConvertTypes:=True, _
+        DateFormat:="M/D/Y", _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        NumCols:=1, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test270", Err
+End Sub
+
+
+Private Sub Test271(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test date format conflict 2"
+    FileName = "test_date_format_conflict_2.csv"
+    Expected = CSVRead(Folder & FileName, ConvertTypes:=False, SkipToRow:=1, NumCols:=1, SkipToCol:=1)
+    TestRes = TestCSVRead(271, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        NumRowsExpected:=730, _
+        NumColsExpected:=1, _
+        ConvertTypes:=True, _
+        Delimiter:=",", _
+        DateFormat:="M/D/Y", _
+        IgnoreEmptyLines:=False, _
+        NumCols:=1, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test271", Err
+End Sub
+
+

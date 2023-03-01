@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+238	01-Mar-2023	20:18	Philip Swannell	Added two more tests - Test270 & Test271, testing "date format conflicts".
 237	01-Mar-2023	11:01	Philip Swannell	Refactor test code - now easy to run a subset of the tests.
 236	28-Feb-2023	10:45	Philip Swannell	Re-wrote method CastToDouble for better speed.
 235	27-Feb-2023	20:42	Philip Swannell	Fix to method ParseDateFromat.
