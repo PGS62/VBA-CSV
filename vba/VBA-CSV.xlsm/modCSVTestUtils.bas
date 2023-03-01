@@ -28,7 +28,7 @@ Function GenerateTestCode(TestNo As Long, FileName As String, ExpectedReturn As 
     
     On Error GoTo ErrHandler
     
-    Res = "Private Sub Test" & TestNo & "(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)"
+    Res = "Private Sub Test" & TestNo & "(Folder As String)"
     Res = Res & vbLf & Indent & "Dim Expected as Variant"
     Res = Res & vbLf & Indent & "Dim FileName As String"
     Res = Res & vbLf & Indent & "Dim Observed As Variant"
@@ -153,7 +153,7 @@ Function GenerateTestCode(TestNo As Long, FileName As String, ExpectedReturn As 
 
     Res = Res & ")"
     
-    Res = Res & vbLf & Indent & "AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures"
+    Res = Res & vbLf & Indent & "AccumulateResults TestRes, WhatDiffers"
     
     Res = Res & vbLf
     Res = Res & vbLf & "    Exit Sub"

@@ -6,345 +6,72 @@ Attribute VB_Name = "modCSVTest"
 ' Document: https://github.com/PGS62/VBA-CSV#readme
 
 Option Explicit
+Private m_NumPassed As Long
+Private m_NumFailed As Long
+Private m_NumSkipped As Long
+Private m_Failures() As String
+
+Sub SwitchAllTests(NewValue As Boolean)
+    On Error GoTo ErrHandler
+    shTest.ListObjects("Tests").ListColumns("RunThisTest").DataBodyRange.value = NewValue
+    Exit Sub
+ErrHandler:
+     MsgBox ReThrow("SwitchAllTests", Err, True), vbCritical
+End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RunTests
-' Purpose    : Multiple calls to TestCSVRead, via functions Test1, Test2 etc. Tests against many different data files,
-'              and combinations of arguments. Many of the files taken from
-'              https://github.com/JuliaData/CSV.jl/tree/main/test/testfiles
+' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub RunTests(IncludeLargeFiles As Boolean, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef NumSkipped As Long, ByRef Failures() As String)
-
-    Dim Folder As String
+Public Sub RunTests()
+    Dim ProtectContents As Boolean
 
     On Error GoTo ErrHandler
+
+    Dim i As Long
+    Dim Folder As String
+    Dim RunIndicators As Variant
+    Dim TestNumbers As Variant
+    
     Folder = ThisWorkbook.path
     Folder = Left$(Folder, InStrRev(Folder, "\")) & "testfiles\"
 
     If Not FolderExists(Folder) Then Throw "Cannot find folder: '" & Folder & "'"
     
-    Test1 Folder, NumPassed, NumFailed, Failures
-    Test2 Folder, NumPassed, NumFailed, Failures
-    Test3 Folder, NumPassed, NumFailed, Failures
-    Test4 Folder, NumPassed, NumFailed, Failures
-    Test5 Folder, NumPassed, NumFailed, Failures
-    Test6 Folder, NumPassed, NumFailed, Failures
-    Test7 Folder, NumPassed, NumFailed, Failures
-    Test8 Folder, NumPassed, NumFailed, Failures
-    Test9 Folder, NumPassed, NumFailed, Failures
-    Test10 Folder, NumPassed, NumFailed, Failures
-    Test11 Folder, NumPassed, NumFailed, Failures
-    Test12 Folder, NumPassed, NumFailed, Failures
-    Test13 Folder, NumPassed, NumFailed, Failures
-    Test14 Folder, NumPassed, NumFailed, Failures
-    Test15 Folder, NumPassed, NumFailed, Failures
-    Test16 Folder, NumPassed, NumFailed, Failures
-    Test17 Folder, NumPassed, NumFailed, Failures
-    Test18 Folder, NumPassed, NumFailed, Failures
-    Test19 Folder, NumPassed, NumFailed, Failures
-    Test20 Folder, NumPassed, NumFailed, Failures
-    Test21 Folder, NumPassed, NumFailed, Failures
-    Test22 Folder, NumPassed, NumFailed, Failures
-    Test23 Folder, NumPassed, NumFailed, Failures
-    Test24 Folder, NumPassed, NumFailed, Failures
-    Test25 Folder, NumPassed, NumFailed, Failures
-    Test26 Folder, NumPassed, NumFailed, Failures
-    Test27 Folder, NumPassed, NumFailed, Failures
-    Test28 Folder, NumPassed, NumFailed, Failures
-    Test29 Folder, NumPassed, NumFailed, Failures
-    Test30 Folder, NumPassed, NumFailed, Failures
-    Test31 Folder, NumPassed, NumFailed, Failures
-    Test32 Folder, NumPassed, NumFailed, Failures
-    Test33 Folder, NumPassed, NumFailed, Failures
-    Test34 Folder, NumPassed, NumFailed, Failures
-    Test35 Folder, NumPassed, NumFailed, Failures
-    Test36 Folder, NumPassed, NumFailed, Failures
-    Test37 Folder, NumPassed, NumFailed, Failures
-    Test38 Folder, NumPassed, NumFailed, Failures
-    Test39 Folder, NumPassed, NumFailed, Failures
-    Test40 Folder, NumPassed, NumFailed, Failures
-    Test41 Folder, NumPassed, NumFailed, Failures
-    Test42 Folder, NumPassed, NumFailed, Failures
-    Test43 Folder, NumPassed, NumFailed, Failures
-    Test44 Folder, NumPassed, NumFailed, Failures
-    Test45 Folder, NumPassed, NumFailed, Failures
-    Test46 Folder, NumPassed, NumFailed, Failures
-    Test47 Folder, NumPassed, NumFailed, Failures
-    Test48 Folder, NumPassed, NumFailed, Failures
-    Test49 Folder, NumPassed, NumFailed, Failures
-    Test50 Folder, NumPassed, NumFailed, Failures
-    Test51 Folder, NumPassed, NumFailed, Failures
-    Test52 Folder, NumPassed, NumFailed, Failures
-    Test53 Folder, NumPassed, NumFailed, Failures
-    Test54 Folder, NumPassed, NumFailed, Failures
-    Test55 Folder, NumPassed, NumFailed, Failures
-    Test56 Folder, NumPassed, NumFailed, Failures
-    Test57 Folder, NumPassed, NumFailed, Failures
-    Test58 Folder, NumPassed, NumFailed, Failures
-    Test59 Folder, NumPassed, NumFailed, Failures
-    Test60 Folder, NumPassed, NumFailed, Failures
-    Test61 Folder, NumPassed, NumFailed, Failures
-    Test62 Folder, NumPassed, NumFailed, Failures
-    Test63 Folder, NumPassed, NumFailed, Failures
-    Test64 Folder, NumPassed, NumFailed, Failures
-    Test65 Folder, NumPassed, NumFailed, Failures
-    Test66 Folder, NumPassed, NumFailed, Failures
-    Test67 Folder, NumPassed, NumFailed, Failures
-    Test68 Folder, NumPassed, NumFailed, Failures
-    Test69 Folder, NumPassed, NumFailed, Failures
-    Test70 Folder, NumPassed, NumFailed, Failures
-    Test71 Folder, NumPassed, NumFailed, Failures
-    Test72 Folder, NumPassed, NumFailed, Failures
-    Test73 Folder, NumPassed, NumFailed, Failures
-    Test74 Folder, NumPassed, NumFailed, Failures
-    Test75 Folder, NumPassed, NumFailed, Failures
-    Test76 Folder, NumPassed, NumFailed, Failures
-    Test77 Folder, NumPassed, NumFailed, Failures
-    Test78 Folder, NumPassed, NumFailed, Failures
-    If IncludeLargeFiles Then
-        Test79 Folder, NumPassed, NumFailed, Failures
-    Else
-        NumSkipped = NumSkipped + 1
-    End If
-    Test80 Folder, NumPassed, NumFailed, Failures
-    Test81 Folder, NumPassed, NumFailed, Failures
-    Test82 Folder, NumPassed, NumFailed, Failures
-    Test83 Folder, NumPassed, NumFailed, Failures
-    Test84 Folder, NumPassed, NumFailed, Failures
-    Test85 Folder, NumPassed, NumFailed, Failures
-    Test86 Folder, NumPassed, NumFailed, Failures
-    Test87 Folder, NumPassed, NumFailed, Failures
-    Test88 Folder, NumPassed, NumFailed, Failures
-    Test89 Folder, NumPassed, NumFailed, Failures
-    Test90 Folder, NumPassed, NumFailed, Failures
-    Test91 Folder, NumPassed, NumFailed, Failures
-    If IncludeLargeFiles Then
-        Test92 Folder, NumPassed, NumFailed, Failures
-    Else
-        NumSkipped = NumSkipped + 1
-    End If
-    Test93 Folder, NumPassed, NumFailed, Failures
-    Test94 Folder, NumPassed, NumFailed, Failures
-    Test95 Folder, NumPassed, NumFailed, Failures
-    Test96 Folder, NumPassed, NumFailed, Failures
-    Test97 Folder, NumPassed, NumFailed, Failures
-    Test98 Folder, NumPassed, NumFailed, Failures
-    Test99 Folder, NumPassed, NumFailed, Failures
-    Test100 Folder, NumPassed, NumFailed, Failures
-    Test101 Folder, NumPassed, NumFailed, Failures
-    Test102 Folder, NumPassed, NumFailed, Failures
-    Test103 Folder, NumPassed, NumFailed, Failures
-    Test104 Folder, NumPassed, NumFailed, Failures
-    Test105 Folder, NumPassed, NumFailed, Failures
-    Test106 Folder, NumPassed, NumFailed, Failures
-    Test107 Folder, NumPassed, NumFailed, Failures
-    Test108 Folder, NumPassed, NumFailed, Failures
-    Test109 Folder, NumPassed, NumFailed, Failures
-    Test110 Folder, NumPassed, NumFailed, Failures
-    Test111 Folder, NumPassed, NumFailed, Failures
-    Test112 Folder, NumPassed, NumFailed, Failures
-    Test113 Folder, NumPassed, NumFailed, Failures
-    Test114 Folder, NumPassed, NumFailed, Failures
-    Test115 Folder, NumPassed, NumFailed, Failures
-    Test116 Folder, NumPassed, NumFailed, Failures
-    Test117 Folder, NumPassed, NumFailed, Failures
-    Test118 Folder, NumPassed, NumFailed, Failures
-    Test119 Folder, NumPassed, NumFailed, Failures
-    Test120 Folder, NumPassed, NumFailed, Failures
-    Test121 Folder, NumPassed, NumFailed, Failures
-    Test122 Folder, NumPassed, NumFailed, Failures
-    Test123 Folder, NumPassed, NumFailed, Failures
-    Test124 Folder, NumPassed, NumFailed, Failures
-    Test125 Folder, NumPassed, NumFailed, Failures
-    Test126 Folder, NumPassed, NumFailed, Failures
-    Test127 Folder, NumPassed, NumFailed, Failures
-    If IncludeLargeFiles Then
-        Test128 Folder, NumPassed, NumFailed, Failures
-    Else
-        NumSkipped = NumSkipped + 1
-    End If
-    Test129 Folder, NumPassed, NumFailed, Failures
-    Test130 Folder, NumPassed, NumFailed, Failures
-    Test131 Folder, NumPassed, NumFailed, Failures
-    Test132 Folder, NumPassed, NumFailed, Failures
-    Test133 Folder, NumPassed, NumFailed, Failures
-    Test134 Folder, NumPassed, NumFailed, Failures
-    Test135 Folder, NumPassed, NumFailed, Failures
-    Test136 Folder, NumPassed, NumFailed, Failures
-    Test137 Folder, NumPassed, NumFailed, Failures
-    Test138 Folder, NumPassed, NumFailed, Failures
-    Test139 Folder, NumPassed, NumFailed, Failures
-    Test140 Folder, NumPassed, NumFailed, Failures
-    Test141 Folder, NumPassed, NumFailed, Failures
-    Test142 Folder, NumPassed, NumFailed, Failures
-    Test143 Folder, NumPassed, NumFailed, Failures
-    Test144 Folder, NumPassed, NumFailed, Failures
-    Test145 Folder, NumPassed, NumFailed, Failures
-    Test146 Folder, NumPassed, NumFailed, Failures
-    Test147 Folder, NumPassed, NumFailed, Failures
-    Test148 Folder, NumPassed, NumFailed, Failures
-    Test149 Folder, NumPassed, NumFailed, Failures
-    Test150 Folder, NumPassed, NumFailed, Failures
-    Test151 Folder, NumPassed, NumFailed, Failures
-    Test152 Folder, NumPassed, NumFailed, Failures
-    Test153 Folder, NumPassed, NumFailed, Failures
-    Test154 Folder, NumPassed, NumFailed, Failures
-    Test155 Folder, NumPassed, NumFailed, Failures
-    Test156 Folder, NumPassed, NumFailed, Failures
-    Test157 Folder, NumPassed, NumFailed, Failures
-    Test158 Folder, NumPassed, NumFailed, Failures
-    Test159 Folder, NumPassed, NumFailed, Failures
-    Test160 Folder, NumPassed, NumFailed, Failures
-    Test161 Folder, NumPassed, NumFailed, Failures
-    Test162 Folder, NumPassed, NumFailed, Failures
-    Test163 Folder, NumPassed, NumFailed, Failures
-    Test164 Folder, NumPassed, NumFailed, Failures
-    Test165 Folder, NumPassed, NumFailed, Failures
-    Test166 Folder, NumPassed, NumFailed, Failures
-    Test167 Folder, NumPassed, NumFailed, Failures
-    Test168 Folder, NumPassed, NumFailed, Failures
-    Test169 Folder, NumPassed, NumFailed, Failures
-    Test170 Folder, NumPassed, NumFailed, Failures
-    Test171 Folder, NumPassed, NumFailed, Failures
-    Test172 Folder, NumPassed, NumFailed, Failures
-    Test173 Folder, NumPassed, NumFailed, Failures
-    Test174 Folder, NumPassed, NumFailed, Failures
-    Test175 Folder, NumPassed, NumFailed, Failures
-    Test176 Folder, NumPassed, NumFailed, Failures
-    Test177 Folder, NumPassed, NumFailed, Failures
-    Test178 Folder, NumPassed, NumFailed, Failures
-    Test179 Folder, NumPassed, NumFailed, Failures
-    Test180 Folder, NumPassed, NumFailed, Failures
-    Test181 Folder, NumPassed, NumFailed, Failures
-    Test182 Folder, NumPassed, NumFailed, Failures
-    Test183 Folder, NumPassed, NumFailed, Failures
-    Test184 Folder, NumPassed, NumFailed, Failures
-    Test185 Folder, NumPassed, NumFailed, Failures
-    Test186 Folder, NumPassed, NumFailed, Failures
-    Test187 Folder, NumPassed, NumFailed, Failures
-    Test188 Folder, NumPassed, NumFailed, Failures
-    Test189 Folder, NumPassed, NumFailed, Failures
-    Test190 Folder, NumPassed, NumFailed, Failures
-    Test191 Folder, NumPassed, NumFailed, Failures
-    Test192 Folder, NumPassed, NumFailed, Failures
-    Test193 Folder, NumPassed, NumFailed, Failures
-    Test194 Folder, NumPassed, NumFailed, Failures
-    Test195 Folder, NumPassed, NumFailed, Failures
-    Test196 Folder, NumPassed, NumFailed, Failures
-    Test197 Folder, NumPassed, NumFailed, Failures
-    Test198 Folder, NumPassed, NumFailed, Failures
-    Test199 Folder, NumPassed, NumFailed, Failures
-    Test200 Folder, NumPassed, NumFailed, Failures
-    Test201 Folder, NumPassed, NumFailed, Failures
-    Test202 Folder, NumPassed, NumFailed, Failures
-    Test203 Folder, NumPassed, NumFailed, Failures
-    Test204 Folder, NumPassed, NumFailed, Failures
-    Test205 Folder, NumPassed, NumFailed, Failures
-    Test206 Folder, NumPassed, NumFailed, Failures
-    Test207 Folder, NumPassed, NumFailed, Failures
-    Test208 Folder, NumPassed, NumFailed, Failures
-    Test209 Folder, NumPassed, NumFailed, Failures
-    Test210 Folder, NumPassed, NumFailed, Failures
-    Test211 Folder, NumPassed, NumFailed, Failures
-    Test212 Folder, NumPassed, NumFailed, Failures
-    Test213 Folder, NumPassed, NumFailed, Failures
-    Test214 Folder, NumPassed, NumFailed, Failures
-    Test215 Folder, NumPassed, NumFailed, Failures
-    Test216 Folder, NumPassed, NumFailed, Failures
-    Test217 Folder, NumPassed, NumFailed, Failures
-    Test218 Folder, NumPassed, NumFailed, Failures
-    Test219 Folder, NumPassed, NumFailed, Failures
-    Test220 Folder, NumPassed, NumFailed, Failures
-    Test221 Folder, NumPassed, NumFailed, Failures
-    Test222 Folder, NumPassed, NumFailed, Failures
-    Test223 Folder, NumPassed, NumFailed, Failures
-    Test224 Folder, NumPassed, NumFailed, Failures
-    Test225 Folder, NumPassed, NumFailed, Failures
-    Test226 Folder, NumPassed, NumFailed, Failures
-    Test227 Folder, NumPassed, NumFailed, Failures
-    Test228 Folder, NumPassed, NumFailed, Failures
-    Test229 Folder, NumPassed, NumFailed, Failures
-    Test230 Folder, NumPassed, NumFailed, Failures
-    Test231 Folder, NumPassed, NumFailed, Failures
-    Test232 Folder, NumPassed, NumFailed, Failures
-    Test233 Folder, NumPassed, NumFailed, Failures
-    Test234 Folder, NumPassed, NumFailed, Failures
-    Test235 Folder, NumPassed, NumFailed, Failures
-    Test236 Folder, NumPassed, NumFailed, Failures
-    Test237 Folder, NumPassed, NumFailed, Failures
-    Test238 Folder, NumPassed, NumFailed, Failures
-    Test239 Folder, NumPassed, NumFailed, Failures
-    Test240 Folder, NumPassed, NumFailed, Failures
-    Test241 Folder, NumPassed, NumFailed, Failures
-    Test242 Folder, NumPassed, NumFailed, Failures
-    Test243 Folder, NumPassed, NumFailed, Failures
-    Test244 Folder, NumPassed, NumFailed, Failures
-    Test245 Folder, NumPassed, NumFailed, Failures
-    Test246 Folder, NumPassed, NumFailed, Failures
-    Test247 Folder, NumPassed, NumFailed, Failures
-    Test248 Folder, NumPassed, NumFailed, Failures
-    Test249 Folder, NumPassed, NumFailed, Failures
-    Test250 Folder, NumPassed, NumFailed, Failures
-    Test251 Folder, NumPassed, NumFailed, Failures
-    Test252 Folder, NumPassed, NumFailed, Failures
-    Test253 Folder, NumPassed, NumFailed, Failures
-    Test254 Folder, NumPassed, NumFailed, Failures
-    Test255 Folder, NumPassed, NumFailed, Failures
-    Test256 Folder, NumPassed, NumFailed, Failures
-    Test257 Folder, NumPassed, NumFailed, Failures
-    Test258 Folder, NumPassed, NumFailed, Failures
-    Test259 Folder, NumPassed, NumFailed, Failures
-    Test260 Folder, NumPassed, NumFailed, Failures
-    Test261 Folder, NumPassed, NumFailed, Failures
-    Test262 Folder, NumPassed, NumFailed, Failures
-    Test263 Folder, NumPassed, NumFailed, Failures
-    Test264 Folder, NumPassed, NumFailed, Failures
-    Test265 Folder, NumPassed, NumFailed, Failures
-    Test266 Folder, NumPassed, NumFailed, Failures
-    Test267 Folder, NumPassed, NumFailed, Failures
-    Test268 Folder, NumPassed, NumFailed, Failures
-    Test269 Folder, NumPassed, NumFailed, Failures
+    m_Failures = VBA.Split(vbNullString) 'Creates array of length zero!
+    m_NumPassed = 0
+    m_NumFailed = 0
+    m_NumSkipped = 0
 
-    shHiddenSheet.UsedRange.EntireRow.Delete
+    RunIndicators = shTest.ListObjects("Tests").ListColumns("RunThisTest").DataBodyRange.value
+    TestNumbers = shTest.ListObjects("Tests").ListColumns("TestNo").DataBodyRange.value
     
-    Exit Sub
-ErrHandler:
-    ReThrow "RunTests", Err
-End Sub
+    For i = 1 To NRows(RunIndicators)
+        If RunIndicators(i, 1) Then
+            Application.StatusBar = "Running test " & CStr(TestNumbers(i, 1))
+            Application.Run "'" & ThisWorkbook.Name & "'!Test" & CStr(TestNumbers(i, 1)), Folder
+        Else
+            m_NumSkipped = m_NumSkipped + 1
+        End If
+    Next i
+    Application.StatusBar = False
 
-' -----------------------------------------------------------------------------------------------------------------------
-' Procedure  : RunTestsFromButton
-' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
-' -----------------------------------------------------------------------------------------------------------------------
-Public Sub RunTestsFromButton()
-    Dim Failures() As String
-    Dim IncludeLargeFiles As Boolean
-    Dim NumFailed As Long
-    Dim NumPassed As Long
-    Dim NumSkipped As Long
-    Dim ProtectContents As Boolean
-
-    On Error GoTo ErrHandler
-
-    IncludeLargeFiles = shTest.Range("IncludeLargeFiles").value
-
-    Failures = VBA.Split(vbNullString) 'Creates array of length zero!
-
-    RunTests IncludeLargeFiles, NumPassed, NumFailed, NumSkipped, Failures
+    shHiddenSheet.Unprotect
+    shHiddenSheet.UsedRange.EntireRow.Delete
 
     With shTest
         ProtectContents = .ProtectContents
         .Unprotect
-        .Range("NumPassed").value = NumPassed
-        .Range("NumFailed").value = NumFailed
-        .Range("NumSkipped").value = NumSkipped
-        PasteFailures NumFailed, Failures
+        .Range("NumPassed").value = m_NumPassed
+        .Range("NumFailed").value = m_NumFailed
+        .Range("NumSkipped").value = m_NumSkipped
+        PasteFailures m_NumFailed, m_Failures
         .Protect Contents:=ProtectContents
     End With
 
     Exit Sub
 ErrHandler:
-    MsgBox ReThrow("RunTestsFromButton", Err, True), vbCritical
+    MsgBox ReThrow("RunTests", Err, True), vbCritical
 End Sub
 
 Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
@@ -401,14 +128,14 @@ ErrHandler:
     FileExists = False
 End Function
 
-Private Sub AccumulateResults(TestRes As Boolean, ByRef NumPassed As Long, ByRef NumFailed As Long, _
-    WhatDiffers As String, ByRef Failures() As String)
+Private Sub AccumulateResults(TestRes As Boolean, WhatDiffers As String)
     If TestRes Then
-        NumPassed = NumPassed + 1
+        m_NumPassed = m_NumPassed + 1
     Else
-        NumFailed = NumFailed + 1
-        ReDim Preserve Failures(LBound(Failures) To UBound(Failures) + 1)
-        Failures(UBound(Failures)) = WhatDiffers
+        m_NumFailed = m_NumFailed + 1
+
+        ReDim Preserve m_Failures(LBound(m_Failures) To UBound(m_Failures) + 1)
+        m_Failures(UBound(m_Failures)) = WhatDiffers
     End If
 End Sub
 
@@ -430,7 +157,7 @@ Private Sub CastDoublesToDates(ByRef x As Variant)
     End If
 End Sub
 
-Private Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test1(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -445,14 +172,14 @@ Private Sub Test1(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestRes = TestCSVRead(1, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test1", Err
 End Sub
 
-Private Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test2(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -465,14 +192,14 @@ Private Sub Test2(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     FileName = "test_empty_file_newlines.csv"
     Expected = HStack(Array(Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty))
     TestRes = TestCSVRead(2, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty, IgnoreEmptyLines:=False)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test2", Err
 End Sub
 
-Private Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test3(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -487,14 +214,14 @@ Private Sub Test3(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     TestRes = TestCSVRead(3, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test3", Err
 End Sub
 
-Private Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test4(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -507,14 +234,14 @@ Private Sub Test4(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     FileName = "comma_decimal.csv"
     Expected = HStack(Array("x", 3.14, 1#), Array("y", 1#, 1#))
     TestRes = TestCSVRead(4, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty, DecimalSeparator:=",")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test4", Err
 End Sub
 
-Private Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test5(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -531,14 +258,14 @@ Private Sub Test5(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
         Array("C", 3#, 6#), _
         Array("D", Empty, Empty))
     TestRes = TestCSVRead(5, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test5", Err
 End Sub
 
-Private Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test6(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -551,14 +278,14 @@ Private Sub Test6(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     FileName = "test_issue_326.wsv"
     Expected = HStack(Array("A", 1#, 11#), Array("B", 2#, 22#))
     TestRes = TestCSVRead(6, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test6", Err
 End Sub
 
-Private Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test7(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -577,14 +304,14 @@ Private Sub Test7(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
         Array("E", Empty, Empty))
 
     TestRes = TestCSVRead(7, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test7", Err
 End Sub
 
-Private Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test8(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -597,14 +324,14 @@ Private Sub Test8(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     FileName = "test_comments1.csv"
     Expected = HStack(Array("a", 1#, 7#), Array("b", 2#, 8#), Array("c", 3#, 9#))
     TestRes = TestCSVRead(8, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test8", Err
 End Sub
 
-Private Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test9(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -617,14 +344,14 @@ Private Sub Test9(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As 
     FileName = "test_comments_multichar.csv"
     Expected = HStack(Array("a", 1#, 7#), Array("b", 2#, 8#), Array("c", 3#, 9#))
     TestRes = TestCSVRead(9, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="//")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test9", Err
 End Sub
 
-Private Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test10(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -642,14 +369,14 @@ Private Sub Test10(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("D", Empty, Empty), _
         Array("E", Empty, Empty))
     TestRes = TestCSVRead(10, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test10", Err
 End Sub
 
-Private Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test11(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -668,14 +395,14 @@ Private Sub Test11(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("E", 5#, Empty))
 
     TestRes = TestCSVRead(11, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test11", Err
 End Sub
 
-Private Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test12(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -693,14 +420,14 @@ Private Sub Test12(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("D", 100#, 200#))
 
     TestRes = TestCSVRead(12, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test12", Err
 End Sub
 
-Private Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test13(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -713,14 +440,14 @@ Private Sub Test13(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_basic.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(13, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test13", Err
 End Sub
 
-Private Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test14(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -733,14 +460,14 @@ Private Sub Test14(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_basic_pipe.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(14, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test14", Err
 End Sub
 
-Private Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test15(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -753,14 +480,14 @@ Private Sub Test15(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_mac_line_endings.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(15, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test15", Err
 End Sub
 
-Private Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test16(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -773,14 +500,14 @@ Private Sub Test16(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_newline_line_endings.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(16, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test16", Err
 End Sub
 
-Private Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test17(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -793,14 +520,14 @@ Private Sub Test17(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_delim.tsv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(17, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test17", Err
 End Sub
 
-Private Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test18(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -813,14 +540,14 @@ Private Sub Test18(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_delim.wsv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(18, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test18", Err
 End Sub
 
-Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test19(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -841,14 +568,14 @@ Private Sub Test19(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         MissingStrings:="NULL", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test19", Err
 End Sub
 
-Private Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test20(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -861,14 +588,14 @@ Private Sub Test20(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_crlf_line_endings.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(20, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test20", Err
 End Sub
 
-Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test21(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -885,14 +612,14 @@ Private Sub Test21(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         SkipToRow:=4, _
         ShowMissingsAs:=Empty, _
         IgnoreEmptyLines:=False)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test21", Err
 End Sub
 
-Private Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test22(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -905,14 +632,14 @@ Private Sub Test22(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_missing_last_field.csv"
     Expected = HStack(Array("col1", 1#, 4#), Array("col2", 2#, 5#), Array("col3", 3#, Empty))
     TestRes = TestCSVRead(22, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test22", Err
 End Sub
 
-Private Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test23(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -925,14 +652,14 @@ Private Sub Test23(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_no_header.csv"
     Expected = HStack(Array(1#, 4#, 7#), Array(2#, 5#, 8#), Array(3#, 6#, 9#))
     TestRes = TestCSVRead(23, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test23", Err
 End Sub
 
-Private Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test24(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -946,14 +673,14 @@ Private Sub Test24(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     Expected = HStack(Array("col1", CDate("2015-Jan-01"), CDate("2015-Jan-02"), CDate("2015-Jan-03")))
     TestRes = TestCSVRead(24, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test24", Err
 End Sub
 
-Private Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test25(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -966,14 +693,14 @@ Private Sub Test25(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_excel_date_formats.csv"
     Expected = HStack(Array("col1", CDate("2015-Jan-01"), CDate("2015-Feb-01"), CDate("2015-Mar-01")))
     TestRes = TestCSVRead(25, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="D/M/Y", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test25", Err
 End Sub
 
-Private Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test26(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -992,14 +719,14 @@ Private Sub Test26(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("e", 5#, 5#, 5#))
 
     TestRes = TestCSVRead(26, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test26", Err
 End Sub
 
-Private Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test27(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1012,14 +739,14 @@ Private Sub Test27(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_simple_quoted.csv"
     Expected = HStack(Array("col1", "quoted field 1"), Array("col2", "quoted field 2"))
     TestRes = TestCSVRead(27, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test27", Err
 End Sub
 
-Private Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test28(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1036,14 +763,14 @@ Private Sub Test28(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col3", "3", "6", "9", "12", Empty))
 
     TestRes = TestCSVRead(28, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test28", Err
 End Sub
 
-Private Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test29(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1057,14 +784,14 @@ Private Sub Test29(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_quoted_delim_and_newline.csv"
     Expected = HStack(Array("col1", "quoted ,field 1"), Array("col2", "quoted" & vbCrLf & " field 2"))
     TestRes = TestCSVRead(29, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test29", Err
 End Sub
 
-Private Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test30(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1077,14 +804,14 @@ Private Sub Test30(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_missing_value.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, Empty, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(30, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test30", Err
 End Sub
 
-Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test31(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1104,14 +831,14 @@ Private Sub Test31(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         TrueStrings:=HStack("T", "TRUE", "true"), _
         FalseStrings:=HStack("F", "FALSE", "false"), _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test31", Err
 End Sub
 
-Private Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test32(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1124,14 +851,14 @@ Private Sub Test32(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_floats.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(32, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test32", Err
 End Sub
 
-Private Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test33(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1144,14 +871,14 @@ Private Sub Test33(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_utf8.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(33, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test33", Err
 End Sub
 
-Private Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test34(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1164,14 +891,14 @@ Private Sub Test34(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_windows.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(34, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test34", Err
 End Sub
 
-Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test35(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1187,14 +914,14 @@ Private Sub Test35(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         MissingStrings:="NULL", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test35", Err
 End Sub
 
-Private Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test36(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1212,14 +939,14 @@ Private Sub Test36(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col3", 1#, 42#, 12#))
 
     TestRes = TestCSVRead(36, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NQ", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test36", Err
 End Sub
 
-Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test37(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1240,14 +967,14 @@ Private Sub Test37(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         IgnoreEmptyLines:=True)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test37", Err
 End Sub
 
-Private Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test38(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1260,14 +987,14 @@ Private Sub Test38(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_utf8_with_BOM.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(38, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test38", Err
 End Sub
 
-Private Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test39(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1287,14 +1014,14 @@ Private Sub Test39(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col5", 4#, 8#, 12#))
 
     TestRes = TestCSVRead(39, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test39", Err
 End Sub
 
-Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test40(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1316,14 +1043,14 @@ Private Sub Test40(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         MissingStrings:="++", _
         ShowMissingsAs:=Empty, _
         DecimalSeparator:=",")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test40", Err
 End Sub
 
-Private Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test41(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1338,14 +1065,14 @@ Private Sub Test41(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     Expected = HStack(Array("col1", "01/01/2015", "01/02/2015", "01/03/2015", CDate("2015-Jan-02"), CDate("2015-Jan-03")))
     TestRes = TestCSVRead(41, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test41", Err
 End Sub
 
-Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test42(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1365,14 +1092,14 @@ Private Sub Test42(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         MissingStrings:=HStack("NULL", "NA", "\N"), _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test42", Err
 End Sub
 
-Private Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test43(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1390,14 +1117,14 @@ Private Sub Test43(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("num4", 978300760#, 978302109#))
 
     TestRes = TestCSVRead(43, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:="::", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test43", Err
 End Sub
 
-Private Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test44(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1414,14 +1141,14 @@ Private Sub Test44(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col3", 1#, 2#, 3#, 4#))
 
     TestRes = TestCSVRead(44, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test44", Err
 End Sub
 
-Private Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test45(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1438,14 +1165,14 @@ Private Sub Test45(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("col3", 1#, 2#, 3#, 4#))
 
     TestRes = TestCSVRead(45, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test45", Err
 End Sub
 
-Private Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test46(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1458,14 +1185,14 @@ Private Sub Test46(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_comment_first_row.csv"
     Expected = HStack(Array("a", 1#, 7#), Array("b", 2#, 8#), Array("c", 3#, 9#))
     TestRes = TestCSVRead(46, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test46", Err
 End Sub
 
-Private Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test47(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1486,14 +1213,14 @@ Private Sub Test47(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("f", -0.002033899, Empty))
 
     TestRes = TestCSVRead(47, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test47", Err
 End Sub
 
-Private Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test48(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1510,14 +1237,14 @@ Private Sub Test48(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("c", 3#, 9#, 12#, 15#))
 
     TestRes = TestCSVRead(48, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test48", Err
 End Sub
 
-Private Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test49(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1531,14 +1258,14 @@ Private Sub Test49(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_utf16.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(49, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test49", Err
 End Sub
 
-Private Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test50(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1552,14 +1279,14 @@ Private Sub Test50(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_utf16_le.csv"
     Expected = HStack(Array("col1", 1#, 4#, 7#), Array("col2", 2#, 5#, 8#), Array("col3", 3#, 6#, 9#))
     TestRes = TestCSVRead(50, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty, Encoding:="UTF-16")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test50", Err
 End Sub
 
-Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test51(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1584,14 +1311,14 @@ Private Sub Test51(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test51", Err
 End Sub
 
-Private Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test52(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1607,14 +1334,14 @@ Private Sub Test52(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("Medium rare", "Medium", "Medium", "Medium rare", Empty, "Rare"))
 
     TestRes = TestCSVRead(52, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Comment:="#", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test52", Err
 End Sub
 
-Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test53(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1640,14 +1367,14 @@ Private Sub Test53(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ShowMissingsAs:=Empty, _
         DecimalSeparator:=",", _
         Encoding:="UTF-8")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test53", Err
 End Sub
 
-Private Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test54(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1665,14 +1392,14 @@ Private Sub Test54(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("acentric_factor", -0.002, 0.087, 0.225, 0.045, 0.011, -0.217, 0.005, 0.008))
 
     TestRes = TestCSVRead(54, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", Comment:="#", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test54", Err
 End Sub
 
-Private Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test55(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1695,14 +1422,14 @@ Private Sub Test55(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("TEMP", 0.0931399, 0.311013, 0.424537))
 
     TestRes = TestCSVRead(55, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test55", Err
 End Sub
 
-Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test56(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1727,14 +1454,14 @@ Private Sub Test56(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test56", Err
 End Sub
 
-Private Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test57(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1754,14 +1481,14 @@ Private Sub Test57(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestRes = TestCSVRead(57, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:="T", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test57", Err
 End Sub
 
-Private Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test58(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1780,14 +1507,14 @@ Private Sub Test58(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("RATIO", "0.0214", "0.0107", "0.00253", "0.0116", "0.00842", "0.0202", "0.00955", "0.0193", "0.0135", "0.0239", "0.0157", "0.0154", "0.0154", "0.00784", "0.0112"))
 
     TestRes = TestCSVRead(58, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Delimiter:=" ", IgnoreRepeated:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test58", Err
 End Sub
 
-Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test59(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1814,14 +1541,14 @@ Private Sub Test59(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         DateFormat:="D-M-Y", _
         NumRows:=3, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test59", Err
 End Sub
 
-Private Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test60(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1855,14 +1582,14 @@ Private Sub Test60(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(132.356, 132.356, 132.356, 132.356, 132.356))
 
     TestRes = TestCSVRead(60, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test60", Err
 End Sub
 
-Private Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test61(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1886,14 +1613,14 @@ Private Sub Test61(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("INTPTLONG", -66.749961, -67.17613, -67.119887))
 
     TestRes = TestCSVRead(61, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NT", Delimiter:=vbTab, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test61", Err
 End Sub
 
-Private Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test62(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1912,14 +1639,14 @@ Private Sub Test62(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("OriginalWellName", "PIONEER OIL & GAS #1", "DAVIS WELL #1", "GREAT NORTHERN OIL & GAS PIPELINE #1", "ROBINSON PAT'D LAND #1", "GLENFIELD OIL COMPANY #1", "#1", "H. HANSON OIL SYNDICATE #1", "ARMSTRONG #1", "GEHRINGER #1", "VELVA PETROLEUM CO. #1", "BURNSTAD #1", "BIG VIKING #1", "NELS KAMP #1", "EXPLORATION-NORTH DAKOTA #1", "E. L. SEMLING #1", "FRANKLIN INVESTMENT CO. #1", "RUDDY BROS #1", "J. H. KLINE #1", "STRATIGRAPHIC TEST #1", "AANSTAD STRATIGRAPHIC TEST #1", "FRITZ LEUTZ #1", "VAUGHN HANSON #1", "J. J. WEBER #1", "NORTH DAKOTA STATE ""A"" #1"))
 
     TestRes = TestCSVRead(62, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:=True, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test62", Err
 End Sub
 
-Private Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test63(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1948,14 +1675,14 @@ Private Sub Test63(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(Empty, Empty, Empty, Empty, "First half of season", "Second half of season", Empty, Empty, Empty, Empty, Empty, Empty, Empty, "NL Pennant", "NL Pennant", Empty, Empty, "WS Champs", "NL Pennant", Empty, Empty, "NL Pennant", Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, "5 Pennants and 1 World Series Title", "5 Pennants and 1 World Series Title"))
 
     TestRes = TestCSVRead(63, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test63", Err
 End Sub
 
-Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test64(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1974,14 +1701,14 @@ Private Sub Test64(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test64", Err
 End Sub
 
-Private Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test65(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1997,14 +1724,14 @@ Private Sub Test65(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("44424", "2021-08-18", "True", "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(65, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test65", Err
 End Sub
 
-Private Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test66(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2020,14 +1747,14 @@ Private Sub Test66(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(44424#, "2021-08-18", "True", "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(66, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="N", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test66", Err
 End Sub
 
-Private Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test67(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2043,14 +1770,14 @@ Private Sub Test67(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("44424", CDate("2021-Aug-18"), "True", "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(67, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="D", DateFormat:="Y-M-D", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test67", Err
 End Sub
 
-Private Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test68(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2066,14 +1793,14 @@ Private Sub Test68(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("44424", "2021-08-18", True, "#DIV/0!", "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(68, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="B", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test68", Err
 End Sub
 
-Private Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test69(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2089,14 +1816,14 @@ Private Sub Test69(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("44424", "2021-08-18", "True", CVErr(2007), "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(69, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="E", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test69", Err
 End Sub
 
-Private Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test70(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2112,14 +1839,14 @@ Private Sub Test70(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(44424#, "2021-08-18", "True", "#DIV/0!", 1#, "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(70, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NQ", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test70", Err
 End Sub
 
-Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test71(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2138,14 +1865,14 @@ Private Sub Test71(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:="DQ", _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test71", Err
 End Sub
 
-Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test72(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2163,14 +1890,14 @@ Private Sub Test72(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:="BQ", _
         IgnoreEmptyLines:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test72", Err
 End Sub
 
-Private Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test73(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2186,14 +1913,14 @@ Private Sub Test73(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array("44424", "2021-08-18", "True", CVErr(2007), "1", "16-Aug-2021", "TRUE", CVErr(2007), "abc", "abc""def"))
 
     TestRes = TestCSVRead(73, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="EQ", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test73", Err
 End Sub
 
-Private Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test74(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2209,14 +1936,14 @@ Private Sub Test74(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(44424#, CDate("2021-Aug-18"), True, CVErr(2007), "1", "16-Aug-2021", "TRUE", "#DIV/0!", "abc", "abc""def"))
 
     TestRes = TestCSVRead(74, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, ConvertTypes:="NDBE", DateFormat:="Y-M-D", ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test74", Err
 End Sub
 
-Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test75(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2234,14 +1961,14 @@ Private Sub Test75(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:="NDBEQ", _
         IgnoreEmptyLines:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test75", Err
 End Sub
 
-Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test76(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2266,14 +1993,14 @@ Private Sub Test76(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         TestRes = IsEmpty(Observed(UBound(Observed, 1) - 2, LBound(Observed, 2) + 16))
         If Not TestRes Then WhatDiffers = "Test 76 latest (1) FAILED, Test was that element in 17th col, last but 2 row should be empty"
     End If
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test76", Err
 End Sub
 
-Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test77(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2289,14 +2016,14 @@ Private Sub Test77(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         RelTol:=0.000000000000001)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test77", Err
 End Sub
 
-Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test78(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2331,14 +2058,14 @@ Private Sub Test78(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:="N", _
         NumRows:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test78", Err
 End Sub
 
-Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test79(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2355,14 +2082,14 @@ Private Sub Test79(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=36635, _
         NumColsExpected:=18)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test79", Err
 End Sub
 
-Private Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test80(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2377,14 +2104,14 @@ Private Sub Test80(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestRes = TestCSVRead(80, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test80", Err
 End Sub
 
-Private Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test81(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2397,14 +2124,14 @@ Private Sub Test81(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_skip_args.csv"
     Expected = HStack(Array("3,3", "4,3", "5,3", "6,3", "7,3", "8,3", "9,3", "10,3", Empty, Empty))
     TestRes = TestCSVRead(81, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, SkipToRow:=3, SkipToCol:=3, NumRows:=10, NumCols:=1, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test81", Err
 End Sub
 
-Private Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test82(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2417,14 +2144,14 @@ Private Sub Test82(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_skip_args.csv"
     Expected = HStack("6,5", "6,6", "6,7", "6,8", "6,9", "6,10", Empty, Empty)
     TestRes = TestCSVRead(82, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, SkipToRow:=6, SkipToCol:=5, NumRows:=1, NumCols:=8, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test82", Err
 End Sub
 
-Private Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test83(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2442,14 +2169,14 @@ Private Sub Test83(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(Empty, Empty, Empty, Empty))
 
     TestRes = TestCSVRead(83, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, SkipToRow:=8, SkipToCol:=8, NumRows:=4, NumCols:=4, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test83", Err
 End Sub
 
-Private Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test84(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2462,14 +2189,14 @@ Private Sub Test84(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_skip_args_with_comments.csv"
     Expected = HStack(Array("3,3", "4,3", "5,3", "6,3", "7,3", "8,3", "9,3", "10,3", Empty, Empty))
     TestRes = TestCSVRead(84, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=3, SkipToCol:=3, NumRows:=10, NumCols:=1, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test84", Err
 End Sub
 
-Private Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test85(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2482,14 +2209,14 @@ Private Sub Test85(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     FileName = "test_skip_args_with_comments.csv"
     Expected = HStack("6,5", "6,6", "6,7", "6,8", "6,9", "6,10", Empty, Empty)
     TestRes = TestCSVRead(85, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=6, SkipToCol:=5, NumRows:=1, NumCols:=8, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test85", Err
 End Sub
 
-Private Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test86(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2507,14 +2234,14 @@ Private Sub Test86(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Array(Empty, Empty, Empty, Empty))
 
     TestRes = TestCSVRead(86, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, Comment:="#", SkipToRow:=8, SkipToCol:=8, NumRows:=4, NumCols:=4, ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test86", Err
 End Sub
 
-Private Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test87(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2540,14 +2267,14 @@ Private Sub Test87(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     TestRes = TestCSVRead(87, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test87", Err
 End Sub
 
-Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test88(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2569,14 +2296,14 @@ Private Sub Test88(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         Delimiter:="{""}", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test88", Err
 End Sub
 
-Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test89(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2599,14 +2326,14 @@ Private Sub Test89(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Delimiter:="Delim", _
         IgnoreRepeated:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test89", Err
 End Sub
 
-Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test90(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2620,14 +2347,14 @@ Private Sub Test90(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
     Expected = "#CSVRead: File is empty!"
     TestRes = TestCSVRead(90, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test90", Err
 End Sub
 
-Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test91(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2665,14 +2392,14 @@ Private Sub Test91(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:=True, _
         NumRows:=1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test91", Err
 End Sub
 
-Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test92(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim k As Long
@@ -2705,13 +2432,13 @@ Private Sub Test92(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
             WhatDiffers = "Test 92 pandas zeros FAILED, Test was that sum of elements be 2,499,772, but instead its " & Format$(Total, "###,###")
         End If
     End If
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test92", Err
 End Sub
-Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test93(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2732,14 +2459,14 @@ Private Sub Test93(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         IgnoreRepeated:=True, _
         NumRows:=3, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test93", Err
 End Sub
 
-Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test94(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2778,14 +2505,14 @@ Private Sub Test94(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         DateFormat:="Y-M-D", _
         NumRows:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test94", Err
 End Sub
 
-Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test95(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2805,14 +2532,14 @@ Private Sub Test95(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Delimiter:=",", _
         DateFormat:="D-M-Y", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test95", Err
 End Sub
 
-Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test96(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2832,14 +2559,14 @@ Private Sub Test96(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Delimiter:=",", _
         DateFormat:="M-D-Y", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test96", Err
 End Sub
 
-Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test97(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2859,14 +2586,14 @@ Private Sub Test97(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         Delimiter:=",", _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test97", Err
 End Sub
 
-Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test98(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2888,14 +2615,14 @@ Private Sub Test98(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         ConvertTypes:="N", _
         NumRows:=10, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test98", Err
 End Sub
 
-Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test99(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2918,14 +2645,14 @@ Private Sub Test99(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test99", Err
 End Sub
 
-Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test100(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2948,14 +2675,14 @@ Private Sub Test100(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test100", Err
 End Sub
 
-Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test101(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2975,14 +2702,14 @@ Private Sub Test101(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test101", Err
 End Sub
 
-Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test102(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3005,14 +2732,14 @@ Private Sub Test102(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test102", Err
 End Sub
 
-Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test103(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3032,14 +2759,14 @@ Private Sub Test103(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test103", Err
 End Sub
 
-Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test104(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3062,14 +2789,14 @@ Private Sub Test104(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test104", Err
 End Sub
 
-Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test105(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3089,14 +2816,14 @@ Private Sub Test105(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test105", Err
 End Sub
 
-Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test106(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3119,14 +2846,14 @@ Private Sub Test106(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=0.01 / 24 / 60 / 60 / 1000) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test106", Err
 End Sub
 
-Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test107(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3146,14 +2873,14 @@ Private Sub Test107(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test107", Err
 End Sub
 
-Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test108(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3186,14 +2913,14 @@ Private Sub Test108(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="M/D/Y", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test108", Err
 End Sub
 
-Private Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test109(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3208,14 +2935,14 @@ Private Sub Test109(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(109, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test109", Err
 End Sub
 
-Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test110(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3233,14 +2960,14 @@ Private Sub Test110(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Delimiter:=",", _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test110", Err
 End Sub
 
-Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test111(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3256,14 +2983,14 @@ Private Sub Test111(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         MissingStrings:="-", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test111", Err
 End Sub
 
-Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test112(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3280,14 +3007,14 @@ Private Sub Test112(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         MissingStrings:="NA", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test112", Err
 End Sub
 
-Private Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test113(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3302,14 +3029,14 @@ Private Sub Test113(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(113, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test113", Err
 End Sub
 
-Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test114(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3325,14 +3052,14 @@ Private Sub Test114(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         MissingStrings:="+", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test114", Err
 End Sub
 
-Private Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test115(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3347,14 +3074,14 @@ Private Sub Test115(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(115, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test115", Err
 End Sub
 
-Private Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test116(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3374,14 +3101,14 @@ Private Sub Test116(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(116, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test116", Err
 End Sub
 
-Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test117(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3406,14 +3133,14 @@ Private Sub Test117(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="ISO", _
         NumRows:=20, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test117", Err
 End Sub
 
-Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test118(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3431,14 +3158,14 @@ Private Sub Test118(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=5112, _
         NumRows:=3, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test118", Err
 End Sub
 
-Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test119(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3455,14 +3182,14 @@ Private Sub Test119(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=986, _
         NumColsExpected:=12)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test119", Err
 End Sub
 
-Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test120(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3478,14 +3205,14 @@ Private Sub Test120(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=282, _
         NumColsExpected:=31)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test120", Err
 End Sub
 
-Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test121(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3515,14 +3242,14 @@ Private Sub Test121(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="M/D/Y", _
         NumRows:=20, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test121", Err
 End Sub
 
-Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test122(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3539,14 +3266,14 @@ Private Sub Test122(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=4, _
         NumColsExpected:=20128)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test122", Err
 End Sub
 
-Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test123(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3573,14 +3300,14 @@ Private Sub Test123(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="M/D/Y", _
         SkipToRow:=7580, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test123", Err
 End Sub
 
-Private Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test124(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3594,14 +3321,14 @@ Private Sub Test124(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     FileName = "test_empty_lines.csv"
     TestRes = TestCSVRead(124, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test124", Err
 End Sub
 
-Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test125(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3623,14 +3350,14 @@ Private Sub Test125(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumRows:=5, _
         NumCols:=4, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test125", Err
 End Sub
 
-Private Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test126(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3645,14 +3372,14 @@ Private Sub Test126(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(126, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:="False", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test126", Err
 End Sub
 
-Private Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test127(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3670,14 +3397,14 @@ Private Sub Test127(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
 
     TestRes = TestCSVRead(127, TestDescription, Expected, FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test127", Err
 End Sub
 
-Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test128(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3694,14 +3421,14 @@ Private Sub Test128(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=167939, _
         NumColsExpected:=18)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test128", Err
 End Sub
 
-Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test129(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3727,14 +3454,14 @@ Private Sub Test129(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="ISO", _
         NumRows:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test129", Err
 End Sub
 
-Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test130(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3752,14 +3479,14 @@ Private Sub Test130(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         NumRowsExpected:=5002, _
         NumColsExpected:=8)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test130", Err
 End Sub
 
-Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test131(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3781,14 +3508,14 @@ Private Sub Test131(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="ISO", _
         NumRows:=3, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test131", Err
 End Sub
 
-Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test132(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3810,14 +3537,14 @@ Private Sub Test132(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         ExpectedHeaderRow:=HStack("Col2", "Col3"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test132", Err
 End Sub
 
-Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test133(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3848,14 +3575,14 @@ Private Sub Test133(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8", "Col9", "Col10"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test133", Err
 End Sub
 
-Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test134(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3873,14 +3600,14 @@ Private Sub Test134(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=4#, _
         ExpectedHeaderRow:=HStack("col1", "col2", "col3"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test134", Err
 End Sub
 
-Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test135(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3896,14 +3623,14 @@ Private Sub Test135(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Delimiter:=1, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test135", Err
 End Sub
 
-Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test136(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3919,14 +3646,14 @@ Private Sub Test136(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Delimiter:="""bad", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test136", Err
 End Sub
 
-Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test137(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3942,14 +3669,14 @@ Private Sub Test137(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         NumCols:=-1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test137", Err
 End Sub
 
-Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test138(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3965,14 +3692,14 @@ Private Sub Test138(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         NumRows:=-1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test138", Err
 End Sub
 
-Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test139(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3988,14 +3715,14 @@ Private Sub Test139(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         DecimalSeparator:="bad")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test139", Err
 End Sub
 
-Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test140(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4013,14 +3740,14 @@ Private Sub Test140(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         DecimalSeparator:=",")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test140", Err
 End Sub
 
-Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test141(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4036,14 +3763,14 @@ Private Sub Test141(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         SkipToCol:=-1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test141", Err
 End Sub
 
-Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test142(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4059,14 +3786,14 @@ Private Sub Test142(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         SkipToRow:=-1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test142", Err
 End Sub
 
-Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test143(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4082,14 +3809,14 @@ Private Sub Test143(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Comment:="bad""", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test143", Err
 End Sub
 
-Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test144(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4105,14 +3832,14 @@ Private Sub Test144(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=-1#)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test144", Err
 End Sub
 
-Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test145(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4128,14 +3855,14 @@ Private Sub Test145(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         Encoding:="BAD")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test145", Err
 End Sub
 
-Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test146(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4151,14 +3878,14 @@ Private Sub Test146(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         ConvertTypes:=Array(Array(1, "N", "BAD")))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test146", Err
 End Sub
 
-Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test147(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4174,14 +3901,14 @@ Private Sub Test147(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=Array(Array(1, "D"), Array("B", "N")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test147", Err
 End Sub
 
-Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test148(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4197,14 +3924,14 @@ Private Sub Test148(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=Array(Array(True, "D"), Array("B", "N"), Array(1, "D")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test148", Err
 End Sub
 
-Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test149(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4220,14 +3947,14 @@ Private Sub Test149(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:="Q", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test149", Err
 End Sub
 
-Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test150(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4243,14 +3970,14 @@ Private Sub Test150(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Delimiter:="""", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test150", Err
 End Sub
 
-Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test151(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4267,14 +3994,14 @@ Private Sub Test151(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         TrueStrings:=2#, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test151", Err
 End Sub
 
-Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test152(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4290,14 +4017,14 @@ Private Sub Test152(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         TrueStrings:="Bad", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test152", Err
 End Sub
 
-Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test153(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4313,14 +4040,14 @@ Private Sub Test153(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         FalseStrings:="Bad", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test153", Err
 End Sub
 
-Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test154(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4341,14 +4068,14 @@ Private Sub Test154(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         ExpectedHeaderRow:=HStack("Col5", "Col6"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test154", Err
 End Sub
 
-Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test155(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4377,14 +4104,14 @@ Private Sub Test155(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         HeaderRowNum:=1#, _
         SkipToRow:=1#, _
         ExpectedHeaderRow:=HStack("Type", "Col A", "Col B", "Col C", "Col D", "Col E", "Col F", "Col G"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test155", Err
 End Sub
 
-Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test156(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4407,14 +4134,14 @@ Private Sub Test156(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Delimiter:=False, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test156", Err
 End Sub
 
-Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test157(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4430,14 +4157,14 @@ Private Sub Test157(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Delimiter:=99#, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test157", Err
 End Sub
 
-Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test158(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4454,14 +4181,14 @@ Private Sub Test158(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         SkipToCol:=4, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test158", Err
 End Sub
 
-Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test159(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4491,14 +4218,14 @@ Private Sub Test159(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         HeaderRowNum:=1#, _
         SkipToRow:=1, _
         ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", vbNullString, vbNullString, vbNullString, vbNullString, vbNullString))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test159", Err
 End Sub
 
-Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test160(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4514,14 +4241,14 @@ Private Sub Test160(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:="XYZ", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test160", Err
 End Sub
 
-Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test161(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4551,14 +4278,14 @@ Private Sub Test161(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         HeaderRowNum:=1#, _
         SkipToRow:=1, _
         ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8", "Col9", "Col10"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test161", Err
 End Sub
 
-Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test162(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4576,14 +4303,14 @@ Private Sub Test162(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="BAD", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test162", Err
 End Sub
 
-Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test163(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4601,14 +4328,14 @@ Private Sub Test163(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="Y-M/D", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test163", Err
 End Sub
 
-Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test164(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4624,14 +4351,14 @@ Private Sub Test164(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=Array(1.5, "N"), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test164", Err
 End Sub
 
-Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test165(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4647,14 +4374,14 @@ Private Sub Test165(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=HStack(Array(1.5, 2#), Array("N", "N")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test165", Err
 End Sub
 
-Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test166(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4672,14 +4399,14 @@ Private Sub Test166(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=3, _
         NumRows:=3, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test166", Err
 End Sub
 
-Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test167(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4699,14 +4426,14 @@ Private Sub Test167(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="YYYY-MM-DD", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test167", Err
 End Sub
 
-Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test168(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4722,14 +4449,14 @@ Private Sub Test168(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=HStack(Array(1#, False), Array(2#, True), Array(3#, False)), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test168", Err
 End Sub
 
-Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test169(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4745,14 +4472,14 @@ Private Sub Test169(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=HStack(Array(1#, "NB"), Array(1#, "BN"), Array(2#, "N"), Array(2#, "B")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test169", Err
 End Sub
 
-Private Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test170(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4788,14 +4515,14 @@ Private Sub Test170(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         "incidents_00_14", _
         "fatal_accidents_00_14", _
         "fatalities_00_14"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test170", Err
 End Sub
 
-Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test171(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4829,14 +4556,14 @@ Private Sub Test171(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         DateFormat:="ISO", _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test171", Err
 End Sub
 
-Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test172(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4860,14 +4587,14 @@ Private Sub Test172(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Array(8#, "EQ")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test172", Err
 End Sub
 
-Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test173(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4883,14 +4610,14 @@ Private Sub Test173(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=HStack(Array(0#, False), Array(2#, "XX"), Array(3#, "B"), Array(4#, "D")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test173", Err
 End Sub
 
-Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test174(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4906,14 +4633,14 @@ Private Sub Test174(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=HStack(Array(3#, CVErr(2007)), Array(4#, "D"), Array(5#, "E")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test174", Err
 End Sub
 
-Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test175(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4929,14 +4656,14 @@ Private Sub Test175(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=HStack(Array("Col A", "N"), Array("Col B", "N"), Array("Col C", "N")), _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test175", Err
 End Sub
 
-Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test176(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4958,14 +4685,14 @@ Private Sub Test176(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         AbsTol:=0.000000000000001, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test176", Err
 End Sub
 
-Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test177(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4987,14 +4714,14 @@ Private Sub Test177(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         AbsTol:=0.0000000001, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test177", Err
 End Sub
 
-Private Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test178(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5020,14 +4747,14 @@ Private Sub Test178(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         HeaderRowNum:=1#, _
         SkipToRow:=1, _
         ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test178", Err
 End Sub
 
-Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test179(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5056,14 +4783,14 @@ Private Sub Test179(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=1, _
         ExpectedHeaderRow:=HStack("Col1", "Col2", "Col3", "Col4", "Col5", "Col6"))
         
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test179", Err
 End Sub
 
-Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test180(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5087,14 +4814,14 @@ Private Sub Test180(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         End If
     End If
 
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test180", Err
 End Sub
 
-Private Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test181(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5110,7 +4837,7 @@ Private Sub Test181(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
@@ -5144,7 +4871,7 @@ ErrHandler:
     ReThrow "TwoFiveFiveChars", Err
 End Function
 
-Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test182(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5160,14 +4887,14 @@ Private Sub Test182(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=False, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test182", Err
 End Sub
 
-Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test183(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5183,14 +4910,14 @@ Private Sub Test183(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty, _
         Encoding:="UTF-8")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test183", Err
 End Sub
 
-Private Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test184(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5205,14 +4932,14 @@ Private Sub Test184(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(184, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test184", Err
 End Sub
 
-Private Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test185(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5227,13 +4954,13 @@ Private Sub Test185(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(185, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
     Exit Sub
 ErrHandler:
     ReThrow "Test185", Err
 End Sub
 
-Private Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test186(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5248,13 +4975,13 @@ Private Sub Test186(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(186, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
     Exit Sub
 ErrHandler:
     ReThrow "Test186", Err
 End Sub
 
-Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test187(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5272,14 +4999,14 @@ Private Sub Test187(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         NumRows:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test187", Err
 End Sub
 
-Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test188(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5297,14 +5024,14 @@ Private Sub Test188(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         NumRows:=5, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test188", Err
 End Sub
 
-Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test189(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5323,14 +5050,14 @@ Private Sub Test189(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumRows:=2, _
         NumCols:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test189", Err
 End Sub
 
-Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test190(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5362,14 +5089,14 @@ Private Sub Test190(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         "br7_Klimascenarier", "br9_Flomvarsling", "br11_FRIEND", "br12_GRDC", "br23_HBV", "br24_middelavrenning_1961_1990", "br26_TotalAvlop", "br31_FlomserierPrim", "br32_FlomserierSekundar", "br33_Flomkart_aktive_ureg", _
         "br34_Hydrologisk_referanseserier_klimastudier", "br38_Flomkart_aktive_ureg_periode", "br39_Flomkart_nedlagt_stasjon"))
 
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test190", Err
 End Sub
 
-Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test191(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5389,14 +5116,14 @@ Private Sub Test191(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         Encoding:="UTF-8", _
         HeaderRowNum:=1#, _
         ExpectedHeaderRow:=HStack("Time (CEST)", "Latitude", "Longitude", "Course", "kts", "mph", "feet", "Rate", "Reporting Facility"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test191", Err
 End Sub
 
-Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test192(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5414,14 +5141,14 @@ Private Sub Test192(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISOZ", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test192", Err
 End Sub
 
-Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test193(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5474,14 +5201,14 @@ Private Sub Test193(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         "EAS D3", _
         "EAS D4", _
         "EAS T"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test193", Err
 End Sub
 
-Private Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test194(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5496,14 +5223,14 @@ Private Sub Test194(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(194, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test194", Err
 End Sub
 
-Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test195(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5521,14 +5248,14 @@ Private Sub Test195(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="D-M-Y", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test195", Err
 End Sub
 
-Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test196(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5546,14 +5273,14 @@ Private Sub Test196(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="M-D-Y", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test196", Err
 End Sub
 
-Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test197(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5571,14 +5298,14 @@ Private Sub Test197(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="Y-M-D", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test197", Err
 End Sub
 
-Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test198(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5599,14 +5326,14 @@ Private Sub Test198(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=1 / 24 / 60 / 60 / 1000 / 100) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test198", Err
 End Sub
 
-Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test199(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5627,14 +5354,14 @@ Private Sub Test199(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=1 / 24 / 60 / 60 / 1000 / 100) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test199", Err
 End Sub
 
-Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test200(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5655,7 +5382,7 @@ Private Sub Test200(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumCols:=1, _
         ShowMissingsAs:=Empty, _
         AbsTol:=1 / 24 / 60 / 60 / 1000 / 100) '10 microsecond tolerance
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
@@ -5663,7 +5390,7 @@ ErrHandler:
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
-Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test201(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
@@ -5701,7 +5428,7 @@ Private Sub Test201(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     End If
      
     If Not TestRes Then WhatDiffers = "Test201 Observed = '" & strObserved & "' Expected = '" & Expected & "'"
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
     shHiddenSheet.UsedRange.Clear
 
     Exit Sub
@@ -5710,7 +5437,7 @@ ErrHandler:
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
-Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test202(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
@@ -5748,7 +5475,7 @@ Private Sub Test202(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     End If
      
     If Not TestRes Then WhatDiffers = "Test202 Observed = '" & strObserved & "' Expected = '" & Expected & "'"
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
     shHiddenSheet.UsedRange.Clear
 
     Exit Sub
@@ -5761,7 +5488,7 @@ End Sub
 ' Added after discovering bug when a)ConvertTypes <> FALSE; and b) SkipToRow = HeaderRow > 1. Problem was that variable
 ' HeaderRow was not being populated which led to type mismatch.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub Test203(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test203(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5779,14 +5506,14 @@ Private Sub Test203(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=2#, _
         ExpectedHeaderRow:=HStack("1", "2", "3"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test203", Err
 End Sub
 
-Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test204(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5802,14 +5529,14 @@ Private Sub Test204(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="D M Y", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test204", Err
 End Sub
 
-Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test205(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
@@ -5850,14 +5577,14 @@ Private Sub Test205(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         WhatDiffers = "Cannot run this test on Excel version " & Application.Version
     End If
     
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test205", Err
 End Sub
 
-Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test206(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
@@ -5895,7 +5622,7 @@ Private Sub Test206(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         WhatDiffers = "Cannot run this test on Excel version " & Application.Version
     End If
     
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
@@ -5903,7 +5630,7 @@ ErrHandler:
 End Sub
 
 'Tests TrueString and FalseString (in this case yes and no) appearing in the file with quotes.
-Private Sub Test207(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test207(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5930,14 +5657,14 @@ Private Sub Test207(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test207", Err
 End Sub
 
-Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test208(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5965,14 +5692,14 @@ Private Sub Test208(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test208", Err
 End Sub
 
-Private Sub Test209(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test209(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5989,14 +5716,14 @@ Private Sub Test209(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         TrueStrings:="foo", _
         FalseStrings:="foo", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test209", Err
 End Sub
 
-Private Sub Test210(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test210(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6013,14 +5740,14 @@ Private Sub Test210(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         TrueStrings:="foo", _
         MissingStrings:="foo", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test210", Err
 End Sub
 
-Private Sub Test211(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test211(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6037,14 +5764,14 @@ Private Sub Test211(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         FalseStrings:="foo", _
         MissingStrings:="foo", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test211", Err
 End Sub
 
-Private Sub Test212(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test212(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6061,14 +5788,14 @@ Private Sub Test212(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         TrueStrings:="foo", _
         FalseStrings:="""foo""", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test212", Err
 End Sub
 
-Private Sub Test213(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test213(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6084,14 +5811,14 @@ Private Sub Test213(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:="B", _
         TrueStrings:="""foo", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test213", Err
 End Sub
 
-Private Sub Test214(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test214(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6107,14 +5834,14 @@ Private Sub Test214(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:="B", _
         FalseStrings:="""foo", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test214", Err
 End Sub
 
-Private Sub Test215(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test215(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6130,14 +5857,14 @@ Private Sub Test215(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:="B", _
         MissingStrings:="""foo", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test215", Err
 End Sub
 
-Private Sub Test216(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test216(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6154,14 +5881,14 @@ Private Sub Test216(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         TrueStrings:="foo", _
         FalseStrings:="""foo""", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test216", Err
 End Sub
 
-Private Sub Test217(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test217(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6176,14 +5903,14 @@ Private Sub Test217(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(217, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         Delimiter:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test217", Err
 End Sub
 
-Private Sub Test218(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test218(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6198,14 +5925,14 @@ Private Sub Test218(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(218, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test218", Err
 End Sub
 
-Private Sub Test219(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test219(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6221,14 +5948,14 @@ Private Sub Test219(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="Y-D-M", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test219", Err
 End Sub
 
-Private Sub Test220(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test220(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6242,14 +5969,14 @@ Private Sub Test220(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     Expected = "#CSVRead: Could not find file '" & Folder & FileName & "'!"
     TestRes = TestCSVRead(220, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test220", Err
 End Sub
 
-Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test221(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6264,14 +5991,14 @@ Private Sub Test221(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(221, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty, _
         Encoding:="Foo")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test221", Err
 End Sub
 
-Private Sub Test222(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test222(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6287,14 +6014,14 @@ Private Sub Test222(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         FalseStrings:="NA", _
         ShowMissingsAs:="NA")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test222", Err
 End Sub
 
-Private Sub Test223(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test223(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6317,14 +6044,14 @@ Private Sub Test223(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumRows:=6, _
         NumCols:=6, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test223", Err
 End Sub
 
-Private Sub Test224(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test224(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6341,7 +6068,7 @@ Private Sub Test224(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=True, _
         SkipToRow:=10, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
@@ -6349,7 +6076,7 @@ ErrHandler:
 End Sub
 
 'Test on non compliant input - odd number of double quotes
-Private Sub Test225(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test225(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6364,14 +6091,14 @@ Private Sub Test225(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(225, TestDescription, Expected, FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test225", Err
 End Sub
 
-Private Sub Test226(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test226(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6388,14 +6115,14 @@ Private Sub Test226(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=10#, _
         ExpectedHeaderRow:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test226", Err
 End Sub
 
-Private Sub Test227(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test227(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6413,7 +6140,7 @@ Private Sub Test227(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=10#, _
         ExpectedHeaderRow:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
@@ -6421,7 +6148,7 @@ ErrHandler:
 End Sub
 
 ' x""y does not get unquoted since it's not correctly quoted in the first place.
-Private Sub Test228(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test228(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6436,14 +6163,14 @@ Private Sub Test228(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(228, TestDescription, Expected, FileName, Observed, WhatDiffers, _
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test228", Err
 End Sub
 
-Private Sub Test229(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test229(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6459,14 +6186,14 @@ Private Sub Test229(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         TrueStrings:="foo""", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test229", Err
 End Sub
 
-Private Sub Test230(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test230(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6482,14 +6209,14 @@ Private Sub Test230(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         TrueStrings:="""f""oo""", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test230", Err
 End Sub
 
-Private Sub Test231(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test231(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6505,14 +6232,14 @@ Private Sub Test231(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         TrueStrings:="""", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test231", Err
 End Sub
 
-Private Sub Test232(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test232(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6530,14 +6257,14 @@ Private Sub Test232(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumRows:=2, _
         NumCols:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test232", Err
 End Sub
 
-Private Sub Test233(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test233(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6554,14 +6281,14 @@ Private Sub Test233(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumRows:=3, _
         NumCols:=3, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test233", Err
 End Sub
 
-Private Sub Test234(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test234(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6579,14 +6306,14 @@ Private Sub Test234(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         NumRows:=4, _
         NumCols:=1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test234", Err
 End Sub
 
-Private Sub Test235(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test235(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6603,14 +6330,14 @@ Private Sub Test235(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:=5, _
         NumRows:=4, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test235", Err
 End Sub
 
-Private Sub Test236(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test236(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6626,14 +6353,14 @@ Private Sub Test236(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test236", Err
 End Sub
 
-Private Sub Test237(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test237(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6649,14 +6376,14 @@ Private Sub Test237(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test237", Err
 End Sub
 
-Private Sub Test238(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test238(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6672,14 +6399,14 @@ Private Sub Test238(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test238", Err
 End Sub
 
-Private Sub Test239(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test239(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6695,14 +6422,14 @@ Private Sub Test239(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test239", Err
 End Sub
 
-Private Sub Test240(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test240(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6718,14 +6445,14 @@ Private Sub Test240(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test240", Err
 End Sub
 
-Private Sub Test241(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test241(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6741,14 +6468,14 @@ Private Sub Test241(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test241", Err
 End Sub
 
-Private Sub Test242(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test242(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6764,14 +6491,14 @@ Private Sub Test242(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test242", Err
 End Sub
 
-Private Sub Test243(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test243(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6787,14 +6514,14 @@ Private Sub Test243(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test243", Err
 End Sub
 
-Private Sub Test244(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test244(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6810,14 +6537,14 @@ Private Sub Test244(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test244", Err
 End Sub
 
-Private Sub Test245(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test245(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6833,14 +6560,14 @@ Private Sub Test245(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test245", Err
 End Sub
 
-Private Sub Test246(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test246(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6856,14 +6583,14 @@ Private Sub Test246(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test246", Err
 End Sub
 
-Private Sub Test247(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test247(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6879,14 +6606,14 @@ Private Sub Test247(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         DateFormat:="ISO", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test247", Err
 End Sub
 
-Private Sub Test248(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test248(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6902,14 +6629,14 @@ Private Sub Test248(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         ShowMissingsAs:=Empty, _
         DecimalSeparator:=",")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test248", Err
 End Sub
 
-Private Sub Test249(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test249(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6931,14 +6658,14 @@ Private Sub Test249(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:=2, _
         ShowMissingsAs:=Empty, _
         Encoding:="UTF-8")
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test249", Err
 End Sub
 
-Private Sub Test250(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test250(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6959,14 +6686,14 @@ Private Sub Test250(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(250, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test250", Err
 End Sub
 
-Private Sub Test251(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test251(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6987,14 +6714,14 @@ Private Sub Test251(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(251, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test251", Err
 End Sub
 
-Private Sub Test252(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test252(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -7015,14 +6742,14 @@ Private Sub Test252(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(252, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test252", Err
 End Sub
 
-Private Sub Test253(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test253(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -7043,14 +6770,14 @@ Private Sub Test253(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
     TestRes = TestCSVRead(253, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         SkipToCol:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test253", Err
 End Sub
 
-Private Sub Test254(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test254(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7066,14 +6793,14 @@ Private Sub Test254(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         ConvertTypes:=True, _
         IgnoreEmptyLines:=False, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test254", Err
 End Sub
 
-Private Sub Test255(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test255(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7091,14 +6818,14 @@ Private Sub Test255(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:="bb", _
         NumCols:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test255", Err
 End Sub
 
-Private Sub Test256(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test256(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7116,14 +6843,14 @@ Private Sub Test256(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:="xx", _
         NumCols:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test256", Err
 End Sub
 
-Private Sub Test257(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test257(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7140,14 +6867,14 @@ Private Sub Test257(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         NumCols:="bb", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test257", Err
 End Sub
 
-Private Sub Test258(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test258(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7165,14 +6892,14 @@ Private Sub Test258(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:="bb", _
         NumCols:="cc", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test258", Err
 End Sub
 
-Private Sub Test259(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test259(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7190,14 +6917,14 @@ Private Sub Test259(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:="cc", _
         NumCols:="bb", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test259", Err
 End Sub
 
-Private Sub Test260(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test260(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7214,14 +6941,14 @@ Private Sub Test260(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         NumCols:=CVErr(2007), _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test260", Err
 End Sub
 
-Private Sub Test261(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test261(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7239,14 +6966,14 @@ Private Sub Test261(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:="bb", _
         NumCols:=2, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test261", Err
 End Sub
 
-Private Sub Test262(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test262(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7264,14 +6991,14 @@ Private Sub Test262(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=True, _
         NumCols:="bb", _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test262", Err
 End Sub
 
-Private Sub Test263(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test263(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7289,14 +7016,14 @@ Private Sub Test263(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:=1.5, _
         NumCols:=Empty, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test263", Err
 End Sub
 
-Private Sub Test264(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test264(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7314,14 +7041,14 @@ Private Sub Test264(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToCol:=CVErr(2007), _
         NumCols:=Empty, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test264", Err
 End Sub
 
-Private Sub Test265(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test265(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7338,14 +7065,14 @@ Private Sub Test265(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         NumCols:=2.5, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test265", Err
 End Sub
 
-Private Sub Test266(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test266(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7364,14 +7091,14 @@ Private Sub Test266(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         NumCols:=1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test266", Err
 End Sub
 
-Private Sub Test267(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test267(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7390,14 +7117,14 @@ Private Sub Test267(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         NumCols:=1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test267", Err
 End Sub
 
-Private Sub Test268(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test268(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7416,14 +7143,14 @@ Private Sub Test268(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         SkipToRow:=2, _
         NumCols:=1, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test268", Err
 End Sub
 
-Private Sub Test269(Folder As String, ByRef NumPassed As Long, ByRef NumFailed As Long, ByRef Failures() As String)
+Private Sub Test269(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7441,7 +7168,7 @@ Private Sub Test269(Folder As String, ByRef NumPassed As Long, ByRef NumFailed A
         IgnoreEmptyLines:=False, _
         NumCols:=9, _
         ShowMissingsAs:=Empty)
-    AccumulateResults TestRes, NumPassed, NumFailed, WhatDiffers, Failures
+    AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
