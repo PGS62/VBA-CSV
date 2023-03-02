@@ -38,7 +38,7 @@ Sub TestAgainstLargestFileInRDatasets()
     Dim WhatDiffers As String
 
     t1 = ElapsedTime
-    res1 = CSVRead(FileName)
+    res1 = CSVRead(FileName, False)
     t2 = ElapsedTime
   '  res2 = ArrayFromCSVfile(FileName, , , RemoveQuotes)
     t3 = ElapsedTime
@@ -47,6 +47,46 @@ Sub TestAgainstLargestFileInRDatasets()
     Debug.Print WhatDiffers
 
 End Sub
+
+'Time for type conversion is trivial (at least for the test file in quesiton)
+'====================================================================================================
+'Running TestImpactOfTypeConversion 2023-Mar-02 11:19:34
+'NumTrials = 20
+'FileName = C:\Projects\RDatasets\csv\openintro\military.csv
+'ComputerName = DESKTOP-HSGAM5S
+'VBA-CSV Audit Sheet Version = 240
+'Elapsed time for CSVRead(FileName, False): 9.53321450500225
+'Elapsed time for CSVRead(FileName, True): 9.57358807499986
+
+Sub TestImpactOfTypeConversion()
+    Const FileName As String = "C:\Projects\RDatasets\csv\openintro\military.csv"
+    Dim res1, res2, t1 As Double, t2 As Double, i As Long
+    
+    Const NumTrials = 20
+    
+    Debug.Print "'" & String(100, "=")
+    Debug.Print "'Running TestImpactOfTypeConversion " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
+    Debug.Print "'NumTrials = " & CStr(NumTrials)
+    Debug.Print "'FileName = " & FileName
+    Debug.Print "'ComputerName = " & Environ("ComputerName")
+    Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
+    
+    t1 = ElapsedTime()
+    For i = 1 To NumTrials
+        res1 = CSVRead(FileName, False)
+    Next i
+    t2 = ElapsedTime()
+    Debug.Print "'Elapsed time for CSVRead(FileName, False): " & CStr((t2 - t1) / NumTrials)
+    
+    t1 = ElapsedTime()
+    For i = 1 To NumTrials
+        res1 = CSVRead(FileName, True)
+    Next i
+    t2 = ElapsedTime()
+    Debug.Print "'Elapsed time for CSVRead(FileName, True): " & CStr((t2 - t1) / NumTrials)
+    
+End Sub
+
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : TestAgainstRDatasets

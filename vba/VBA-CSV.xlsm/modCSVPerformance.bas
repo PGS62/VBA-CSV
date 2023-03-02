@@ -1,5 +1,4 @@
 Attribute VB_Name = "modCSVPerformance"
-
 ' VBA-CSV
 
 ' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
@@ -108,7 +107,7 @@ Private Sub RunSpeedTests()
     For Each N In ws.Names
         If InStr(N.Name, "PasteResultsHere") > 1 Then
             If NameRefersToRange(N) Then
-                Application.GoTo N.RefersToRange
+                Application.Goto N.RefersToRange
                 For Each c In N.RefersToRange.Cells
                     c.Resize(1, NumColsInTFPRet).ClearContents
                     TestResults = ThrowIfError(TimeParsers(ws.Range("ParserNames").value, c.Offset(0, -3).value, c.Offset(0, -2).value, _
@@ -330,7 +329,7 @@ Sub AddCharts(Optional Export As Boolean = True)
         End If
     Next N
 
-    Application.GoTo ws.Cells(1, 1)
+    Application.Goto ws.Cells(1, 1)
     ws.Protect , , prot
 
     Exit Sub

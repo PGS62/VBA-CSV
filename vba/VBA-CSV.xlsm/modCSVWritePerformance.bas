@@ -100,7 +100,7 @@ Sub TestWriteSpeedUsingMilitary()
 2         Debug.Print String(80, "-")
 3         Debug.Print "Time:         ", Now
 4         Debug.Print "ComputerName: ", Environ$("ComputerName")
-5         Debug.Print "VersionNumber:", shAudit.Range("B6").value
+5         Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
 6         tic
 7         Data = ThrowIfError(CSVRead("C:\Projects\RDatasets\csv\openintro\military.csv", True))
 8         toc "CSVRead"

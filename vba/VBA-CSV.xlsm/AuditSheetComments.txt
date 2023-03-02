@@ -1,4 +1,7 @@
 Version	Date	Time	Author	Comment
+241	02-Mar-2023	12:08	Philip Swannell	Tweaks to TestImpactOfTypeConversion.
+240	02-Mar-2023	11:08	Philip Swannell	Added method TestImpactOfTypeConversion
+239	02-Mar-2023	10:41	Philip Swannell	Improved error message when file is over 2GB.
 238	01-Mar-2023	20:18	Philip Swannell	Added two more tests - Test270 & Test271, testing "date format conflicts".
 237	01-Mar-2023	11:01	Philip Swannell	Refactor test code - now easy to run a subset of the tests.
 236	28-Feb-2023	10:45	Philip Swannell	Re-wrote method CastToDouble for better speed.

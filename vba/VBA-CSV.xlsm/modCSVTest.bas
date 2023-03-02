@@ -11,6 +11,14 @@ Private m_NumFailed As Long
 Private m_NumSkipped As Long
 Private m_Failures() As String
 
+Sub SwitchAllTrue()
+    SwitchAllTests True
+End Sub
+
+Sub SwitchAllFalse()
+    SwitchAllTests False
+End Sub
+
 Sub SwitchAllTests(NewValue As Boolean)
     On Error GoTo ErrHandler
     shTest.ListObjects("Tests").ListColumns("RunThisTest").DataBodyRange.value = NewValue

@@ -91,6 +91,7 @@ Private Sub SpeedTest_CastToDate()
     Debug.Print "'SysDateSeparator = " & SysDateSeparator
     Debug.Print "'N = " & Format$(N, "###,###")
     Debug.Print "'ComputerName = " & Environ("ComputerName")
+    Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
     
     For k = 1 To 12
         For j = 1 To 1 'Maybe do multiple times to test for variability or results.
@@ -202,7 +203,7 @@ Sub SpeedTestCDateVDateSerial()
 1         Debug.Print String(80, "-")
 2         Debug.Print "Time:         ", Now
 3         Debug.Print "ComputerName: ", Environ$("ComputerName")
-4         Debug.Print "VersionNumber:", shAudit.Range("B6").value
+4         Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
 
 5         tic
 6         For i = 1 To N
@@ -354,6 +355,7 @@ Private Sub SpeedTest_CastISO8601()
     Debug.Print "'Running SpeedTest_CastISO8601 " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
     Debug.Print "'N = " & Format$(N, "###,###")
     Debug.Print "'ComputerName = " & Environ("ComputerName")
+    Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
     
     For k = 0 To 9
         For j = 1 To 1
@@ -462,79 +464,80 @@ Private Sub SpeedTest_CastToDouble()
 2         Debug.Print "'Running SpeedTest_CastToDouble " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
 3         Debug.Print "'N = " & Format$(N, "###,###")
 4         Debug.Print "'ComputerName = " & Environ("ComputerName")
-5         SysDecimalSeparator = Application.DecimalSeparator
+5         Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
+6         SysDecimalSeparator = Application.DecimalSeparator
           
-6         For k = 1 To 8
-7             For j = 1 To 1
-8                 DblOut = 0
-9                 Converted = False
-10                Select Case k
+7         For k = 1 To 8
+8             For j = 1 To 1
+9                 DblOut = 0
+10                Converted = False
+11                Select Case k
                       Case 1
-11                        strIn = "a random string"
-12                        DecimalSeparator = "."
-13                        SepStandard = DecimalSeparator = SysDecimalSeparator
-14                        AscSeparator = Asc(DecimalSeparator)
-15                        Expected = CDbl(0)
-16                    Case 2
-17                        strIn = "1"
-18                        DecimalSeparator = "."
-19                        SepStandard = DecimalSeparator = SysDecimalSeparator
-20                        AscSeparator = Asc(DecimalSeparator)
-21                        Expected = CDbl(1)
-22                    Case 3
-23                        strIn = "9"
-24                        DecimalSeparator = "."
-25                        SepStandard = DecimalSeparator = SysDecimalSeparator
-26                        AscSeparator = Asc(DecimalSeparator)
-27                        Expected = CDbl(9)
-28                    Case 4
-29                        strIn = "-4"
-30                        DecimalSeparator = "."
-31                        SepStandard = DecimalSeparator = SysDecimalSeparator
-32                        AscSeparator = Asc(DecimalSeparator)
-33                        Expected = CDbl(-4)
-34                    Case 5
-35                        strIn = "1e6"
-36                        DecimalSeparator = "."
-37                        SepStandard = DecimalSeparator = SysDecimalSeparator
-38                        AscSeparator = Asc(DecimalSeparator)
-39                        Expected = CDbl(1000000)
-40                    Case 6
-41                        strIn = ".5"
-42                        DecimalSeparator = "."
-43                        SepStandard = DecimalSeparator = SysDecimalSeparator
-44                        AscSeparator = Asc(DecimalSeparator)
-45                        Expected = 0.5
-46                    Case 7
-47                        strIn = "123,4"
-48                        DecimalSeparator = ","
-49                        SepStandard = DecimalSeparator = SysDecimalSeparator
-50                        AscSeparator = Asc(DecimalSeparator)
-51                        Expected = 123.4
-52                    Case 8
-53                        strIn = ",4"
-54                        DecimalSeparator = ","
-55                        SepStandard = DecimalSeparator = SysDecimalSeparator
-56                        AscSeparator = Asc(DecimalSeparator)
-57                        Expected = 0.4
-58                End Select
+12                        strIn = "a random string"
+13                        DecimalSeparator = "."
+14                        SepStandard = DecimalSeparator = SysDecimalSeparator
+15                        AscSeparator = Asc(DecimalSeparator)
+16                        Expected = CDbl(0)
+17                    Case 2
+18                        strIn = "1"
+19                        DecimalSeparator = "."
+20                        SepStandard = DecimalSeparator = SysDecimalSeparator
+21                        AscSeparator = Asc(DecimalSeparator)
+22                        Expected = CDbl(1)
+23                    Case 3
+24                        strIn = "9"
+25                        DecimalSeparator = "."
+26                        SepStandard = DecimalSeparator = SysDecimalSeparator
+27                        AscSeparator = Asc(DecimalSeparator)
+28                        Expected = CDbl(9)
+29                    Case 4
+30                        strIn = "-4"
+31                        DecimalSeparator = "."
+32                        SepStandard = DecimalSeparator = SysDecimalSeparator
+33                        AscSeparator = Asc(DecimalSeparator)
+34                        Expected = CDbl(-4)
+35                    Case 5
+36                        strIn = "1e6"
+37                        DecimalSeparator = "."
+38                        SepStandard = DecimalSeparator = SysDecimalSeparator
+39                        AscSeparator = Asc(DecimalSeparator)
+40                        Expected = CDbl(1000000)
+41                    Case 6
+42                        strIn = ".5"
+43                        DecimalSeparator = "."
+44                        SepStandard = DecimalSeparator = SysDecimalSeparator
+45                        AscSeparator = Asc(DecimalSeparator)
+46                        Expected = 0.5
+47                    Case 7
+48                        strIn = "123,4"
+49                        DecimalSeparator = ","
+50                        SepStandard = DecimalSeparator = SysDecimalSeparator
+51                        AscSeparator = Asc(DecimalSeparator)
+52                        Expected = 123.4
+53                    Case 8
+54                        strIn = ",4"
+55                        DecimalSeparator = ","
+56                        SepStandard = DecimalSeparator = SysDecimalSeparator
+57                        AscSeparator = Asc(DecimalSeparator)
+58                        Expected = 0.4
+59                End Select
 
-59                t1 = ElapsedTime()
-60                For i = 1 To N
-61                    CastToDouble strIn, DblOut, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
-62                Next i
-63                t2 = ElapsedTime()
+60                t1 = ElapsedTime()
+61                For i = 1 To N
+62                    CastToDouble strIn, DblOut, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
+63                Next i
+64                t2 = ElapsedTime()
 
                   Dim PrintThis As String
-64                PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
-65                If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
-66                PrintThis = PrintThis & " strIn = """ & strIn & """, Separator = " & """" & DecimalSeparator & """ "
-67                If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
-68                PrintThis = PrintThis & "Result as expected? " & (Expected = DblOut)
+65                PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
+66                If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
+67                PrintThis = PrintThis & " strIn = """ & strIn & """, Separator = " & """" & DecimalSeparator & """ "
+68                If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
+69                PrintThis = PrintThis & "Result as expected? " & (Expected = DblOut)
                   
-69                Debug.Print PrintThis
-70                DoEvents 'kick Immediate window to life
-71            Next j
-72        Next k
+70                Debug.Print PrintThis
+71                DoEvents 'kick Immediate window to life
+72            Next j
+73        Next k
 End Sub
 

@@ -3,7 +3,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.27
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.28
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -25,7 +25,7 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.27/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.28/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 '5) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
@@ -3555,13 +3555,23 @@ Private Function ParseDownloadError(ErrNum As Long) As String
 End Function
 
 Private Function GetFileSize(FilePath As String)
-1         On Error GoTo ErrHandler
+
+1         On Error GoTo ErrHandler1
 2         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
 3         GetFileSize = m_FSO.GetFile(FilePath).Size
 
-4         Exit Function
-ErrHandler:
-5         Throw "Could not find file '" & FilePath & "'"
+4         On Error GoTo ErrHandler2
+5         If GetFileSize >= (2 ^ 31) Then
+6             Throw "File is too large. It is " & Format(GetFileSize, "###,###") & _
+                  " bytes, which exceeds the maximum allowed size of " & Format((2 ^ 31) - 1, "###,###")
+7         End If
+8         Exit Function
+
+ErrHandler1:
+9         Throw "Could not find file '" & FilePath & "'"
+
+ErrHandler2:
+10        ReThrow "GetFileSize", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------

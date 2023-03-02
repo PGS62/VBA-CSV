@@ -1,5 +1,4 @@
 Attribute VB_Name = "modCSVTestDeps"
-
 ' VBA-CSV
 
 ' Copyright (C) 2021 - Philip Swannell (https://github.com/PGS62/VBA-CSV )
