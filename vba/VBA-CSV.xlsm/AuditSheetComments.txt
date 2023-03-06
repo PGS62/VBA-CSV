@@ -1,4 +1,5 @@
 Version	Date	Time	Author	Comment
+242	06-Mar-2023	16:56	Philip Swannell	Deleted worksheets NotRFC4180, Demo, Col-by-col, Sheet1, Notes
 241	02-Mar-2023	12:08	Philip Swannell	Tweaks to TestImpactOfTypeConversion.
 240	02-Mar-2023	11:08	Philip Swannell	Added method TestImpactOfTypeConversion
 239	02-Mar-2023	10:41	Philip Swannell	Improved error message when file is over 2GB.
