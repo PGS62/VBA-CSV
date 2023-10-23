@@ -4741,7 +4741,7 @@ Private Sub Test178(Folder As String)
     TestDescription = "Used as example in README.md"
     FileName = "https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv"
     Expected = HStack( _
-        Array(vbNullString, "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine", "Allison, Mr. Hudson Joshua Crei", "Allison, Mrs. Hudson J C (Bessi", "Anderson, Mr. Harry", "Andrews, Miss. Kornelia Theodos", "Andrews, Mr. Thomas Jr", "Appleton, Mrs. Edward Dale (Cha", "Artagaveytia, Mr. Ramon", "Astor, Col. John Jacob", "Astor, Mrs. John Jacob (Madelei", "Aubart, Mme. Leontine Pauline", "Barber, Miss. Ellen Nellie", "Barkworth, Mr. Algernon Henry W", "Baumann, Mr. John D"), _
+        Array("rownames", "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine", "Allison, Mr. Hudson Joshua Crei", "Allison, Mrs. Hudson J C (Bessi", "Anderson, Mr. Harry", "Andrews, Miss. Kornelia Theodos", "Andrews, Mr. Thomas Jr", "Appleton, Mrs. Edward Dale (Cha", "Artagaveytia, Mr. Ramon", "Astor, Col. John Jacob", "Astor, Mrs. John Jacob (Madelei", "Aubart, Mme. Leontine Pauline", "Barber, Miss. Ellen Nellie", "Barkworth, Mr. Algernon Henry W", "Baumann, Mr. John D"), _
         Array("survived", "yes", "yes", "no", "no", "no", "yes", "yes", "no", "yes", "no", "no", "yes", "yes", "yes", "yes", "no"), _
         Array("sex", "female", "male", "female", "male", "female", "male", "female", "male", "female", "male", "male", "female", "female", "female", "male", "male"), _
         Array("age", 29#, 0.916700006, 2#, 30#, 25#, 48#, 63#, 39#, 53#, 71#, 47#, 18#, 24#, 26#, 80#, Empty), _
@@ -4754,7 +4754,7 @@ Private Sub Test178(Folder As String)
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
         SkipToRow:=1, _
-        ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
+        ExpectedHeaderRow:=HStack("rownames", "survived", "sex", "age", "passengerClass"))
     AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
@@ -5649,7 +5649,7 @@ Private Sub Test207(Folder As String)
     On Error GoTo ErrHandler
     TestDescription = "https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival"
     Expected = HStack( _
-        Array(vbNullString, "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine"), _
+        Array("rownames", "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine"), _
         Array("survived", True, True, False), _
         Array("sex", "female", "male", "female"), _
         Array("age", "29", "0.916700006", "2"), _
@@ -5664,7 +5664,7 @@ Private Sub Test207(Folder As String)
         MissingStrings:="NA", _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
-        ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
+        ExpectedHeaderRow:=HStack("rownames", "survived", "sex", "age", "passengerClass"))
     AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
@@ -5683,7 +5683,7 @@ Private Sub Test208(Folder As String)
     On Error GoTo ErrHandler
     TestDescription = "https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival"
     Expected = HStack( _
-        Array(vbNullString, "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine"), _
+        Array("rownames", "Allen, Miss. Elisabeth Walton", "Allison, Master. Hudson Trevor", "Allison, Miss. Helen Loraine"), _
         Array("survived", True, True, False), _
         Array("sex", "female", "male", "female"), _
         Array("age", "29", "0.916700006", "2"), _
@@ -5694,12 +5694,12 @@ Private Sub Test208(Folder As String)
         ConvertTypes:="B", _
         SkipToRow:=1, _
         NumRows:=4, _
-        TrueStrings:="""yes""", _
-        FalseStrings:="""no""", _
+        TrueStrings:="yes", _
+        FalseStrings:="no", _
         MissingStrings:="NA", _
         ShowMissingsAs:=Empty, _
         HeaderRowNum:=1#, _
-        ExpectedHeaderRow:=HStack(vbNullString, "survived", "sex", "age", "passengerClass"))
+        ExpectedHeaderRow:=HStack("rownames", "survived", "sex", "age", "passengerClass"))
     AccumulateResults TestRes, WhatDiffers
 
     Exit Sub

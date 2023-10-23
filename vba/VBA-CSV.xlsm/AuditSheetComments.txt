@@ -1,4 +1,5 @@
 ﻿Version	Date	Time	Author	Comment
+244	23-Oct-2023	16:34	Philip Swannell	Rebased tests 178, 207 & 208. Necessary thanks to changes in file https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv. Example changes: top left element was null string is now text "rownames", yes and no previously appeared quoted, now unquoted.
 243	23-Oct-2023	16:31	Philip Swannell	Re-arranged file locations.
 242	06-Mar-2023	16:56	Philip Swannell	Deleted worksheets NotRFC4180, Demo, Col-by-col, Sheet1, Notes
 241	02-Mar-2023	12:08	Philip Swannell	Tweaks to TestImpactOfTypeConversion.
