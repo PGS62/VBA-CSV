@@ -1,0 +1,9 @@
+﻿Address	Formula
+A3:A7	=SEQUENCE(5)
+B3:B7	=MOD(A3#,2)=0
+C3:C7	=TODAY()+A3#
+D6	="A"&CHAR(13)&" CR"
+A10	=CSVWrite(A2:D7,"C:\Temp\Test.csv")
+A13:A20	=CSVRead(A10,FALSE,FALSE)
+A23:D28	=CSVRead(A10,TRUE)
+A31:D36	=A2:D7=A23:D28

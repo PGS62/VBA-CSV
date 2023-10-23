@@ -1,20 +1,36 @@
-AuditSheetComments.txt
-CSVinterface.cls
-ECPArrayList.cls
-ECPTextStream.cls
-modCSVNotRFC4180.bas
-modCSVPerformance.bas
-modCSVPerformanceLowLevel.bas
-modCSVReadWrite.bas
-modCSVTest.bas
-modCSVTestDeps.bas
-modCSVTestRDatasets.bas
-modCSVTestRoundTrip.bas
-modCSVTestUtils.bas
-modCSVWritePerformance.bas
-modCSVXLUtils.bas
-parserConfig.cls
-sdkn104_CSVUtils.bas
-shTest.cls
-ThisWorkbook.cls
+﻿AuditSheetComments.txt
+Formulas\CSVWriteTests.txt
+Formulas\DateParsingTest.txt
+Formulas\GIF.txt
+Formulas\GIF2.txt
+Formulas\GIF3.txt
+Formulas\Performance (10).txt
+Formulas\Performance (2).txt
+Formulas\Performance (3).txt
+Formulas\Performance (4).txt
+Formulas\Performance (6).txt
+Formulas\Performance (7).txt
+Formulas\Performance (8).txt
+Formulas\Performance (9).txt
+Formulas\Performance.txt
+Formulas\RegExp.txt
+Formulas\Test.txt
+VBA\CSVinterface.cls
+VBA\ECPArrayList.cls
+VBA\ECPTextStream.cls
+VBA\modCSVNotRFC4180.bas
+VBA\modCSVPerformance.bas
+VBA\modCSVPerformanceLowLevel.bas
+VBA\modCSVReadWrite.bas
+VBA\modCSVTest.bas
+VBA\modCSVTestDeps.bas
+VBA\modCSVTestRDatasets.bas
+VBA\modCSVTestRoundTrip.bas
+VBA\modCSVTestUtils.bas
+VBA\modCSVWritePerformance.bas
+VBA\modCSVXLUtils.bas
+VBA\parserConfig.cls
+VBA\sdkn104_CSVUtils.bas
+VBA\shTest.cls
+VBA\ThisWorkbook.cls
 VBA-CSV.xlsm

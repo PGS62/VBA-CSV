@@ -37,7 +37,7 @@ Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean
             Set CSVReadRes = Me.Range("CallToCSVRead")
         End If
         
-        Application.Goto Me.Cells(1, 1)
+        Application.GoTo Me.Cells(1, 1)
         Me.Range("TheVBACode").Select
         
         protContents = Me.ProtectContents
