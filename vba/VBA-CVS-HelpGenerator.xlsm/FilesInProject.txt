@@ -1,6 +1,7 @@
-AuditSheetComments.txt
-modCSVHelp.bas
-modDependencies.bas
-modIntellisense.bas
-Module1.bas
+﻿AuditSheetComments.txt
+Formulas\Help.txt
+VBA\modCSVHelp.bas
+VBA\modDependencies.bas
+VBA\modIntellisense.bas
+VBA\Module1.bas
 VBA-CVS-HelpGenerator.xlsm

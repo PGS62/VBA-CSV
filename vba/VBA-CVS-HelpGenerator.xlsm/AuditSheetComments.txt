@@ -1,4 +1,5 @@
-Version	Date	Time	Author	Comment
+﻿Version	Date	Time	Author	Comment
+24	25-Oct-2023	19:04	Philip Swannell	Updated help for "K" option to ConvertTypes.
 23	06-Feb-2023	16:05	Philip Swannell	Updated documentation for SkipToCol and NumCols.
 22	09-Nov-2022	22:10	Philip Swannell	Updates to Help.
 21	07-Nov-2022	18:58	Philip Swannell	Updated help for Encoding argument to CSVRead.

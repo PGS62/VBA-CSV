@@ -13,7 +13,7 @@ Sub CreateIntellisenseWorkbook()
           Dim wb As Workbook
 
 1         On Error GoTo ErrHandler
-2         Prompt = "Create intellisense dtata and save to " & ThisWorkbook.Path & "\" & TargetBookName
+2         Prompt = "Create intellisense data and save to " & ThisWorkbook.Path & "\" & TargetBookName
 
 3         If MsgBox(Prompt, vbOKCancel + vbQuestion) <> vbOK Then Exit Sub
 
