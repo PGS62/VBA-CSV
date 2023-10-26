@@ -161,6 +161,7 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     Dim NC As Long
     Dim NR As Long
     Dim NumDone As Long
+    Dim Passed As Boolean
     
     On Error GoTo ErrHandler
     
@@ -188,13 +189,25 @@ Private Sub RoundTripTestCore(Folder As String, OS As String, ByVal Data As Vari
     
     'The Call to CSVRead has to infer both Encoding and EOL, and in most cases must infer the delimiter
     DataReadBack = CSVRead(FileName, ConvertTypes, DelimiterForRead, DateFormat:=DateFormat, ShowMissingsAs:=Empty, TrueStrings:=CStr(True), FalseStrings:=CStr(False))
+    Passed = ArraysIdentical(Data, DataReadBack, True, PermitBaseDifference, WhatDiffers)
     
     'Code to test the test
     'If Rnd() < 0.001 Then
     '    DataReadBack(1, 1) = "foo"
     'End If
     
-    If ArraysIdentical(Data, DataReadBack, True, PermitBaseDifference, WhatDiffers) Then
+    'Test another style of round-tripping: take a well-formed CSV file, read it "raw" - with ConvertTypes = "K" _
+    and write it raw with QuoteAllStrings = "Raw", file should be unchanged apart perhaps from final character _
+    (the CSV spec allows a final line feed to be either present or absent)
+    Dim FileName2 As String, Data2
+    FileName2 = Left(FileName, Len(FileName) - 4) & "_ReadAndRewritten.csv"
+    Data2 = CSVRead(FileName, "K", Delimiter, , , , , , , , , , , , , , Encoding)
+    ThrowIfError CSVWrite(Data2, FileName2, "Raw", , , Delimiter, Encoding)
+    If Not ArraysIdentical(CSVRead(FileName, , False), CSVRead(FileName2, , False)) Then
+        Passed = False
+    End If
+    
+    If Passed Then
         NumPassed = NumPassed + 1
     Else
         Debug.Print String(100, "=")

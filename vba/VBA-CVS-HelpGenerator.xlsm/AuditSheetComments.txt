@@ -1,4 +1,7 @@
-Version	Date	Time	Author	Comment
+﻿Version	Date	Time	Author	Comment
+26	26-Oct-2023	11:51	Philip Swannell	CSVWrite now supports "Raw" as value for QuoteAllStrings.
+25	26-Oct-2023	09:44	Philip Swannell	Added "Usage" text box.
+24	25-Oct-2023	19:04	Philip Swannell	Updated help for "K" option to ConvertTypes.
 23	06-Feb-2023	16:05	Philip Swannell	Updated documentation for SkipToCol and NumCols.
 22	09-Nov-2022	22:10	Philip Swannell	Updates to Help.
 21	07-Nov-2022	18:58	Philip Swannell	Updated help for Encoding argument to CSVRead.

@@ -306,6 +306,6 @@ Function RawFileContents(FileName As String)
 
     Exit Function
 ErrHandler:
-   ' Throw "#RawFileContents (line " & CStr(Erl) + "): " & Err.Description & "!"
+    Throw "#RawFileContents (line " & CStr(Erl) + "): " & Err.Description & "!"
 End Function
 
