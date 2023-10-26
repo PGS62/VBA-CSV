@@ -1,4 +1,5 @@
 ﻿Version	Date	Time	Author	Comment
+247	26-Oct-2023	12:18	Philip Swannell	Code comments only.
 246	26-Oct-2023	11:57	Philip Swannell	CSVWrite now supports "Raw" as value for QuoteAllStrings argument.
 245	26-Oct-2023	09:49	Philip Swannell	Added tests 272 to 274 to test behaviour of new "K" option to ConvertTypes. Updated "docstrings" for CSVRead and CSVWrite. Updated method RegisterCSVRead.
 244	23-Oct-2023	16:34	Philip Swannell	Rebased tests 178, 207 & 208. Necessary thanks to changes in file https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv. Example changes: top left element was null string is now text "rownames", yes and no previously appeared quoted, now unquoted.

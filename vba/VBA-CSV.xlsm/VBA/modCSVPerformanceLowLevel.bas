@@ -340,7 +340,6 @@ End Sub
 Private Sub SpeedTest_CastISO8601()
 
     Const N As Long = 5000000
-    Dim Converted As Boolean
     Dim DtOut As Date
     Dim Expected As Date
     Dim i As Long

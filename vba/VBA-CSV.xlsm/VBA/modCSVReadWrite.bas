@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.28
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.29
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -26,7 +26,7 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.28/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.29/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 '5) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
@@ -3375,28 +3375,6 @@ Private Function MakeEncoder(TrueString As String, FalseString As String) As Scr
 ErrHandler:
 21        ReThrow "MakeEncoder", Err
 End Function
-
-'TODO Delete this method
-Function Encode2(x As String, QuoteSimpleStrings As Boolean, QuoteComplexStrings As Boolean)
-Const Delim As String = ","
-3                 If Not QuoteComplexStrings Then
-4                     Encode2 = x
-5                 ElseIf InStr(x, DQ) > 0 Then
-6                     Encode2 = DQ & Replace$(x, DQ, DQ2) & DQ
-7                 ElseIf QuoteSimpleStrings Then
-8                     Encode2 = DQ & x & DQ
-9                 ElseIf InStr(x, vbCr) > 0 Then
-10                    Encode2 = DQ & x & DQ
-11                ElseIf InStr(x, vbLf) > 0 Then
-12                    Encode2 = DQ & x & DQ
-13                ElseIf InStr(x, Delim) > 0 Then
-14                    Encode2 = DQ & x & DQ
-15                Else
-16                    Encode2 = x
-17                End If
-
-End Function
-
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Encode
