@@ -1,7 +1,0 @@
-﻿Address	Formula
-J7	=sCSVWrite(E7:G17,"c:\temp\foo.csv")
-M7:O17	=CSVRead(J7,M2:N4)
-J21:J31	=sCSVRead(J7,,FALSE)
-R31	=TestFolder()
-R34	=sJoinPath(R31,R32)
-Y37	=sCSVWrite(R37:U40,R34)

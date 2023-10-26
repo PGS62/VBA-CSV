@@ -1,5 +1,6 @@
 Attribute VB_Name = "modCSVReadWrite"
 ' VBA-CSV
+
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
@@ -2976,8 +2977,9 @@ End Function
 ' QuoteAllStrings: If `TRUE` (the default) then elements of Data that are strings are quoted before being
 '             written to file, other elements (Numbers, Booleans, Errors) are not quoted. If `FALSE` then
 '             the only elements of Data that are quoted are strings containing Delimiter, line feed,
-'             carriage return or double quote. In all cases, double quotes are escaped by another double
-'             quote.
+'             carriage return or double quote. In both cases, double quotes are escaped by another double
+'             quote. If "Raw" then no strings are quoted. Use this option with care, the file written may
+'             not be in valid CSV format.
 ' DateFormat: A format string that determines how dates, including cells formatted as dates, appear in the
 '             file. If omitted, defaults to `yyyy-mm-dd`.
 ' DateTimeFormat: Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use
@@ -3002,7 +3004,7 @@ End Function
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
-          Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
+          Optional ByVal QuoteAllStrings As Variant = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
           Optional TrueString As String = "True", Optional FalseString As String = "False") As String
@@ -3023,6 +3025,8 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
           Dim Lines() As String
           Dim OneLine() As String
           Dim WriteToFile As Boolean
+          Dim QuoteSimpleStrings As Boolean
+          Dim QuoteComplexStrings As Boolean
 
 1         On Error GoTo ErrHandler
           
@@ -3035,82 +3039,84 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 7             Throw Err_Delimiter2
 8         End If
           
-9         ValidateTrueAndFalseStrings TrueString, FalseString, Delimiter
-
-10        WriteToFile = Len(FileName) > 0
-
-11        If EOL = vbNullString Then
-12            If WriteToFile Then
-13                EOL = vbCrLf
-14            Else
-15                EOL = vbLf
-16            End If
-17        End If
-
-18        EOL = OStoEOL(EOL, "EOL")
-19        EOLIsWindows = EOL = vbCrLf
+9         ParseQuoteAllStrings QuoteAllStrings, QuoteSimpleStrings, QuoteComplexStrings
           
-20        If DateFormat = "" Or UCase(DateFormat) = "ISO" Then
+10        ValidateTrueAndFalseStrings TrueString, FalseString, Delimiter
+
+11        WriteToFile = Len(FileName) > 0
+
+12        If EOL = vbNullString Then
+13            If WriteToFile Then
+14                EOL = vbCrLf
+15            Else
+16                EOL = vbLf
+17            End If
+18        End If
+
+19        EOL = OStoEOL(EOL, "EOL")
+20        EOLIsWindows = EOL = vbCrLf
+          
+21        If DateFormat = "" Or UCase(DateFormat) = "ISO" Then
               'Avoid DateFormat being the null string as that would make CSVWrite's _
                behaviour depend on Windows locale (via calls to Format$ in function Encode).
-21            DateFormat = "yyyy-mm-dd"
-22        End If
+22            DateFormat = "yyyy-mm-dd"
+23        End If
           
-23        Select Case UCase$(DateTimeFormat)
+24        Select Case UCase$(DateTimeFormat)
               Case "ISO", ""
-24                DateTimeFormat = "yyyy-mm-ddThh:mm:ss"
-25            Case "ISOZ"
-26                DateTimeFormat = ISOZFormatString()
-27        End Select
+25                DateTimeFormat = "yyyy-mm-ddThh:mm:ss"
+26            Case "ISOZ"
+27                DateTimeFormat = ISOZFormatString()
+28        End Select
 
-28        If TypeName(Data) = "Range" Then
+29        If TypeName(Data) = "Range" Then
               'Preserve elements of type Date by using .Value, not .Value2
-29            Data = Data.value
-30        End If
-31        Select Case NumDimensions(Data)
+30            Data = Data.value
+31        End If
+32        Select Case NumDimensions(Data)
               Case 0
                   Dim Tmp() As Variant
-32                ReDim Tmp(1 To 1, 1 To 1)
-33                Tmp(1, 1) = Data
-34                Data = Tmp
-35            Case 1
-36                ReDim Tmp(LBound(Data) To UBound(Data), 1 To 1)
-37                For i = LBound(Data) To UBound(Data)
-38                    Tmp(i, 1) = Data(i)
-39                Next i
-40                Data = Tmp
-41            Case Is > 2
-42                Throw Err_Dimensions
-43        End Select
+33                ReDim Tmp(1 To 1, 1 To 1)
+34                Tmp(1, 1) = Data
+35                Data = Tmp
+36            Case 1
+37                ReDim Tmp(LBound(Data) To UBound(Data), 1 To 1)
+38                For i = LBound(Data) To UBound(Data)
+39                    Tmp(i, 1) = Data(i)
+40                Next i
+41                Data = Tmp
+42            Case Is > 2
+43                Throw Err_Dimensions
+44        End Select
 
-44        Set Encoder = MakeEncoder(TrueString, FalseString)
+45        Set Encoder = MakeEncoder(TrueString, FalseString)
 
-45        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
-46        ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
+46        ReDim OneLine(LBound(Data, 2) To UBound(Data, 2))
+47        ReDim Lines(LBound(Data) To UBound(Data) + 1) 'add one to ensure that result has a terminating EOL
         
-47        For i = LBound(Data) To UBound(Data)
-48            For j = LBound(Data, 2) To UBound(Data, 2)
-49                OneLine(j) = Encode(Data(i, j), QuoteAllStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
-50            Next j
-51            Lines(i) = VBA.Join(OneLine, Delimiter)
-52        Next i
-53        FileContents = VBA.Join(Lines, EOL)
+48        For i = LBound(Data) To UBound(Data)
+49            For j = LBound(Data, 2) To UBound(Data, 2)
+50                OneLine(j) = Encode(Data(i, j), QuoteSimpleStrings, QuoteComplexStrings, DateFormat, DateTimeFormat, Delimiter, Encoder)
+51            Next j
+52            Lines(i) = VBA.Join(OneLine, Delimiter)
+53        Next i
+54        FileContents = VBA.Join(Lines, EOL)
           
-54        If WriteToFile Then
-55            CSVWrite = SaveTextFile(FileName, FileContents, Encoding)
-56        Else
-57            If Len(FileContents) > MaxStringLengthInArray() Then
-58                If TypeName(Application.Caller) = "Range" Then
-59                    Throw "Cannot return string of length " & Format$(CStr(Len(FileContents)), "#,###") & _
+55        If WriteToFile Then
+56            CSVWrite = SaveTextFile(FileName, FileContents, Encoding)
+57        Else
+58            If Len(FileContents) > MaxStringLengthInArray() Then
+59                If TypeName(Application.Caller) = "Range" Then
+60                    Throw "Cannot return string of length " & Format$(CStr(Len(FileContents)), "#,###") & _
                           " to a cell of an Excel worksheet"
-60                End If
-61            End If
-62            CSVWrite = FileContents
-63        End If
+61                End If
+62            End If
+63            CSVWrite = FileContents
+64        End If
           
-64        Exit Function
+65        Exit Function
 ErrHandler:
-65        CSVWrite = ReThrow("CSVWrite", Err, m_ErrorStyle = es_ReturnString)
+66        CSVWrite = ReThrow("CSVWrite", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3370,46 +3376,71 @@ ErrHandler:
 21        ReThrow "MakeEncoder", Err
 End Function
 
+'TODO Delete this method
+Function Encode2(x As String, QuoteSimpleStrings As Boolean, QuoteComplexStrings As Boolean)
+Const Delim As String = ","
+3                 If Not QuoteComplexStrings Then
+4                     Encode2 = x
+5                 ElseIf InStr(x, DQ) > 0 Then
+6                     Encode2 = DQ & Replace$(x, DQ, DQ2) & DQ
+7                 ElseIf QuoteSimpleStrings Then
+8                     Encode2 = DQ & x & DQ
+9                 ElseIf InStr(x, vbCr) > 0 Then
+10                    Encode2 = DQ & x & DQ
+11                ElseIf InStr(x, vbLf) > 0 Then
+12                    Encode2 = DQ & x & DQ
+13                ElseIf InStr(x, Delim) > 0 Then
+14                    Encode2 = DQ & x & DQ
+15                Else
+16                    Encode2 = x
+17                End If
+
+End Function
+
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Encode
 ' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Encode(ByVal x As Variant, ByVal QuoteAllStrings As Boolean, ByVal DateFormat As String, _
-          ByVal DateTimeFormat As String, ByVal Delim As String, Encoder As Scripting.Dictionary) As String
+Private Function Encode(ByVal x As Variant, QuoteSimpleStrings As Boolean, QuoteComplexStrings As Boolean, DateFormat As String, _
+          DateTimeFormat As String, Delim As String, Encoder As Scripting.Dictionary) As String
           
 1         On Error GoTo ErrHandler
 2         Select Case VarType(x)
 
               Case vbString
-3                 If InStr(x, DQ) > 0 Then
-4                     Encode = DQ & Replace$(x, DQ, DQ2) & DQ
-5                 ElseIf QuoteAllStrings Then
-6                     Encode = DQ & x & DQ
-7                 ElseIf InStr(x, vbCr) > 0 Then
+                'We do not handle case QuoteSimpleStrings = TRUE and QuoteComplexStrings = FALSE as that case is never encountered
+3                 If Not QuoteComplexStrings Then
+4                     Encode = x
+5                 ElseIf InStr(x, DQ) > 0 Then
+6                     Encode = DQ & Replace$(x, DQ, DQ2) & DQ
+7                 ElseIf QuoteSimpleStrings Then
 8                     Encode = DQ & x & DQ
-9                 ElseIf InStr(x, vbLf) > 0 Then
+9                 ElseIf InStr(x, vbCr) > 0 Then
 10                    Encode = DQ & x & DQ
-11                ElseIf InStr(x, Delim) > 0 Then
+11                ElseIf InStr(x, vbLf) > 0 Then
 12                    Encode = DQ & x & DQ
-13                Else
-14                    Encode = x
-15                End If
-16            Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty, 20 '20 = vbLongLong - not available on 32 bit.
-17                Encode = CStr(x)
-18            Case vbBoolean, vbError, vbNull
-19                Encode = Encoder(x)
-20            Case vbDate
-21                If CLng(x) = x Then
-22                    Encode = Format$(x, DateFormat)
-23                Else
-24                    Encode = Format$(x, DateTimeFormat)
-25                End If
-26            Case Else
-27                Throw "Cannot convert variant of type " & TypeName(x) & " to String"
-28        End Select
-29        Exit Function
+13                ElseIf InStr(x, Delim) > 0 Then
+14                    Encode = DQ & x & DQ
+15                Else
+16                    Encode = x
+17                End If
+18            Case vbInteger, vbLong, vbSingle, vbDouble, vbCurrency, vbEmpty, 20 '20 = vbLongLong - not available on 32 bit.
+19                Encode = CStr(x)
+20            Case vbBoolean, vbError, vbNull
+21                Encode = Encoder(x)
+22            Case vbDate
+23                If CLng(x) = x Then
+24                    Encode = Format$(x, DateFormat)
+25                Else
+26                    Encode = Format$(x, DateTimeFormat)
+27                End If
+28            Case Else
+29                Throw "Cannot convert variant of type " & TypeName(x) & " to String"
+30        End Select
+31        Exit Function
 ErrHandler:
-30        ReThrow "Encode", Err
+32        ReThrow "Encode", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4152,6 +4183,31 @@ ErrHandler:
 48        ReThrow "AmendSkipToColAndNumCols", Err
 End Sub
 
+Private Sub ParseQuoteAllStrings(QuoteAllStrings, ByRef QuoteSimpleStrings As Boolean, QuoteComplexStrings As Boolean)
+
+          Const Err_QuoteAllStrings = "QuoteAllStrings must be TRUE (quote all strings in Data), FALSE (quote only strings containing delimiter, double quote, line feed or carriage return) or ""Raw"" (no strings are not quoted)"
+
+1         If VarType(QuoteAllStrings) = vbBoolean Then
+2             If QuoteAllStrings Then
+3                 QuoteSimpleStrings = True
+4                 QuoteComplexStrings = True
+5             Else
+6                 QuoteSimpleStrings = False
+7                 QuoteComplexStrings = True
+8             End If
+9         ElseIf VarType(QuoteAllStrings) = vbString Then
+10            If StrComp(QuoteAllStrings, "Raw", vbTextCompare) = 0 Then
+11                QuoteSimpleStrings = False
+12                QuoteComplexStrings = False
+13            Else
+14                Throw Err_QuoteAllStrings
+15            End If
+16        Else
+17            Throw Err_QuoteAllStrings
+18        End If
+End Sub
+
+
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVRead
 ' Purpose    : Register the function CSVRead with the Excel function wizard. Suggest this function is called from a
@@ -4235,8 +4291,8 @@ Public Sub RegisterCSVWrite()
     ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
                   "function returns Data converted CSV-style to a string."
     ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
-                  "FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. " & _
-                  "Double quotes are always escaped by another double quote."
+                  "FALSE only strings containing Delimiter, line feed, carriage return or quote are quoted. If " & _
+                  """Raw"" no strings are quoted. The file may not be valid csv format."
     ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
                   "file. If omitted, defaults to `yyyy-mm-dd`."
     ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
@@ -4259,4 +4315,3 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
     Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
-
