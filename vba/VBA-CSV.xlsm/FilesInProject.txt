@@ -14,6 +14,7 @@ Formulas\Performance (8).txt
 Formulas\Performance (9).txt
 Formulas\Performance.txt
 Formulas\RegExp.txt
+Formulas\Sheet1.txt
 Formulas\Test.txt
 VBA\CSVinterface.cls
 VBA\ECPArrayList.cls

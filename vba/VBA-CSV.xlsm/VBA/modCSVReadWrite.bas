@@ -80,7 +80,7 @@ End Enum
 ' ConvertTypes: Controls whether fields in the file are converted to typed values or remain as strings, and
 '             sets the treatment of "quoted fields" and space characters.
 '
-'             ConvertTypes should be a string of zero or more letters from allowed characters `NDBETQ`.
+'             ConvertTypes should be a string of zero or more letters from allowed characters `NDBETQK`.
 '
 '             The most commonly useful letters are:
 '             1) `N` number fields are returned as numbers (Doubles).
@@ -90,19 +90,20 @@ End Enum
 '             ConvertTypes is optional and defaults to the null string for no type conversion. `TRUE` is
 '             equivalent to `NDB` and `FALSE` to the null string.
 '
-'             Three further options are available:
+'             Four further options are available:
 '             4) `E` fields that match Excel errors are converted to error values. There are fourteen of
 '             these, including `#N/A`, `#NAME?`, `#VALUE!` and `#DIV/0!`.
 '             5) `T` leading and trailing spaces are trimmed from fields. In the case of quoted fields,
 '             this will not remove spaces between the quotes.
 '             6) `Q` conversion happens for both quoted and unquoted fields; otherwise only unquoted fields
 '             are converted.
+'             7) `K` quoted fields are returned with their quotes kept in place.
 '
 '             For most files, correct type conversion can be achieved with ConvertTypes as a string which
 '             applies for all columns, but type conversion can also be specified on a per-column basis.
 '
 '             Enter an array (or range) with two columns or two rows, column numbers on the left/top and
-'             type conversion (subset of `NDBETQ`) on the right/bottom. Instead of column numbers, you can
+'             type conversion (subset of `NDBETQK`) on the right/bottom. Instead of column numbers, you can
 '             enter strings matching the contents of the header row, and a column number of zero applies to
 '             all columns not otherwise referenced.
 '
@@ -237,6 +238,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
           Dim ISO8601 As Boolean
           Dim j As Long
           Dim k As Long
+          Dim KeepQuotes As Boolean
           Dim Lengths() As Long
           Dim MaxSentinelLength As Long
           Dim MSLIA As Long
@@ -319,7 +321,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
 42        ParseConvertTypes ConvertTypes, ShowNumbersAsNumbers, _
               ShowDatesAsDates, ShowBooleansAsBooleans, ShowErrorsAsErrors, _
-              ConvertQuoted, TrimFields, ColByColFormatting, HeaderRowNum, CTDict
+              ConvertQuoted, KeepQuotes, TrimFields, ColByColFormatting, HeaderRowNum, CTDict
 
 43        Set Sentinels = New Scripting.Dictionary
 44        MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
@@ -420,7 +422,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 113               If CallingFromWorksheet Then
 114                   If Lengths(k) > MSLIA Then
                           Dim UnquotedLength As Long
-115                       UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), DQ, 4))
+115                       UnquotedLength = Len(Unquote(Mid$(CSVContents, Starts(k), Lengths(k)), DQ, 4, KeepQuotes))
 116                       If UnquotedLength > MSLIA Then
 117                           Err_StringTooLong = "The file has a field (row " & CStr(i + SkipToRow - 1) & _
                                   ", column " & CStr(j + SkipToCol - 1) & ") of length " & Format$(UnquotedLength, "###,###")
@@ -440,7 +442,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 128                   ReturnArray(i + Adj, j + Adj) = Mid$(CSVContents, Starts(k), Lengths(k))
 129               Else
 130                   ReturnArray(i + Adj, j + Adj) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
-                          Lengths(k), TrimFields, DQ, QuoteCounts(k), ConvertQuoted, ShowNumbersAsNumbers, SepStandard, _
+                          Lengths(k), TrimFields, DQ, QuoteCounts(k), ConvertQuoted, KeepQuotes, ShowNumbersAsNumbers, SepStandard, _
                           DecimalSeparator, SysDecimalSeparator, ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, _
                           AcceptWithTimeZone, DateOrder, DateSeparator, SysDateSeparator, AnySentinels, _
                           Sentinels, MaxSentinelLength, ShowMissingsAs, AscSeparator)
@@ -520,7 +522,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 189               If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
                   
 190               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
-                      ShowErrorsAsErrors, ConvertQuoted, TrimFields
+                      ShowErrorsAsErrors, ConvertQuoted, KeepQuotes, TrimFields
                   
 191               AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
                       ShowBooleansAsBooleans Or ShowErrorsAsErrors
@@ -535,7 +537,7 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 196                       Field = CStr(ReturnArray(i + Adj, j + Adj))
 197                       QC = CountQuotes(Field, DQ)
 198                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
-                              Len(ReturnArray(i + Adj, j + Adj)), TrimFields, DQ, QC, ConvertQuoted, _
+                              Len(ReturnArray(i + Adj, j + Adj)), TrimFields, DQ, QC, ConvertQuoted, KeepQuotes, _
                               ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
                               ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone, DateOrder, _
                               DateSeparator, SysDateSeparator, AnySentinels, Sentinels, _
@@ -695,7 +697,7 @@ Private Function IsCTValid(CT As Variant) As Boolean
 3             Set rx = New RegExp
 4             With rx
 5                 .IgnoreCase = True
-6                 .Pattern = "^[NDBETQ]*$"
+6                 .Pattern = "^[NDBETQK]*$"
 7                 .Global = False        'Find first match only
 8             End With
 9         End If
@@ -750,7 +752,8 @@ Private Function StandardiseCT(CT As Variant) As String
                   IIf(InStr(1, CT, "E", vbTextCompare), "E", vbNullString) & _
                   IIf(InStr(1, CT, "N", vbTextCompare), "N", vbNullString) & _
                   IIf(InStr(1, CT, "Q", vbTextCompare), "Q", vbNullString) & _
-                  IIf(InStr(1, CT, "T", vbTextCompare), "T", vbNullString)
+                  IIf(InStr(1, CT, "T", vbTextCompare), "T", vbNullString) & _
+                  IIf(InStr(1, CT, "K", vbTextCompare), "K", vbNullString)
 11        End If
 12        Exit Function
 ErrHandler:
@@ -774,6 +777,7 @@ End Function
 '  ShowBooleansAsBooleans: Set only if ConvertTypes is not an array
 '  ShowErrorsAsErrors    : Set only if ConvertTypes is not an array
 '  ConvertQuoted         : Set only if ConvertTypes is not an array
+'  KeepQuotes            : Set only if ConvertTypes is not an array
 '  TrimFields            : Set only if ConvertTypes is not an array
 '  ColByColFormatting    : Set to True if ConvertTypes is an array
 '  HeaderRowNum          : As passed to CSVRead, used to throw an error if HeaderRowNum has not been specified when
@@ -783,7 +787,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAsNumbers As Boolean, _
           ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
-          ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean, _
+          ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef KeepQuotes As Boolean, ByRef TrimFields As Boolean, _
           ByRef ColByColFormatting As Boolean, HeaderRowNum As Long, ByRef CTDict As Scripting.Dictionary)
           
           Const Err_2D As String = "If ConvertTypes is given as a two dimensional array then the " & _
@@ -793,7 +797,7 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
               "ConvertTypes must be strings or non-negative whole numbers"
           Const Err_BadCT As String = "Type Conversion given in bottom row (or right column) of ConvertTypes must be " & _
               "Booleans or strings containing letters NDBETQ"
-          Const Err_ConvertTypes As String = "ConvertTypes must be a Boolean, a string with allowed letters ""NDBETQ"" or an array"
+          Const Err_ConvertTypes As String = "ConvertTypes must be a Boolean, a string with allowed letters ""NDBETQK"" or an array"
           Const Err_HeaderRowNum As String = "ConvertTypes specifies columns by their header (instead of by number), " & _
               "but HeaderRowNum has not been specified"
           
@@ -812,7 +816,7 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
 
 3         If VarType(ConvertTypes) = vbString Or IsEmpty(ConvertTypes) Then
 4             ParseCTString CStr(ConvertTypes), ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
-                  ShowErrorsAsErrors, ConvertQuoted, TrimFields
+                  ShowErrorsAsErrors, ConvertQuoted, KeepQuotes, TrimFields
 5             ColByColFormatting = False
 6             Exit Sub
 7         End If
@@ -911,11 +915,12 @@ End Sub
 '                          Booleans?
 '  ShowErrorsAsErrors    : Should fields in the file that look like Excel errors (#N/A #REF! etc) be returned as errors?
 '  ConvertQuoted         : Should the four conversion rules above apply even to quoted fields?
+'  KeepQuotes            : Should quotes be kept? If True then quotes fields are returned to Excel with their leading and trailing quotes..
 '  TrimFields            : Should leading and trailing spaces be trimmed from fields?
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbers As Boolean, _
           ByRef ShowDatesAsDates As Boolean, ByRef ShowBooleansAsBooleans As Boolean, _
-          ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef TrimFields As Boolean)
+          ByRef ShowErrorsAsErrors As Boolean, ByRef ConvertQuoted As Boolean, ByRef KeepQuotes As Boolean, ByRef TrimFields As Boolean)
 
           Const Err_ConvertTypes As String = "ConvertTypes must be Boolean or string with allowed letters NDBETQ. " & _
               """N"" show numbers as numbers, ""D"" show dates as dates, ""B"" show Booleans " & _
@@ -924,6 +929,7 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
               "(convert unquoted numbers, dates and Booleans), FALSE = no conversion"
           Const Err_Quoted As String = "ConvertTypes is incorrect, ""Q"" indicates that conversion should apply even to " & _
               "quoted fields, but none of ""N"", ""D"", ""B"" or ""E"" are present to indicate which type conversion to apply"
+          Const Err_KQ As String = "ConvertTypes is incorrect, since it contains both ""Q"" and ""K"" which specify incompatible treatment of quoted fields"
           Dim i As Long
 
 1         On Error GoTo ErrHandler
@@ -933,35 +939,42 @@ Private Sub ParseCTString(ByVal ConvertTypes As String, ByRef ShowNumbersAsNumbe
 4         ShowBooleansAsBooleans = False
 5         ShowErrorsAsErrors = False
 6         ConvertQuoted = False
-7         For i = 1 To Len(ConvertTypes)
-              'Adding another letter? Also change method IsCTValid!
-8             Select Case UCase$(Mid$(ConvertTypes, i, 1))
+7         KeepQuotes = False
+8         For i = 1 To Len(ConvertTypes)
+              'Adding another letter? Also change methods IsCTValid and StandardiseCT.
+9             Select Case UCase$(Mid$(ConvertTypes, i, 1))
                   Case "N"
-9                     ShowNumbersAsNumbers = True
-10                Case "D"
-11                    ShowDatesAsDates = True
-12                Case "B"
-13                    ShowBooleansAsBooleans = True
-14                Case "E"
-15                    ShowErrorsAsErrors = True
-16                Case "Q"
-17                    ConvertQuoted = True
-18                Case "T"
-19                    TrimFields = True
-20                Case Else
-21                    Throw Err_ConvertTypes & " Found unrecognised character '" _
+10                    ShowNumbersAsNumbers = True
+11                Case "D"
+12                    ShowDatesAsDates = True
+13                Case "B"
+14                    ShowBooleansAsBooleans = True
+15                Case "E"
+16                    ShowErrorsAsErrors = True
+17                Case "Q"
+18                    ConvertQuoted = True
+19                Case "T"
+20                    TrimFields = True
+21                Case "K"
+22                    KeepQuotes = True
+23                Case Else
+24                    Throw Err_ConvertTypes & " Found unrecognised character '" _
                           & Mid$(ConvertTypes, i, 1) & "'"
-22            End Select
-23        Next i
+25            End Select
+26        Next i
           
-24        If ConvertQuoted And Not (ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+27        If ConvertQuoted And KeepQuotes Then
+28            Throw Err_KQ
+29        End If
+          
+30        If ConvertQuoted And Not (ShowNumbersAsNumbers Or ShowDatesAsDates Or _
               ShowBooleansAsBooleans Or ShowErrorsAsErrors) Then
-25            Throw Err_Quoted
-26        End If
+31            Throw Err_Quoted
+32        End If
 
-27        Exit Sub
+33        Exit Sub
 ErrHandler:
-28        ReThrow "ParseCTString", Err
+34        ReThrow "ParseCTString", Err
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -1534,12 +1547,12 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
 123                       If HaveReachedSkipToRow Then
 124                           If RowNum + SkipToRow - 1 = HeaderRowNum Then
 125                               HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
-                                      ColIndexes, QuoteCounts, j)
+                                      ColIndexes, QuoteCounts, j, False) 'TODO need to consider whether passing KeepQuotes as false is correct behaviour in this case
 126                           End If
 127                       Else
 128                           If RowNum = HeaderRowNum Then
 129                               HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
-                                      ColIndexes, QuoteCounts, j)
+                                      ColIndexes, QuoteCounts, j, False) 'TODO need to consider whether passing KeepQuotes as false is correct behaviour in this case
 130                           End If
 131                       End If
                           
@@ -1637,7 +1650,7 @@ End Function
 '              field in the header row
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() As Long, _
-          ColIndexes() As Long, QuoteCounts() As Long, j As Long) As Variant
+          ColIndexes() As Long, QuoteCounts() As Long, j As Long, KeepQuotes As Boolean) As Variant
           Dim NC As Long
 
           Dim Field As String
@@ -1650,7 +1663,7 @@ Private Function GetLastParsedRow(Buffer As String, Starts() As Long, Lengths() 
 3         ReDim Res(1 To 1, 1 To NC)
 4         For i = j To j - NC + 1 Step -1
 5             Field = Mid$(Buffer, Starts(i), Lengths(i))
-6             Res(1, NC + i - j) = Unquote(Trim$(Field), DQ, QuoteCounts(i))
+6             Res(1, NC + i - j) = Unquote(Trim$(Field), DQ, QuoteCounts(i), KeepQuotes)
 7         Next i
 8         GetLastParsedRow = Res
 
@@ -1927,6 +1940,7 @@ End Function
 '  QuoteCount           : How many quote characters does Field contain?
 '  ConvertQuoted        : Should quoted fields (after quote removal) be converted according to arguments
 '                         ShowNumbersAsNumbers, ShowDatesAsDates, and the contents of Sentinels.
+'  KeepQuotes           : Should quotes be kept instead of removed?
 'Numbers
 '  ShowNumbersAsNumbers : If Field is a string representation of a number should the function return that number?
 '  SepStandard          : Is the decimal separator the same as the system defaults? If True then the next two arguments
@@ -1953,7 +1967,7 @@ End Function
 '                         ShowMissingsAs, thanks to method MakeSentinels.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, _
-          TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, _
+          TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, KeepQuotes As Boolean, _
           ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
           SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
           AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
@@ -1997,82 +2011,88 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
 27        End If
 
 28        If quoteCount > 0 Then
-29            If Left$(Field, 1) = QuoteChar Then
-30                If Right$(Field, 1) = QuoteChar Then
-31                    Field = Mid$(Field, 2, FieldLength - 2)
-32                    If quoteCount > 2 Then
-33                        Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
-34                    End If
-35                    If ConvertQuoted Then
-36                        FieldLength = Len(Field)
-37                    Else
-38                        ConvertField = Field
-39                        Exit Function
-40                    End If
-41                End If
-42            End If
-43        End If
+29            If KeepQuotes Then
+30                ConvertField = Field
+31                Exit Function
+32            End If
+33            If Left$(Field, 1) = QuoteChar Then
+34                If Right$(Field, 1) = QuoteChar Then
+35                    Field = Mid$(Field, 2, FieldLength - 2)
+36                    If quoteCount > 2 Then
+37                        Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
+38                    End If
+39                    If ConvertQuoted Then
+40                        FieldLength = Len(Field)
+41                    Else
+42                        ConvertField = Field
+43                        Exit Function
+44                    End If
+45                End If
+46            End If
+47        End If
 
-44        If Not ConvertQuoted Then
-45            If quoteCount > 0 Then
-46                ConvertField = Field
-47                Exit Function
-48            End If
-49        End If
+48        If Not ConvertQuoted Then
+49            If quoteCount > 0 Then
+50                ConvertField = Field
+51                Exit Function
+52            End If
+53        End If
 
-50        If ShowNumbersAsNumbers Then
-51            CastToDouble Field, dblResult, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
-52            If Converted Then
-53                ConvertField = dblResult
-54                Exit Function
-55            End If
-56        End If
+54        If ShowNumbersAsNumbers Then
+55            CastToDouble Field, dblResult, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
+56            If Converted Then
+57                ConvertField = dblResult
+58                Exit Function
+59            End If
+60        End If
 
-57        If ShowDatesAsDates Then
-58            If ISO8601 Then
-59                CastISO8601 Field, dtResult, Converted, AcceptWithoutTimeZone, AcceptWithTimeZone
-60            Else
-61                CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateSeparator, Converted
-62            End If
-63            If Not Converted Then
-64                If InStr(Field, ":") > 0 Then
-65                    CastToTime Field, dtResult, Converted
-66                    If Not Converted Then
-67                        CastToTimeB Field, dtResult, Converted
-68                    End If
-69                End If
-70            End If
-71            If Converted Then
-72                ConvertField = dtResult
-73                Exit Function
+61        If ShowDatesAsDates Then
+62            If ISO8601 Then
+63                CastISO8601 Field, dtResult, Converted, AcceptWithoutTimeZone, AcceptWithTimeZone
+64            Else
+65                CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateSeparator, Converted
+66            End If
+67            If Not Converted Then
+68                If InStr(Field, ":") > 0 Then
+69                    CastToTime Field, dtResult, Converted
+70                    If Not Converted Then
+71                        CastToTimeB Field, dtResult, Converted
+72                    End If
+73                End If
 74            End If
-75        End If
+75            If Converted Then
+76                ConvertField = dtResult
+77                Exit Function
+78            End If
+79        End If
 
-76        ConvertField = Field
+80        ConvertField = Field
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Unquote
 ' Purpose    : Unquote a field.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function Unquote(ByVal Field As String, QuoteChar As String, quoteCount As Long) As String
+Private Function Unquote(ByVal Field As String, QuoteChar As String, quoteCount As Long, KeepQuotes As Boolean) As String
 
 1         On Error GoTo ErrHandler
 2         If quoteCount > 0 Then
-3             If Left$(Field, 1) = QuoteChar Then
-4                 If Right$(QuoteChar, 1) = QuoteChar Then
-5                     Field = Mid$(Field, 2, Len(Field) - 2)
-6                     If quoteCount > 2 Then
-7                         Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
-8                     End If
-9                 End If
-10            End If
-11        End If
-12        Unquote = Field
+3             If Not KeepQuotes Then
+4                 If Left$(Field, 1) = QuoteChar Then
+5                     If Right$(QuoteChar, 1) = QuoteChar Then
+6                         Field = Mid$(Field, 2, Len(Field) - 2)
+7                         If quoteCount > 2 Then
+8                             Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
+9                         End If
+10                    End If
+11                End If
+12            End If
+13        End If
+14        Unquote = Field
 
-13        Exit Function
+15        Exit Function
 ErrHandler:
-14        ReThrow "Unquote", Err
+16        ReThrow "Unquote", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4138,60 +4158,60 @@ End Sub
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub RegisterCSVRead()
-          Const Description As String = "Returns the contents of a comma-separated file on disk as an array."
-          Dim ArgDescs() As String
+    Const Description As String = "Returns the contents of a comma-separated file on disk as an array."
+    Dim ArgDescs() As String
 
-1         On Error GoTo ErrHandler
+    On Error GoTo ErrHandler
 
-2         ReDim ArgDescs(1 To 19)
-3         ArgDescs(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV " & _
-              "format."
-4         ArgDescs(2) = "Type conversion: Boolean or string. Allowed letters NDBETQ. N = convert Numbers, D = convert " & _
-              "Dates, B = convert Booleans, E = convert Excel errors, T = trim leading & trailing spaces, Q = " & _
-              "quoted fields also converted. TRUE = NDB, FALSE = no conversion."
-5         ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found " & _
-              "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
-              "contents as would be displayed in a text editor."
-6         ArgDescs(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after " & _
-              "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
-              "padding between fields."
-7         ArgDescs(5) = "The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO` " & _
-              "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
-              "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
-8         ArgDescs(6) = "Rows that start with this string will be skipped while parsing."
-9         ArgDescs(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column " & _
-              "will be assigned ShowMissingsAs for that empty row)."
-10        ArgDescs(8) = "The row in the file containing headers. Optional and defaults to 0. Type conversion is not " & _
-              "applied to fields in the header row, though leading and trailing spaces are trimmed."
-11        ArgDescs(9) = "The first row in the file that's included in the return. Optional and defaults to one more than " & _
-              "HeaderRowNum."
-12        ArgDescs(10) = "The column in the file at which reading starts, as a number or a string matching one of the " & _
-              "file's headers. Optional and defaults to 1 to read from the first column."
-13        ArgDescs(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the " & _
-              "end of the file are read."
-14        ArgDescs(12) = "If a number, sets the number of columns to read from the file. If a string matching one of the " & _
-              "file's headers, sets the last column to be read. If omitted (or zero), all columns from " & _
-              "SkipToCol are read."
-15        ArgDescs(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings " & _
-              "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
-16        ArgDescs(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings " & _
-              "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
-17        ArgDescs(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings " & _
-              "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
-              "considered missing."
-18        ArgDescs(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the " & _
-              "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
-              "string or `#N/A!` error value can be good alternatives."
-19        ArgDescs(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be " & _
-              "omitted and CSVRead will detect the file's encoding."
-20        ArgDescs(18) = "The character that represents a decimal point. If omitted, then the value from Windows " & _
-              "regional settings is used."
-21        ArgDescs(19) = "For use from VBA only."
-22        Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgDescs
-23        Exit Sub
+    ReDim ArgDescs(1 To 19)
+    ArgDescs(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV " & _
+                  "format."
+    ArgDescs(2) = "Type conversion: Boolean or string. Allowed letters NDBETQK. N = Numbers, D = Dates, B = " & _
+                  "Booleans, E = Excel errors, T = trim leading & trailing spaces, Q = quoted fields also " & _
+                  "converted, K = quotes kept. TRUE = NDB, FALSE = no conversion."
+    ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found " & _
+                  "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
+                  "contents as would be displayed in a text editor."
+    ArgDescs(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after " & _
+                  "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
+                  "padding between fields."
+    ArgDescs(5) = "The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO` " & _
+                  "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
+                  "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
+    ArgDescs(6) = "Rows that start with this string will be skipped while parsing."
+    ArgDescs(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column " & _
+                  "will be assigned ShowMissingsAs for that empty row)."
+    ArgDescs(8) = "The row in the file containing headers. Optional and defaults to 0. Type conversion is not " & _
+                  "applied to fields in the header row, though leading and trailing spaces are trimmed."
+    ArgDescs(9) = "The first row in the file that's included in the return. Optional and defaults to one more than " & _
+                  "HeaderRowNum."
+    ArgDescs(10) = "The column in the file at which reading starts, as a number or a string matching one of the " & _
+                   "file's headers. Optional and defaults to 1 to read from the first column."
+    ArgDescs(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the " & _
+                   "end of the file are read."
+    ArgDescs(12) = "If a number, sets the number of columns to read from the file. If a string matching one of the " & _
+                   "file's headers, sets the last column to be read. If omitted (or zero), all columns from " & _
+                   "SkipToCol are read."
+    ArgDescs(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings " & _
+                   "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
+    ArgDescs(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings " & _
+                   "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
+    ArgDescs(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings " & _
+                   "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
+                   "considered missing."
+    ArgDescs(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the " & _
+                   "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
+                   "string or `#N/A!` error value can be good alternatives."
+    ArgDescs(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be " & _
+                   "omitted and CSVRead will detect the file's encoding."
+    ArgDescs(18) = "The character that represents a decimal point. If omitted, then the value from Windows " & _
+                   "regional settings is used."
+    ArgDescs(19) = "For use from VBA only."
+    Application.MacroOptions "CSVRead", Description, , , , , , , , , ArgDescs
+    Exit Sub
 
 ErrHandler:
-24        Debug.Print "Warning: Registration of function CSVRead failed with error: " & Err.Description
+    Debug.Print "Warning: Registration of function CSVRead failed with error: " & Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4200,43 +4220,43 @@ End Sub
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub RegisterCSVWrite()
-          Const Description As String = "Creates a comma-separated file on disk containing Data. Any existing file of " & _
-              "the same name is overwritten. If successful, the function returns FileName, " & _
-              "otherwise an ""error string"" (starts with `#`, ends with `!`) describing what " & _
-              "went wrong."
-          Dim ArgDescs() As String
+    Const Description As String = "Creates a comma-separated file on disk containing Data. Any existing file of " & _
+                                  "the same name is overwritten. If successful, the function returns FileName, " & _
+                                  "otherwise an ""error string"" (starts with `#`, ends with `!`) describing what " & _
+                                  "went wrong."
+    Dim ArgDescs() As String
 
-1         On Error GoTo ErrHandler
+    On Error GoTo ErrHandler
 
-2         ReDim ArgDescs(1 To 10)
-3         ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
-              "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
-              "dimension then the output file has a single column, one field per row."
-4         ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
-              "function returns Data converted CSV-style to a string."
-5         ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
-              "FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. " & _
-              "Double quotes are always escaped by another double quote."
-6         ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
-              "file. If omitted, defaults to `yyyy-mm-dd`."
-7         ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
-              "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
-              "inconsistent across the datetimes in data."
-8         ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
-              "character."
-9         ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this " & _
-              "argument is `ANSI` but Data contains characters that cannot be written to an ANSI file. `UTF-8` " & _
-              "and `UTF-16` files are written with a byte option mark."
-10        ArgDescs(8) = "Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending " & _
-              "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
-              "is provided, or `Unix` if not."
-11        ArgDescs(9) = "How the Boolean value True is to be represented in the file. Optional, defaulting to ""True""."
-12        ArgDescs(10) = "How the Boolean value False is to be represented in the file. Optional, defaulting to " & _
-              """False""."
-13        Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
-14        Exit Sub
+    ReDim ArgDescs(1 To 10)
+    ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
+                  "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
+                  "dimension then the output file has a single column, one field per row."
+    ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
+                  "function returns Data converted CSV-style to a string."
+    ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
+                  "FALSE only strings containing Delimiter, line feed, carriage return or double quote are quoted. " & _
+                  "Double quotes are always escaped by another double quote."
+    ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
+                  "file. If omitted, defaults to `yyyy-mm-dd`."
+    ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
+                  "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
+                  "inconsistent across the datetimes in data."
+    ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
+                  "character."
+    ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this " & _
+                  "argument is `ANSI` but Data contains characters that cannot be written to an ANSI file. `UTF-8` " & _
+                  "and `UTF-16` files are written with a byte option mark."
+    ArgDescs(8) = "Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending " & _
+                  "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
+                  "is provided, or `Unix` if not."
+    ArgDescs(9) = "How the Boolean value True is to be represented in the file. Optional, defaulting to ""True""."
+    ArgDescs(10) = "How the Boolean value False is to be represented in the file. Optional, defaulting to " & _
+                   """False""."
+    Application.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
+    Exit Sub
 
 ErrHandler:
-15        Debug.Print "Warning: Registration of function CSVWrite failed with error: " + Err.Description
+    Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
 

@@ -7241,3 +7241,88 @@ ErrHandler:
 End Sub
 
 
+Private Sub Test272(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test keep quotes"
+    Expected = HStack( _
+        Array("""Col1""", "1", "2", "3"), _
+        Array("""Col2""", """x""", """y""", """z"""), _
+        Array("""Col3""", """x""", """y""", """z"""), _
+        Array("""Col4""", "True", "False", "True"))
+    FileName = "test_keep_quotes.csv"
+    TestRes = TestCSVRead(272, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="K", _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test272", Err
+End Sub
+
+Private Sub Test273(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test keep quotes"
+    Expected = HStack( _
+        Array("""Col1""", 1#, 2#, 3#), _
+        Array("""Col2""", """x""", """y""", """z"""), _
+        Array("""Col3""", """x""", """y""", """z"""), _
+        Array("""Col4""", True, False, True))
+    FileName = "test_keep_quotes.csv"
+    TestRes = TestCSVRead(273, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:="KNB", _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test273", Err
+End Sub
+
+Private Sub Test274(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test keep quotes"
+    Expected = HStack( _
+        Array("Col1", 1#, 2#, 3#), _
+        Array("""Col2""", """x""", """y""", """z"""), _
+        Array("Col3", "x", "y", "z"), _
+        Array("Col4", True, False, True))
+    FileName = "test_keep_quotes.csv"
+    TestRes = TestCSVRead(274, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=HStack(Array(1#, 2#, 3#, 4#), Array(True, "K", True, True)), _
+        IgnoreEmptyLines:=False, _
+        ShowMissingsAs:=Empty)
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test274", Err
+End Sub
+
+
+
+
+
