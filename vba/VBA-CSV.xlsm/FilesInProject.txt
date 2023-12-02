@@ -15,6 +15,25 @@ Formulas\Performance (9).txt
 Formulas\Performance.txt
 Formulas\RegExp.txt
 Formulas\Test.txt
+Values\Audit.csv
+Values\CSVWriteTests.csv
+Values\DateParsingTest.csv
+Values\GIF.csv
+Values\GIF2.csv
+Values\GIF3.csv
+Values\HiddenSheet.csv
+Values\Performance (10).csv
+Values\Performance (2).csv
+Values\Performance (3).csv
+Values\Performance (4).csv
+Values\Performance (6).csv
+Values\Performance (7).csv
+Values\Performance (8).csv
+Values\Performance (9).csv
+Values\Performance.csv
+Values\RegExp.csv
+Values\Test.csv
+Values\TestResults.csv
 VBA\CSVinterface.cls
 VBA\ECPArrayList.cls
 VBA\ECPTextStream.cls

@@ -104,7 +104,7 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 |`FalseStrings`|Indicates how `FALSE` values are represented in the file. May be a string, an array of strings or a range containing strings; by default, `FALSE`, `False` and `false` are recognised.|
 |`MissingStrings`|Indicates how missing values are represented in the file. May be a string, an array of strings or a range containing strings. By default, only an empty field (consecutive delimiters) is considered missing.|
 |`ShowMissingsAs`|Fields which are missing in the file (consecutive delimiters) or match one of the `MissingStrings` are returned in the array as `ShowMissingsAs`. Defaults to Empty, but the null string or `#N/A!` error value can be good alternatives.<br/><br/>If `NumRows` is greater than the number of rows in the file then the return is "padded" with the value of `ShowMissingsAs`. Likewise, if `NumCols` is greater than the number of columns in the file.|
-|`Encoding`|Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work, then it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte option mark to identify the encoding. Experiment with `Encoding` as each of `UTF-8` and `UTF-16`.<br/><br/>`ANSI` is taken to mean [`Windows-1252`](https://en.wikipedia.org/wiki/Windows-1252) encoding.|
+|`Encoding`|Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be omitted and `CSVRead` will detect the file's encoding. If auto-detection does not work, then it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte order mark to identify the encoding. Experiment with `Encoding` as each of `UTF-8` and `UTF-16`.<br/><br/>`ANSI` is taken to mean [`Windows-1252`](https://en.wikipedia.org/wiki/Windows-1252) encoding.|
 |`DecimalSeparator`|In many places in the world, floating point number decimals are separated with a comma instead of a period (3,14 vs. 3.14). `CSVRead` can correctly parse these numbers by passing in the `DecimalSeparator` as a comma, in which case comma ceases to be a candidate if the parser needs to guess the `Delimiter`.|
 |`HeaderRow`|This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is populated with the contents of the header row, with no type conversion, though leading and trailing spaces are removed.|
 
@@ -115,7 +115,7 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 Creates a comma-separated file on disk containing `Data`. Any existing file of the same name is overwritten. If successful, the function returns `FileName`, otherwise an "error string" (starts with `#`, ends with `!`) describing what went wrong.
 ```vba
 Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As String, _
-          Optional ByVal QuoteAllStrings As Boolean = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
+          Optional ByVal QuoteAllStrings As Variant = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
           Optional TrueString As String = "True", Optional FalseString As String = "False") As String
@@ -129,7 +129,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
 |`DateFormat`|A format string that determines how dates, including cells formatted as dates, appear in the file. If omitted, defaults to `yyyy-mm-dd`.|
 |`DateTimeFormat`|Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be inconsistent across the datetimes in data.|
 |`Delimiter`|The delimiter string, if omitted defaults to a comma. `Delimiter` may have more than one character.|
-|`Encoding`|Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this argument is `ANSI` but `Data` contains characters that cannot be written to an ANSI file. `UTF-8` and `UTF-16` files are written with a byte option mark.|
+|`Encoding`|Allowed entries are `ANSI` (the default), `UTF-8`, `UTF-16`, `UTF-8NOBOM` and `UTF-16NOBOM`. An error will result if this argument is `ANSI` but `Data` contains characters with code point above 127.|
 |`EOL`|Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if `FileName` is provided, or `Unix` if not. The last line of the file is written with a line ending.|
 |`TrueString`|How the Boolean value True is to be represented in the file. Optional, defaulting to "True".|
 |`FalseString`|How the Boolean value False is to be represented in the file. Optional, defaulting to "False".|

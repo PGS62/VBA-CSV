@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2021 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.29
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.30
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -26,7 +26,7 @@ Attribute VB_Name = "modCSVReadWrite"
 '4) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.29/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.30/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 '5) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
@@ -162,7 +162,7 @@ End Enum
 '             the file.
 ' Encoding  : Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be
 '             omitted and CSVRead will detect the file's encoding. If auto-detection does not work, then
-'             it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte option mark to
+'             it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte order mark to
 '             identify the encoding. Experiment with Encoding as each of `UTF-8` and `UTF-16`.
 '
 '             `ANSI` is taken to mean `Windows-1252` encoding.
@@ -656,7 +656,7 @@ Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef C
 4         End If
               
 5         If VarType(Encoding) = vbString Then
-6             Select Case UCase$(Replace(Replace(Encoding, "-", vbNullString), " ", vbNullString))
+6             Select Case UCase$(Replace$(Replace$(Encoding, "-", vbNullString), " ", vbNullString))
                   Case "ASCII"
 7                     Encoding = "ASCII"
 8                     CharSet = "us-ascii"
@@ -667,10 +667,10 @@ Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef C
                       'HKEY_CLASSES_ROOT\MIME\Database\Charset in the Windows Registry.
 10                    Encoding = "ANSI"
 11                    CharSet = "windows-1252"
-12                Case "UTF8"
+12                Case "UTF8", "UTF8NOBOM"
 13                    Encoding = "UTF-8"
 14                    CharSet = "utf-8"
-15                Case "UTF16"
+15                Case "UTF16", "UTF16NOBOM"
 16                    Encoding = "UTF-16"
 17                    CharSet = "utf-16"
 18                Case Else
@@ -1006,7 +1006,7 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : DetectEncoding
-' Purpose    : Attempt to detect the file's encoding by looking for a byte option mark
+' Purpose    : Attempt to detect the file's encoding by looking for a byte order mark
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function DetectEncoding(FilePath As String)
 
@@ -1033,10 +1033,10 @@ Private Function DetectEncoding(FilePath As String)
           
 13        intAsc2Chr = Asc(T.Read(1))
 14        If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
-              'File is probably encoded UTF-16 LE BOM (little endian, with Byte Option Marker)
+              'File is probably encoded UTF-16 LE BOM (little endian, with Byte Order Mark)
 15            DetectEncoding = "UTF-16"
 16        ElseIf (intAsc1Chr = 254) And (intAsc2Chr = 255) Then
-              'File is probably encoded UTF-16 BE BOM (big endian, with Byte Option Marker)
+              'File is probably encoded UTF-16 BE BOM (big endian, with Byte Order Mark)
 17            DetectEncoding = "UTF-16"
 18        Else
 19            If T.AtEndOfStream Then
@@ -1321,7 +1321,7 @@ Private Sub ReplaceRepeats(ByRef TheString As String, TheChar As String)
           Dim ChCh As String
 1         ChCh = TheChar & TheChar
 2         Do While InStr(TheString, ChCh) > 0
-3             TheString = Replace(TheString, ChCh, TheChar)
+3             TheString = Replace$(TheString, ChCh, TheChar)
 4         Loop
 End Sub
 
@@ -2020,7 +2020,7 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
 34                If Right$(Field, 1) = QuoteChar Then
 35                    Field = Mid$(Field, 2, FieldLength - 2)
 36                    If quoteCount > 2 Then
-37                        Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
+37                        Field = Replace$(Field, QuoteChar & QuoteChar, QuoteChar)
 38                    End If
 39                    If ConvertQuoted Then
 40                        FieldLength = Len(Field)
@@ -2083,7 +2083,7 @@ Private Function Unquote(ByVal Field As String, QuoteChar As String, quoteCount 
 5                     If Right$(QuoteChar, 1) = QuoteChar Then
 6                         Field = Mid$(Field, 2, Len(Field) - 2)
 7                         If quoteCount > 2 Then
-8                             Field = Replace(Field, QuoteChar & QuoteChar, QuoteChar)
+8                             Field = Replace$(Field, QuoteChar & QuoteChar, QuoteChar)
 9                         End If
 10                    End If
 11                End If
@@ -2113,7 +2113,7 @@ Public Sub CastToDouble(strIn As String, ByRef DblOut As Double, SepStandard As 
 4                     DblOut = CDbl(strIn)
 5                 Else
 6                     If InStr(strIn, DecimalSeparator) > 0 Then
-7                         DblOut = CDbl(Replace(strIn, DecimalSeparator, SysDecimalSeparator))
+7                         DblOut = CDbl(Replace$(strIn, DecimalSeparator, SysDecimalSeparator))
 8                     Else
 9                         DblOut = CDbl(strIn)
 10                    End If
@@ -2294,7 +2294,7 @@ End Sub
 '  lm    : The length of m
 '  ld    : The length of d
 ' -----------------------------------------------------------------------------------------------------------------------
-Function MyCDate(y As String, m As String, d As String, lm As Long, ld As Long)
+Private Function MyCDate(y As String, m As String, d As String, lm As Long, ld As Long)
 
 1         If lm <= 2 Then
 2             If ld <= 2 Then
@@ -2688,7 +2688,7 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
 50            Keys = Sentinels.Keys
 51            items = Sentinels.items
 52            For i = LBound(Keys) To UBound(Keys)
-53                NewKey = DQ & Replace(Keys(i), DQ, DQ2) & DQ
+53                NewKey = DQ & Replace$(Keys(i), DQ, DQ2) & DQ
 54                AddKeyToDict Sentinels, NewKey, items(i)
 55            Next i
 56        End If
@@ -2987,9 +2987,9 @@ End Function
 '             saving may be inconsistent across the datetimes in data.
 ' Delimiter : The delimiter string, if omitted defaults to a comma. Delimiter may have more than one
 '             character.
-' Encoding  : Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this
-'             argument is `ANSI` but Data contains characters that cannot be written to an ANSI file.
-'             `UTF-8` and `UTF-16` files are written with a byte option mark.
+' Encoding  : Allowed entries are `ANSI` (the default), `UTF-8`, `UTF-16`, `UTF-8NOBOM` and `UTF-16NOBOM`.
+'             An error will result if this argument is `ANSI` but Data contains characters with code point
+'             above 127.
 ' EOL       : Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending
 '             characters themselves (ascii 13 + ascii 10, ascii 10, ascii 13) or the strings `CRLF`, `LF`
 '             or `CR`. The default is `Windows` if FileName is provided, or `Unix` if not. The last line of
@@ -3129,43 +3129,94 @@ End Function
 '              written to file as question marks, resulting in loss of data.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function SaveTextFile(FileName As String, FileContents As String, Encoding As String)
+
+          Const adModeReadWrite = 3
+          Const adSaveCreateOverWrite = 2
+          Const adTypeBinary = 1
+          Const adTypeText = 2
+          Dim BOMLength As Long
+          Dim CharSet As String
+          Dim iStr As Object
+          Dim oStr As Object
           Dim Stream As Object
-          Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default) or ""UTF-8"" or ""UTF-16"""
+                    
+          Const Err_Encoding As String = "Encoding must be ""ANSI"" (the default), ""UTF-8"", ""UTF-16"", ""UTF-8NOBOM"" or ""UTF-16NOBOM"""
 
 1         On Error GoTo ErrHandler
-2         Select Case UCase(Encoding)
-              Case "UTF-8", "UTF-16"
+          'Ignore hyphens and spaces
+2         Select Case UCase$(Replace$(Replace$(Encoding, "-", vbNullString), " ", vbNullString))
+              Case "UTF8", "UTF16", "UTF8BOM", "UTF16BOM"
 3                 Set Stream = CreateObject("ADODB.Stream")
-4                 Stream.Open
-5                 Stream.Type = 2 'Text
-6                 Stream.CharSet = LCase(Encoding)
-7                 Stream.WriteText FileContents
-8                 Stream.SaveToFile FileName, 2 'adSaveCreateOverWrite
-9                 Stream.Close: Set Stream = Nothing
-10                SaveTextFile = FileName
-11            Case "ANSI", ""
-12                If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
+4                 CharSet = IIf(InStr(Encoding, "8") > 0, "utf-8", "utf-16")
+5                 Stream.Open
+6                 Stream.Type = adTypeText
+7                 Stream.CharSet = CharSet
+8                 Stream.WriteText FileContents
+9                 Stream.SaveToFile FileName, adSaveCreateOverWrite
+10                Stream.Close: Set Stream = Nothing
+11                SaveTextFile = FileName
+
+12            Case "UTF8NOBOM", "UTF16NOBOM"
+                  ' Adapted from https://stackoverflow.com/questions/52339439/how-to-create-utf-16-file-in-vbscript
+
+13                If UCase(Encoding) = "UTF-8NOBOM" Then
+14                    CharSet = "utf-8"
+15                    BOMLength = 3
+16                Else
+17                    CharSet = "utf-16"
+18                    BOMLength = 2
+19                End If
+
+20                Set iStr = CreateObject("ADODB.Stream")
+21                Set oStr = CreateObject("ADODB.Stream")
+
+                  ' one stream for converting the text to UTF bytes
+22                iStr.Mode = adModeReadWrite
+23                iStr.Type = adTypeText
+24                iStr.CharSet = CharSet
+25                iStr.Open
+26                iStr.WriteText FileContents
+
+                  ' one steam to write bytes to a file
+27                oStr.Mode = adModeReadWrite
+28                oStr.Type = adTypeBinary
+29                oStr.Open
+
+                  ' switch first stream to binary mode and skip BOM
+30                iStr.Position = 0
+31                iStr.Type = adTypeBinary
+32                iStr.Position = BOMLength
+
+                  ' write remaining bytes to file and clean up
+33                oStr.Write iStr.Read
+34                oStr.SaveToFile FileName, adSaveCreateOverWrite
+35                oStr.Close
+36                iStr.Close
+37                SaveTextFile = FileName
+
+38            Case "ANSI", ""
+39                If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
                   Dim ED As String
                   Dim EN As Long
-13                On Error Resume Next
-14                Set Stream = m_FSO.CreateTextFile(FileName, True, False)
-15                EN = Err.Number: ED = Err.Description
-16                On Error GoTo ErrHandler
-17                If EN <> 0 Then Throw "Error '" & ED & "' when attempting to create file '" + FileName + "'"
-18                WriteWrap Stream, FileContents
-19                Stream.Close: Set Stream = Nothing
-20                SaveTextFile = FileName
-21            Case Else
-22                Throw Err_Encoding
-23        End Select
+40                On Error Resume Next
+41                Set Stream = m_FSO.CreateTextFile(FileName, True, False)
+42                EN = Err.Number: ED = Err.Description
+43                On Error GoTo ErrHandler
+44                If EN <> 0 Then Throw "Error '" & ED & "' when attempting to create file '" + FileName + "'"
+45                WriteWrap Stream, FileContents
+46                Stream.Close: Set Stream = Nothing
+47                SaveTextFile = FileName
+48            Case Else
+49                Throw Err_Encoding
+50        End Select
 
-24        Exit Function
+51        Exit Function
 ErrHandler:
-25        If Not Stream Is Nothing Then
-26            Stream.Close
-27            Set Stream = Nothing
-28        End If
-29        ReThrow "SaveTextFile", Err
+52        If Not Stream Is Nothing Then
+53            Stream.Close
+54            Set Stream = Nothing
+55        End If
+56        ReThrow "SaveTextFile", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3226,7 +3277,7 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
 5         If InStr(strValue, vbCr) > 0 Then Throw strName & " contains a carriage return character (ascii 13), which is not permitted"
 6         If InStr(strValue, Delimiter) > 0 Then Throw strName & " contains Delimiter '" & Delimiter & "' which is not permitted"
 7         If InStr(strValue, DQ) > 0 Then
-8             DQCount = Len(strValue) - Len(Replace(strValue, DQ, vbNullString))
+8             DQCount = Len(strValue) - Len(Replace$(strValue, DQ, vbNullString))
 9             If DQCount <> 2 Or Left$(strValue, 1) <> DQ Or Right$(strValue, 1) <> DQ Then
 10                Throw "When " & strName & " contains any double quote characters they must be at the start, the end and nowhere else"
 11            End If
@@ -3293,7 +3344,7 @@ Private Sub ValidateCSVField(FieldValue As String, FieldName As String, Delimite
 20                Else
 21                    InnerPart = Mid$(FieldValue, 2, Len(FieldValue) - 2)
 22                    If InStr(InnerPart, DQ) > 0 Then
-23                        If Len(Replace(InnerPart, DQ & DQ, "")) <> Len(Replace(InnerPart, DQ, "")) Then
+23                        If Len(Replace$(InnerPart, DQ & DQ, "")) <> Len(Replace$(InnerPart, DQ, "")) Then
 24                            DQsGood = False
 25                        End If
 26                    End If
@@ -3303,7 +3354,7 @@ Private Sub ValidateCSVField(FieldValue As String, FieldName As String, Delimite
 
 30        If HasCR Or HasLF Or HasDelim Or HasDQ Then
 31            If Not DQsGood Then
-32                Throw "Got '" & Replace(Replace(FieldValue, vbCr, "<CR>"), vbLf, "<LF>") & "' as " & _
+32                Throw "Got '" & Replace$(Replace$(FieldValue, vbCr, "<CR>"), vbLf, "<LF>") & "' as " & _
                       FieldName & ", but that cannot be a field in a CSV file, since it is not correctly quoted"
 33            End If
 34        End If
@@ -3680,7 +3731,7 @@ Private Sub CreatePath(ByVal FolderPath As String)
                   "UNC folder name"
 6         End If
 
-7         FolderPath = Replace(FolderPath, "/", "\")
+7         FolderPath = Replace$(FolderPath, "/", "\")
 
 8         If Right$(FolderPath, 1) <> "\" Then
 9             FolderPath = FolderPath & "\"
@@ -4278,9 +4329,9 @@ Public Sub RegisterCSVWrite()
                   "inconsistent across the datetimes in data."
     ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
                   "character."
-    ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8` and `UTF-16`. An error will result if this " & _
-                  "argument is `ANSI` but Data contains characters that cannot be written to an ANSI file. `UTF-8` " & _
-                  "and `UTF-16` files are written with a byte option mark."
+    ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8`, `UTF-16`, `UTF-8NOBOM` and `UTF-16NOBOM`. An " & _
+                  "error will result if this argument is `ANSI` but Data contains characters with code point above " & _
+                  "127."
     ArgDescs(8) = "Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending " & _
                   "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
                   "is provided, or `Unix` if not."
@@ -4293,3 +4344,4 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
     Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
+

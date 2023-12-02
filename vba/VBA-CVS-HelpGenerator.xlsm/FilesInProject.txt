@@ -1,5 +1,7 @@
 ﻿AuditSheetComments.txt
 Formulas\Help.txt
+Values\Audit.csv
+Values\Help.csv
 VBA\modCSVHelp.bas
 VBA\modDependencies.bas
 VBA\modIntellisense.bas

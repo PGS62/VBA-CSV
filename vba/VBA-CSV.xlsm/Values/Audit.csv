@@ -1,0 +1,262 @@
+﻿,"Audit",,,,,,
+,,,,,,,
+,,,,,,,
+,,,,,,,"Check list for release"
+,"Version","Date","Time","Author","Comment",,"Tests pass (Button Test on worksheet Test)"
+,249,2023-12-02,0.404907407406427,"Philip Swannell","Bumped to 0.30.",,"Round trip tests pass (VBA method RoundTripTest)"
+,248,2023-12-02,0.388888888890506,"Philip Swannell","SCVWrite now supports UTF-8NOBOM and UTF-16NOBOM as Encoding argument.",,"Recalculate worksheet CSVWriteTests"
+,247,2023-10-26,0.512777777774318,"Philip Swannell","Code comments only.",,"Recalculate worksheet DateParsingTest"
+,246,2023-10-26,0.498171296298096,"Philip Swannell","CSVWrite now supports ""Raw"" as value for QuoteAllStrings argument.",,"MZTools Review code quality"
+,245,2023-10-26,0.409305555556784,"Philip Swannell","Added tests 272 to 274 to test behaviour of new ""K"" option to ConvertTypes. Updated ""docstrings"" for CSVRead and CSVWrite. Updated method RegisterCSVRead.",,"No links to other workbooks"
+,244,2023-10-23,0.690902777780138,"Philip Swannell","Rebased tests 178, 207 & 208. Necessary thanks to changes in file https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv. Example changes: top left element was null string is now text ""rownames"", yes and no previously appeared quoted, now unquoted.",,"modCSVReadWrite has line numbers"
+,243,2023-10-23,0.688229166669771,"Philip Swannell","Re-arranged file locations.",,"No line numbers in other modules."
+,242,2023-03-06,0.705763888887304,"Philip Swannell","Deleted worksheets NotRFC4180, Demo, Col-by-col, Sheet1, Notes",,"No Stop Resume statements left over from debugging"
+,241,2023-03-02,0.505555555559113,"Philip Swannell","Tweaks to TestImpactOfTypeConversion.",,"Updated ref at top of modules to version numbers. NB two edits required."
+,240,2023-03-02,0.464050925926131,"Philip Swannell","Added method TestImpactOfTypeConversion",,"modCSVReadWrite has no dependencies on other modules - test by copying to new project and compiling."
+,239,2023-03-02,0.445162037038244,"Philip Swannell","Improved error message when file is over 2GB.",,
+,238,2023-03-01,0.846192129632982,"Philip Swannell","Added two more tests - Test270 & Test271, testing ""date format conflicts"".",,"ToDo"
+,237,2023-03-01,0.459652777775773,"Philip Swannell","Refactor test code - now easy to run a subset of the tests.",,"Optimise speed for very small files?"
+,236,2023-02-28,0.448194444441469,"Philip Swannell","Re-wrote method CastToDouble for better speed.",,"Change CSVWrite to use ADODB? See http://www.sysmod.com/ADOStream.bas"
+,235,2023-02-27,0.862777777780138,"Philip Swannell","Fix to method ParseDateFromat.",,"My Repo"
+,234,2023-02-27,0.802569444444089,"Philip Swannell","Ran ""AmendVBA"" script.",,"https://github.com/PGS62/VBA-CSV"
+,233,2023-02-27,0.798252314816636,"Philip Swannell","Tweak to CastToDouble.",,"Promotion"
+,232,2023-02-27,0.700011574073869,"Philip Swannell","Tweak to CastISO8601.",,"https://dev.to/nastyox1/8-concrete-steps-to-get-stars-on-github-355c"
+,231,2023-02-27,0.697453703702195,"Philip Swannell","Tweak to ParseDateFormat.",,"Stackoverflow questions"
+,230,2023-02-27,0.532916666663368,"Philip Swannell","Performance improvements for date parsing.",,"https://stackoverflow.com/questions/12259595/load-csv-file-into-a-vba-array-rather-than-excel-sheet?"
+,229,2023-02-24,0.76200231481198,"Philip Swannell","Work on date parsing, including new worksheet DateParsingTest",,"https://stackoverflow.com/questions/68354563/difficulty-forcing-vba-to-parse-dates-in-us-uk-format"
+,228,2023-02-24,0.510914351849351,"Philip Swannell","Work on date parsing, including new worksheet DateParsingTest",,"https://stackoverflow.com/questions/6780765/parse-csv-ignoring-commas-inside-string-literals-in-vba"
+,227,2023-02-24,0.482256944444089,"Philip Swannell","Work on date parsing, including new worksheet DateParsingTest",,
+,226,2023-02-24,0.440486111110658,"Philip Swannell","Work on date parsing, including new worksheet DateParsingTest",,"Other resources"
+,225,2023-02-23,0.800115740741603,"Philip Swannell","Correction to previous release.",,"Python"
+,224,2023-02-23,0.785405092596193,"Philip Swannell","Correction to previous release.",,"https://docs.python.org/3/library/csv.html"
+,223,2023-02-23,0.749791666668898,"Philip Swannell","Improved parsing of dates: a) Now have constants defining the range of years to which 2-digit years are converted. b) Fixed the possibility for strings to be interpreted as dates even though they did not match the specified DateFormat.",,"Julia"
+,222,2023-02-06,0.674849537033879,"Philip Swannell","Added line numbers.",,"https://csv.juliadata.org/stable/"
+,221,2023-02-06,0.673113425924385,"Philip Swannell","Updated RegisterCSVWrite and docstring for CSVWrite.",,"R"
+,220,2023-02-06,0.663043981483497,"Philip Swannell","Removed redundant code.",,"https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread"
+,219,2023-02-06,0.654918981483206,"Philip Swannell","SkipToCol and NumCols arguments to CSVRead can now be provided as strings that match into the header row.",,"https://raw.githubusercontent.com/plotly/datasets/master/mtcars.csv"
+,218,2023-01-04,0.681435185186274,"Philip Swannell","Recorded performance of CSVWrite.",,"Javascript"
+,217,2023-01-04,0.680752314816345,"Philip Swannell","Method MakeEncoder is now Private - avoids exposing as a worksheet function.",,"https://www.papaparse.com/"
+,216,2022-11-29,0.611539351848478,"Philip Swannell","Whitespace only.",,
+,215,2022-11-29,0.604004629632982,"Philip Swannell","Bumped to v0.26",,"Article on security vulnerability of CSV files"
+,214,2022-11-28,0.600717592591536,"Philip Swannell","Updated ToDo list.",,"https://www.contextis.com/en/blog/comma-separated-vulnerabilities"
+,213,2022-11-28,0.573553240741603,"Philip Swannell","Recorded performance of CSVWrite. Edits to rubric at top of modCSVReadWrite.",,
+,212,2022-11-28,0.520555555558531,"Philip Swannell","Added error handlers to a couple of methods.",,"Parsing non-standard CSV"
+,211,2022-11-28,0.409027777779556,"Philip Swannell","Bumped to v0.25",,"https://github.com/osiegmar/JavaCsvComparison"
+,210,2022-11-28,0.400972222225391,"Philip Swannell","Refactored CSVWrite.",,
+,209,2022-11-27,0.676354166665988,"Philip Swannell","Changes in release 208 seem to have more than doubled the speed for CSVWrite for large files. Average time to execute CSVWrite(Data, FileName) when Data is obtained from RDataSets file military.csv (1.4 million rows, 7 cols) falls from 24 seconds to 11 seconds.",,"Backports to SAI"
+,208,2022-11-27,0.652731481481169,"Philip Swannell","Changes to CSVWrite, with hope of improved performance, but not yet tested.",,"Improve code for VBA header generation"
+,207,2022-11-27,0.640370370369055,"Philip Swannell","Added module modCSVWritePerformance, in order to benchmark changes to CSVWrite.",,"Hstack and VStack treatment of 1-d arrays"
+,206,2022-11-26,0.762326388889051,"Philip Swannell","Spell-checked this Audit sheet.",,
+,205,2022-11-26,0.749293981483788,"Philip Swannell","Simplified method Encode, which now uses a dictionary to handle encoding of Booleans and errors.",,"See also"
+,204,2022-11-24,0.58732638888614,"Philip Swannell","Bumped to v0.24",,"https://github.com/22222/CsvTextFieldParser#error-handling"
+,203,2022-11-24,0.576111111113278,"Philip Swannell","Changed CSVWrite so that when called on PC for which the display language of VBA is not English, then errors are written to file using the English-language representation (e.g. #SPILL!). This makes round-tripping work correctly.",,"Interesting comments on possible errors when parsing a csv file"
+,202,2022-11-18,0.515763888892252,"Philip Swannell","Further changes to ReThrow. Error strings from CSVRead and CSVWrite are now concise unless m_ErrorStringsEmbedCallStack is set to True.",,
+,201,2022-11-18,0.468043981483788,"Philip Swannell","Change to expected results for tests to soft code the string representation of True and False, so that tests pass on non English language PCs.",,
+,200,2022-11-18,0.435868055552419,"Philip Swannell","a) Removed module modCodeFromStackOverflow.
+b) Simplified methods Throw and ReThrow, as a consequence error string now include the ""call stack"".
+c) Changes to tests such that if observed and expected are both error strings that differ but have the same ""root cause"" then the test passes but with a warning printed to the VBA immediate window.
+d) Removed declared-but-unused variables (via MZTools).
+e) Changes to round trip testing to pass in TrueStrings and FalseStrings such that tests should work on non English-language PC.",,
+,199,2022-11-17,0.77342592592322,"Philip Swannell","Added Test254 for a file containing only two characters - a carriage return and a line feed, but test currently fails - need to investigate.",,
+,198,2022-11-17,0.760567129625997,"Philip Swannell","Change to (hopefully) fix bug on non English-language version of Excel. Passing ConvertTypes as True failed on PC with display language of German. Not yet tested though.",,
+,197,2022-11-09,0.94719907407125,"Philip Swannell","Code comments only.",,
+,196,2022-11-09,0.772511574075907,"Philip Swannell","Bumped to v0.23",,
+,195,2022-11-09,0.764791666668316,"Philip Swannell","Early bind to ADODB. Will require change to installation instructions.",,
+,194,2022-11-09,0.750289351854008,"Philip Swannell","Changes on sheet CSVWriteTests.",,
+,193,2022-11-09,0.747754629628616,"Philip Swannell","Bumped to v0.22",,
+,192,2022-11-09,0.745104166664532,"Philip Swannell","Code comments only.",,
+,191,2022-11-09,0.713298611110076,"Philip Swannell","Ran a new set of performance tests. See sheet 'Performance (10)'.",,
+,190,2022-11-09,0.637627314812562,"Philip Swannell","Re-ordered methods in modCSVReadWrite.",,
+,189,2022-11-09,0.617476851854008,"Philip Swannell","Added line numbers to modCSVReadWrite. These will appear in the call stack only for unanticipated errors, i.e. the kind we need to debug.",,
+,188,2022-11-09,0.598611111112405,"Philip Swannell","Reformed error handling in all the modules.",,
+,187,2022-11-09,0.434363425927586,"Philip Swannell","Reformed error handling. Error handlers in all methods are now simpler just calling new method ReThrow. We now no longer see the ""call stack"" in the return from CSVRead if the error is ""anticipated"" (mostly input validation) but we do see the call stack for unanticipated errors.",,
+,186,2022-11-08,0.821643518516794,"Philip Swannell","Ensure streams are always closed.",,
+,185,2022-11-08,0.812349537038244,"Philip Swannell","CSVRead now always uses ADODB text stream (rather than ADODB for some encodings and Scripting.TextStream for other encodings). Refactored and simplified.",,
+,184,2022-11-08,0.675219907410792,"Philip Swannell","Removed Stop statement.",,
+,183,2022-11-08,0.662870370368182,"Philip Swannell","Added timer functions tic and toc.",,
+,182,2022-11-08,0.629999999997381,"Philip Swannell","Optimised ReadAllFromStream - ChunkSize now set to 32,768.",,
+,181,2022-11-07,0.825347222220444,"Philip Swannell","Charset is now ""windows-1252"" for ANSI files.",,
+,180,2022-11-07,0.69211805555824,"Philip Swannell","Ran MZTools -> Clean Project.",,
+,179,2022-11-07,0.46092592592322,"Philip Swannell","Refactored recent changes to modCSVReadWrite.",,
+,178,2022-11-07,0.423842592594156,"Philip Swannell","Removed worksheet UnicodeTests, have replaced by tests 249 to 252.",,
+,177,2022-11-06,0.765011574076198,"Philip Swannell","Changes to method ReadAllFromStream - should give a performance improvement, but need to test whether that is the case.",,
+,176,2022-11-06,0.463854166664532,"Philip Swannell","Added worksheet UnicodeTests",,
+,175,2022-11-06,0.381886574075907,"Philip Swannell","Refactored method ParseEncoding. Previously there were two places in the code where we decided whether to use a TextStream or ADODB (according to whether the Encoding argument had been provided or had to be guessed\inferred), now only one place.",,
+,174,2022-11-06,0.3493402777749,"Philip Swannell","Reverted the 4 class modules (garcia code) to as they were in version 145. They had since been amended by MZTools\my AmendVBA code. Did so because my function wrap_ws_garcia has stopped working...",,
+,173,2022-11-05,0.381296296298387,"Philip Swannell","Tweak to method ReadAllFromStream.",,
+,172,2022-11-04,0.81792824074364,"Philip Swannell","Improved validation of argument ShowMissingsAs.",,
+,171,2022-11-04,0.721516203702777,"Philip Swannell","Added tests for CSVWrite. modCSVWrite now uses consts DQ and DQ2 throughout.",,
+,170,2022-11-03,0.812071759261016,"Philip Swannell","Bumped version to v0.20",,
+,169,2022-11-03,0.791504629632982,"Philip Swannell","Removed breakpoint, removed declared but unused variables.",,
+,168,2022-11-03,0.7674421296324,"Philip Swannell","Method InferDelimiter could fail for UTF-8 and UTF-16 files (the BOM was being read as part of the file's contents). Fixed this.",,
+,167,2022-11-03,0.696979166663368,"Philip Swannell","Improved method InferDelimiter to avoid interpreting the colon inside a date-with-time field as the file delimiter.",,
+,166,2022-11-03,0.606446759258688,"Philip Swannell","Round trip tests extended to test various DateTimeFormats. Amended CSVWrite to recognise ""ISO"" as a DateFormat (was confusing for that to be recognised as DateTimeFormat but not as DateFormat).",,
+,165,2022-11-03,0.544594907405553,"Philip Swannell","More testing of CSVWrite - important to test aspects of CSVWrite that are not tested in the round-trip tests, e.g. invalid inputs and behaviour when returning to worksheet and when QuoteAllStrings is FALSE.",,
+,164,2022-11-03,0.402916666665988,"Philip Swannell","Help changes",,
+,163,2022-11-02,0.808842592596193,"Philip Swannell","Help changes",,
+,162,2022-11-02,0.795208333336632,"Philip Swannell","CSVWrite was not correctly handling argument QuoteAllStrings when the delimiter was not a comma. CSVRead fix to another edge case re ragged files and ShowMissingsAs.",,
+,161,2022-11-01,0.712025462962629,"Philip Swannell","CSVRead: Now reject elements of TrueStrings, FalseStrings and MissingStrings that are not valid fields of a CSV file. Added tests 209 to 232 (to increase code coverage). Use & instead of + for string concatenation. Fixed edge case in CSVRead with regards to missing fields in ragged files.",,
+,160,2022-10-31,0.697002314816928,"Philip Swannell","Code comments about intellisense.",,
+,159,2022-10-28,0.602442129631527,"Philip Swannell","Removed commented-out module modCSVDevUtils. Tweak to method ValidateBooleanRepresentation. Amended variable declaration (automatically, via a script).",,
+,158,2022-10-25,0.76282407407416,"Philip Swannell","Tweaks to CSVWrite including changed behaviour if DateFormat is passed as null string (as opposed to being omitted). Old behaviour: date format used in output would depend on the Windows locale. New behaviour: date format used is YYYY-MM-DD, i.e. same as omitting the argument.",,
+,157,2022-10-24,0.402662037035043,"Philip Swannell","CSVRead: better handling for when Booleans in file are represented by quoted strings. E.g. https://vincentarelbundock.github.io/Rdatasets/csv/carData/TitanicSurvival.csv where the TrueString is quoted yes and FalseString is quoted no.",,
+,156,2022-10-24,0.390671296299843,"Philip Swannell","Method ValidateTrueAndFalseStrings now rejects strings containing line feed, carriage return, delimiter (cont.)",,
+,155,2022-10-24,0.377268518517667,"Philip Swannell","Method ValidateTrueAndFalseStrings now rejects strings containing line feed, carriage return, delimiter.",,
+,154,2022-10-23,0.689224537039991,"Philip Swannell","Tweaked method ValidateTrueAndFalseStrings. Removed worksheet Adhoc.",,
+,153,2022-10-23,0.661631944443798,"Philip Swannell","Fixed compile error. Added test 207.",,
+,152,2022-10-23,0.516863425924385,"Philip Swannell","CSVWrite, improved validation of TrueString and FalseString. Added one more test for CSVRead.",,
+,151,2022-10-22,0.761585648149776,"Philip Swannell","Improved handling of files containing long fields - length of field is now tested after ""unquoting"".",,
+,150,2022-10-22,0.735578703701322,"Philip Swannell","Now know that for Excel 2013 function MaxStringLengthInArray should return 255. Also changes to code that detects that an array to be returned to Excel contains a too-long string.",,
+,149,2022-10-22,0.428668981483497,"Philip Swannell","Tested on Excel 2010, with necessary changes to test code.",,
+,148,2022-10-21,0.695613425923511,"Philip Swannell","Bumped tag to 16.",,
+,147,2022-10-21,0.693877314814017,"Philip Swannell","Added arguments TrueString and FalseString to CSVWrite.",,
+,146,2022-10-21,0.67820601852145,"Philip Swannell","1) Bug fix to method ParseCSVContents for case ConvertTypes <> FALSE _and_ SkipToRow > 1 _and_ HeaderRow > 1 _and_ SkipToRow = HeaderRow. Test = 203
+2) Argument DateFormat can now use the space character as the separator. e.g. ""D M Y"" is allowed. Test = 204.",,
+,145,2021-11-01,0.679398148145992,"Philip Swannell","Now use SolumAddin for exporting VBA code.",,
+,144,2021-11-01,0.671030092591536,"Philip Swannell","Vba code is now exported to folder c:\Projects\<ProjectName>\vba\<WorkbookName>",,
+,143,2021-10-14,0.714733796296059,"Philip Swannell","Moved performance testing methods out of modCSVReadWrite. 331 fewer loc.",,
+,142,2021-10-14,0.692037037035334,"Philip Swannell","In release 120 (or soon after) I followed suggestions from RubberDuck code analysis to explicitly declare all arguments as ByVal or ByRef with preference for ByVal. But I now believe that caused a performance hit, especially when ConvertTypes is not FALSE. Reverted declarations to as of version 119. I now declare as follows:
+ByVal = argument will be changed in function and we don't want that change to be visible to the caller.
+ByRef = argument will be changed in function and we DO want that change to be visible to the caller.
+Silent = argument won't be changed in the function, so pass by reference (the default) for better speed.",,
+,141,2021-10-14,0.404467592590663,"Philip Swannell","Added to ToDo list.",,
+,140,2021-10-14,0.393726851849351,"Philip Swannell","Comments in module modCSVTestRDatasets.",,
+,139,2021-10-13,0.720266203701613,"Philip Swannell","Reinstated changes that were lost in 138.",,
+,138,2021-10-13,0.71825231481489,"Philip Swannell","Reverted to 137 as 138 corrupted.",,
+,137,2021-10-12,0.525925925925549,"Philip Swannell","CSVWrite now accepts one-dimensional Data.",,
+,136,2021-10-11,0.799432870371675,"Philip Swannell","CSVWrite now accepts zero-dimensional Data.",,
+,135,2021-10-08,0.812118055553583,"Philip Swannell","More performance testing",,
+,134,2021-10-08,0.683969907404389,"Philip Swannell","Tweaked method PrepareForRelease.",,
+,133,2021-10-08,0.487488425926131,"Philip Swannell","Improved error handling in method Download.",,
+,132,2021-10-08,0.455173611109785,"Philip Swannell","Method TimeParsers now adjusts for the overhead of calling ElapsedTime within the timing loop.",,
+,131,2021-10-07,0.939976851848769,"Philip Swannell","Removed line numbers.",,
+,130,2021-10-05,0.684236111112114,"Philip Swannell","Added another VBA CSV parser to those tested by Performance-testing code. It's the top-voted answer on the most relevant StackOverflow question (at https://stackoverflow.com/questions/12259595/load-csv-file-into-a-vba-array-rather-than-excel-sheet?)",,
+,129,2021-10-04,0.42137731481489,"Philip Swannell","Work on non-RFC4180",,
+,128,2021-10-01,0.436076388890797,"Philip Swannell","Added sheet NotRFC4180.",,
+,127,2021-09-30,0.662615740737238,"Philip Swannell","Re-ran performance tests. Strangely there seems to have been a regression in Julia's performance...",,
+,126,2021-09-30,0.602233796293149,"Philip Swannell","Changes prompted by RubberDuck analysis.",,
+,125,2021-09-30,0.574525462965539,"Philip Swannell","Changes prompted by RubberDuck analysis.",,
+,124,2021-09-30,0.355879629627452,"Philip Swannell","Re-imported sdkn104 code also.",,
+,123,2021-09-30,0.35304398147855,"Philip Swannell","Re-imported ws_garcia code - I must have inadvertently changed it when making the Rubberduck-prompted changes and somehow broke it.",,
+,122,2021-09-29,0.818391203705687,"Philip Swannell","Changes prompted by RubberDuck analysis.",,
+,121,2021-09-29,0.762118055557949,"Philip Swannell","Changes prompted by RubberDuck analysis.",,
+,120,2021-09-29,0.707928240743058,"Philip Swannell","Changes prompted by RubberDuck analysis.",,
+,119,2021-09-29,0.529374999998254,"Philip Swannell","First GIF revisited.",,
+,118,2021-09-28,0.834317129629198,"Philip Swannell","Added hyperlinks etc on this sheet.",,
+,117,2021-09-28,0.709189814813726,"Philip Swannell","Work on third GIF",,
+,116,2021-09-28,0.479293981479714,"Philip Swannell","Work on second GIF",,
+,115,2021-09-28,0.466006944443507,"Philip Swannell","Work on Titanic GIF.",,
+,114,2021-09-28,0.423888888886722,"Philip Swannell","Merged src and dev folders. Deleted variable HasBOM as no longer needed.",,
+,113,2021-09-27,0.803043981482915,"Philip Swannell","Arg DateFormat to CSVRead now defaults to Y-M-D.",,
+,112,2021-09-27,0.788055555553001,"Philip Swannell","Changes to sheet GIF.",,
+,111,2021-09-27,0.769201388888177,"Philip Swannell","Changes to sheet GIF.",,
+,110,2021-09-27,0.729178240741021,"Philip Swannell","Changes to sheet GIF.",,
+,109,2021-09-25,0.815185185187147,"Philip Swannell","Added sheet GIF that works in conjunction with workbook VBA-CSV-GIFMaker.xlsm",,
+,108,2021-09-24,0.731944444443798,"Philip Swannell","Added code to generate CSVReadTitanic.gif.",,
+,107,2021-09-24,0.545219907406135,"Philip Swannell","Added tests for breach of 32k limit on field length when calling from Excel.",,
+,106,2021-09-24,0.532627314816636,"Philip Swannell","Sorted methods in module modCSVReadWrite",,
+,105,2021-09-24,0.455555555556202,"Philip Swannell","Work on 32k/255 limit for returning strings to Excel",,
+,104,2021-09-23,0.58405092592875,"Philip Swannell","Late bind to ADODB. It would make installation simpler if late bound to Scripting run time and regular expressions but that I suspect that would hit performance.",,
+,103,2021-09-23,0.551087962965539,"Philip Swannell","CSVWrite now takes argument Encoding rather than Unicode.",,
+,102,2021-09-23,0.420775462960592,"Philip Swannell","Added to TODO list.",,
+,101,2021-09-22,0.498969907406718,"Philip Swannell","Deleted older of the two Performance sheets.",,
+,100,2021-09-22,0.497604166666861,"Philip Swannell","Added tests for date-time parsing, including decimal fractions of a second for D-M-Y, M-D-Y and Y-M-D.",,
+,99,2021-09-21,0.735706018516794,"Philip Swannell","Reduced the number of lines> 122 in length",,
+,98,2021-09-21,0.672141203700448,"Philip Swannell","Simplified declaration of CSVRead by not providing unnecessary defaults.",,
+,97,2021-09-21,0.666307870371384,"Philip Swannell","More tests using files from the Julia CSV.jl test suite.",,
+,96,2021-09-21,0.642314814816928,"Philip Swannell","Fixed bug that SkipToRow was not defaulting to HeaderRowNum+1 when omitted.",,
+,95,2021-09-21,0.614583333335759,"Philip Swannell","Corrected typos on worksheet ""Test"".",,
+,94,2021-09-21,0.594085648146574,"Philip Swannell","Method ParseTextFile replaces methods ShowTextFile and SplitCSVContents. Better performance when Delimited = False.",,
+,93,2021-09-20,0.74761574074364,"Philip Swannell","Docstring changes.",,
+,92,2021-09-20,0.716296296297514,"Philip Swannell","Rewrote ShowTextFile to work for files with Mac line endings.",,
+,91,2021-09-20,0.647916666668607,"Philip Swannell","Ran AmendVBA",,
+,90,2021-09-20,0.642685185186565,"Philip Swannell","Ran MZTools > Clean Project.",,
+,89,2021-09-20,0.60615740740468,"Philip Swannell","Updated docstrings.",,
+,88,2021-09-20,0.431527777778683,"Philip Swannell","Changes on Test sheet.",,
+,87,2021-09-20,0.40533564814541,"Philip Swannell","Added five more tests to be sure we interpret ANSI, UTF-8, UTF-8-BOM, UTF-16-LE-BOM and UTF-16-BE-BOM correctly.",,
+,86,2021-09-19,0.801874999997381,"Philip Swannell","Now use ADODB.Stream for UTF-8 files and Scripting.Stream for ASCII, ANSI and UTF-16.",,
+,85,2021-09-19,0.77153935185197,"Philip Swannell","ReadTextWrapper mostly solves the performance problem.",,
+,84,2021-09-19,0.690150462964084,"Philip Swannell","Performance turned out to be terrible thanks to bad performance of ADODB.ReadText on large files. Wrote method ReadTextWrapper to (hopefully) solve the problem.",,
+,83,2021-09-19,0.469930555555038,"Philip Swannell","All tests pass with ADODB.Stream, need to check performance.",,
+,82,2021-09-19,0.428217592590954,"Philip Swannell","Experimenting with using ADODB.Stream in place of Scripting.TextStream",,
+,81,2021-09-11,0.47984953703417,"Philip Swannell","Code comments only.",,
+,80,2021-09-11,0.404212962959718,"Philip Swannell","Added test for FileName being literal with no line feed.",,
+,79,2021-09-11,0.390567129630654,"Philip Swannell","Code comments only.",,
+,78,2021-09-09,0.523391203700157,"Philip Swannell","Change to InferSourceType",,
+,77,2021-09-09,0.43658564814541,"Philip Swannell","mid -> mid$",,
+,76,2021-09-09,0.37820601851854,"Philip Swannell","Ran method AmendVBACode",,
+,75,2021-09-08,0.791990740741312,"Philip Swannell","Docstring changes.",,
+,74,2021-09-08,0.38273148148437,"Philip Swannell","Improved ""word-wrapping"" in modCSVReadWrite.",,
+,73,2021-09-07,0.574537037035043,"Philip Swannell","Improved speed of method CastToDate.",,
+,72,2021-09-07,0.474016203705105,"Philip Swannell","Can now (optionally) set array lower bounds to zero.",,
+,71,2021-09-06,0.599050925928168,"Philip Swannell","Changes to method CastToDate",,
+,70,2021-09-05,0.352592592593282,"Philip Swannell","Renamed functions sNRows -> NRows etc.",,
+,69,2021-09-03,0.388055555558822,"Philip Swannell","HeaderRow now trimmed.",,
+,68,2021-09-02,0.770393518519995,"Philip Swannell","Removed two old Performance sheets.",,
+,67,2021-09-02,0.734490740738693,"Philip Swannell","Updated docstrings.",,
+,66,2021-09-02,0.40944444444176,"Philip Swannell","Amending Tests",,
+,65,2021-09-02,0.395509259258688,"Philip Swannell","Recovering from Git woes and their consequences for tests.",,
+,64,2021-09-01,0.758078703700448,"Philip Swannell","Re-ran performance tests.",,
+,63,2021-09-01,0.698912037034461,"Philip Swannell","Fixed compile errors when modCSVReadWrite is ""stand-alone"".",,
+,62,2021-09-01,0.675393518518831,"Philip Swannell","Added 2 missing tests - 110 and 124.",,
+,61,2021-09-01,0.645659722220444,"Philip Swannell","Deleted temporary sheets used during previous release.",,
+,60,2021-09-01,0.645277777781303,"Philip Swannell","Changes to compile on 32bit.",,
+,59,2021-09-01,0.440949074072705,"Philip Swannell","Code of modWrappers moved to modCSVPerformance",,
+,58,2021-08-31,0.41174768518249,"Philip Swannell","Workbook now more ""portable"" i.e. folder locations all relative to the path of the workbook itself.",,
+,57,2021-08-30,0.816145833334303,"Philip Swannell","Reinstated conditional formatting on sheet Demo.",,
+,56,2021-08-30,0.770972222220735,"Philip Swannell","Deal with times with fractional seconds - CDate does not cope with them.",,
+,55,2021-08-30,0.574131944442343,"Philip Swannell","Now test all possible responses to bad inputs.",,
+,54,2021-08-30,0.32952546296292,"Philip Swannell","Reworked performance testing to include comparison with Julia.",,
+,53,2021-08-28,0.659189814818092,"Philip Swannell","More tests and fixes to column-by-column formatting.",,
+,52,2021-08-27,0.853576388886722,"Philip Swannell","Implemented Column-by-column type conversion",,
+,51,2021-08-26,0.806435185186274,"Philip Swannell","Changes to sheet Demo.",,
+,50,2021-08-26,0.801539351850806,"Philip Swannell","More refactoring.",,
+,49,2021-08-26,0.770590277774318,"Philip Swannell","Refactoring",,
+,48,2021-08-26,0.57442129629635,"Philip Swannell","Got rid of RetainQuotes option for ConvertTypes. ConvertTypes TRUE is now NDB rather than NDBE as previously.",,
+,47,2021-08-26,0.572395833332848,"Philip Swannell","Now have two possibilities for DateFormat: ISO and ISOZ, the latter handles datetime with time zone.",,
+,46,2021-08-25,0.010671296295186,"Philip Swannell","Added more tests.",,
+,45,2021-08-24,0.820497685184819,"Philip Swannell","Added sheet ""RegExp"".",,
+,44,2021-08-24,0.799525462964084,"Philip Swannell","Work on ISOO8601 date recognition.",,
+,43,2021-08-24,0.432581018518249,"Philip Swannell","Sheet Demo no longer creates a file on disk.",,
+,42,2021-08-24,0.403472222220444,"Philip Swannell","Work on ISOO8601 date recognition",,
+,41,2021-08-21,0.793078703703941,"Philip Swannell","Added arguments TrueStrings, FalseStrings and MissingStrings .",,
+,40,2021-08-21,0.496944444443216,"Philip Swannell","Added module modCVSSentinels, but not yet ""plugged in"".",,
+,39,2021-08-20,0.523888888885267,"Philip Swannell","CSVRead now accepts FileName as URL or a CSV string.",,
+,38,2021-08-20,0.375462962962047,"Philip Swannell","CSVWrite can now write to String.",,
+,37,2021-08-19,0.808692129627161,"Philip Swannell","Now support UTf8 with BOM",,
+,36,2021-08-19,0.745185185187438,"Philip Swannell","Now support ""T"" as a ConvertTypes option.",,
+,35,2021-08-19,0.519201388888177,"Philip Swannell","More work on tests",,
+,34,2021-08-18,0.846979166664823,"Philip Swannell","Removed modCVSTestAgainstExcel.",,
+,33,2021-08-18,0.844432870369928,"Philip Swannell","New module modCSVTest",,
+,32,2021-08-16,0.936377314814308,"Philip Swannell","New argument ""Comment"" to CSVRead.",,
+,31,2021-08-16,0.491053240737529,"Philip Swannell","Changes to type conversion code. Now possible to convert quoted strings.",,
+,30,2021-08-15,0.495937500003492,"Philip Swannell","Got capitalisation of functions CSVRead and CSVWrite called from cells correct. ",,
+,29,2021-08-15,0.437638888892252,"Philip Swannell","More work on IgnoreRepeated.",,
+,28,2021-08-15,0.334652777775773,"Philip Swannell","Added argument IgnoreRepeated.",,
+,27,2021-08-13,0.841504629628616,"Philip Swannell","Reinstated conditional formatting on sheet Demo.",,
+,26,2021-08-13,0.830983796295186,"Philip Swannell","Added a bunch of functions to modCSVTestDeps so that we no longer have dependency on SAI for testing.",,
+,25,2021-08-13,0.730972222219862,"Philip Swannell","Removed Help sheet - broken out to separate workbook",,
+,24,2021-08-13,0.711064814815472,"Philip Swannell","Help changes",,
+,23,2021-08-12,0.8042824074073,"Philip Swannell","Work on Markdown help.",,
+,22,2021-08-12,0.747812499997963,"Philip Swannell","Added argument ShowMissingsAs to CSVRead. Simplification of this workbook.",,
+,21,2021-08-11,0.988541666665697,"Philip Swannell","Corrections to code comments.",,
+,20,2021-08-11,0.981354166666279,"Philip Swannell","Code formatting.",,
+,19,2021-08-11,0.822719907409919,"Philip Swannell","Method TimeThreeParsers now has TimeOut argument so that time to execute is averaged over the number of calls required to take (in total) the TimeOut value.",,
+,18,2021-08-11,0.739756944443798,"Philip Swannell","Removed reference to SolumAddin.",,
+,17,2021-08-11,0.708356481482042,"Philip Swannell","Renamed CSVRead_V3 as CSVRead",,
+,16,2021-08-11,0.519606481480878,"Philip Swannell","Removed redundant modules. CSVWrite no longer has Ragged argument.",,
+,15,2021-08-11,0.495775462964957,"Philip Swannell","Deleted functions CSVRead_V1 and CSVRead_V2",,
+,14,2021-08-11,0.491747685184237,"Philip Swannell","Deleted 2 of the 3 sheets with timing results.",,
+,13,2021-08-11,0.490347222221317,"Philip Swannell","Changed method SaveWorkbookAndExportModules to also save a backup to OneDrive.",,
+,12,2021-08-11,0.481909722220735,"Philip Swannell","Bug fixes to handling of SkipNumRows etc.",,
+,11,2021-08-10,0.954675925924676,"Philip Swannell","Added sheet `TimingResults (3)`",,
+,10,2021-08-10,0.73436342592322,"Philip Swannell","CSVRead_V3 now supports SkipToRow and NumRows.",,
+,9,2021-08-09,0.54605324073782,"Philip Swannell","CSVRead_V2 now supports SkipToCol and NumCols, not yet SkipToRow and NumRows though.",,
+,8,2021-08-08,0.549398148148612,"Philip Swannell","Now have two functions CSVRead_V1 and CSVRead_V2",,
+,7,2021-08-07,0.961377314815763,"Philip Swannell","Settled on fastest algo.",,
+,6,2021-08-06,0.666076388886722,"Philip Swannell","Add sheet ""TimingResults"" and module modCompareAgainstAlternatives.",,
+,5,2021-08-04,0.349120370367018,"Philip Swannell","Added code to compare against https://github.com/sdkn104/VBA-CSV",,
+,4,2021-08-03,0.376828703701904,"Philip Swannell","Rewrote code to split a string, rather than examining each character in VBA code, use InStr in a while loop to push the character examination down to C code.",,
+,3,2021-07-29,0.598425925927586,"Philip Swannell","Code now compiles.",,
+,2,2021-07-29,0.576770833336923,"Philip Swannell","Reimported sFileSaveCSV and sFileShow from SolumAddin version 2199. Code does not yet compile",,
+,1,2021-07-23,0.58872685184906,"Philip Swannell","First version. Start with SolumAddin's sFileShow to create CSVParse.",,

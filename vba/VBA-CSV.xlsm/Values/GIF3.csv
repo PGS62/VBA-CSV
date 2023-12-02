@@ -1,0 +1,38 @@
+﻿"Data",,,
+"Nums","Bools","Dates","Strings"
+1,False,2021-11-02,"Text"
+2,True,2021-11-03,"A, comma"
+3,False,2021-11-04,"A
+LF"
+4,True,2021-11-05,"A CR"
+5,False,2021-11-06,"""Quotes"""
+,,,
+"CSVWrite",,,
+"C:\Temp\Test.csv",,,
+,,,
+"CSVRead (Delimited = FALSE)",,,
+"""Nums"",""Bools"",""Dates"",""Strings""",,,
+"1,False,2021-11-02,""Text""",,,
+"2,True,2021-11-03,""A, comma""",,,
+"3,False,2021-11-04,""A",,,
+"LF""",,,
+"4,True,2021-11-05,""A",,,
+" CR""",,,
+"5,False,2021-11-06,""""""Quotes""""""",,,
+,,,
+"CSVRead",,,
+"Nums","Bools","Dates","Strings"
+1,False,2021-11-02,"Text"
+2,True,2021-11-03,"A, comma"
+3,False,2021-11-04,"A
+LF"
+4,True,2021-11-05,"A CR"
+5,False,2021-11-06,"""Quotes"""
+,,,
+"Test equality (A2:D7=A23:D28)",,,
+True,True,True,True
+True,True,True,True
+True,True,True,True
+True,True,True,True
+True,True,True,True
+True,True,True,True

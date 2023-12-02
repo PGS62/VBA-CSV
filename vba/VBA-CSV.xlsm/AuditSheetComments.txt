@@ -1,4 +1,6 @@
 ﻿Version	Date	Time	Author	Comment
+249	02-Dec-2023	09:43	Philip Swannell	Bumped to 0.30.
+248	02-Dec-2023	09:20	Philip Swannell	SCVWrite now supports UTF-8NOBOM and UTF-16NOBOM as Encoding argument.
 247	26-Oct-2023	12:18	Philip Swannell	Code comments only.
 246	26-Oct-2023	11:57	Philip Swannell	CSVWrite now supports "Raw" as value for QuoteAllStrings argument.
 245	26-Oct-2023	09:49	Philip Swannell	Added tests 272 to 274 to test behaviour of new "K" option to ConvertTypes. Updated "docstrings" for CSVRead and CSVWrite. Updated method RegisterCSVRead.

@@ -1,0 +1,12 @@
+﻿"Data",,,,,"CSVWrite",,"CSVRead (Delimited = FALSE)",,"CSVRead",,,
+"Nums","Bools","Dates","Strings",,"C:\Temp\Test.csv",,"""Nums"",""Bools"",""Dates"",""Strings""",,"Nums","Bools","Dates","Strings"
+1,False,2021-11-02,"Text",,,,"1,False,2021-11-02,""Text""",,1,False,2021-11-02,"Text"
+2,True,2021-11-03,"A, comma",,,,"2,True,2021-11-03,""A, comma""",,2,True,2021-11-03,"A, comma"
+3,False,2021-11-04,"A
+LF",,,,"3,False,2021-11-04,""A",,3,False,2021-11-04,"A
+LF"
+4,True,2021-11-05,"A CR",,,,"LF""",,4,True,2021-11-05,"A CR"
+5,False,2021-11-06,"""Quotes""",,,,"4,True,2021-11-05,""A",,5,False,2021-11-06,"""Quotes"""
+6,True,2021-11-07,"Text",,,," CR""",,6,True,2021-11-07,"Text"
+,,,,,,,"5,False,2021-11-06,""""""Quotes""""""",,,,,
+,,,,,,,"6,True,2021-11-07,""Text""",,,,,

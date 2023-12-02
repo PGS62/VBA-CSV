@@ -1,0 +1,171 @@
+﻿,"Regular Expressions",,,,,,,,,,
+,,,,,,,,,,"Start","^"
+,"Constructing regular expressions that matches valid ISO8601 strings ",,,,,,,,,"Date part","[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9]"
+,"The expressions some, but not all, strings for which elements are",,,,,,,,,"Time part","T[0-2][0-9]:[0-5][0-9]:[0-5][0-9]"
+,"out-of-range e.g. 2021-13-01",,,,,,,,,"fractional second","\.[0-9]+"
+,,,,,,,,,,"time part and optional fractional second","T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?"
+,,,,,,,,,,"Time Zone","(Z|((\+|\-)[0-2][0-9]:[0-5][0-9]))"
+,,,,,,,,,,"Time part and optional fractional second and optional timezone","T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?((Z|((\+|\-)[0-2][0-9]:[0-5][0-9])))?"
+,,,,,,,,,,"(Time part and optional fractional second) and timezone","T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?(Z|((\+|\-)[0-2][0-9]:[0-5][0-9]))"
+,,,,,,,,,,"End","$"
+,"Good Strings",,,,,,,,,"rxNoNo - accept date, reject datetime","^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9]$"
+,"C:\Projects\VBA-CSV\testfiles\\test_good_ISO8601.csv",,,,,,,,,"rxYesNo - accept date, accept datetime without time zone, reject datetime with time zone","^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?)?$"
+,"Bad Strings",,,,,,,,,"rxNoYes - accept date, reject datetime without time zone, accept datetime with time zone","^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?(Z|((\+|\-)[0-2][0-9]:[0-5][0-9])))?$"
+,"C:\Projects\VBA-CSV\testfiles\\test_bad_ISO8601.csv",,,,,,,,,"rxYesYes - accept date, accept datetime without time zone, accept datetime with time zone","^[0-9][0-9][0-9][0-9]\-[[0-1][0-9]\-[0-3][0-9](T[0-2][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]+)?((Z|((\+|\-)[0-2][0-9]:[0-5][0-9])))?)?$"
+,,,,,,,,,,,
+,"Good","rxNoNo - accept date, reject datetime","rxYesNo - accept date, accept datetime without time zone, reject datetime with time zone","rxNoYes - accept date, reject datetime without time zone, accept datetime with time zone","rxYesYes - accept date, accept datetime without time zone, accept datetime with time zone",,"Bad","rxNoNo - accept date, reject datetime","rxYesNo - accept date, accept datetime without time zone, reject datetime with time zone","rxNoYes - accept date, reject datetime without time zone, accept datetime with time zone","rxYesYes - accept date, accept datetime without time zone, accept datetime with time zone"
+,"2023-01-17T18:40:01.786-12:00",False,False,True,True,,"2021-00-29T17:58:23.492-12:00",False,False,True,True
+,"2021-10-09T04:00:48.243-11:00",False,False,True,True,,"2021-13-29T17:58:23.492-12:00",False,False,True,True
+,"2022-02-13T18:10:03.598-10:00",False,False,True,True,,"2021-06-00T17:58:23.492-12:00",False,False,True,True
+,"2023-11-25T15:19:27.591-09:30",False,False,True,True,,"2021-06-31T17:58:23.492-12:00",False,False,True,True
+,"2021-12-06T16:21:10.629-09:00",False,False,True,True,,"2021-06-29T25:58:23.492-12:00",False,False,True,True
+,"2023-11-19T07:14:42.016-08:00",False,False,True,True,,"2021-06-29T17:61:23.492-12:00",False,False,False,False
+,"2022-08-17T18:58:38.966-07:00",False,False,True,True,,"2021-06-29T17:58:60.492-12:00",False,False,False,False
+,"2022-12-30T19:14:19.889-06:00",False,False,True,True,,"2021-06-29T17:58:23.492-24:00",False,False,True,True
+,"2024-03-04T13:31:04.623-05:00",False,False,True,True,,"2021-06-29T17:58:23.492-12:60",False,False,False,False
+,"2022-05-12T09:58:34.702-04:00",False,False,True,True,,"2021-00-29",True,True,True,True
+,"2022-02-11T12:23:33.553-03:30",False,False,True,True,,"2021-13-29",True,True,True,True
+,"2023-07-18T22:56:17.224-03:00",False,False,True,True,,"2021-06-00",True,True,True,True
+,"2024-03-10T16:56:15.842-02:00",False,False,True,True,,"2021-06-31",True,True,True,True
+,"2023-12-25T03:53:39.947-01:00",False,False,True,True,,"2021-06-29T25:15:20",False,True,False,True
+,"2024-05-10T05:24:27.917Z",False,False,True,True,,"2021-30-29",False,False,False,False
+,"2022-09-01T00:08:26.304+01:00",False,False,True,True,,"2021-06-40",False,False,False,False
+,"2023-02-10T10:58:22.848+02:00",False,False,True,True,,"2021-06-29T30:15:20",False,False,False,False
+,"2023-09-10T04:49:48.520+03:00",False,False,True,True,,"2021-06-29T20:60:20",False,False,False,False
+,"2023-01-21T04:19:39.829+03:30",False,False,True,True,,"2021-06-29T:20:59:60",False,False,False,False
+,"2023-12-21T23:53:44.094+04:00",False,False,True,True,,"x021-06-29T17:58:23.492-12:00",False,False,False,False
+,"2022-09-23T14:54:38.795+04:30",False,False,True,True,,"2x21-06-29T17:58:23.492-12:00",False,False,False,False
+,"2024-02-04T07:45:08.056+05:00",False,False,True,True,,"20x1-06-29T17:58:23.492-12:00",False,False,False,False
+,"2022-02-13T05:14:55.673+05:30",False,False,True,True,,"202x-06-29T17:58:23.492-12:00",False,False,False,False
+,"2023-02-09T22:42:26.934+05:45",False,False,True,True,,"2021x06-29T17:58:23.492-12:00",False,False,False,False
+,"2021-11-28T14:02:33.680+06:00",False,False,True,True,,"2021-x6-29T17:58:23.492-12:00",False,False,False,False
+,"2022-03-06T02:37:14.609+06:30",False,False,True,True,,"2021-0x-29T17:58:23.492-12:00",False,False,False,False
+,"2022-05-18T13:26:59.269+07:00",False,False,True,True,,"2021-06x29T17:58:23.492-12:00",False,False,False,False
+,"2023-10-12T03:41:20.854+08:00",False,False,True,True,,"2021-06-x9T17:58:23.492-12:00",False,False,False,False
+,"2022-10-23T20:13:06.354+08:45",False,False,True,True,,"2021-06-2xT17:58:23.492-12:00",False,False,False,False
+,"2022-06-23T21:54:01.766+09:00",False,False,True,True,,"2021-06-29x17:58:23.492-12:00",False,False,False,False
+,"2022-08-10T23:10:35.889+09:30",False,False,True,True,,"2021-06-29Tx7:58:23.492-12:00",False,False,False,False
+,"2021-10-08T09:53:25.098+10:00",False,False,True,True,,"2021-06-29T1x:58:23.492-12:00",False,False,False,False
+,"2022-02-20T13:40:23.458+10:30",False,False,True,True,,"2021-06-29T17x58:23.492-12:00",False,False,False,False
+,"2024-05-19T02:21:56.931+11:00",False,False,True,True,,"2021-06-29T17:x8:23.492-12:00",False,False,False,False
+,"2023-05-09T06:39:45.156+12:00",False,False,True,True,,"2021-06-29T17:5x:23.492-12:00",False,False,False,False
+,"2024-02-17T15:28:28.148+12:45",False,False,True,True,,"2021-06-29T17:58x23.492-12:00",False,False,False,False
+,"2023-05-10T03:28:07.276+13:00",False,False,True,True,,"2021-06-29T17:58:x3.492-12:00",False,False,False,False
+,"2022-02-10T20:10:54.146+14:00",False,False,True,True,,"2021-06-29T17:58:2x.492-12:00",False,False,False,False
+,"2021-09-26T22:52:42-12:00",False,False,True,True,,"2021-06-29T17:58:23x492-12:00",False,False,False,False
+,"2022-03-19T14:23:37-11:00",False,False,True,True,,"2021-06-29T17:58:23.x92-12:00",False,False,False,False
+,"2022-07-31T12:03:09-10:00",False,False,True,True,,"2021-06-29T17:58:23.4x2-12:00",False,False,False,False
+,"2021-12-02T17:28:14-09:30",False,False,True,True,,"2021-06-29T17:58:23.49x-12:00",False,False,False,False
+,"2021-10-02T15:51:18-09:00",False,False,True,True,,"2021-06-29T17:58:23.492x12:00",False,False,False,False
+,"2024-01-22T19:42:48-08:00",False,False,True,True,,"2021-06-29T17:58:23.492-x2:00",False,False,False,False
+,"2024-01-28T11:57:19-07:00",False,False,True,True,,"2021-06-29T17:58:23.492-1x:00",False,False,False,False
+,"2024-02-25T17:06:49-06:00",False,False,True,True,,"2021-06-29T17:58:23.492-12x00",False,False,False,False
+,"2024-04-09T11:35:26-05:00",False,False,True,True,,"2021-06-29T17:58:23.492-12:x0",False,False,False,False
+,"2023-07-04T01:03:25-04:00",False,False,True,True,,"2021-06-29T17:58:23.492-12:0x",False,False,False,False
+,"2024-03-11T13:12:44-03:30",False,False,True,True,,"x024-05-10T05:24:27.917Z",False,False,False,False
+,"2022-10-09T23:35:28-03:00",False,False,True,True,,"2x24-05-10T05:24:27.917Z",False,False,False,False
+,"2022-06-10T03:18:48-02:00",False,False,True,True,,"20x4-05-10T05:24:27.917Z",False,False,False,False
+,"2022-08-22T00:06:54-01:00",False,False,True,True,,"202x-05-10T05:24:27.917Z",False,False,False,False
+,"2023-03-08T06:29:28Z",False,False,True,True,,"2024x05-10T05:24:27.917Z",False,False,False,False
+,"2024-02-21T02:02:59+01:00",False,False,True,True,,"2024-x5-10T05:24:27.917Z",False,False,False,False
+,"2023-04-24T05:25:16+02:00",False,False,True,True,,"2024-0x-10T05:24:27.917Z",False,False,False,False
+,"2023-12-04T11:29:18+03:00",False,False,True,True,,"2024-05x10T05:24:27.917Z",False,False,False,False
+,"2023-09-18T10:16:43+03:30",False,False,True,True,,"2024-05-x0T05:24:27.917Z",False,False,False,False
+,"2024-01-04T04:57:34+04:00",False,False,True,True,,"2024-05-1xT05:24:27.917Z",False,False,False,False
+,"2022-11-10T09:10:08+04:30",False,False,True,True,,"2024-05-10x05:24:27.917Z",False,False,False,False
+,"2022-03-25T04:35:17+05:00",False,False,True,True,,"2024-05-10Tx5:24:27.917Z",False,False,False,False
+,"2022-01-16T09:57:34+05:30",False,False,True,True,,"2024-05-10T0x:24:27.917Z",False,False,False,False
+,"2022-11-18T03:23:39+05:45",False,False,True,True,,"2024-05-10T05x24:27.917Z",False,False,False,False
+,"2023-10-28T13:53:34+06:00",False,False,True,True,,"2024-05-10T05:x4:27.917Z",False,False,False,False
+,"2022-03-06T18:49:35+06:30",False,False,True,True,,"2024-05-10T05:2x:27.917Z",False,False,False,False
+,"2023-06-03T17:15:40+07:00",False,False,True,True,,"2024-05-10T05:24x27.917Z",False,False,False,False
+,"2023-03-27T05:59:07+08:00",False,False,True,True,,"2024-05-10T05:24:x7.917Z",False,False,False,False
+,"2022-05-07T01:43:14+08:45",False,False,True,True,,"2024-05-10T05:24:2x.917Z",False,False,False,False
+,"2023-09-15T21:35:44+09:00",False,False,True,True,,"2024-05-10T05:24:27x917Z",False,False,False,False
+,"2024-01-10T06:16:51+09:30",False,False,True,True,,"2024-05-10T05:24:27.x17Z",False,False,False,False
+,"2022-08-02T10:46:04+10:00",False,False,True,True,,"2024-05-10T05:24:27.9x7Z",False,False,False,False
+,"2023-06-21T01:47:02+10:30",False,False,True,True,,"2024-05-10T05:24:27.91xZ",False,False,False,False
+,"2023-02-19T04:58:22+11:00",False,False,True,True,,"2024-05-10T05:24:27.917x ",False,False,False,False
+,"2022-05-04T12:44:53+12:00",False,False,True,True,,"2024-05-10T05:24:27.917Zx ",False,False,False,False
+,"2022-05-19T17:46:15+12:45",False,False,True,True,,"x021-09-26T22:52:42-12:00",False,False,False,False
+,"2022-02-22T01:10:31+13:00",False,False,True,True,,"2x21-09-26T22:52:42-12:00",False,False,False,False
+,"2024-03-28T11:27:53+14:00",False,False,True,True,,"20x1-09-26T22:52:42-12:00",False,False,False,False
+,"2022-09-01T00:08:26.304",False,True,False,True,,"202x-09-26T22:52:42-12:00",False,False,False,False
+,"2023-02-10T10:58:22.848",False,True,False,True,,"2021x09-26T22:52:42-12:00",False,False,False,False
+,"2023-09-10T04:49:48.520",False,True,False,True,,"2021-x9-26T22:52:42-12:00",False,False,False,False
+,"2023-01-21T04:19:39.829",False,True,False,True,,"2021-0x-26T22:52:42-12:00",False,False,False,False
+,"2023-12-21T23:53:44.094",False,True,False,True,,"2021-09x26T22:52:42-12:00",False,False,False,False
+,"2022-09-23T14:54:38.795",False,True,False,True,,"2021-09-x6T22:52:42-12:00",False,False,False,False
+,"2024-02-04T07:45:08.056",False,True,False,True,,"2021-09-2xT22:52:42-12:00",False,False,False,False
+,"2022-02-13T05:14:55.673",False,True,False,True,,"2021-09-26x22:52:42-12:00",False,False,False,False
+,"2023-02-09T22:42:26.934",False,True,False,True,,"2021-09-26Tx2:52:42-12:00",False,False,False,False
+,"2021-11-28T14:02:33.680",False,True,False,True,,"2021-09-26T2x:52:42-12:00",False,False,False,False
+,"2022-03-06T02:37:14.609",False,True,False,True,,"2021-09-26T22x52:42-12:00",False,False,False,False
+,"2022-05-18T13:26:59.269",False,True,False,True,,"2021-09-26T22:x2:42-12:00",False,False,False,False
+,"2023-10-12T03:41:20.854",False,True,False,True,,"2021-09-26T22:5x:42-12:00",False,False,False,False
+,"2022-10-23T20:13:06.354",False,True,False,True,,"2021-09-26T22:52x42-12:00",False,False,False,False
+,"2022-06-23T21:54:01.766",False,True,False,True,,"2021-09-26T22:52:x2-12:00",False,False,False,False
+,"2022-08-10T23:10:35.889",False,True,False,True,,"2021-09-26T22:52:4x-12:00",False,False,False,False
+,"2021-10-08T09:53:25.098",False,True,False,True,,"2021-09-26T22:52:42x12:00",False,False,False,False
+,"2022-02-20T13:40:23.458",False,True,False,True,,"2021-09-26T22:52:42-x2:00",False,False,False,False
+,"2024-05-19T02:21:56.931",False,True,False,True,,"2021-09-26T22:52:42-1x:00",False,False,False,False
+,"2023-05-09T06:39:45.156",False,True,False,True,,"2021-09-26T22:52:42-12x00",False,False,False,False
+,"2024-02-17T15:28:28.148",False,True,False,True,,"2021-09-26T22:52:42-12:x0",False,False,False,False
+,"2023-05-10T03:28:07.276",False,True,False,True,,"2021-09-26T22:52:42-12:0x ",False,False,False,False
+,"2022-02-10T20:10:54.146",False,True,False,True,,"2021-09-26T22:52:42-12:00x ",False,False,False,False
+,"2022-12-24",True,True,True,True,,"x023-03-08T06:29:28Z",False,False,False,False
+,"2023-12-16",True,True,True,True,,"2x23-03-08T06:29:28Z",False,False,False,False
+,"2023-09-14",True,True,True,True,,"20x3-03-08T06:29:28Z",False,False,False,False
+,"2023-11-12",True,True,True,True,,"202x-03-08T06:29:28Z",False,False,False,False
+,"2023-08-11",True,True,True,True,,"2023x03-08T06:29:28Z",False,False,False,False
+,"2023-01-27",True,True,True,True,,"2023-x3-08T06:29:28Z",False,False,False,False
+,"2023-07-15",True,True,True,True,,"2023-0x-08T06:29:28Z",False,False,False,False
+,"2024-03-08",True,True,True,True,,"2023-03x08T06:29:28Z",False,False,False,False
+,"2021-10-06",True,True,True,True,,"2023-03-x8T06:29:28Z",False,False,False,False
+,"2024-03-29",True,True,True,True,,"2023-03-0xT06:29:28Z",False,False,False,False
+,"2023-10-04",True,True,True,True,,"2023-03-08x06:29:28Z",False,False,False,False
+,"2023-08-10",True,True,True,True,,"2023-03-08Tx6:29:28Z",False,False,False,False
+,"2023-04-04",True,True,True,True,,"2023-03-08T0x:29:28Z",False,False,False,False
+,"2021-09-27",True,True,True,True,,"2023-03-08T06x29:28Z",False,False,False,False
+,"2023-06-28",True,True,True,True,,"2023-03-08T06:x9:28Z",False,False,False,False
+,"2021-09-08",True,True,True,True,,"2023-03-08T06:2x:28Z",False,False,False,False
+,"2022-01-16",True,True,True,True,,"2023-03-08T06:29x28Z",False,False,False,False
+,"2023-09-24",True,True,True,True,,"2023-03-08T06:29:x8Z",False,False,False,False
+,"2022-03-20",True,True,True,True,,"2023-03-08T06:29:2xZ",False,False,False,False
+,"2024-01-28",True,True,True,True,,"2023-03-08T06:29:28x ",False,False,False,False
+,"2023-08-27",True,True,True,True,,"2023-03-08T06:29:28Zx ",False,False,False,False
+,"2023-01-15",True,True,True,True,,"x022-09-01T00:08:26.304",False,False,False,False
+,"2023-02-22",True,True,True,True,,"2x22-09-01T00:08:26.304",False,False,False,False
+,"2022-02-26",True,True,True,True,,"20x2-09-01T00:08:26.304",False,False,False,False
+,"2023-02-23",True,True,True,True,,"202x-09-01T00:08:26.304",False,False,False,False
+,"2023-03-04",True,True,True,True,,"2022x09-01T00:08:26.304",False,False,False,False
+,"2022-03-26",True,True,True,True,,"2022-x9-01T00:08:26.304",False,False,False,False
+,"2022-11-15",True,True,True,True,,"2022-0x-01T00:08:26.304",False,False,False,False
+,"2021-11-01",True,True,True,True,,"2022-09x01T00:08:26.304",False,False,False,False
+,"2021-12-29",True,True,True,True,,"2022-09-x1T00:08:26.304",False,False,False,False
+,"2023-01-06",True,True,True,True,,"2022-09-0xT00:08:26.304",False,False,False,False
+,"2024-01-12",True,True,True,True,,"2022-09-01x00:08:26.304",False,False,False,False
+,"2023-08-13",True,True,True,True,,"2022-09-01Tx0:08:26.304",False,False,False,False
+,"2023-08-24",True,True,True,True,,"2022-09-01T0x:08:26.304",False,False,False,False
+,"2021-10-16",True,True,True,True,,"2022-09-01T00x08:26.304",False,False,False,False
+,"2022-03-19",True,True,True,True,,"2022-09-01T00:x8:26.304",False,False,False,False
+,"2022-07-10",True,True,True,True,,"2022-09-01T00:0x:26.304",False,False,False,False
+,"2022-04-25",True,True,True,True,,"2022-09-01T00:08x26.304",False,False,False,False
+,,,,,,,"2022-09-01T00:08:x6.304",False,False,False,False
+,,,,,,,"2022-09-01T00:08:2x.304",False,False,False,False
+,,,,,,,"2022-09-01T00:08:26x304",False,False,False,False
+,,,,,,,"2022-09-01T00:08:26.x04",False,False,False,False
+,,,,,,,"2022-09-01T00:08:26.3x4",False,False,False,False
+,,,,,,,"2022-09-01T00:08:26.30x ",False,False,False,False
+,,,,,,,"2022-09-01T00:08:26.304x ",False,False,False,False
+,,,,,,,"x022-12-24",False,False,False,False
+,,,,,,,"2x22-12-24",False,False,False,False
+,,,,,,,"20x2-12-24",False,False,False,False
+,,,,,,,"202x-12-24",False,False,False,False
+,,,,,,,"2022x12-24",False,False,False,False
+,,,,,,,"2022-x2-24",False,False,False,False
+,,,,,,,"2022-1x-24",False,False,False,False
+,,,,,,,"2022-12x24",False,False,False,False
+,,,,,,,"2022-12-x4",False,False,False,False
+,,,,,,,"2022-12-2x ",False,False,False,False
+,,,,,,,"2022-12-24x ",False,False,False,False

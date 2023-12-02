@@ -1,0 +1,29 @@
+﻿,,,,,,,,,,,
+"Performance",,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+"This data generated 08-October-2021 19:26:26",,,,,,,,,,"Chart_1_Time_v_N for file with N rows and N columns.jpg",
+,,,,,,,,,,"Parse Time v N. Log Scales.
+N columns, N rows of 1-char fields.",
+"Field Length","Each Field Contains","Num Rows","Num Cols and Rows","CSVRead
+v0.14","sdkn104
+v1.9","ArrayFromCSVfile","NCalls
+CSVRead
+v0.14","NCalls
+sdkn104
+v1.9","NCalls
+ArrayFromCSVfile","File","Size"
+1,"x",1,1,1.76448012488409E-04,1.147792423264E-04,1.13554741232414E-04,5471,8255,8340,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0001_x_001_Ascii.csv",3
+1,"x",2,2,1.84451184213404E-04,1.20630134380587E-04,1.15503454189803E-04,5241,7875,8206,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0002_x_002_Ascii.csv",10
+1,"x",4,4,2.01201359833478E-04,1.31907868132015E-04,1.25321296813089E-04,4818,7233,7595,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0004_x_004_Ascii.csv",36
+1,"x",8,8,2.71480837555945E-04,1.78996213432738E-04,1.58817824114612E-04,3600,5396,6055,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0008_x_008_Ascii.csv",136
+1,"x",16,16,5.35173324502474E-04,3.5523165980093E-04,2.87312592919331E-04,1847,2766,3406,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0016_x_016_Ascii.csv",528
+1,"x",32,32,1.63772236162585E-03,1.05671306468826E-03,8.05627093681258E-04,609,941,1232,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0032_x_032_Ascii.csv",2080
+1,"x",64,64,6.41791698718308E-03,3.8925967586751E-03,2.98903848262207E-03,156,257,334,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0064_x_064_Ascii.csv",8256
+1,"x",128,128,2.38228504097884E-02,1.53248327214564E-02,1.16575376191517E-02,43,66,86,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0128_x_128_Ascii.csv",32896
+1,"x",256,256,9.59993296918058E-02,0.066397720031857,5.09581537819415E-02,11,16,20,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0256_x_256_Ascii.csv",131328
+1,"x",512,512,0.592675238781196,0.279872413781816,0.227966898781999,2,4,5,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_0512_x_512_Ascii.csv",524800
+1,"x",1024,1024,1.65146033878304,1.25909503878833,1.1223542387805,1,1,1,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_1024_x_1024_Ascii.csv",2098176
+1,"x",2048,2048,7.78989793877449,6.12252443878137,5.22956923877686,1,1,1,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_2048_x_2048_Ascii.csv",8390656
+1,"x",4096,4096,32.3049384387767,28.0344056387756,26.2637082387872,1,1,1,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_4096_x_4096_Ascii.csv",33558528
+1,"x",8192,8192,159.126722738793,156.653830938775,169.50707963878,1,1,1,"C:\Users\phili\AppData\Local\Temp\VBA-CSV\Performance\Strings_length_1_8192_x_8192_Ascii.csv",134225920
