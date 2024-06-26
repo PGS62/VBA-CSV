@@ -1,5 +1,5 @@
 # VBA-CSV
-Fast and convenient CSV reading and writing for VBA and Excel spreadsheets, inspired by R's [fread](https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread), and [Julia](https://julialang.org/)'s [CSV.jl](https://csv.juliadata.org/stable/).
+Fast and convenient CSV reading and writing for VBA (Excel, Word, Powerpoint) and Excel spreadsheets, inspired by R's [fread](https://www.rdocumentation.org/packages/data.table/versions/1.14.0/topics/fread), and [Julia](https://julialang.org/)'s [CSV.jl](https://csv.juliadata.org/stable/).
 
 If you like this code please give it a star. I like stars.
 
@@ -27,7 +27,7 @@ If you like this code please give it a star. I like stars.
    
    <img src="https://user-images.githubusercontent.com/18028484/202697906-283c287f-9c8c-49cb-8818-cde58c1d9bb0.png" width=60% height=60%>
 
-4. If you plan to call the functions from spreadsheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
+4. If you plan to call the functions from worksheet formulas then you might like to tell Excel's Function Wizard about them by adding calls to `RegisterCSVRead` and `RegisterCSVWrite` to the project's `Workbook_Open` event, which lives in the `ThisWorkbook` class module.
 ```vba
 Private Sub Workbook_Open()
     RegisterCSVRead
