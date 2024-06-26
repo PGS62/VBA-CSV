@@ -664,8 +664,9 @@ End Function
 '  CharSet : Set by reference.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef CharSet As String)
+          
           Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding must be " & _
-              "either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16"""
+              "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-16"", ""UTF-8NOBOM"", ""UTF-16NOBOM"""
           
 1         On Error GoTo ErrHandler
 2         If IsEmpty(Encoding) Or IsMissing(Encoding) Then

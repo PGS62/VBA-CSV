@@ -1,4 +1,5 @@
 ﻿Version	Date	Time	Author	Comment
+253	26-Jun-2024	18:01	Philip Swannell	Updated definition of constant Err_Encoding in method ParseEncoding.
 252	26-Jun-2024	16:36	Philip Swannell	Further changes to make testing on Word, Powerpoint etc. easier.
 251	26-Jun-2024	16:02	Philip Swannell	Changes in other modules to make it simpler to run tests when the host application is not Excel. Bumped to 0.31.
 250	26-Jun-2024	14:31	Philip Swannell	Changes so that the code of modCSVReadWrite compiles when the host application is Word or Powerpoint rather than Excel.
