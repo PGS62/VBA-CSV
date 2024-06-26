@@ -11,7 +11,7 @@
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,"HeaderRow","#Not requested!",,,
 ,"File Size","TestNo","RunThisTest","FileName","ConvertTypes","Delimiter","IgnoreRepeated","DateFormat","Comment","IgnoreEmptyLines","HeaderRowNum","SkipToRow","SkipToCol","NumRows","NumCols","TrueStrings","FalseStrings","MissingStrings","Encoding","DecimalSeparator","Notes",,"VBA code for Test274",,"Raw: CSVRead with Delimiter = FALSE","Size:","4 x 4",,,
-,5,1,True,"test_one_row_of_data.csv",True,"",False,"","",True,,1,1,0,0,,,,,".",,,"Private Sub Test274(Folder As String)","","""Col1"",""Col2"",""Col3"",""Col4"""," ","Col1","""Col2""","Col3","Col4"
+,5,1,True,"test_one_row_of_data.csv",True,"",False,"","",True,,1,1,0,0,,,,,".",,,"Public Sub Test274(Folder As String)","","""Col1"",""Col2"",""Col3"",""Col4"""," ","Col1","""Col2""","Col3","Col4"
 ,20,2,True,"test_empty_file_newlines.csv",True,"",False,"","",False,,1,1,0,0,,,,,".",,,"    Dim Expected as Variant","","1,""x"",""x"",True"," ",1,"""x""","x",True
 ,13,3,True,"test_single_column.csv",True,"",False,"","",True,,1,1,0,0,,,,,".",,,"    Dim FileName As String","","2,""y"",""y"",False"," ",2,"""y""","y",False
 ,18,4,True,"comma_decimal.csv",True,"",False,"","",True,,1,1,0,0,,,,,",",,,"    Dim Observed As Variant","","3,""z"",""z"",True"," ",3,"""z""","z",True

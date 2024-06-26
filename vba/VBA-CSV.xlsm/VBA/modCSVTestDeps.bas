@@ -767,7 +767,7 @@ Public Function HStack(ParamArray Arrays()) As Variant
     On Error GoTo ErrHandler
 
     Static NA As Variant
-    If IsEmpty(NA) Then NA = CVErr(xlErrNA)
+    If IsEmpty(NA) Then NA = CVErr(2042)
 
     If IsMissing(Arrays) Then
         HStack = CreateMissing()

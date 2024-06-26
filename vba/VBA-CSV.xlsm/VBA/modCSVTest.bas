@@ -11,6 +11,9 @@ Private m_NumFailed As Long
 Private m_NumSkipped As Long
 Private m_Failures() As String
 
+#Const HOST_IS_EXCEL = True '<---SWITCH TO False WHEN HOST APPLICATION IS WORD, POWERPOINT ETC
+
+#If HOST_IS_EXCEL Then
 Sub SwitchAllTrue()
     SwitchAllTests True
 End Sub
@@ -26,62 +29,105 @@ Sub SwitchAllTests(NewValue As Boolean)
 ErrHandler:
      MsgBox ReThrow("SwitchAllTests", Err, True), vbCritical
 End Sub
+#End If
 
+
+#If HOST_IS_EXCEL Then
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RunTests
 ' Purpose    : Code behind the "Run Tests" button on the Tests worksheet
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub RunTests()
-    Dim ProtectContents As Boolean
 
-    On Error GoTo ErrHandler
+          Dim ProtectContents As Boolean
 
-    Dim i As Long
-    Dim Folder As String
-    Dim RunIndicators As Variant
-    Dim TestNumbers As Variant
-    
-    Folder = ThisWorkbook.path
-    Folder = Left$(Folder, InStrRev(Folder, "\")) & "testfiles\"
+1         On Error GoTo ErrHandler
 
-    If Not FolderExists(Folder) Then Throw "Cannot find folder: '" & Folder & "'"
-    
-    m_Failures = VBA.Split(vbNullString) 'Creates array of length zero!
-    m_NumPassed = 0
-    m_NumFailed = 0
-    m_NumSkipped = 0
+          Dim i As Long
+          Dim Folder As String
+          Dim RunIndicators As Variant
+          Dim TestNumbers As Variant
+          
 
-    RunIndicators = shTest.ListObjects("Tests").ListColumns("RunThisTest").DataBodyRange.value
-    TestNumbers = shTest.ListObjects("Tests").ListColumns("TestNo").DataBodyRange.value
-    
-    For i = 1 To NRows(RunIndicators)
-        If RunIndicators(i, 1) Then
-            Application.StatusBar = "Running test " & CStr(TestNumbers(i, 1))
-            Application.Run "'" & ThisWorkbook.Name & "'!Test" & CStr(TestNumbers(i, 1)), Folder
-        Else
-            m_NumSkipped = m_NumSkipped + 1
-        End If
-    Next i
-    Application.StatusBar = False
+2         Folder = ThisWorkbook.path
+3         Folder = Left$(Folder, InStrRev(Folder, "\")) & "testfiles\"
 
-    shHiddenSheet.Unprotect
-    shHiddenSheet.UsedRange.EntireRow.Delete
+4         If Not FolderExists(Folder) Then Throw "Cannot find folder: '" & Folder & "'"
+          
+5         m_Failures = VBA.Split(vbNullString) 'Creates array of length zero!
+6         m_NumPassed = 0
+7         m_NumFailed = 0
+8         m_NumSkipped = 0
 
-    With shTest
-        ProtectContents = .ProtectContents
-        .Unprotect
-        .Range("NumPassed").value = m_NumPassed
-        .Range("NumFailed").value = m_NumFailed
-        .Range("NumSkipped").value = m_NumSkipped
-        PasteFailures m_NumFailed, m_Failures
-        .Protect Contents:=ProtectContents
-    End With
+9         RunIndicators = shTest.ListObjects("Tests").ListColumns("RunThisTest").DataBodyRange.value
+10        TestNumbers = shTest.ListObjects("Tests").ListColumns("TestNo").DataBodyRange.value
+11        For i = 1 To NRows(RunIndicators)
+12            If RunIndicators(i, 1) Then
+13                Application.StatusBar = "Running test " & CStr(TestNumbers(i, 1))
+14                Application.Run "'" & ThisWorkbook.Name & "'!Test" & CStr(TestNumbers(i, 1)), Folder
+15            Else
+16                m_NumSkipped = m_NumSkipped + 1
+17            End If
+18        Next i
 
-    Exit Sub
+19        Application.StatusBar = False
+
+20        shHiddenSheet.Unprotect
+21        shHiddenSheet.UsedRange.EntireRow.Delete
+
+22        With shTest
+23            ProtectContents = .ProtectContents
+24            .Unprotect
+25            .Range("NumPassed").value = m_NumPassed
+26            .Range("NumFailed").value = m_NumFailed
+27            .Range("NumSkipped").value = m_NumSkipped
+28            PasteFailures m_NumFailed, m_Failures
+29            .Protect Contents:=ProtectContents
+30        End With
+
+31        Debug.Print "NumPassed", m_NumPassed
+32        Debug.Print "NumFailed", m_NumFailed
+33        Debug.Print "NumSkipped", m_NumSkipped
+
+34        Exit Sub
 ErrHandler:
-    MsgBox ReThrow("RunTests", Err, True), vbCritical
+35        MsgBox ReThrow("RunTests", Err, True), vbCritical
 End Sub
+#Else
 
+Sub RunTests()
+        Dim Folder As String
+        Dim i As Long
+1         On Error GoTo ErrHandler
+2         Folder = "C:\Projects\VBA-CSV\testfiles\"
+3         If Not FolderExists(Folder) Then Throw "Cannot find folder: '" & Folder & "'"
+          
+4         m_Failures = VBA.Split(vbNullString) 'Creates array of length zero!
+5         m_NumPassed = 0
+6         m_NumFailed = 0
+7         m_NumSkipped = 0
+
+8         For i = 1 To 274
+9             Select Case i
+                  Case 201, 202, 205, 206
+10                    m_NumSkipped = m_NumSkipped + 1
+11                Case Else
+12                    Application.Run "Test" & CStr(i), Folder
+13            End Select
+14        Next i
+
+15        Debug.Print "NumPassed", m_NumPassed
+16        Debug.Print "NumFailed", m_NumFailed
+17        Debug.Print "NumSkipped", m_NumSkipped
+
+18        Exit Sub
+ErrHandler:
+19        MsgBox ReThrow("RunTestsFromWordOrPowerPoint", Err, True), vbCritical
+End Sub
+#End If
+
+
+#If HOST_IS_EXCEL Then
 Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
     On Error GoTo ErrHandler
     With shTestResults
@@ -106,6 +152,7 @@ Private Sub PasteFailures(NumFailures As Long, Optional Failures As Variant)
 ErrHandler:
     ReThrow "PasteFailures", Err
 End Sub
+#End If
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : FolderExists
@@ -165,7 +212,7 @@ Private Sub CastDoublesToDates(ByRef x As Variant)
     End If
 End Sub
 
-Private Sub Test1(Folder As String)
+Public Sub Test1(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -187,7 +234,7 @@ ErrHandler:
     ReThrow "Test1", Err
 End Sub
 
-Private Sub Test2(Folder As String)
+Public Sub Test2(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -207,7 +254,7 @@ ErrHandler:
     ReThrow "Test2", Err
 End Sub
 
-Private Sub Test3(Folder As String)
+Public Sub Test3(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -229,7 +276,7 @@ ErrHandler:
     ReThrow "Test3", Err
 End Sub
 
-Private Sub Test4(Folder As String)
+Public Sub Test4(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -249,7 +296,7 @@ ErrHandler:
     ReThrow "Test4", Err
 End Sub
 
-Private Sub Test5(Folder As String)
+Public Sub Test5(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -273,7 +320,7 @@ ErrHandler:
     ReThrow "Test5", Err
 End Sub
 
-Private Sub Test6(Folder As String)
+Public Sub Test6(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -293,7 +340,7 @@ ErrHandler:
     ReThrow "Test6", Err
 End Sub
 
-Private Sub Test7(Folder As String)
+Public Sub Test7(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -319,7 +366,7 @@ ErrHandler:
     ReThrow "Test7", Err
 End Sub
 
-Private Sub Test8(Folder As String)
+Public Sub Test8(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -339,7 +386,7 @@ ErrHandler:
     ReThrow "Test8", Err
 End Sub
 
-Private Sub Test9(Folder As String)
+Public Sub Test9(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -359,7 +406,7 @@ ErrHandler:
     ReThrow "Test9", Err
 End Sub
 
-Private Sub Test10(Folder As String)
+Public Sub Test10(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -384,7 +431,7 @@ ErrHandler:
     ReThrow "Test10", Err
 End Sub
 
-Private Sub Test11(Folder As String)
+Public Sub Test11(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -410,7 +457,7 @@ ErrHandler:
     ReThrow "Test11", Err
 End Sub
 
-Private Sub Test12(Folder As String)
+Public Sub Test12(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -435,7 +482,7 @@ ErrHandler:
     ReThrow "Test12", Err
 End Sub
 
-Private Sub Test13(Folder As String)
+Public Sub Test13(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -455,7 +502,7 @@ ErrHandler:
     ReThrow "Test13", Err
 End Sub
 
-Private Sub Test14(Folder As String)
+Public Sub Test14(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -475,7 +522,7 @@ ErrHandler:
     ReThrow "Test14", Err
 End Sub
 
-Private Sub Test15(Folder As String)
+Public Sub Test15(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -495,7 +542,7 @@ ErrHandler:
     ReThrow "Test15", Err
 End Sub
 
-Private Sub Test16(Folder As String)
+Public Sub Test16(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -515,7 +562,7 @@ ErrHandler:
     ReThrow "Test16", Err
 End Sub
 
-Private Sub Test17(Folder As String)
+Public Sub Test17(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -535,7 +582,7 @@ ErrHandler:
     ReThrow "Test17", Err
 End Sub
 
-Private Sub Test18(Folder As String)
+Public Sub Test18(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -555,7 +602,7 @@ ErrHandler:
     ReThrow "Test18", Err
 End Sub
 
-Private Sub Test19(Folder As String)
+Public Sub Test19(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -583,7 +630,7 @@ ErrHandler:
     ReThrow "Test19", Err
 End Sub
 
-Private Sub Test20(Folder As String)
+Public Sub Test20(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -603,7 +650,7 @@ ErrHandler:
     ReThrow "Test20", Err
 End Sub
 
-Private Sub Test21(Folder As String)
+Public Sub Test21(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -627,7 +674,7 @@ ErrHandler:
     ReThrow "Test21", Err
 End Sub
 
-Private Sub Test22(Folder As String)
+Public Sub Test22(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -647,7 +694,7 @@ ErrHandler:
     ReThrow "Test22", Err
 End Sub
 
-Private Sub Test23(Folder As String)
+Public Sub Test23(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -667,7 +714,7 @@ ErrHandler:
     ReThrow "Test23", Err
 End Sub
 
-Private Sub Test24(Folder As String)
+Public Sub Test24(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -688,7 +735,7 @@ ErrHandler:
     ReThrow "Test24", Err
 End Sub
 
-Private Sub Test25(Folder As String)
+Public Sub Test25(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -708,7 +755,7 @@ ErrHandler:
     ReThrow "Test25", Err
 End Sub
 
-Private Sub Test26(Folder As String)
+Public Sub Test26(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -734,7 +781,7 @@ ErrHandler:
     ReThrow "Test26", Err
 End Sub
 
-Private Sub Test27(Folder As String)
+Public Sub Test27(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -754,7 +801,7 @@ ErrHandler:
     ReThrow "Test27", Err
 End Sub
 
-Private Sub Test28(Folder As String)
+Public Sub Test28(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -778,7 +825,7 @@ ErrHandler:
     ReThrow "Test28", Err
 End Sub
 
-Private Sub Test29(Folder As String)
+Public Sub Test29(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -799,7 +846,7 @@ ErrHandler:
     ReThrow "Test29", Err
 End Sub
 
-Private Sub Test30(Folder As String)
+Public Sub Test30(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -819,7 +866,7 @@ ErrHandler:
     ReThrow "Test30", Err
 End Sub
 
-Private Sub Test31(Folder As String)
+Public Sub Test31(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -846,7 +893,7 @@ ErrHandler:
     ReThrow "Test31", Err
 End Sub
 
-Private Sub Test32(Folder As String)
+Public Sub Test32(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -866,7 +913,7 @@ ErrHandler:
     ReThrow "Test32", Err
 End Sub
 
-Private Sub Test33(Folder As String)
+Public Sub Test33(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -886,7 +933,7 @@ ErrHandler:
     ReThrow "Test33", Err
 End Sub
 
-Private Sub Test34(Folder As String)
+Public Sub Test34(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -906,7 +953,7 @@ ErrHandler:
     ReThrow "Test34", Err
 End Sub
 
-Private Sub Test35(Folder As String)
+Public Sub Test35(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -929,7 +976,7 @@ ErrHandler:
     ReThrow "Test35", Err
 End Sub
 
-Private Sub Test36(Folder As String)
+Public Sub Test36(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -954,7 +1001,7 @@ ErrHandler:
     ReThrow "Test36", Err
 End Sub
 
-Private Sub Test37(Folder As String)
+Public Sub Test37(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -982,7 +1029,7 @@ ErrHandler:
     ReThrow "Test37", Err
 End Sub
 
-Private Sub Test38(Folder As String)
+Public Sub Test38(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1002,7 +1049,7 @@ ErrHandler:
     ReThrow "Test38", Err
 End Sub
 
-Private Sub Test39(Folder As String)
+Public Sub Test39(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1029,7 +1076,7 @@ ErrHandler:
     ReThrow "Test39", Err
 End Sub
 
-Private Sub Test40(Folder As String)
+Public Sub Test40(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1058,7 +1105,7 @@ ErrHandler:
     ReThrow "Test40", Err
 End Sub
 
-Private Sub Test41(Folder As String)
+Public Sub Test41(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1080,7 +1127,7 @@ ErrHandler:
     ReThrow "Test41", Err
 End Sub
 
-Private Sub Test42(Folder As String)
+Public Sub Test42(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1107,7 +1154,7 @@ ErrHandler:
     ReThrow "Test42", Err
 End Sub
 
-Private Sub Test43(Folder As String)
+Public Sub Test43(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1132,7 +1179,7 @@ ErrHandler:
     ReThrow "Test43", Err
 End Sub
 
-Private Sub Test44(Folder As String)
+Public Sub Test44(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1156,7 +1203,7 @@ ErrHandler:
     ReThrow "Test44", Err
 End Sub
 
-Private Sub Test45(Folder As String)
+Public Sub Test45(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1180,7 +1227,7 @@ ErrHandler:
     ReThrow "Test45", Err
 End Sub
 
-Private Sub Test46(Folder As String)
+Public Sub Test46(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1200,7 +1247,7 @@ ErrHandler:
     ReThrow "Test46", Err
 End Sub
 
-Private Sub Test47(Folder As String)
+Public Sub Test47(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1228,7 +1275,7 @@ ErrHandler:
     ReThrow "Test47", Err
 End Sub
 
-Private Sub Test48(Folder As String)
+Public Sub Test48(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1252,7 +1299,7 @@ ErrHandler:
     ReThrow "Test48", Err
 End Sub
 
-Private Sub Test49(Folder As String)
+Public Sub Test49(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1273,7 +1320,7 @@ ErrHandler:
     ReThrow "Test49", Err
 End Sub
 
-Private Sub Test50(Folder As String)
+Public Sub Test50(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1294,7 +1341,7 @@ ErrHandler:
     ReThrow "Test50", Err
 End Sub
 
-Private Sub Test51(Folder As String)
+Public Sub Test51(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1326,7 +1373,7 @@ ErrHandler:
     ReThrow "Test51", Err
 End Sub
 
-Private Sub Test52(Folder As String)
+Public Sub Test52(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1349,7 +1396,7 @@ ErrHandler:
     ReThrow "Test52", Err
 End Sub
 
-Private Sub Test53(Folder As String)
+Public Sub Test53(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1382,7 +1429,7 @@ ErrHandler:
     ReThrow "Test53", Err
 End Sub
 
-Private Sub Test54(Folder As String)
+Public Sub Test54(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1407,7 +1454,7 @@ ErrHandler:
     ReThrow "Test54", Err
 End Sub
 
-Private Sub Test55(Folder As String)
+Public Sub Test55(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1437,7 +1484,7 @@ ErrHandler:
     ReThrow "Test55", Err
 End Sub
 
-Private Sub Test56(Folder As String)
+Public Sub Test56(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1469,7 +1516,7 @@ ErrHandler:
     ReThrow "Test56", Err
 End Sub
 
-Private Sub Test57(Folder As String)
+Public Sub Test57(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1496,7 +1543,7 @@ ErrHandler:
     ReThrow "Test57", Err
 End Sub
 
-Private Sub Test58(Folder As String)
+Public Sub Test58(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1522,7 +1569,7 @@ ErrHandler:
     ReThrow "Test58", Err
 End Sub
 
-Private Sub Test59(Folder As String)
+Public Sub Test59(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1556,7 +1603,7 @@ ErrHandler:
     ReThrow "Test59", Err
 End Sub
 
-Private Sub Test60(Folder As String)
+Public Sub Test60(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1597,7 +1644,7 @@ ErrHandler:
     ReThrow "Test60", Err
 End Sub
 
-Private Sub Test61(Folder As String)
+Public Sub Test61(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1628,7 +1675,7 @@ ErrHandler:
     ReThrow "Test61", Err
 End Sub
 
-Private Sub Test62(Folder As String)
+Public Sub Test62(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1654,7 +1701,7 @@ ErrHandler:
     ReThrow "Test62", Err
 End Sub
 
-Private Sub Test63(Folder As String)
+Public Sub Test63(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1690,7 +1737,7 @@ ErrHandler:
     ReThrow "Test63", Err
 End Sub
 
-Private Sub Test64(Folder As String)
+Public Sub Test64(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1716,7 +1763,7 @@ ErrHandler:
     ReThrow "Test64", Err
 End Sub
 
-Private Sub Test65(Folder As String)
+Public Sub Test65(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1739,7 +1786,7 @@ ErrHandler:
     ReThrow "Test65", Err
 End Sub
 
-Private Sub Test66(Folder As String)
+Public Sub Test66(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1762,7 +1809,7 @@ ErrHandler:
     ReThrow "Test66", Err
 End Sub
 
-Private Sub Test67(Folder As String)
+Public Sub Test67(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1785,7 +1832,7 @@ ErrHandler:
     ReThrow "Test67", Err
 End Sub
 
-Private Sub Test68(Folder As String)
+Public Sub Test68(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1808,7 +1855,7 @@ ErrHandler:
     ReThrow "Test68", Err
 End Sub
 
-Private Sub Test69(Folder As String)
+Public Sub Test69(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1831,7 +1878,7 @@ ErrHandler:
     ReThrow "Test69", Err
 End Sub
 
-Private Sub Test70(Folder As String)
+Public Sub Test70(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1854,7 +1901,7 @@ ErrHandler:
     ReThrow "Test70", Err
 End Sub
 
-Private Sub Test71(Folder As String)
+Public Sub Test71(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1880,7 +1927,7 @@ ErrHandler:
     ReThrow "Test71", Err
 End Sub
 
-Private Sub Test72(Folder As String)
+Public Sub Test72(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1905,7 +1952,7 @@ ErrHandler:
     ReThrow "Test72", Err
 End Sub
 
-Private Sub Test73(Folder As String)
+Public Sub Test73(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1928,7 +1975,7 @@ ErrHandler:
     ReThrow "Test73", Err
 End Sub
 
-Private Sub Test74(Folder As String)
+Public Sub Test74(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1951,7 +1998,7 @@ ErrHandler:
     ReThrow "Test74", Err
 End Sub
 
-Private Sub Test75(Folder As String)
+Public Sub Test75(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -1976,7 +2023,7 @@ ErrHandler:
     ReThrow "Test75", Err
 End Sub
 
-Private Sub Test76(Folder As String)
+Public Sub Test76(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2008,7 +2055,7 @@ ErrHandler:
     ReThrow "Test76", Err
 End Sub
 
-Private Sub Test77(Folder As String)
+Public Sub Test77(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2031,7 +2078,7 @@ ErrHandler:
     ReThrow "Test77", Err
 End Sub
 
-Private Sub Test78(Folder As String)
+Public Sub Test78(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2073,7 +2120,7 @@ ErrHandler:
     ReThrow "Test78", Err
 End Sub
 
-Private Sub Test79(Folder As String)
+Public Sub Test79(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2097,7 +2144,7 @@ ErrHandler:
     ReThrow "Test79", Err
 End Sub
 
-Private Sub Test80(Folder As String)
+Public Sub Test80(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2119,7 +2166,7 @@ ErrHandler:
     ReThrow "Test80", Err
 End Sub
 
-Private Sub Test81(Folder As String)
+Public Sub Test81(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2139,7 +2186,7 @@ ErrHandler:
     ReThrow "Test81", Err
 End Sub
 
-Private Sub Test82(Folder As String)
+Public Sub Test82(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2159,7 +2206,7 @@ ErrHandler:
     ReThrow "Test82", Err
 End Sub
 
-Private Sub Test83(Folder As String)
+Public Sub Test83(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2184,7 +2231,7 @@ ErrHandler:
     ReThrow "Test83", Err
 End Sub
 
-Private Sub Test84(Folder As String)
+Public Sub Test84(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2204,7 +2251,7 @@ ErrHandler:
     ReThrow "Test84", Err
 End Sub
 
-Private Sub Test85(Folder As String)
+Public Sub Test85(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2224,7 +2271,7 @@ ErrHandler:
     ReThrow "Test85", Err
 End Sub
 
-Private Sub Test86(Folder As String)
+Public Sub Test86(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2249,7 +2296,7 @@ ErrHandler:
     ReThrow "Test86", Err
 End Sub
 
-Private Sub Test87(Folder As String)
+Public Sub Test87(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2282,7 +2329,7 @@ ErrHandler:
     ReThrow "Test87", Err
 End Sub
 
-Private Sub Test88(Folder As String)
+Public Sub Test88(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2311,7 +2358,7 @@ ErrHandler:
     ReThrow "Test88", Err
 End Sub
 
-Private Sub Test89(Folder As String)
+Public Sub Test89(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2341,7 +2388,7 @@ ErrHandler:
     ReThrow "Test89", Err
 End Sub
 
-Private Sub Test90(Folder As String)
+Public Sub Test90(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2362,7 +2409,7 @@ ErrHandler:
     ReThrow "Test90", Err
 End Sub
 
-Private Sub Test91(Folder As String)
+Public Sub Test91(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2407,7 +2454,7 @@ ErrHandler:
     ReThrow "Test91", Err
 End Sub
 
-Private Sub Test92(Folder As String)
+Public Sub Test92(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim k As Long
@@ -2446,7 +2493,7 @@ Private Sub Test92(Folder As String)
 ErrHandler:
     ReThrow "Test92", Err
 End Sub
-Private Sub Test93(Folder As String)
+Public Sub Test93(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2474,7 +2521,7 @@ ErrHandler:
     ReThrow "Test93", Err
 End Sub
 
-Private Sub Test94(Folder As String)
+Public Sub Test94(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2520,7 +2567,7 @@ ErrHandler:
     ReThrow "Test94", Err
 End Sub
 
-Private Sub Test95(Folder As String)
+Public Sub Test95(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2547,7 +2594,7 @@ ErrHandler:
     ReThrow "Test95", Err
 End Sub
 
-Private Sub Test96(Folder As String)
+Public Sub Test96(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2574,7 +2621,7 @@ ErrHandler:
     ReThrow "Test96", Err
 End Sub
 
-Private Sub Test97(Folder As String)
+Public Sub Test97(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2601,7 +2648,7 @@ ErrHandler:
     ReThrow "Test97", Err
 End Sub
 
-Private Sub Test98(Folder As String)
+Public Sub Test98(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2630,7 +2677,7 @@ ErrHandler:
     ReThrow "Test98", Err
 End Sub
 
-Private Sub Test99(Folder As String)
+Public Sub Test99(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2660,7 +2707,7 @@ ErrHandler:
     ReThrow "Test99", Err
 End Sub
 
-Private Sub Test100(Folder As String)
+Public Sub Test100(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2690,7 +2737,7 @@ ErrHandler:
     ReThrow "Test100", Err
 End Sub
 
-Private Sub Test101(Folder As String)
+Public Sub Test101(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2717,7 +2764,7 @@ ErrHandler:
     ReThrow "Test101", Err
 End Sub
 
-Private Sub Test102(Folder As String)
+Public Sub Test102(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2747,7 +2794,7 @@ ErrHandler:
     ReThrow "Test102", Err
 End Sub
 
-Private Sub Test103(Folder As String)
+Public Sub Test103(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2774,7 +2821,7 @@ ErrHandler:
     ReThrow "Test103", Err
 End Sub
 
-Private Sub Test104(Folder As String)
+Public Sub Test104(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2804,7 +2851,7 @@ ErrHandler:
     ReThrow "Test104", Err
 End Sub
 
-Private Sub Test105(Folder As String)
+Public Sub Test105(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2831,7 +2878,7 @@ ErrHandler:
     ReThrow "Test105", Err
 End Sub
 
-Private Sub Test106(Folder As String)
+Public Sub Test106(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2861,7 +2908,7 @@ ErrHandler:
     ReThrow "Test106", Err
 End Sub
 
-Private Sub Test107(Folder As String)
+Public Sub Test107(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2888,7 +2935,7 @@ ErrHandler:
     ReThrow "Test107", Err
 End Sub
 
-Private Sub Test108(Folder As String)
+Public Sub Test108(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2928,7 +2975,7 @@ ErrHandler:
     ReThrow "Test108", Err
 End Sub
 
-Private Sub Test109(Folder As String)
+Public Sub Test109(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2950,7 +2997,7 @@ ErrHandler:
     ReThrow "Test109", Err
 End Sub
 
-Private Sub Test110(Folder As String)
+Public Sub Test110(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2975,7 +3022,7 @@ ErrHandler:
     ReThrow "Test110", Err
 End Sub
 
-Private Sub Test111(Folder As String)
+Public Sub Test111(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -2998,7 +3045,7 @@ ErrHandler:
     ReThrow "Test111", Err
 End Sub
 
-Private Sub Test112(Folder As String)
+Public Sub Test112(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3022,7 +3069,7 @@ ErrHandler:
     ReThrow "Test112", Err
 End Sub
 
-Private Sub Test113(Folder As String)
+Public Sub Test113(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3044,7 +3091,7 @@ ErrHandler:
     ReThrow "Test113", Err
 End Sub
 
-Private Sub Test114(Folder As String)
+Public Sub Test114(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3067,7 +3114,7 @@ ErrHandler:
     ReThrow "Test114", Err
 End Sub
 
-Private Sub Test115(Folder As String)
+Public Sub Test115(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3089,7 +3136,7 @@ ErrHandler:
     ReThrow "Test115", Err
 End Sub
 
-Private Sub Test116(Folder As String)
+Public Sub Test116(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3116,7 +3163,7 @@ ErrHandler:
     ReThrow "Test116", Err
 End Sub
 
-Private Sub Test117(Folder As String)
+Public Sub Test117(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3148,7 +3195,7 @@ ErrHandler:
     ReThrow "Test117", Err
 End Sub
 
-Private Sub Test118(Folder As String)
+Public Sub Test118(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3173,7 +3220,7 @@ ErrHandler:
     ReThrow "Test118", Err
 End Sub
 
-Private Sub Test119(Folder As String)
+Public Sub Test119(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3197,7 +3244,7 @@ ErrHandler:
     ReThrow "Test119", Err
 End Sub
 
-Private Sub Test120(Folder As String)
+Public Sub Test120(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3220,7 +3267,7 @@ ErrHandler:
     ReThrow "Test120", Err
 End Sub
 
-Private Sub Test121(Folder As String)
+Public Sub Test121(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3257,7 +3304,7 @@ ErrHandler:
     ReThrow "Test121", Err
 End Sub
 
-Private Sub Test122(Folder As String)
+Public Sub Test122(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3281,7 +3328,7 @@ ErrHandler:
     ReThrow "Test122", Err
 End Sub
 
-Private Sub Test123(Folder As String)
+Public Sub Test123(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3315,7 +3362,7 @@ ErrHandler:
     ReThrow "Test123", Err
 End Sub
 
-Private Sub Test124(Folder As String)
+Public Sub Test124(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3336,7 +3383,7 @@ ErrHandler:
     ReThrow "Test124", Err
 End Sub
 
-Private Sub Test125(Folder As String)
+Public Sub Test125(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3365,7 +3412,7 @@ ErrHandler:
     ReThrow "Test125", Err
 End Sub
 
-Private Sub Test126(Folder As String)
+Public Sub Test126(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3387,7 +3434,7 @@ ErrHandler:
     ReThrow "Test126", Err
 End Sub
 
-Private Sub Test127(Folder As String)
+Public Sub Test127(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3412,7 +3459,7 @@ ErrHandler:
     ReThrow "Test127", Err
 End Sub
 
-Private Sub Test128(Folder As String)
+Public Sub Test128(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3436,7 +3483,7 @@ ErrHandler:
     ReThrow "Test128", Err
 End Sub
 
-Private Sub Test129(Folder As String)
+Public Sub Test129(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3469,7 +3516,7 @@ ErrHandler:
     ReThrow "Test129", Err
 End Sub
 
-Private Sub Test130(Folder As String)
+Public Sub Test130(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3494,7 +3541,7 @@ ErrHandler:
     ReThrow "Test130", Err
 End Sub
 
-Private Sub Test131(Folder As String)
+Public Sub Test131(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3523,7 +3570,7 @@ ErrHandler:
     ReThrow "Test131", Err
 End Sub
 
-Private Sub Test132(Folder As String)
+Public Sub Test132(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3552,7 +3599,7 @@ ErrHandler:
     ReThrow "Test132", Err
 End Sub
 
-Private Sub Test133(Folder As String)
+Public Sub Test133(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3590,7 +3637,7 @@ ErrHandler:
     ReThrow "Test133", Err
 End Sub
 
-Private Sub Test134(Folder As String)
+Public Sub Test134(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3615,7 +3662,7 @@ ErrHandler:
     ReThrow "Test134", Err
 End Sub
 
-Private Sub Test135(Folder As String)
+Public Sub Test135(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3638,7 +3685,7 @@ ErrHandler:
     ReThrow "Test135", Err
 End Sub
 
-Private Sub Test136(Folder As String)
+Public Sub Test136(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3661,7 +3708,7 @@ ErrHandler:
     ReThrow "Test136", Err
 End Sub
 
-Private Sub Test137(Folder As String)
+Public Sub Test137(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3684,7 +3731,7 @@ ErrHandler:
     ReThrow "Test137", Err
 End Sub
 
-Private Sub Test138(Folder As String)
+Public Sub Test138(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3707,7 +3754,7 @@ ErrHandler:
     ReThrow "Test138", Err
 End Sub
 
-Private Sub Test139(Folder As String)
+Public Sub Test139(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3730,7 +3777,7 @@ ErrHandler:
     ReThrow "Test139", Err
 End Sub
 
-Private Sub Test140(Folder As String)
+Public Sub Test140(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3755,7 +3802,7 @@ ErrHandler:
     ReThrow "Test140", Err
 End Sub
 
-Private Sub Test141(Folder As String)
+Public Sub Test141(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3778,7 +3825,7 @@ ErrHandler:
     ReThrow "Test141", Err
 End Sub
 
-Private Sub Test142(Folder As String)
+Public Sub Test142(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3801,7 +3848,7 @@ ErrHandler:
     ReThrow "Test142", Err
 End Sub
 
-Private Sub Test143(Folder As String)
+Public Sub Test143(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3824,7 +3871,7 @@ ErrHandler:
     ReThrow "Test143", Err
 End Sub
 
-Private Sub Test144(Folder As String)
+Public Sub Test144(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3847,7 +3894,7 @@ ErrHandler:
     ReThrow "Test144", Err
 End Sub
 
-Private Sub Test145(Folder As String)
+Public Sub Test145(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3870,7 +3917,7 @@ ErrHandler:
     ReThrow "Test145", Err
 End Sub
 
-Private Sub Test146(Folder As String)
+Public Sub Test146(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3893,7 +3940,7 @@ ErrHandler:
     ReThrow "Test146", Err
 End Sub
 
-Private Sub Test147(Folder As String)
+Public Sub Test147(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3916,7 +3963,7 @@ ErrHandler:
     ReThrow "Test147", Err
 End Sub
 
-Private Sub Test148(Folder As String)
+Public Sub Test148(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3939,7 +3986,7 @@ ErrHandler:
     ReThrow "Test148", Err
 End Sub
 
-Private Sub Test149(Folder As String)
+Public Sub Test149(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3962,7 +4009,7 @@ ErrHandler:
     ReThrow "Test149", Err
 End Sub
 
-Private Sub Test150(Folder As String)
+Public Sub Test150(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -3985,7 +4032,7 @@ ErrHandler:
     ReThrow "Test150", Err
 End Sub
 
-Private Sub Test151(Folder As String)
+Public Sub Test151(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4009,7 +4056,7 @@ ErrHandler:
     ReThrow "Test151", Err
 End Sub
 
-Private Sub Test152(Folder As String)
+Public Sub Test152(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4032,7 +4079,7 @@ ErrHandler:
     ReThrow "Test152", Err
 End Sub
 
-Private Sub Test153(Folder As String)
+Public Sub Test153(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4055,7 +4102,7 @@ ErrHandler:
     ReThrow "Test153", Err
 End Sub
 
-Private Sub Test154(Folder As String)
+Public Sub Test154(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4083,7 +4130,7 @@ ErrHandler:
     ReThrow "Test154", Err
 End Sub
 
-Private Sub Test155(Folder As String)
+Public Sub Test155(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4119,7 +4166,7 @@ ErrHandler:
     ReThrow "Test155", Err
 End Sub
 
-Private Sub Test156(Folder As String)
+Public Sub Test156(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4149,7 +4196,7 @@ ErrHandler:
     ReThrow "Test156", Err
 End Sub
 
-Private Sub Test157(Folder As String)
+Public Sub Test157(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4172,7 +4219,7 @@ ErrHandler:
     ReThrow "Test157", Err
 End Sub
 
-Private Sub Test158(Folder As String)
+Public Sub Test158(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4196,7 +4243,7 @@ ErrHandler:
     ReThrow "Test158", Err
 End Sub
 
-Private Sub Test159(Folder As String)
+Public Sub Test159(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4233,7 +4280,7 @@ ErrHandler:
     ReThrow "Test159", Err
 End Sub
 
-Private Sub Test160(Folder As String)
+Public Sub Test160(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4256,7 +4303,7 @@ ErrHandler:
     ReThrow "Test160", Err
 End Sub
 
-Private Sub Test161(Folder As String)
+Public Sub Test161(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4293,7 +4340,7 @@ ErrHandler:
     ReThrow "Test161", Err
 End Sub
 
-Private Sub Test162(Folder As String)
+Public Sub Test162(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4318,7 +4365,7 @@ ErrHandler:
     ReThrow "Test162", Err
 End Sub
 
-Private Sub Test163(Folder As String)
+Public Sub Test163(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4343,7 +4390,7 @@ ErrHandler:
     ReThrow "Test163", Err
 End Sub
 
-Private Sub Test164(Folder As String)
+Public Sub Test164(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4366,7 +4413,7 @@ ErrHandler:
     ReThrow "Test164", Err
 End Sub
 
-Private Sub Test165(Folder As String)
+Public Sub Test165(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4389,7 +4436,7 @@ ErrHandler:
     ReThrow "Test165", Err
 End Sub
 
-Private Sub Test166(Folder As String)
+Public Sub Test166(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4414,7 +4461,7 @@ ErrHandler:
     ReThrow "Test166", Err
 End Sub
 
-Private Sub Test167(Folder As String)
+Public Sub Test167(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4441,7 +4488,7 @@ ErrHandler:
     ReThrow "Test167", Err
 End Sub
 
-Private Sub Test168(Folder As String)
+Public Sub Test168(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4464,7 +4511,7 @@ ErrHandler:
     ReThrow "Test168", Err
 End Sub
 
-Private Sub Test169(Folder As String)
+Public Sub Test169(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4487,7 +4534,7 @@ ErrHandler:
     ReThrow "Test169", Err
 End Sub
 
-Private Sub Test170(Folder As String)
+Public Sub Test170(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4530,7 +4577,7 @@ ErrHandler:
     ReThrow "Test170", Err
 End Sub
 
-Private Sub Test171(Folder As String)
+Public Sub Test171(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4571,7 +4618,7 @@ ErrHandler:
     ReThrow "Test171", Err
 End Sub
 
-Private Sub Test172(Folder As String)
+Public Sub Test172(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4602,7 +4649,7 @@ ErrHandler:
     ReThrow "Test172", Err
 End Sub
 
-Private Sub Test173(Folder As String)
+Public Sub Test173(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4625,7 +4672,7 @@ ErrHandler:
     ReThrow "Test173", Err
 End Sub
 
-Private Sub Test174(Folder As String)
+Public Sub Test174(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4648,7 +4695,7 @@ ErrHandler:
     ReThrow "Test174", Err
 End Sub
 
-Private Sub Test175(Folder As String)
+Public Sub Test175(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4671,7 +4718,7 @@ ErrHandler:
     ReThrow "Test175", Err
 End Sub
 
-Private Sub Test176(Folder As String)
+Public Sub Test176(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4700,7 +4747,7 @@ ErrHandler:
     ReThrow "Test176", Err
 End Sub
 
-Private Sub Test177(Folder As String)
+Public Sub Test177(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4729,7 +4776,7 @@ ErrHandler:
     ReThrow "Test177", Err
 End Sub
 
-Private Sub Test178(Folder As String)
+Public Sub Test178(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4762,7 +4809,7 @@ ErrHandler:
     ReThrow "Test178", Err
 End Sub
 
-Private Sub Test179(Folder As String)
+Public Sub Test179(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4798,7 +4845,7 @@ ErrHandler:
     ReThrow "Test179", Err
 End Sub
 
-Private Sub Test180(Folder As String)
+Public Sub Test180(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4829,7 +4876,7 @@ ErrHandler:
     ReThrow "Test180", Err
 End Sub
 
-Private Sub Test181(Folder As String)
+Public Sub Test181(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4879,7 +4926,7 @@ ErrHandler:
     ReThrow "TwoFiveFiveChars", Err
 End Function
 
-Private Sub Test182(Folder As String)
+Public Sub Test182(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4902,7 +4949,7 @@ ErrHandler:
     ReThrow "Test182", Err
 End Sub
 
-Private Sub Test183(Folder As String)
+Public Sub Test183(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4925,7 +4972,7 @@ ErrHandler:
     ReThrow "Test183", Err
 End Sub
 
-Private Sub Test184(Folder As String)
+Public Sub Test184(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4947,7 +4994,7 @@ ErrHandler:
     ReThrow "Test184", Err
 End Sub
 
-Private Sub Test185(Folder As String)
+Public Sub Test185(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4968,7 +5015,7 @@ ErrHandler:
     ReThrow "Test185", Err
 End Sub
 
-Private Sub Test186(Folder As String)
+Public Sub Test186(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -4989,7 +5036,7 @@ ErrHandler:
     ReThrow "Test186", Err
 End Sub
 
-Private Sub Test187(Folder As String)
+Public Sub Test187(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5014,7 +5061,7 @@ ErrHandler:
     ReThrow "Test187", Err
 End Sub
 
-Private Sub Test188(Folder As String)
+Public Sub Test188(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5039,7 +5086,7 @@ ErrHandler:
     ReThrow "Test188", Err
 End Sub
 
-Private Sub Test189(Folder As String)
+Public Sub Test189(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5065,7 +5112,7 @@ ErrHandler:
     ReThrow "Test189", Err
 End Sub
 
-Private Sub Test190(Folder As String)
+Public Sub Test190(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5104,7 +5151,7 @@ ErrHandler:
     ReThrow "Test190", Err
 End Sub
 
-Private Sub Test191(Folder As String)
+Public Sub Test191(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5131,7 +5178,7 @@ ErrHandler:
     ReThrow "Test191", Err
 End Sub
 
-Private Sub Test192(Folder As String)
+Public Sub Test192(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5156,7 +5203,7 @@ ErrHandler:
     ReThrow "Test192", Err
 End Sub
 
-Private Sub Test193(Folder As String)
+Public Sub Test193(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5216,7 +5263,7 @@ ErrHandler:
     ReThrow "Test193", Err
 End Sub
 
-Private Sub Test194(Folder As String)
+Public Sub Test194(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5238,7 +5285,7 @@ ErrHandler:
     ReThrow "Test194", Err
 End Sub
 
-Private Sub Test195(Folder As String)
+Public Sub Test195(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5263,7 +5310,7 @@ ErrHandler:
     ReThrow "Test195", Err
 End Sub
 
-Private Sub Test196(Folder As String)
+Public Sub Test196(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5288,7 +5335,7 @@ ErrHandler:
     ReThrow "Test196", Err
 End Sub
 
-Private Sub Test197(Folder As String)
+Public Sub Test197(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5313,7 +5360,7 @@ ErrHandler:
     ReThrow "Test197", Err
 End Sub
 
-Private Sub Test198(Folder As String)
+Public Sub Test198(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5341,7 +5388,7 @@ ErrHandler:
     ReThrow "Test198", Err
 End Sub
 
-Private Sub Test199(Folder As String)
+Public Sub Test199(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5369,7 +5416,7 @@ ErrHandler:
     ReThrow "Test199", Err
 End Sub
 
-Private Sub Test200(Folder As String)
+Public Sub Test200(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5398,19 +5445,21 @@ ErrHandler:
 End Sub
 
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
-Private Sub Test201(Folder As String)
+#If HOST_IS_EXCEL Then
+Public Sub Test201(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim R As Range
     Dim strObserved As String
     Dim TestDescription As String
     Dim TestRes As Boolean
-    Dim wb As Workbook
     Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
+    Debug.Print "Running test 201"
+    Dim wb As Workbook
+    Dim R As Range
     TestDescription = "test 32K limit"
     Expected = "The file has a field (row 2, column 2) of length 33,000. Excel cells cannot contain strings longer than 32,767"
     FileName = "test_32K_limit.csv"
@@ -5438,26 +5487,29 @@ Private Sub Test201(Folder As String)
     If Not TestRes Then WhatDiffers = "Test201 Observed = '" & strObserved & "' Expected = '" & Expected & "'"
     AccumulateResults TestRes, WhatDiffers
     shHiddenSheet.UsedRange.Clear
-
+    
     Exit Sub
 ErrHandler:
     ReThrow "Test201", Err
 End Sub
+#End If
 
+#If HOST_IS_EXCEL Then
 'Non-standard test, since we are testing behaviour which is "From Excel sheet, not from VBA"
-Private Sub Test202(Folder As String)
+Public Sub Test202(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim R As Range
     Dim strObserved As String
     Dim TestDescription As String
     Dim TestRes As Boolean
-    Dim wb As Workbook
     Dim WhatDiffers As String
 
     On Error GoTo ErrHandler
+    Dim wb As Workbook
+    Dim R As Range
+    Debug.Print "Running test 202"
     TestDescription = "test 32K limit"
     Expected = "Line 2 of the file is of length 33,002. Excel cells cannot contain strings longer than 32,767"
     FileName = "test_32K_limit.csv"
@@ -5490,13 +5542,14 @@ Private Sub Test202(Folder As String)
 ErrHandler:
     ReThrow "Test202", Err
 End Sub
+#End If
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Test203
 ' Added after discovering bug when a)ConvertTypes <> FALSE; and b) SkipToRow = HeaderRow > 1. Problem was that variable
 ' HeaderRow was not being populated which led to type mismatch.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub Test203(Folder As String)
+Public Sub Test203(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5521,7 +5574,7 @@ ErrHandler:
     ReThrow "Test203", Err
 End Sub
 
-Private Sub Test204(Folder As String)
+Public Sub Test204(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5544,12 +5597,12 @@ ErrHandler:
     ReThrow "Test204", Err
 End Sub
 
-Private Sub Test205(Folder As String)
+#If HOST_IS_EXCEL Then
+Public Sub Test205(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim R As Range
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5559,6 +5612,8 @@ Private Sub Test205(Folder As String)
      returned by a VBA UDF to Excel.
 
     On Error GoTo ErrHandler
+    Dim R As Range
+    Debug.Print "Running test 205"
     TestDescription = "test 32K limit quote handling"
     Expected = HStack(Array("x", "z"), Array("y", String(NumQuotes, """")))
     FileName = "test_32K_limit_quote_handling.csv"
@@ -5584,20 +5639,22 @@ Private Sub Test205(Folder As String)
         TestRes = False
         WhatDiffers = "Cannot run this test on Excel version " & Application.Version
     End If
-    
+        
     AccumulateResults TestRes, WhatDiffers
 
     Exit Sub
 ErrHandler:
     ReThrow "Test205", Err
 End Sub
+#End If
 
-Private Sub Test206(Folder As String)
+#If HOST_IS_EXCEL Then
+Public Sub Test206(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Formula As String
     Dim Observed As Variant
-    Dim R As Range
+
     Dim TestDescription As String
     Dim TestRes As Boolean
     Dim WhatDiffers As String
@@ -5607,6 +5664,8 @@ Private Sub Test206(Folder As String)
      returned by a VBA UDF to Excel.
 
     On Error GoTo ErrHandler
+    Debug.Print "Running test 206"
+    Dim R As Range
     TestDescription = "test 32K limit quote handling 2"
     Expected = "The file has a field (row 2, column 2) of length 32,768. Excel cells cannot contain strings longer than 32,767"
 
@@ -5631,14 +5690,14 @@ Private Sub Test206(Folder As String)
     End If
     
     AccumulateResults TestRes, WhatDiffers
-
     Exit Sub
 ErrHandler:
     ReThrow "Test206", Err
 End Sub
+#End If
 
 'Tests TrueString and FalseString (in this case yes and no) appearing in the file with quotes.
-Private Sub Test207(Folder As String)
+Public Sub Test207(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5672,7 +5731,7 @@ ErrHandler:
     ReThrow "Test207", Err
 End Sub
 
-Private Sub Test208(Folder As String)
+Public Sub Test208(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5707,7 +5766,7 @@ ErrHandler:
     ReThrow "Test208", Err
 End Sub
 
-Private Sub Test209(Folder As String)
+Public Sub Test209(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5731,7 +5790,7 @@ ErrHandler:
     ReThrow "Test209", Err
 End Sub
 
-Private Sub Test210(Folder As String)
+Public Sub Test210(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5755,7 +5814,7 @@ ErrHandler:
     ReThrow "Test210", Err
 End Sub
 
-Private Sub Test211(Folder As String)
+Public Sub Test211(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5779,7 +5838,7 @@ ErrHandler:
     ReThrow "Test211", Err
 End Sub
 
-Private Sub Test212(Folder As String)
+Public Sub Test212(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5803,7 +5862,7 @@ ErrHandler:
     ReThrow "Test212", Err
 End Sub
 
-Private Sub Test213(Folder As String)
+Public Sub Test213(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5826,7 +5885,7 @@ ErrHandler:
     ReThrow "Test213", Err
 End Sub
 
-Private Sub Test214(Folder As String)
+Public Sub Test214(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5849,7 +5908,7 @@ ErrHandler:
     ReThrow "Test214", Err
 End Sub
 
-Private Sub Test215(Folder As String)
+Public Sub Test215(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5872,7 +5931,7 @@ ErrHandler:
     ReThrow "Test215", Err
 End Sub
 
-Private Sub Test216(Folder As String)
+Public Sub Test216(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5896,7 +5955,7 @@ ErrHandler:
     ReThrow "Test216", Err
 End Sub
 
-Private Sub Test217(Folder As String)
+Public Sub Test217(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5918,7 +5977,7 @@ ErrHandler:
     ReThrow "Test217", Err
 End Sub
 
-Private Sub Test218(Folder As String)
+Public Sub Test218(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5940,7 +5999,7 @@ ErrHandler:
     ReThrow "Test218", Err
 End Sub
 
-Private Sub Test219(Folder As String)
+Public Sub Test219(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5963,7 +6022,7 @@ ErrHandler:
     ReThrow "Test219", Err
 End Sub
 
-Private Sub Test220(Folder As String)
+Public Sub Test220(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -5984,7 +6043,7 @@ ErrHandler:
     ReThrow "Test220", Err
 End Sub
 
-Private Sub Test221(Folder As String)
+Public Sub Test221(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6006,7 +6065,7 @@ ErrHandler:
     ReThrow "Test221", Err
 End Sub
 
-Private Sub Test222(Folder As String)
+Public Sub Test222(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6029,7 +6088,7 @@ ErrHandler:
     ReThrow "Test222", Err
 End Sub
 
-Private Sub Test223(Folder As String)
+Public Sub Test223(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6059,7 +6118,7 @@ ErrHandler:
     ReThrow "Test223", Err
 End Sub
 
-Private Sub Test224(Folder As String)
+Public Sub Test224(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6084,7 +6143,7 @@ ErrHandler:
 End Sub
 
 'Test on non compliant input - odd number of double quotes
-Private Sub Test225(Folder As String)
+Public Sub Test225(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6106,7 +6165,7 @@ ErrHandler:
     ReThrow "Test225", Err
 End Sub
 
-Private Sub Test226(Folder As String)
+Public Sub Test226(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6130,7 +6189,7 @@ ErrHandler:
     ReThrow "Test226", Err
 End Sub
 
-Private Sub Test227(Folder As String)
+Public Sub Test227(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6156,7 +6215,7 @@ ErrHandler:
 End Sub
 
 ' x""y does not get unquoted since it's not correctly quoted in the first place.
-Private Sub Test228(Folder As String)
+Public Sub Test228(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6178,7 +6237,7 @@ ErrHandler:
     ReThrow "Test228", Err
 End Sub
 
-Private Sub Test229(Folder As String)
+Public Sub Test229(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6201,7 +6260,7 @@ ErrHandler:
     ReThrow "Test229", Err
 End Sub
 
-Private Sub Test230(Folder As String)
+Public Sub Test230(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6224,7 +6283,7 @@ ErrHandler:
     ReThrow "Test230", Err
 End Sub
 
-Private Sub Test231(Folder As String)
+Public Sub Test231(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6247,7 +6306,7 @@ ErrHandler:
     ReThrow "Test231", Err
 End Sub
 
-Private Sub Test232(Folder As String)
+Public Sub Test232(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6272,7 +6331,7 @@ ErrHandler:
     ReThrow "Test232", Err
 End Sub
 
-Private Sub Test233(Folder As String)
+Public Sub Test233(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6296,7 +6355,7 @@ ErrHandler:
     ReThrow "Test233", Err
 End Sub
 
-Private Sub Test234(Folder As String)
+Public Sub Test234(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6321,7 +6380,7 @@ ErrHandler:
     ReThrow "Test234", Err
 End Sub
 
-Private Sub Test235(Folder As String)
+Public Sub Test235(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6345,7 +6404,7 @@ ErrHandler:
     ReThrow "Test235", Err
 End Sub
 
-Private Sub Test236(Folder As String)
+Public Sub Test236(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6368,7 +6427,7 @@ ErrHandler:
     ReThrow "Test236", Err
 End Sub
 
-Private Sub Test237(Folder As String)
+Public Sub Test237(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6391,7 +6450,7 @@ ErrHandler:
     ReThrow "Test237", Err
 End Sub
 
-Private Sub Test238(Folder As String)
+Public Sub Test238(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6414,7 +6473,7 @@ ErrHandler:
     ReThrow "Test238", Err
 End Sub
 
-Private Sub Test239(Folder As String)
+Public Sub Test239(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6437,7 +6496,7 @@ ErrHandler:
     ReThrow "Test239", Err
 End Sub
 
-Private Sub Test240(Folder As String)
+Public Sub Test240(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6460,7 +6519,7 @@ ErrHandler:
     ReThrow "Test240", Err
 End Sub
 
-Private Sub Test241(Folder As String)
+Public Sub Test241(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6483,7 +6542,7 @@ ErrHandler:
     ReThrow "Test241", Err
 End Sub
 
-Private Sub Test242(Folder As String)
+Public Sub Test242(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6506,7 +6565,7 @@ ErrHandler:
     ReThrow "Test242", Err
 End Sub
 
-Private Sub Test243(Folder As String)
+Public Sub Test243(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6529,7 +6588,7 @@ ErrHandler:
     ReThrow "Test243", Err
 End Sub
 
-Private Sub Test244(Folder As String)
+Public Sub Test244(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6552,7 +6611,7 @@ ErrHandler:
     ReThrow "Test244", Err
 End Sub
 
-Private Sub Test245(Folder As String)
+Public Sub Test245(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6575,7 +6634,7 @@ ErrHandler:
     ReThrow "Test245", Err
 End Sub
 
-Private Sub Test246(Folder As String)
+Public Sub Test246(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6598,7 +6657,7 @@ ErrHandler:
     ReThrow "Test246", Err
 End Sub
 
-Private Sub Test247(Folder As String)
+Public Sub Test247(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6621,7 +6680,7 @@ ErrHandler:
     ReThrow "Test247", Err
 End Sub
 
-Private Sub Test248(Folder As String)
+Public Sub Test248(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6644,7 +6703,7 @@ ErrHandler:
     ReThrow "Test248", Err
 End Sub
 
-Private Sub Test249(Folder As String)
+Public Sub Test249(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6673,7 +6732,7 @@ ErrHandler:
     ReThrow "Test249", Err
 End Sub
 
-Private Sub Test250(Folder As String)
+Public Sub Test250(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6701,7 +6760,7 @@ ErrHandler:
     ReThrow "Test250", Err
 End Sub
 
-Private Sub Test251(Folder As String)
+Public Sub Test251(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6729,7 +6788,7 @@ ErrHandler:
     ReThrow "Test251", Err
 End Sub
 
-Private Sub Test252(Folder As String)
+Public Sub Test252(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6757,7 +6816,7 @@ ErrHandler:
     ReThrow "Test252", Err
 End Sub
 
-Private Sub Test253(Folder As String)
+Public Sub Test253(Folder As String)
     Dim Expected() As String
     Dim FileName As String
     Dim i As Long
@@ -6785,7 +6844,7 @@ ErrHandler:
     ReThrow "Test253", Err
 End Sub
 
-Private Sub Test254(Folder As String)
+Public Sub Test254(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6808,7 +6867,7 @@ ErrHandler:
     ReThrow "Test254", Err
 End Sub
 
-Private Sub Test255(Folder As String)
+Public Sub Test255(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6833,7 +6892,7 @@ ErrHandler:
     ReThrow "Test255", Err
 End Sub
 
-Private Sub Test256(Folder As String)
+Public Sub Test256(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6858,7 +6917,7 @@ ErrHandler:
     ReThrow "Test256", Err
 End Sub
 
-Private Sub Test257(Folder As String)
+Public Sub Test257(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6882,7 +6941,7 @@ ErrHandler:
     ReThrow "Test257", Err
 End Sub
 
-Private Sub Test258(Folder As String)
+Public Sub Test258(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6907,7 +6966,7 @@ ErrHandler:
     ReThrow "Test258", Err
 End Sub
 
-Private Sub Test259(Folder As String)
+Public Sub Test259(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6932,7 +6991,7 @@ ErrHandler:
     ReThrow "Test259", Err
 End Sub
 
-Private Sub Test260(Folder As String)
+Public Sub Test260(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6956,7 +7015,7 @@ ErrHandler:
     ReThrow "Test260", Err
 End Sub
 
-Private Sub Test261(Folder As String)
+Public Sub Test261(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -6981,7 +7040,7 @@ ErrHandler:
     ReThrow "Test261", Err
 End Sub
 
-Private Sub Test262(Folder As String)
+Public Sub Test262(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7006,7 +7065,7 @@ ErrHandler:
     ReThrow "Test262", Err
 End Sub
 
-Private Sub Test263(Folder As String)
+Public Sub Test263(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7031,7 +7090,7 @@ ErrHandler:
     ReThrow "Test263", Err
 End Sub
 
-Private Sub Test264(Folder As String)
+Public Sub Test264(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7056,7 +7115,7 @@ ErrHandler:
     ReThrow "Test264", Err
 End Sub
 
-Private Sub Test265(Folder As String)
+Public Sub Test265(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7080,7 +7139,7 @@ ErrHandler:
     ReThrow "Test265", Err
 End Sub
 
-Private Sub Test266(Folder As String)
+Public Sub Test266(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7106,7 +7165,7 @@ ErrHandler:
     ReThrow "Test266", Err
 End Sub
 
-Private Sub Test267(Folder As String)
+Public Sub Test267(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7132,7 +7191,7 @@ ErrHandler:
     ReThrow "Test267", Err
 End Sub
 
-Private Sub Test268(Folder As String)
+Public Sub Test268(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7158,7 +7217,7 @@ ErrHandler:
     ReThrow "Test268", Err
 End Sub
 
-Private Sub Test269(Folder As String)
+Public Sub Test269(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7183,7 +7242,7 @@ ErrHandler:
     ReThrow "Test269", Err
 End Sub
 
-Private Sub Test270(Folder As String)
+Public Sub Test270(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7212,7 +7271,7 @@ ErrHandler:
 End Sub
 
 
-Private Sub Test271(Folder As String)
+Public Sub Test271(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7241,7 +7300,7 @@ ErrHandler:
 End Sub
 
 
-Private Sub Test272(Folder As String)
+Public Sub Test272(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7268,7 +7327,7 @@ ErrHandler:
     ReThrow "Test272", Err
 End Sub
 
-Private Sub Test273(Folder As String)
+Public Sub Test273(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7295,7 +7354,7 @@ ErrHandler:
     ReThrow "Test273", Err
 End Sub
 
-Private Sub Test274(Folder As String)
+Public Sub Test274(Folder As String)
     Dim Expected As Variant
     Dim FileName As String
     Dim Observed As Variant
@@ -7321,8 +7380,4 @@ Private Sub Test274(Folder As String)
 ErrHandler:
     ReThrow "Test274", Err
 End Sub
-
-
-
-
 

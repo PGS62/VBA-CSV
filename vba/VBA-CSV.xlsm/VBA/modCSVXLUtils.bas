@@ -14,9 +14,11 @@ Function TempFolder() As String
     TempFolder = Environ$("Temp")
 End Function
 
+#If HOST_IS_EXCEL Then
 Function TestFolder()
     TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & "testfiles\"
 End Function
+#End If
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : FileFromPath
@@ -89,7 +91,7 @@ Function VStack(ParamArray Arrays()) As Variant
     If IsMissing(Arrays) Then
         VStack = CreateMissing()
     Else
-        If IsEmpty(NA) Then NA = CVErr(xlErrNA)
+        If IsEmpty(NA) Then NA = CVErr(2042)
 
         For i = LBound(Arrays) To UBound(Arrays)
             If TypeName(Arrays(i)) = "Range" Then Arrays(i) = Arrays(i).value

@@ -28,7 +28,7 @@ Function GenerateTestCode(TestNo As Long, FileName As String, ExpectedReturn As 
     
     On Error GoTo ErrHandler
     
-    Res = "Private Sub Test" & TestNo & "(Folder As String)"
+    Res = "Public Sub Test" & TestNo & "(Folder As String)"
     Res = Res & vbLf & Indent & "Dim Expected as Variant"
     Res = Res & vbLf & Indent & "Dim FileName As String"
     Res = Res & vbLf & Indent & "Dim Observed As Variant"

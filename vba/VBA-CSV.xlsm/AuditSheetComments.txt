@@ -1,4 +1,7 @@
 ﻿Version	Date	Time	Author	Comment
+252	26-Jun-2024	16:36	Philip Swannell	Further changes to make testing on Word, Powerpoint etc. easier.
+251	26-Jun-2024	16:02	Philip Swannell	Changes in other modules to make it simpler to run tests when the host application is not Excel. Bumped to 0.31.
+250	26-Jun-2024	14:31	Philip Swannell	Changes so that the code of modCSVReadWrite compiles when the host application is Word or Powerpoint rather than Excel.
 249	02-Dec-2023	09:43	Philip Swannell	Bumped to 0.30.
 248	02-Dec-2023	09:20	Philip Swannell	SCVWrite now supports UTF-8NOBOM and UTF-16NOBOM as Encoding argument.
 247	26-Oct-2023	12:18	Philip Swannell	Code comments only.
