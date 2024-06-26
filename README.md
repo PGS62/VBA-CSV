@@ -238,9 +238,7 @@ In summary, the performance tests show:
 -->
 
 # Compatibility
-VBA-CSV works only on Windows, not Mac (since Scripting Runtime is not available), and not iOS or Android (since VBA is not available). It has been tested on Excel 365, both 64-bit and 32-bit, and on Excel 2013, 32 bit. It _should_ work on all other Office versions (2007 or later) but has not yet been tested on them. 
-
-If the PC you are using does not have English as the [Office Display language](https://support.microsoft.com/en-us/office/change-the-language-office-uses-in-its-menus-and-proofing-tools-f5c54ff9-a6fa-4348-a43c-760e7ef148f8) then you need version v0.23 or later; earlier versions did not work correctly on such PCs.
+VBA-CSV works on Windows, but not on Mac, iOS or Android. The host application must be either Excel, Word or PowerPoint. It has been tested on modern (Microsoft 365) versions of these applications, both 64-bit and 32-bit, and on Excel 2013, 32 bit. It _should_ work on all other Office versions (2007 or later) but has not been tested on them. 
 
 # About
 Author: Philip Swannell  
