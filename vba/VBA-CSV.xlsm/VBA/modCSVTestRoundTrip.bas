@@ -453,8 +453,10 @@ Private Function RandomErrorValue()
     Dim N As Long
     On Error GoTo ErrHandler
     N = CLng(0.5 + Rnd() * 14)
-    RandomErrorValue = CVErr(Choose(N, xlErrBlocked, xlErrCalc, xlErrConnect, xlErrDiv0, xlErrField, xlErrGettingData, _
+    'RandomErrorValue = CVErr(Choose(N, xlErrBlocked, xlErrCalc, xlErrConnect, xlErrDiv0, xlErrField, xlErrGettingData, _
         xlErrNA, xlErrName, xlErrNull, xlErrNum, xlErrRef, xlErrSpill, xlErrUnknown, xlErrValue))
+    RandomErrorValue = CVErr(Choose(N, 2047, 2050, 2046, 2007, 2049, 2043, 2042, 2029, 2000, 2036, 2023, 2045, 2048, 2015))
+        
     Exit Function
 ErrHandler:
     ReThrow "RandomErrorValue", Err
@@ -546,7 +548,10 @@ End Function
 'Public because called from worksheet "Demo"
 Public Function RandomVariants(NRows As Long, NCols As Long, AllowLineFeed As Boolean, Encoding As String, ByVal EOL As String)
 
-    Application.Volatile
+    If Application.Name = "Microsoft Excel" Then
+        Dim o As Object: Set o = Application
+        o.Volatile
+    End If
 
     Const DateFormat As String = "yyyy-mmm-dd"
     Dim i As Long
