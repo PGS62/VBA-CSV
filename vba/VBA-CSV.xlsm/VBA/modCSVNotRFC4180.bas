@@ -54,10 +54,10 @@ Function TestNonStandardInput(ByVal InputString As String, IgnoreEmptyLines As B
         Next
     ElseIf ParserName = "ws_garcia" Then
         Dim FSO As New Scripting.FileSystemObject
-        Dim T As Scripting.TextStream
-        Set T = FSO.OpenTextFile("c:\Temp\temp.txt", ForWriting, True)
-        T.Write InputString
-        T.Close
+        Dim t As Scripting.TextStream
+        Set t = FSO.OpenTextFile("c:\Temp\temp.txt", ForWriting, True)
+        t.Write InputString
+        t.Close
     
         ParserRes = Wrap_ws_garcia("c:\temp\temp.txt", ",", vbLf, IgnoreEmptyLines, True)
         If NumDimensions(ParserRes) = 0 Then
@@ -114,10 +114,10 @@ Function SaveNotCompliantFile(ByVal InputString As String, FileName As String)
     InputString = Replace(InputString, SpaceSymbol, " ")
 
     Dim FSO As New Scripting.FileSystemObject
-    Dim T As Scripting.TextStream
-    Set T = FSO.OpenTextFile(FileName, ForWriting, True)
-    T.Write InputString
-    T.Close
+    Dim t As Scripting.TextStream
+    Set t = FSO.OpenTextFile(FileName, ForWriting, True)
+    t.Write InputString
+    t.Close
 
     SaveNotCompliantFile = FileName
 

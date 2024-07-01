@@ -1,4 +1,5 @@
 ﻿Version	Date	Time	Author	Comment
+255	01-Jul-2024	10:54	Philip Swannell	Rebased tests 145 and 221.
 254	27-Jun-2024	16:58	Philip Swannell	Can now test CSVWrite when host application is Word/Outlook.
 253	26-Jun-2024	18:01	Philip Swannell	Updated definition of constant Err_Encoding in method ParseEncoding.
 252	26-Jun-2024	16:36	Philip Swannell	Further changes to make testing on Word, Powerpoint etc. easier.

@@ -53,14 +53,14 @@ End Function
 ' Purpose    : Returns the contents of a file as a string
 ' -----------------------------------------------------------------------------------------------------------------------
 Function FileReadAll(FileName As String) As String
-    Dim F As Scripting.File
+    Dim f As Scripting.File
     Dim FSO As New FileSystemObject
-    Dim T As Scripting.TextStream
+    Dim t As Scripting.TextStream
     On Error GoTo ErrHandler
-    Set F = FSO.GetFile(FileName)
-    Set T = F.OpenAsTextStream()
-    FileReadAll = T.ReadAll
-    T.Close
+    Set f = FSO.GetFile(FileName)
+    Set t = f.OpenAsTextStream()
+    FileReadAll = t.ReadAll
+    t.Close
 
     Exit Function
 ErrHandler:

@@ -52,13 +52,13 @@ End Function
 Public Function Wrap_sdkn104(FileName As String, Unicode As Boolean) As Variant
     Dim Contents As String
     Dim FSO As New FileSystemObject
-    Dim T As Scripting.TextStream
+    Dim t As Scripting.TextStream
 
     On Error GoTo ErrHandler
 
-    Set T = FSO.GetFile(FileName).OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
-    Contents = T.ReadAll
-    T.Close
+    Set t = FSO.GetFile(FileName).OpenAsTextStream(ForReading, IIf(Unicode, TristateTrue, TristateFalse))
+    Contents = t.ReadAll
+    t.Close
     Wrap_sdkn104 = ParseCSVToArray(Contents)
     
     Exit Function
@@ -77,7 +77,7 @@ Private Sub RunSpeedTests()
     Const Title As String = "VBA-CSV Speed Tests"
     Dim c As Range
     Dim JuliaResultsFile As String
-    Dim N As Name
+    Dim n As Name
     Dim Prompt As String
     Dim TestResults As Variant
     Dim ws As Worksheet
@@ -104,11 +104,11 @@ Private Sub RunSpeedTests()
         Throw "Cannot find file '" & JuliaResultsFile & "'"
     End If
     
-    For Each N In ws.Names
-        If InStr(N.Name, "PasteResultsHere") > 1 Then
-            If NameRefersToRange(N) Then
-                Application.GoTo N.RefersToRange
-                For Each c In N.RefersToRange.Cells
+    For Each n In ws.Names
+        If InStr(n.Name, "PasteResultsHere") > 1 Then
+            If NameRefersToRange(n) Then
+                Application.GoTo n.RefersToRange
+                For Each c In n.RefersToRange.Cells
                     c.Resize(1, NumColsInTFPRet).ClearContents
                     TestResults = ThrowIfError(TimeParsers(ws.Range("ParserNames").value, c.Offset(0, -3).value, c.Offset(0, -2).value, _
                         c.Offset(0, -1).value, Timeout))
@@ -120,7 +120,7 @@ Private Sub RunSpeedTests()
                 ThisWorkbook.Save
             End If
         End If
-    Next N
+    Next n
 
     AddCharts False
 
@@ -285,7 +285,7 @@ End Sub
 Sub AddCharts(Optional Export As Boolean = True)
     
     Dim c As ChartObject
-    Dim N As Name
+    Dim n As Name
     Dim NumSeries As Long
     Dim prot As Boolean
     Dim ws As Worksheet
@@ -306,10 +306,10 @@ Sub AddCharts(Optional Export As Boolean = True)
         c.Delete
     Next
 
-    For Each N In ws.Names
-        If InStr(N.Name, "PasteResultsHere") > 1 Then
-            If NameRefersToRange(N) Then
-                Set yData = N.RefersToRange
+    For Each n In ws.Names
+        If InStr(n.Name, "PasteResultsHere") > 1 Then
+            If NameRefersToRange(n) Then
+                Set yData = n.RefersToRange
                 With yData
                     Set yData = .Offset(-1).Resize(.Rows.count + 1, NumSeries)
                 End With
@@ -327,7 +327,7 @@ Sub AddCharts(Optional Export As Boolean = True)
                 AddChart xData, yData, Export
             End If
         End If
-    Next N
+    Next n
 
     Application.GoTo ws.Cells(1, 1)
     ws.Protect , , prot
@@ -337,11 +337,11 @@ ErrHandler:
     MsgBox ReThrow("AddCharts", Err, True), vbCritical
 End Sub
 
-Private Function NameRefersToRange(N As Name) As Boolean
+Private Function NameRefersToRange(n As Name) As Boolean
     Dim R As Range
 
     On Error GoTo ErrHandler
-    Set R = N.RefersToRange
+    Set R = n.RefersToRange
     NameRefersToRange = True
     
     Exit Function

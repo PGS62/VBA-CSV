@@ -666,7 +666,7 @@ End Function
 Private Sub ParseEncoding(FileName As String, ByRef Encoding As Variant, ByRef CharSet As String)
           
           Const Err_Encoding As String = "Encoding argument can usually be omitted, but otherwise Encoding must be " & _
-              "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-16"", ""UTF-8NOBOM"", ""UTF-16NOBOM"""
+              "either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-16"", ""UTF-8NOBOM"" or ""UTF-16NOBOM"""
           
 1         On Error GoTo ErrHandler
 2         If IsEmpty(Encoding) Or IsMissing(Encoding) Then
@@ -1031,25 +1031,25 @@ Private Function DetectEncoding(FilePath As String)
           Dim intAsc1Chr As Long
           Dim intAsc2Chr As Long
           Dim intAsc3Chr As Long
-          Dim T As Scripting.TextStream
+          Dim t As Scripting.TextStream
 
 1         On Error GoTo ErrHandler
           
 2         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
           
-3         Set T = m_FSO.OpenTextFile(FilePath, 1, False, 0)
-4         If T.AtEndOfStream Then
+3         Set t = m_FSO.OpenTextFile(FilePath, 1, False, 0)
+4         If t.AtEndOfStream Then
 5             DetectEncoding = "ANSI"
 6             GoTo EarlyExit
 7         End If
           
-8         intAsc1Chr = Asc(T.Read(1))
-9         If T.AtEndOfStream Then
+8         intAsc1Chr = Asc(t.Read(1))
+9         If t.AtEndOfStream Then
 10            DetectEncoding = "ANSI"
 11            GoTo EarlyExit
 12        End If
           
-13        intAsc2Chr = Asc(T.Read(1))
+13        intAsc2Chr = Asc(t.Read(1))
 14        If (intAsc1Chr = 255) And (intAsc2Chr = 254) Then
               'File is probably encoded UTF-16 LE BOM (little endian, with Byte Order Mark)
 15            DetectEncoding = "UTF-16"
@@ -1057,11 +1057,11 @@ Private Function DetectEncoding(FilePath As String)
               'File is probably encoded UTF-16 BE BOM (big endian, with Byte Order Mark)
 17            DetectEncoding = "UTF-16"
 18        Else
-19            If T.AtEndOfStream Then
+19            If t.AtEndOfStream Then
 20                DetectEncoding = "ANSI"
 21                GoTo EarlyExit
 22            End If
-23            intAsc3Chr = Asc(T.Read(1))
+23            intAsc3Chr = Asc(t.Read(1))
 24            If (intAsc1Chr = 239) And (intAsc2Chr = 187) And (intAsc3Chr = 191) Then
                   'File is probably encoded UTF-8 with BOM
 25                DetectEncoding = "UTF-8"
@@ -1072,11 +1072,11 @@ Private Function DetectEncoding(FilePath As String)
 29        End If
 
 EarlyExit:
-30        T.Close: Set T = Nothing
+30        t.Close: Set t = Nothing
 31        Exit Function
 
 ErrHandler:
-32        If Not T Is Nothing Then T.Close
+32        If Not t Is Nothing Then t.Close
 33        ReThrow "DetectEncoding", Err
 End Function
 
@@ -1174,7 +1174,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
           Const MAX_CHUNKS As Long = 10
           Dim Contents As String
           Dim EvenQuotes As Boolean
-          Dim F As Scripting.File
+          Dim f As Scripting.File
           Dim i As Long
           Dim j As Long
           Dim MaxChars As Long
@@ -1208,14 +1208,14 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
 21                                            AmendDelimiterIfFirstFieldIsDateTime Contents, InferDelimiter
 22                                        End If
 23                                    End If
-24                                    Stream.Close: Set Stream = Nothing: Set F = Nothing
+24                                    Stream.Close: Set Stream = Nothing: Set f = Nothing
 25                                    Exit Function
 26                                End If
 27                            End If
 28                    End Select
 29                Next i
 30            Loop
-31            Stream.Close: Set Stream = Nothing: Set F = Nothing
+31            Stream.Close: Set Stream = Nothing: Set f = Nothing
 32        ElseIf st = st_String Then
 33            Contents = FileNameOrContents
 34            MaxChars = MAX_CHUNKS * CHUNK_SIZE
@@ -1257,7 +1257,7 @@ Private Function InferDelimiter(st As enmSourceType, FileNameOrContents As Strin
 ErrHandler:
 62        If Not Stream Is Nothing Then
 63            Stream.Close
-64            Set Stream = Nothing: Set F = Nothing
+64            Set Stream = Nothing: Set f = Nothing
 65        End If
 66        ReThrow "InferDelimiter", Err
 End Function
@@ -1929,16 +1929,16 @@ End Sub
 '              case it's not possible to use the count of quotes made at parsing time which is organised row-by-row.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function CountQuotes(Str As String, QuoteChar As String) As Long
-          Dim N As Long
+          Dim n As Long
           Dim pos As Long
 
 1         Do
 2             pos = InStr(pos + 1, Str, QuoteChar)
 3             If pos = 0 Then
-4                 CountQuotes = N
+4                 CountQuotes = n
 5                 Exit Function
 6             End If
-7             N = N + 1
+7             n = n + 1
 8         Loop
 End Function
 
@@ -2415,7 +2415,7 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
           AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean)
 
           Dim d As Long
-          Dim L As Long
+          Dim l As Long
           Dim LocalTime As Double
           Dim m As Long
           Dim MilliPart As Double
@@ -2468,9 +2468,9 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
 27            rxExists = True
 28        End If
           
-29        L = Len(strIn)
+29        l = Len(strIn)
 
-30        If L = 10 Then
+30        If l = 10 Then
 31            If rxNoNo.Test(strIn) Then
 32                y = Left$(strIn, 4)
 33                m = Mid$(strIn, 6, 2)
@@ -2484,10 +2484,10 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
 40                Converted = True
 41                Exit Sub
 42            End If
-43        ElseIf L < 10 Then
+43        ElseIf l < 10 Then
 44            Converted = False
 45            Exit Sub
-46        ElseIf L > 40 Then
+46        ElseIf l > 40 Then
 47            Converted = False
 48            Exit Sub
 49        End If
@@ -2511,7 +2511,7 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
           'Replace the "T" separator
 64        Mid$(strIn, 11, 1) = " "
           
-65        If L = 19 Then
+65        If l = 19 Then
               'Tests show that CDate is faster than DateSerial(Mid$(... + TimeSerial(Mid$(...
 66            DtOut = CDate(strIn)
 67            Converted = True
@@ -2537,7 +2537,7 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
 85            Select Case Sign
                   Case 0
                       'Example: "2021-08-23T08:47:20.920Z"
-86                    MilliPart = CDbl(Mid$(strIn, 20, IIf(ZAtEnd, L - 20, L - 19)))
+86                    MilliPart = CDbl(Mid$(strIn, 20, IIf(ZAtEnd, l - 20, l - 19)))
 87                Case 1
                       'Example: "2021-08-23T08:47:20.920+05:00"
 88                    MilliPart = CDbl(Mid$(strIn, 20, PlusPos - 20))
@@ -2556,12 +2556,12 @@ Private Sub CastISO8601(ByVal strIn As String, ByRef DtOut As Date, ByRef Conver
 96                Converted = True
 97                Exit Sub
 98            Case 1
-99                If L <> PlusPos + 5 Then Exit Sub
+99                If l <> PlusPos + 5 Then Exit Sub
 100               Adjust = CDate(Right$(strIn, 5))
 101               DtOut = LocalTime - Adjust
 102               Converted = True
 103           Case -1
-104               If L <> MinusPos + 5 Then Exit Sub
+104               If l <> MinusPos + 5 Then Exit Sub
 105               Adjust = CDate(Right$(strIn, 5))
 106               DtOut = LocalTime + Adjust
 107               Converted = True
@@ -3529,14 +3529,14 @@ End Function
 '              argument" if the error is caused by attempting to write illegal characters to a stream opened with
 '              TriStateFalse.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub WriteWrap(T As TextStream, text As String)
+Private Sub WriteWrap(t As TextStream, text As String)
 
           Dim ErrDesc As String
           Dim ErrNum As Long
           Dim i As Long
 
 1         On Error GoTo ErrHandler
-2         T.Write text
+2         t.Write text
 3         Exit Sub
 
 ErrHandler:
@@ -3710,10 +3710,10 @@ End Function
 ' Purpose    : Returns True if FileName exists on disk, False o.w.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function FileExists(FileName As String) As Boolean
-          Dim F As Scripting.File
+          Dim f As Scripting.File
 1         On Error GoTo ErrHandler
 2         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-3         Set F = m_FSO.GetFile(FileName)
+3         Set f = m_FSO.GetFile(FileName)
 4         FileExists = True
 5         Exit Function
 ErrHandler:
@@ -3725,12 +3725,12 @@ End Function
 ' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function FolderExists(FolderPath As String) As Boolean
-          Dim F As Scripting.Folder
+          Dim f As Scripting.Folder
           
 1         On Error GoTo ErrHandler
 2         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
           
-3         Set F = m_FSO.GetFolder(FolderPath)
+3         Set f = m_FSO.GetFolder(FolderPath)
 4         FolderExists = True
 5         Exit Function
 ErrHandler:
@@ -3742,12 +3742,12 @@ End Function
 ' Purpose    : Delete a file, returns True or error string.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub FileDelete(FileName As String)
-          Dim F As Scripting.File
+          Dim f As Scripting.File
 1         On Error GoTo ErrHandler
 
 2         If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
-3         Set F = m_FSO.GetFile(FileName)
-4         F.Delete
+3         Set f = m_FSO.GetFile(FileName)
+4         f.Delete
 
 5         Exit Sub
 ErrHandler:
@@ -3765,7 +3765,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub CreatePath(ByVal FolderPath As String)
 
-          Dim F As Scripting.Folder
+          Dim f As Scripting.Folder
           Dim i As Long
           Dim ParentFolderName As String
           Dim ThisFolderName As String
@@ -3796,14 +3796,14 @@ Private Sub CreatePath(ByVal FolderPath As String)
 14        For i = Len(FolderPath) - 1 To 3 Step -1
 15            If Mid$(FolderPath, i, 1) = "\" Then
 16                If FolderExists(Left$(FolderPath, i)) Then
-17                    Set F = m_FSO.GetFolder(Left$(FolderPath, i))
+17                    Set f = m_FSO.GetFolder(Left$(FolderPath, i))
 18                    ParentFolderName = Left$(FolderPath, i)
 19                    Exit For
 20                End If
 21            End If
 22        Next i
 
-23        If F Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
+23        If f Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
 
           'now add folders one level at a time
 24        For i = Len(ParentFolderName) + 1 To Len(FolderPath)
@@ -3811,14 +3811,14 @@ Private Sub CreatePath(ByVal FolderPath As String)
                   
 26                ThisFolderName = Mid$(FolderPath, InStrRev(FolderPath, "\", i - 1) + 1, _
                       i - 1 - InStrRev(FolderPath, "\", i - 1))
-27                F.SubFolders.Add ThisFolderName
-28                Set F = m_FSO.GetFolder(Left$(FolderPath, i))
+27                f.SubFolders.Add ThisFolderName
+28                Set f = m_FSO.GetFolder(Left$(FolderPath, i))
 29            End If
 30        Next i
 
 EarlyExit:
-31        Set F = m_FSO.GetFolder(FolderPath)
-32        Set F = Nothing
+31        Set f = m_FSO.GetFolder(FolderPath)
+32        Set f = Nothing
 
 33        Exit Sub
 ErrHandler:
@@ -4088,15 +4088,15 @@ Private Function Transpose(TheArray As Variant) As Variant
           Dim i As Long
           Dim j As Long
           Dim m As Long
-          Dim N As Long
+          Dim n As Long
           Dim Result As Variant
           Dim Ro As Long
 1         On Error GoTo ErrHandler
-2         Force2DArrayR TheArray, N, m
+2         Force2DArrayR TheArray, n, m
 3         Ro = LBound(TheArray, 1) - 1
 4         Co = LBound(TheArray, 2) - 1
-5         ReDim Result(1 To m, 1 To N)
-6         For i = 1 To N
+5         ReDim Result(1 To m, 1 To n)
+6         For i = 1 To n
 7             For j = 1 To m
 8                 Result(j, i) = TheArray(i + Ro, j + Co)
 9             Next j

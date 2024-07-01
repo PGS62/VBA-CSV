@@ -327,7 +327,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Function CreatePath(ByVal FolderPath As String) As String
 
-    Dim F As Scripting.Folder
+    Dim f As Scripting.Folder
     Dim FSO As Scripting.FileSystemObject
     Dim i As Long
     Dim isUNC As Boolean
@@ -357,29 +357,29 @@ Function CreatePath(ByVal FolderPath As String) As String
     For i = Len(FolderPath) - 1 To 3 Step -1
         If Mid$(FolderPath, i, 1) = "\" Then
             If FolderExists(Left$(FolderPath, i)) Then
-                Set F = FSO.GetFolder(Left$(FolderPath, i))
+                Set f = FSO.GetFolder(Left$(FolderPath, i))
                 ParentFolderName = Left$(FolderPath, i)
                 Exit For
             End If
         End If
     Next i
 
-    If F Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
+    If f Is Nothing Then Throw "Cannot create folder " & Left$(FolderPath, 3)
 
     'now add folders one level at a time
     For i = Len(ParentFolderName) + 1 To Len(FolderPath)
         If Mid$(FolderPath, i, 1) = "\" Then
             Dim ThisFolderName As String
             ThisFolderName = Mid$(FolderPath, InStrRev(FolderPath, "\", i - 1) + 1, i - 1 - InStrRev(FolderPath, "\", i - 1))
-            F.SubFolders.Add ThisFolderName
-            Set F = FSO.GetFolder(Left$(FolderPath, i))
+            f.SubFolders.Add ThisFolderName
+            Set f = FSO.GetFolder(Left$(FolderPath, i))
         End If
     Next i
 
 EarlyExit:
-    Set F = FSO.GetFolder(FolderPath)
-    CreatePath = F.path
-    Set F = Nothing: Set FSO = Nothing
+    Set f = FSO.GetFolder(FolderPath)
+    CreatePath = f.path
+    Set f = Nothing: Set FSO = Nothing
 
     Exit Function
 ErrHandler:
@@ -391,11 +391,11 @@ End Function
 ' Purpose   : Returns True or False. Does not matter if FolderPath has a terminating backslash or not.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function FolderExists(ByVal FolderPath As String) As Boolean
-    Dim F As Scripting.Folder
+    Dim f As Scripting.Folder
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler
     Set FSO = New FileSystemObject
-    Set F = FSO.GetFolder(FolderPath)
+    Set f = FSO.GetFolder(FolderPath)
     FolderExists = True
     Exit Function
 ErrHandler:
@@ -725,15 +725,15 @@ Public Function Transpose(ByVal TheArray As Variant)
     Dim i As Long
     Dim j As Long
     Dim m As Long
-    Dim N As Long
+    Dim n As Long
     Dim Result As Variant
     Dim Ro As Long
     On Error GoTo ErrHandler
-    Force2DArrayR TheArray, N, m
+    Force2DArrayR TheArray, n, m
     Ro = LBound(TheArray, 1) - 1
     Co = LBound(TheArray, 2) - 1
-    ReDim Result(1 To m, 1 To N)
-    For i = 1 To N
+    ReDim Result(1 To m, 1 To n)
+    For i = 1 To n
         For j = 1 To m
             Result(j, i) = TheArray(i + Ro, j + Co)
         Next j
@@ -924,13 +924,13 @@ ErrHandler:
 End Function
 
 Public Sub FileCopy(SourceFile As String, TargetFile As String)
-    Dim F As Scripting.File
+    Dim f As Scripting.File
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler
     Set FSO = New FileSystemObject
-    Set F = FSO.GetFile(SourceFile)
-    F.Copy TargetFile, True
-    Set FSO = Nothing: Set F = Nothing
+    Set f = FSO.GetFile(SourceFile)
+    f.Copy TargetFile, True
+    Set FSO = Nothing: Set f = Nothing
     Exit Sub
 ErrHandler:
     ReThrow "FileCopy", Err

@@ -450,12 +450,12 @@ ErrHandler:
 End Function
 
 Private Function RandomErrorValue()
-    Dim N As Long
+    Dim n As Long
     On Error GoTo ErrHandler
-    N = CLng(0.5 + Rnd() * 14)
+    n = CLng(0.5 + Rnd() * 14)
     'RandomErrorValue = CVErr(Choose(N, xlErrBlocked, xlErrCalc, xlErrConnect, xlErrDiv0, xlErrField, xlErrGettingData, _
         xlErrNA, xlErrName, xlErrNull, xlErrNum, xlErrRef, xlErrSpill, xlErrUnknown, xlErrValue))
-    RandomErrorValue = CVErr(Choose(N, 2047, 2050, 2046, 2007, 2049, 2043, 2042, 2029, 2000, 2036, 2023, 2045, 2048, 2015))
+    RandomErrorValue = CVErr(Choose(n, 2047, 2050, 2046, 2007, 2049, 2043, 2042, 2029, 2000, 2036, 2023, 2045, 2048, 2015))
         
     Exit Function
 ErrHandler:
@@ -484,13 +484,13 @@ End Function
 
 Private Function RandomVariant(DateFormat As String, AllowLineFeed As Boolean, Encoding As String, EOL As String)
 
-    Dim N As Long
+    Dim n As Long
     Const NUMTYPES As Long = 11
 
     On Error GoTo ErrHandler
-    N = CLng(0.5 + NUMTYPES * Rnd())
+    n = CLng(0.5 + NUMTYPES * Rnd())
 
-    Select Case N
+    Select Case n
         Case 1
             RandomVariant = RandomBoolean()
         Case 2

@@ -70,7 +70,7 @@ Option Explicit
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastToDate()
 
-    Const N As Long = 1000000
+    Const n As Long = 1000000
     Dim Converted As Boolean
     Dim DateOrder As Long
     Dim DateSeparator As String
@@ -89,7 +89,7 @@ Private Sub SpeedTest_CastToDate()
     Debug.Print "'" & String(100, "=")
     Debug.Print "'Running SpeedTest_CastToDate " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
     Debug.Print "'SysDateSeparator = " & SysDateSeparator
-    Debug.Print "'N = " & Format$(N, "###,###")
+    Debug.Print "'N = " & Format$(n, "###,###")
     Debug.Print "'ComputerName = " & Environ("ComputerName")
     Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
     
@@ -161,13 +161,13 @@ Private Sub SpeedTest_CastToDate()
             End Select
 
             t1 = ElapsedTime()
-            For i = 1 To N
+            For i = 1 To n
                 'CastToDate strIn, DtOut, DateOrder, DateSeparator, SysDateSeparator, Converted
             Next i
             t2 = ElapsedTime()
 
             Dim PrintThis As String
-            PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
+            PrintThis = "'Calls per second = " & Format$(n / (t2 - t1), "###,###")
             If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
             PrintThis = PrintThis & " strIn = """ & strIn & """"
             If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")
@@ -197,7 +197,7 @@ Sub SpeedTestCDateVDateSerial()
 
           Const TheInput As String = "2023-02-13"
           Dim TheOutput As Date
-          Const N As Long = 10000000
+          Const n As Long = 10000000
           Dim i As Long
 
 1         Debug.Print String(80, "-")
@@ -206,15 +206,15 @@ Sub SpeedTestCDateVDateSerial()
 4         Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
 
 5         tic
-6         For i = 1 To N
+6         For i = 1 To n
 7             TheOutput = CDate(TheInput)
 8         Next
-9         toc Format(N, "#,###") & " calls to CDate"
+9         toc Format(n, "#,###") & " calls to CDate"
 10        tic
-11        For i = 1 To N
+11        For i = 1 To n
 12            TheOutput = DateSerial(Mid$(TheInput, 1, 4), Mid$(TheInput, 6, 2), Mid$(TheInput, 9, 2))
 13        Next
-14        toc Format(N, "#,###") & " calls to DateSerial"
+14        toc Format(n, "#,###") & " calls to DateSerial"
 
 End Sub
 
@@ -237,7 +237,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_Sentinels()
     
-    Const N As Long = 10000000
+    Const n As Long = 10000000
     Dim Comment As String
     Dim Field As String
     Dim i As Long
@@ -277,7 +277,7 @@ Private Sub SpeedTest_Sentinels()
         End Select
 
         t1 = ElapsedTime()
-        For i = 1 To N
+        For i = 1 To n
             If Len(Field) <= MaxLength Then
                 If Sentinels.Exists(Field) Then
                     Res = Sentinels.item(Field)
@@ -287,7 +287,7 @@ Private Sub SpeedTest_Sentinels()
         Next i
         t2 = ElapsedTime()
 
-        Debug.Print "Conversions per second = " & Format$(N / (t2 - t1), "###,###"), _
+        Debug.Print "Conversions per second = " & Format$(n / (t2 - t1), "###,###"), _
             "Field = """ & Field & """" & IIf(Comment = vbNullString, vbNullString, " (" & Comment & ")")
 
     Next j
@@ -339,7 +339,7 @@ End Sub
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub SpeedTest_CastISO8601()
 
-    Const N As Long = 5000000
+    Const n As Long = 5000000
     Dim DtOut As Date
     Dim Expected As Date
     Dim i As Long
@@ -352,7 +352,7 @@ Private Sub SpeedTest_CastISO8601()
 
     Debug.Print "'" & String(100, "=")
     Debug.Print "'Running SpeedTest_CastISO8601 " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
-    Debug.Print "'N = " & Format$(N, "###,###")
+    Debug.Print "'N = " & Format$(n, "###,###")
     Debug.Print "'ComputerName = " & Environ("ComputerName")
     Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
     
@@ -393,12 +393,12 @@ Private Sub SpeedTest_CastISO8601()
             End Select
 
             t1 = ElapsedTime()
-            For i = 1 To N
+            For i = 1 To n
                 'CastISO8601 strIn, DtOut, Converted, True, True
             Next i
             t2 = ElapsedTime()
             
-            PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
+            PrintThis = "'Calls per second = " & Format$(n / (t2 - t1), "###,###")
             If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
             If Len(strIn) > 30 Then
                 PrintThis = PrintThis & "strIn = """ & Left$(strIn, 27) & "..."""
@@ -444,7 +444,7 @@ End Sub
 'Calls per second = 2,362,177  strIn = ",4", Separator = ","     Result as expected? True
 Private Sub SpeedTest_CastToDouble()
 
-          Const N As Long = 10000000
+          Const n As Long = 10000000
           Dim Converted As Boolean
           Dim DblOut As Double
           Dim Expected As Date
@@ -461,7 +461,7 @@ Private Sub SpeedTest_CastToDouble()
 
 1         Debug.Print "'" & String(100, "=")
 2         Debug.Print "'Running SpeedTest_CastToDouble " & Format$(Now(), "yyyy-mmm-dd hh:mm:ss")
-3         Debug.Print "'N = " & Format$(N, "###,###")
+3         Debug.Print "'N = " & Format$(n, "###,###")
 4         Debug.Print "'ComputerName = " & Environ("ComputerName")
 5         Debug.Print "'VBA-CSV Audit Sheet Version = " & shAudit.Range("Headers").Cells(2, 1).value
 6         SysDecimalSeparator = Application.DecimalSeparator
@@ -522,13 +522,13 @@ Private Sub SpeedTest_CastToDouble()
 59                End Select
 
 60                t1 = ElapsedTime()
-61                For i = 1 To N
+61                For i = 1 To n
 62                    CastToDouble strIn, DblOut, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
 63                Next i
 64                t2 = ElapsedTime()
 
                   Dim PrintThis As String
-65                PrintThis = "'Calls per second = " & Format$(N / (t2 - t1), "###,###")
+65                PrintThis = "'Calls per second = " & Format$(n / (t2 - t1), "###,###")
 66                If Len(PrintThis) < 30 Then PrintThis = PrintThis & String(30 - Len(PrintThis), " ")
 67                PrintThis = PrintThis & " strIn = """ & strIn & """, Separator = " & """" & DecimalSeparator & """ "
 68                If Len(PrintThis) < 65 Then PrintThis = PrintThis & String(65 - Len(PrintThis), " ")

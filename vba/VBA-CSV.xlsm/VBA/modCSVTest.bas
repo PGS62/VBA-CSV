@@ -160,11 +160,11 @@ End Sub
 '             backslash.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function FolderExists(ByVal FolderPath As String) As Boolean
-    Dim F As Scripting.Folder
+    Dim f As Scripting.Folder
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler
     Set FSO = New FileSystemObject
-    Set F = FSO.GetFolder(FolderPath)
+    Set f = FSO.GetFolder(FolderPath)
     FolderExists = True
     Exit Function
 ErrHandler:
@@ -172,11 +172,11 @@ ErrHandler:
 End Function
 
 Function FileExists(ByVal FilePath As String) As Boolean
-    Dim F As Scripting.File
+    Dim f As Scripting.File
     Dim FSO As Scripting.FileSystemObject
     On Error GoTo ErrHandler
     Set FSO = New FileSystemObject
-    Set F = FSO.GetFile(FilePath)
+    Set f = FSO.GetFile(FilePath)
     FileExists = True
     Exit Function
 ErrHandler:
@@ -3904,7 +3904,8 @@ Public Sub Test145(Folder As String)
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!"
+    Expected = "#CSVRead: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-16"", ""UTF-8NOBOM"" or ""UTF-16NOBOM""!"
+    
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(145, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         IgnoreEmptyLines:=False, _
@@ -6053,7 +6054,7 @@ Public Sub Test221(Folder As String)
 
     On Error GoTo ErrHandler
     TestDescription = "test bad inputs"
-    Expected = "#CSVRead: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", or ""UTF-16""!"
+    Expected = "#CSVRead: Encoding argument can usually be omitted, but otherwise Encoding must be either ""ASCII"", ""ANSI"", ""UTF-8"", ""UTF-16"", ""UTF-8NOBOM"" or ""UTF-16NOBOM""!"
     FileName = "test_bad_inputs.csv"
     TestRes = TestCSVRead(221, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
         ShowMissingsAs:=Empty, _

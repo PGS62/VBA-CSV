@@ -477,14 +477,14 @@ End Function
 '
 ' add number of double quotes in [n+1, p1] of Source to quoteCount
 '
-Private Sub StrCount(Source As String, N As Long, p1 As Long, ByRef quoteCount As Long)
+Private Sub StrCount(Source As String, n As Long, p1 As Long, ByRef quoteCount As Long)
     Dim nn As Long
     Dim ss As String
     Do
-        ss = Mid(Source, N + 1, p1 - N) ' to avoid from feeding long string to InStr().
+        ss = Mid(Source, n + 1, p1 - n) ' to avoid from feeding long string to InStr().
         nn = InStr(1, ss, """")
         If nn = 0 Then Exit Do
-        N = N + nn
+        n = n + nn
         quoteCount = quoteCount + 1
     Loop
 End Sub
