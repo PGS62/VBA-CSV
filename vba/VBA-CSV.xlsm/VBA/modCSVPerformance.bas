@@ -94,7 +94,7 @@ Private Sub RunSpeedTests()
     
     ws.Protect , , False
     
-    ws.Range("TimeStamp").value = "This data generated " & Format$(Now, "dd-mmmm-yyyy hh:mm:ss")
+    ws.Range("TimeStamp").value = "This data generated " & Format$(Now, "dd-mmmm-yyyy hh:mm:ss") & " on computer " & Environ("COMPUTERNAME")
     
     'Julia results file created by Julia function benchmark. See julia/benchmarkCSV.jl
     

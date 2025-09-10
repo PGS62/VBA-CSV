@@ -4,7 +4,9 @@ Formulas\DateParsingTest.tsv
 Formulas\GIF.tsv
 Formulas\GIF2.tsv
 Formulas\GIF3.tsv
+Formulas\Performance (1).tsv
 Formulas\Performance (10).tsv
+Formulas\Performance (11).tsv
 Formulas\Performance (2).tsv
 Formulas\Performance (3).tsv
 Formulas\Performance (4).tsv
@@ -12,7 +14,6 @@ Formulas\Performance (6).tsv
 Formulas\Performance (7).tsv
 Formulas\Performance (8).tsv
 Formulas\Performance (9).tsv
-Formulas\Performance.tsv
 Formulas\RegExp.tsv
 Formulas\Test.tsv
 Values\Audit.csv
@@ -22,7 +23,9 @@ Values\GIF.csv
 Values\GIF2.csv
 Values\GIF3.csv
 Values\HiddenSheet.csv
+Values\Performance (1).csv
 Values\Performance (10).csv
+Values\Performance (11).csv
 Values\Performance (2).csv
 Values\Performance (3).csv
 Values\Performance (4).csv
@@ -30,7 +33,6 @@ Values\Performance (6).csv
 Values\Performance (7).csv
 Values\Performance (8).csv
 Values\Performance (9).csv
-Values\Performance.csv
 Values\RegExp.csv
 Values\Test.csv
 Values\TestResults.csv
