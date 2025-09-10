@@ -1,10 +1,10 @@
 Attribute VB_Name = "modCSVReadWrite"
 ' VBA-CSV
 
-' Copyright (C) 2021 - Philip Swannell
+' Copyright (C) 2025 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.31
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.32
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -30,13 +30,12 @@ Attribute VB_Name = "modCSVReadWrite"
 '5) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.31/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.32/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 '6) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
 '   then consider changing constant m_ErrorStyle to be es_RaiseError.
 '   https://github.com/PGS62/VBA-CSV#errors
-
 
 Option Explicit
 
@@ -201,8 +200,6 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
           Optional ByVal MissingStrings As Variant, Optional ByVal ShowMissingsAs As Variant, _
           Optional ByVal Encoding As Variant, Optional ByVal DecimalSeparator As String, _
           Optional ByRef HeaderRow As Variant) As Variant
-Attribute CSVRead.VB_Description = "Returns the contents of a comma-separated file on disk as an array."
-Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter As String = "Delimiter character must be passed as a string, FALSE for no delimiter. " & _
               "Omit to guess from file contents"
@@ -248,9 +245,11 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
           Dim NotDelimited As Boolean
           Dim NumColsFound As Long
           Dim NumColsInReturn As Long
+          Dim NumColsPopulated As Long
           Dim NumFields As Long
           Dim NumRowsFound As Long
           Dim NumRowsInReturn As Long
+          Dim NumRowsPopulated As Long
           Dim QuoteCounts() As Long
           Dim Ragged As Boolean
           Dim ReturnArray() As Variant
@@ -453,44 +452,72 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
 132           End If
 133       Next k
           
-134       If Ragged Then
-135           If Not ShowMissingsAsEmpty Then
-136               For i = 1 + Adj To NumRowsInReturn + Adj
-137                   For j = 1 + Adj To NumColsInReturn + Adj
-138                       If IsEmpty(ReturnArray(i, j)) Then
-139                           ReturnArray(i, j) = ShowMissingsAs
-140                       End If
-141                   Next j
-142               Next i
-143           End If
-144           If Not IsEmpty(HeaderRow) Then
-145               If NCols(HeaderRow) < NCols(ReturnArray) + SkipToCol - 1 Then
-146                   ReDim Preserve HeaderRow(1 To 1, 1 To NCols(ReturnArray) + SkipToCol - 1)
-147               End If
+134       NumRowsPopulated = NumRowsFound
+135       NumColsPopulated = NumColsFound - SkipToCol + 1
+          
+136       If NCols(ReturnArray) <> NumColsInReturn Then
+137           Throw "Assertion failed"
+138       End If
+          
+139       If Ragged Then
+140           If Not ShowMissingsAsEmpty Then
+141               For i = 1 + Adj To NumRowsInReturn + Adj
+142                   For j = 1 + Adj To NumColsInReturn + Adj
+143                       If IsEmpty(ReturnArray(i, j)) Then
+144                           ReturnArray(i, j) = ShowMissingsAs
+145                       End If
+146                   Next j
+147               Next i
 148           End If
-149       End If
+149           If Not IsEmpty(HeaderRow) Then
+150               If NCols(HeaderRow) < NumColsInReturn + SkipToCol - 1 Then
+151                   ReDim Preserve HeaderRow(1 To 1, 1 To NumColsInReturn + SkipToCol - 1)
+152               End If
+153           End If
+154       End If
 
-150       If SkipToCol > 1 Then
-151           If Not IsEmpty(HeaderRow) Then
+155       If Not Ragged Then
+156           If Not ShowMissingsAsEmpty Then
+157               If NumColsInReturn > NumColsPopulated Then
+158                   For i = 1 + Adj To NumRowsInReturn + Adj
+159                       For j = NumColsPopulated + 1 + Adj To NumColsInReturn + Adj
+160                           ReturnArray(i, j) = ShowMissingsAs
+161                       Next j
+162                   Next i
+163               End If
+164               If NumRowsInReturn > NumRowsPopulated Then
+165                   For i = NumRowsPopulated + 1 + Adj To NumRowsInReturn + Adj
+166                       For j = 1 + Adj To NumColsInReturn + Adj
+167                           If IsEmpty(ReturnArray(i, j)) Then
+168                               ReturnArray(i, j) = ShowMissingsAs
+169                           End If
+170                       Next j
+171                   Next i
+172               End If
+173           End If
+174       End If
+
+175       If SkipToCol > 1 Then
+176           If Not IsEmpty(HeaderRow) Then
                   Dim HeaderRowTruncated() As String
-152               ReDim HeaderRowTruncated(1 To 1, 1 To NumColsInReturn)
-153               For i = 1 To NumColsInReturn
-154                   HeaderRowTruncated(1, i) = HeaderRow(1, i + SkipToCol - 1)
-155               Next i
-156               HeaderRow = HeaderRowTruncated
-157           End If
-158       End If
+177               ReDim HeaderRowTruncated(1 To 1, 1 To NumColsInReturn)
+178               For i = 1 To NumColsInReturn
+179                   HeaderRowTruncated(1, i) = HeaderRow(1, i + SkipToCol - 1)
+180               Next i
+181               HeaderRow = HeaderRowTruncated
+182           End If
+183       End If
           
           'In this case no type conversion should be applied to the top row of the return
-159       If HeaderRowNum = SkipToRow Then
-160           If AnyConversion Then
-161               For i = 1 To MinLngs(NCols(HeaderRow), NumColsInReturn)
-162                   ReturnArray(1 + Adj, i + Adj) = HeaderRow(1, i)
-163               Next
-164           End If
-165       End If
+184       If HeaderRowNum = SkipToRow Then
+185           If AnyConversion Then
+186               For i = 1 To MinLngs(NCols(HeaderRow), NumColsInReturn)
+187                   ReturnArray(1 + Adj, i + Adj) = HeaderRow(1, i)
+188               Next
+189           End If
+190       End If
 
-166       If ColByColFormatting Then
+191       If ColByColFormatting Then
               Dim CT As Variant
               Dim Field As String
               Dim NC As Long
@@ -498,64 +525,64 @@ Attribute CSVRead.VB_ProcData.VB_Invoke_Func = " \n14"
               Dim NR As Long
               Dim QC As Long
               Dim UnQuotedHeader As String
-167           NR = NRows(ReturnArray)
-168           NC = NCols(ReturnArray)
-169           If IsEmpty(HeaderRow) Then
-170               NCH = 0
-171           Else
-172               NCH = NCols(HeaderRow) 'possible that headers has fewer than expected columns if file is ragged
-173           End If
+192           NR = NRows(ReturnArray)
+193           NC = NCols(ReturnArray)
+194           If IsEmpty(HeaderRow) Then
+195               NCH = 0
+196           Else
+197               NCH = NCols(HeaderRow) 'possible that headers has fewer than expected columns if file is ragged
+198           End If
 
-174           For j = 1 To NC
-175               If j + SkipToCol - 1 <= NCH Then
-176                   UnQuotedHeader = HeaderRow(1, j + SkipToCol - 1)
-177               Else
-178                   UnQuotedHeader = -1 'Guaranteed not to be a key of the Dictionary
-179               End If
-180               If CTDict.Exists(j + SkipToCol - 1) Then
-181                   CT = CTDict.item(j + SkipToCol - 1)
-182               ElseIf CTDict.Exists(UnQuotedHeader) Then
-183                   CT = CTDict.item(UnQuotedHeader)
-184               ElseIf CTDict.Exists(0) Then
-185                   CT = CTDict.item(0)
-186               Else
-187                   CT = vbNullString
-188               End If
+199           For j = 1 To NC
+200               If j + SkipToCol - 1 <= NCH Then
+201                   UnQuotedHeader = HeaderRow(1, j + SkipToCol - 1)
+202               Else
+203                   UnQuotedHeader = -1 'Guaranteed not to be a key of the Dictionary
+204               End If
+205               If CTDict.Exists(j + SkipToCol - 1) Then
+206                   CT = CTDict.item(j + SkipToCol - 1)
+207               ElseIf CTDict.Exists(UnQuotedHeader) Then
+208                   CT = CTDict.item(UnQuotedHeader)
+209               ElseIf CTDict.Exists(0) Then
+210                   CT = CTDict.item(0)
+211               Else
+212                   CT = vbNullString
+213               End If
                   
-189               If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
+214               If VarType(CT) = vbBoolean Then CT = StandardiseCT(CT)
                   
-190               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
+215               ParseCTString CT, ShowNumbersAsNumbers, ShowDatesAsDates, ShowBooleansAsBooleans, _
                       ShowErrorsAsErrors, ConvertQuoted, KeepQuotes, TrimFields
                   
-191               AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
+216               AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
                       ShowBooleansAsBooleans Or ShowErrorsAsErrors
                       
-192               Set Sentinels = New Scripting.Dictionary
+217               Set Sentinels = New Scripting.Dictionary
                   
-193               MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
+218               MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
                       ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
 
-194               For i = 1 To NR
-195                   If Not IsEmpty(ReturnArray(i + Adj, j + Adj)) Then
-196                       Field = CStr(ReturnArray(i + Adj, j + Adj))
-197                       QC = CountQuotes(Field, DQ)
-198                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
+219               For i = 1 To NR
+220                   If Not IsEmpty(ReturnArray(i + Adj, j + Adj)) Then
+221                       Field = CStr(ReturnArray(i + Adj, j + Adj))
+222                       QC = CountQuotes(Field, DQ)
+223                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
                               Len(ReturnArray(i + Adj, j + Adj)), TrimFields, DQ, QC, ConvertQuoted, KeepQuotes, _
                               ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
                               ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone, DateOrder, _
                               DateSeparator, SysDateSeparator, AnySentinels, Sentinels, _
                               MaxSentinelLength, ShowMissingsAs, AscSeparator)
-199                   End If
-200               Next i
-201           Next j
-202       End If
+224                   End If
+225               Next i
+226           Next j
+227       End If
 
-203       CSVRead = ReturnArray
+228       CSVRead = ReturnArray
 
-204       Exit Function
+229       Exit Function
 
 ErrHandler:
-205       CSVRead = ReThrow("CSVRead", Err, m_ErrorStyle = es_ReturnString)
+230       CSVRead = ReThrow("CSVRead", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2124,7 +2151,6 @@ Public Sub CastToDouble(strIn As String, ByRef DblOut As Double, SepStandard As 
 1         On Error GoTo ErrHandler
           'Checking the first character makes this function approx 12 times faster at rejecting non-numeric strings at the cost of about a 20% slowdown in converting numeric strings so worth it
 
-
 2         Select Case Asc(strIn)
               Case 32, 43, 45, 46, 48 To 57, AscSeparator 'Characters " +-.0123456789" and also the decimal separator that may be different from "."
 3                 If SepStandard Then
@@ -3026,8 +3052,6 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
           Optional TrueString As String = "True", Optional FalseString As String = "False") As String
-Attribute CSVWrite.VB_Description = "Creates a comma-separated file on disk containing Data. Any existing file of the same name is overwritten. If successful, the function returns FileName, otherwise an ""error string"" (starts with `#`, ends with `!`) describing what went wrong."
-Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
 
           Const Err_Delimiter1 = "Delimiter must have at least one character"
           Const Err_Delimiter2 As String = "Delimiter cannot start with a " & _
@@ -3042,9 +3066,9 @@ Attribute CSVWrite.VB_ProcData.VB_Invoke_Func = " \n14"
           Dim j As Long
           Dim Lines() As String
           Dim OneLine() As String
-          Dim WriteToFile As Boolean
-          Dim QuoteSimpleStrings As Boolean
           Dim QuoteComplexStrings As Boolean
+          Dim QuoteSimpleStrings As Boolean
+          Dim WriteToFile As Boolean
 
 1         On Error GoTo ErrHandler
           
@@ -4207,62 +4231,66 @@ Private Sub AmendSkipToColAndNumCols(ByVal FileName As String, ByRef SkipToCol A
                                
 1         On Error GoTo ErrHandler
           
-2         If IsNumber(SkipToCol) Then
-3             If SkipToCol <> CLng(SkipToCol) Or SkipToCol < 1 Then
-4                 Throw "SkipToCol" & Err_BadInput
-5             End If
-6         ElseIf VarType(SkipToCol) = vbString Then
-7             ReadFile = True
-8         ElseIf VarType(SkipToCol) <> vbString Then
-9             Throw "SkipToCol" & Err_BadInput
-10        End If
+          'Treat Empty (such as a blank cell) as missing argument would be treated
+2         If IsEmpty(SkipToCol) Then SkipToCol = 1
+3         If IsEmpty(NumCols) Then NumCols = 0
           
-11        If IsNumber(NumCols) Then
-12            If NumCols <> CLng(NumCols) Or NumCols < 0 Then
-13                Throw "NumCols" & Err_BadInput
-14            End If
-15        ElseIf VarType(NumCols) = vbString Then
-16            ReadFile = True
-17        ElseIf VarType(NumCols) <> vbString Then
-18            Throw "NumCols" & Err_BadInput
-19        End If
+4         If IsNumber(SkipToCol) Then
+5             If SkipToCol <> CLng(SkipToCol) Or SkipToCol < 1 Then
+6                 Throw "SkipToCol" & Err_BadInput
+7             End If
+8         ElseIf VarType(SkipToCol) = vbString Then
+9             ReadFile = True
+10        ElseIf VarType(SkipToCol) <> vbString Then
+11            Throw "SkipToCol" & Err_BadInput
+12        End If
           
-20        If Not ReadFile Then Exit Sub
+13        If IsNumber(NumCols) Then
+14            If NumCols <> CLng(NumCols) Or NumCols < 0 Then
+15                Throw "NumCols" & Err_BadInput
+16            End If
+17        ElseIf VarType(NumCols) = vbString Then
+18            ReadFile = True
+19        ElseIf VarType(NumCols) <> vbString Then
+20            Throw "NumCols" & Err_BadInput
+21        End If
           
-21        Headers = ThrowIfError(CSVRead(FileName, False, Delimiter, IgnoreRepeated, , Comment, IgnoreEmptyLines, , _
+22        If Not ReadFile Then Exit Sub
+          
+23        Headers = ThrowIfError(CSVRead(FileName, False, Delimiter, IgnoreRepeated, , Comment, IgnoreEmptyLines, , _
               HeaderRowNum, 1, 1, 0, , , , , Encoding))
-22        RealHeaderRowNum = IIf(HeaderRowNum = 0, 1, HeaderRowNum)
-23        If VarType(SkipToCol) = vbString Then
-24            origSkipToCol = SkipToCol
-25            For i = 1 To NCols(Headers)
-26                If Headers(1, i) = SkipToCol Then
-27                    SkipToCol = i
-28                    Exit For
-29                End If
-30            Next i
-31            If VarType(SkipToCol) = vbString Then Throw "Argument SkipToCol was given as the string '" & SkipToCol & _
+24        RealHeaderRowNum = IIf(HeaderRowNum = 0, 1, HeaderRowNum)
+25        If VarType(SkipToCol) = vbString Then
+26            origSkipToCol = SkipToCol
+27            For i = 1 To NCols(Headers)
+28                If Headers(1, i) = SkipToCol Then
+29                    SkipToCol = i
+30                    Exit For
+31                End If
+32            Next i
+33            If VarType(SkipToCol) = vbString Then Throw "Argument SkipToCol was given as the string '" & SkipToCol & _
                   "', but that cannot be found in the header row (row " & RealHeaderRowNum & ") of the file."
-32        End If
+34        End If
 
-33        If VarType(NumCols) = vbString Then
-34            For i = 1 To NCols(Headers)
-35                If Headers(1, i) = NumCols Then
-36                    If i >= SkipToCol Then
-37                        NumCols = i - SkipToCol + 1
-38                    Else
-39                        NumCols = SkipToCol - i + 1
-40                        SkipToCol = i
-41                    End If
-42                    Exit For
-43                End If
-44            Next i
-45            If VarType(NumCols) = vbString Then Throw "Argument NumCols was given as the string '" & NumCols & _
+35        If VarType(NumCols) = vbString Then
+36            For i = 1 To NCols(Headers)
+37                If Headers(1, i) = NumCols Then
+38                    If i >= SkipToCol Then
+39                        NumCols = i - SkipToCol + 1
+40                    Else
+41                        NumCols = SkipToCol - i + 1
+42                        SkipToCol = i
+43                    End If
+44                    Exit For
+45                End If
+46            Next i
+47            If VarType(NumCols) = vbString Then Throw "Argument NumCols was given as the string '" & NumCols & _
                   "', but that cannot be found in the header row (row " & RealHeaderRowNum & ") of the file."
-46        End If
+48        End If
 
-47        Exit Sub
+49        Exit Sub
 ErrHandler:
-48        ReThrow "AmendSkipToColAndNumCols", Err
+50        ReThrow "AmendSkipToColAndNumCols", Err
 End Sub
 
 Private Sub ParseQuoteAllStrings(QuoteAllStrings, ByRef QuoteSimpleStrings As Boolean, QuoteComplexStrings As Boolean)
@@ -4406,5 +4434,4 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
     Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
-
 

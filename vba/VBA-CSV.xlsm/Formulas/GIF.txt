@@ -1,2 +1,0 @@
-﻿Address	Formula
-B3:F1312	=CSVRead(B1,TRUE,,,,,,,,,,,,,"NA",NA())

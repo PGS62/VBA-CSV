@@ -1,20 +1,20 @@
 ﻿AuditSheetComments.txt
-Formulas\CSVWriteTests.txt
-Formulas\DateParsingTest.txt
-Formulas\GIF.txt
-Formulas\GIF2.txt
-Formulas\GIF3.txt
-Formulas\Performance (10).txt
-Formulas\Performance (2).txt
-Formulas\Performance (3).txt
-Formulas\Performance (4).txt
-Formulas\Performance (6).txt
-Formulas\Performance (7).txt
-Formulas\Performance (8).txt
-Formulas\Performance (9).txt
-Formulas\Performance.txt
-Formulas\RegExp.txt
-Formulas\Test.txt
+Formulas\CSVWriteTests.tsv
+Formulas\DateParsingTest.tsv
+Formulas\GIF.tsv
+Formulas\GIF2.tsv
+Formulas\GIF3.tsv
+Formulas\Performance (10).tsv
+Formulas\Performance (2).tsv
+Formulas\Performance (3).tsv
+Formulas\Performance (4).tsv
+Formulas\Performance (6).tsv
+Formulas\Performance (7).tsv
+Formulas\Performance (8).tsv
+Formulas\Performance (9).tsv
+Formulas\Performance.tsv
+Formulas\RegExp.tsv
+Formulas\Test.tsv
 Values\Audit.csv
 Values\CSVWriteTests.csv
 Values\DateParsingTest.csv

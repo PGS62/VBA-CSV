@@ -29,6 +29,10 @@ Sub SwitchAllTests(NewValue As Boolean)
 ErrHandler:
      MsgBox ReThrow("SwitchAllTests", Err, True), vbCritical
 End Sub
+
+Function TestFolder()
+    TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & "testfiles\"
+End Function
 #End If
 
 
@@ -7381,4 +7385,332 @@ Public Sub Test274(Folder As String)
 ErrHandler:
     ReThrow "Test274", Err
 End Sub
+
+Public Sub Test275(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows too large"
+    Expected = HStack(Array("a", 1#, 4#, 7#, "Missing!"), Array("b", 2#, 5#, 8#, "Missing!"), Array("c", 3#, 6#, 9#, "Missing!"))
+    FileName = "test_numrows_too_large.csv"
+    TestRes = TestCSVRead(275, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=Empty, _
+        NumRows:=5, _
+        NumCols:=Empty, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test275", Err
+End Sub
+
+Public Sub Test276(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numcols too large"
+    Expected = HStack(Array("a", 1#, 4#, 7#), Array("b", 2#, 5#, 8#), Array("c", 3#, 6#, 9#), Array("Missing!", "Missing!", "Missing!", "Missing!"))
+    FileName = "test_numcols_too_large.csv"
+    TestRes = TestCSVRead(276, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=Empty, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test276", Err
+End Sub
+
+Public Sub Test277(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows and numcols too large"
+    Expected = HStack(Array("a", 1#, 4#, 7#, "Missing!"), Array("b", 2#, 5#, 8#, "Missing!"), Array("c", 3#, 6#, 9#, "Missing!"), Array("Missing!", "Missing!", "Missing!", "Missing!", "Missing!"))
+    FileName = "test_numrows_and_numcols_too_large.csv"
+    TestRes = TestCSVRead(277, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=Empty, _
+        NumRows:=5, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test277", Err
+End Sub
+
+Public Sub Test278(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows too large and file is ragged"
+    Expected = HStack(Array("a", 1#, 4#, 7#, "Missing!"), Array("b", 2#, 5#, 8#, "Missing!"), Array("c", 3#, 6#, "Missing!", "Missing!"))
+    FileName = "test_numrows_too_large_and_file_is_ragged.csv"
+    TestRes = TestCSVRead(278, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=Empty, _
+        NumRows:=5, _
+        NumCols:=Empty, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test278", Err
+End Sub
+
+Public Sub Test279(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numcols too large and file is ragged"
+    Expected = HStack(Array("a", 1#, 4#, 7#), Array("b", 2#, 5#, 8#), Array("c", 3#, 6#, "Missing!"), Array("Missing!", "Missing!", "Missing!", "Missing!"))
+    FileName = "test_numcols_too_large_and_file_is_ragged.csv"
+    TestRes = TestCSVRead(279, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=Empty, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test279", Err
+End Sub
+
+Public Sub Test280(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows and numcols too large and file is ragged"
+    Expected = HStack( _
+        Array("a", 1#, 4#, 7#, "Missing!"), _
+        Array("b", 2#, 5#, 8#, "Missing!"), _
+        Array("c", 3#, 6#, "Missing!", "Missing!"), _
+        Array("Missing!", "Missing!", "Missing!", "Missing!", "Missing!"))
+    FileName = "test_numrows_and_numcols_too_large_and_file_is_ragged.csv"
+    TestRes = TestCSVRead(280, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToCol:=Empty, _
+        NumRows:=5, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test280", Err
+End Sub
+
+Public Sub Test281(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows too large with skip args set"
+    Expected = HStack(Array(2#, 5#, 8#, "Missing!", "Missing!"), Array(3#, 6#, 9#, "Missing!", "Missing!"))
+    FileName = "test_numrows_too_large_with_skip_args_set.csv"
+    TestRes = TestCSVRead(281, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        SkipToCol:=2, _
+        NumRows:=5, _
+        NumCols:=Empty, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test281", Err
+End Sub
+
+Public Sub Test282(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numcols too large with skip args set"
+    Expected = HStack(Array(2#, 5#, 8#), Array(3#, 6#, 9#), Array("Missing!", "Missing!", "Missing!"), Array("Missing!", "Missing!", "Missing!"))
+    FileName = "test_numcols_too_large_with_skip_args_set.csv"
+    TestRes = TestCSVRead(282, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        SkipToCol:=2, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test282", Err
+End Sub
+
+Public Sub Test283(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows and numcols too large with skip args set"
+    Expected = HStack( _
+        Array(2#, 5#, 8#, "Missing!", "Missing!"), _
+        Array(3#, 6#, 9#, "Missing!", "Missing!"), _
+        Array("Missing!", "Missing!", "Missing!", "Missing!", "Missing!"), _
+        Array("Missing!", "Missing!", "Missing!", "Missing!", "Missing!"))
+    FileName = "test_numrows_and_numcols_too_large_with_skip_args_set.csv"
+    TestRes = TestCSVRead(283, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        SkipToCol:=2, _
+        NumRows:=5, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test283", Err
+End Sub
+
+Public Sub Test284(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows too large and file is ragged with skip args set"
+    Expected = HStack(Array(2#, 5#, 8#, "Missing!", "Missing!"), Array(3#, 6#, "Missing!", "Missing!", "Missing!"))
+    FileName = "test_numrows_too_large_and_file_is_ragged_with_skip_args_set.csv"
+    TestRes = TestCSVRead(284, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        SkipToCol:=2, _
+        NumRows:=5, _
+        NumCols:=Empty, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test284", Err
+End Sub
+
+Public Sub Test285(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numcols too large and file is ragged with skip args set"
+    Expected = HStack(Array(2#, 5#, 8#), Array(3#, 6#, "Missing!"), Array("Missing!", "Missing!", "Missing!"), Array("Missing!", "Missing!", "Missing!"))
+    FileName = "test_numcols_too_large_and_file_is_ragged_with_skip_args_set.csv"
+    TestRes = TestCSVRead(285, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        SkipToCol:=2, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test285", Err
+End Sub
+
+Public Sub Test286(Folder As String)
+    Dim Expected As Variant
+    Dim FileName As String
+    Dim Observed As Variant
+    Dim TestDescription As String
+    Dim TestRes As Boolean
+    Dim WhatDiffers As String
+
+    On Error GoTo ErrHandler
+    TestDescription = "test numrows and numcols too large and file is ragged with skip args set"
+    Expected = HStack( _
+        Array(2#, 5#, 8#, "Missing!", "Missing!"), _
+        Array(3#, 6#, "Missing!", "Missing!", "Missing!"), _
+        Array("Missing!", "Missing!", "Missing!", "Missing!", "Missing!"), _
+        Array("Missing!", "Missing!", "Missing!", "Missing!", "Missing!"))
+    FileName = "test_numrows_and_numcols_too_large_and_file_is_ragged_with_skip_args_set.csv"
+    TestRes = TestCSVRead(286, TestDescription, Expected, Folder & FileName, Observed, WhatDiffers, _
+        ConvertTypes:=True, _
+        IgnoreEmptyLines:=False, _
+        SkipToRow:=2, _
+        SkipToCol:=2, _
+        NumRows:=5, _
+        NumCols:=4, _
+        ShowMissingsAs:="Missing!")
+    AccumulateResults TestRes, WhatDiffers
+
+    Exit Sub
+ErrHandler:
+    ReThrow "Test286", Err
+End Sub
+
+
 

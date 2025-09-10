@@ -1,8 +1,8 @@
-﻿Address	Formula
-F2	=CSVWrite(A2:D8,"C:\Temp\Test.csv")
+Address	Formula
+F2	"=CSVWrite(A2:D8,""C:\Temp\Test.csv"")"
 H2:H10	=CSVRead(F2,,FALSE)
 J2:M8	=CSVRead(F2,TRUE)
 A3:A8	=SEQUENCE(6)
 B3:B8	=MOD(A3#,2)=0
 C3:C8	=TODAY()+A3#
-D6	="A"&CHAR(13)&" CR"
+D6	"=""A""&CHAR(13)&"" CR"""

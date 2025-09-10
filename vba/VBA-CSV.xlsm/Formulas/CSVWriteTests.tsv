@@ -1,4 +1,4 @@
-﻿Address	Formula
+Address	Formula
 F5	=AND(Q8#)
 O8	=CSVWrite(INDIRECT(E8),G8,F8,H8,I8,J8,K8,L8,M8,N8)
 Q8:Q57	=O8:O57=P8:P57

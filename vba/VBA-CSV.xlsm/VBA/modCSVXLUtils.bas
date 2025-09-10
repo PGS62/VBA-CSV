@@ -14,12 +14,6 @@ Function TempFolder() As String
     TempFolder = Environ$("Temp")
 End Function
 
-#If HOST_IS_EXCEL Then
-Function TestFolder()
-    TestFolder = Left$(ThisWorkbook.path, InStrRev(ThisWorkbook.path, "\")) & "testfiles\"
-End Function
-#End If
-
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : FileFromPath
 ' Purpose    : Split file-with-path to file name (if ReturnFileName is True) or path otherwise.

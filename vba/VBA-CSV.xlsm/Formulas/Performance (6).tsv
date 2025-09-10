@@ -1,5 +1,5 @@
-﻿Address	Formula
-H7:J7	="NCalls"&CHAR(10)&E7:G7
+Address	Formula
+H7:J7	"=""NCalls""&CHAR(10)&E7:G7"
 A8	=LEN(B8)
 A9	=LEN(B9)
 D9	=D8*2
