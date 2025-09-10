@@ -1,4 +1,5 @@
 ﻿Version	Date	Time	Author	Comment
+257	10-Sep-2025	11:47	Philip Swannell	Replaced use of function TypeName with TypeOf.
 256	10-Sep-2025	10:29	Philip Swannell	When NumRows or NumCols are such that the returned array has more rows or columns than the file then the additional rows/columns are now padded with ShowMissingsAs rather than Empty.
 255	01-Jul-2024	10:54	Philip Swannell	Rebased tests 145 and 221.
 254	27-Jun-2024	16:58	Philip Swannell	Can now test CSVWrite when host application is Word/Outlook.

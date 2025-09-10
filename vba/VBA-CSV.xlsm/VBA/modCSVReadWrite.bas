@@ -630,7 +630,7 @@ Private Function IsWorksheetCall() As Boolean
           Dim o As Object
 1         If Application.Name = "Microsoft Excel" Then
 2             Set o = Application
-3             IsWorksheetCall = TypeName(o.Caller) = "Range"
+3             IsWorksheetCall = (TypeOf o.Caller Is Range)
 4         End If
 End Function
 
@@ -867,7 +867,7 @@ Private Sub ParseConvertTypes(ByVal ConvertTypes As Variant, ByRef ShowNumbersAs
 6             Exit Sub
 7         End If
 
-8         If TypeName(ConvertTypes) = "Range" Then ConvertTypes = ConvertTypes.Value2
+8         If (TypeOf ConvertTypes Is Range) Then ConvertTypes = ConvertTypes.Value2
 9         ND = NumDimensions(ConvertTypes)
 10        If ND = 1 Then
 11            ConvertTypes = OneDArrayToTwoDArray(ConvertTypes)
@@ -2672,7 +2672,7 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
 
 2         If IsMissing(ShowMissingsAs) Then
 3             ShowMissingsAs = Empty
-4         ElseIf TypeName(ShowMissingsAs) = "Range" Then
+4         ElseIf TypeOf ShowMissingsAs Is Range Then
 5             ShowMissingsAs = ShowMissingsAs.value
 6         End If
           
@@ -2761,7 +2761,7 @@ Private Sub AddKeysToDict(ByRef Sentinels As Scripting.Dictionary, ByVal Keys As
         
 1         On Error GoTo ErrHandler
         
-2         If TypeName(Keys) = "Range" Then
+2         If TypeOf Keys Is Range Then
 3             Keys = Keys.value
 4         End If
           
@@ -3111,7 +3111,7 @@ Public Function CSVWrite(ByVal Data As Variant, Optional ByVal FileName As Strin
 27                DateTimeFormat = ISOZFormatString()
 28        End Select
 
-29        If TypeName(Data) = "Range" Then
+29        If TypeOf Data Is Range Then
               'Preserve elements of type Date by using .Value, not .Value2
 30            Data = Data.value
 31        End If
@@ -3362,19 +3362,19 @@ Private Function ValidateBooleanRepresentation(strValue As String, strName As St
               
 14        For i = 0 To 2
 15            For Each DateSeparator In Array("/", "-", " ")
-                  Converted = False
-16                CastToDate strValue, DtOut, i, _
+16                Converted = False
+17                CastToDate strValue, DtOut, i, _
                       CStr(DateSeparator), SysDateSeparator, Converted
-17                If Converted Then
-18                    Throw "Got '" & strValue & "' as " & _
+18                If Converted Then
+19                    Throw "Got '" & strValue & "' as " & _
                           strName & " but that's not valid because it represents a date"
-19                End If
-20            Next
-21        Next
+20                End If
+21            Next
+22        Next
 
-22        Exit Function
+23        Exit Function
 ErrHandler:
-23        ReThrow "ValidateBooleanRepresentation", Err
+24        ReThrow "ValidateBooleanRepresentation", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4054,7 +4054,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function NCols(Optional TheArray As Variant) As Long
 1         On Error GoTo ErrHandler
-2         If TypeName(TheArray) = "Range" Then
+2         If TypeOf TheArray Is Range Then
 3             NCols = TheArray.Columns.count
 4         ElseIf IsMissing(TheArray) Then
 5             NCols = 0
@@ -4080,7 +4080,7 @@ End Function
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function NRows(Optional TheArray As Variant) As Long
 1         On Error GoTo ErrHandler
-2         If TypeName(TheArray) = "Range" Then
+2         If TypeOf TheArray Is Range Then
 3             NRows = TheArray.Rows.count
 4         ElseIf IsMissing(TheArray) Then
 5             NRows = 0
@@ -4179,7 +4179,7 @@ End Sub
 '             input into a 2-dimensional 1-based array (even if it's a single cell or single row of cells)
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Sub Force2DArrayR(ByRef RangeOrArray As Variant, Optional ByRef NR As Long, Optional ByRef NC As Long)
-1         If TypeName(RangeOrArray) = "Range" Then RangeOrArray = RangeOrArray.Value2
+1         If (TypeOf RangeOrArray Is Range) Then RangeOrArray = RangeOrArray.Value2
 2         Force2DArray RangeOrArray, NR, NC
 End Sub
 
@@ -4323,65 +4323,65 @@ End Sub
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub RegisterCSVRead()
-    Const Description As String = "Returns the contents of a comma-separated file on disk as an array."
-    Dim ArgDescs() As String
+          Const Description As String = "Returns the contents of a comma-separated file on disk as an array."
+          Dim ArgDescs() As String
 
-    On Error GoTo ErrHandler
+1         On Error GoTo ErrHandler
 
-    ReDim ArgDescs(1 To 19)
-    ArgDescs(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV " & _
-        "format."
-    ArgDescs(2) = "Type conversion: Boolean or string. Allowed letters NDBETQK. N = Numbers, D = Dates, B = " & _
-        "Booleans, E = Excel errors, T = trim leading & trailing spaces, Q = quoted fields also " & _
-        "converted, K = quotes kept. TRUE = NDB, FALSE = no conversion."
-    ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found " & _
-        "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
-        "contents as would be displayed in a text editor."
-    ArgDescs(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after " & _
-        "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
-        "padding between fields."
-    ArgDescs(5) = "The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO` " & _
-        "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
-        "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
-    ArgDescs(6) = "Rows that start with this string will be skipped while parsing."
-    ArgDescs(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column " & _
-        "will be assigned ShowMissingsAs for that empty row)."
-    ArgDescs(8) = "The row in the file containing headers. Optional and defaults to 0. Type conversion is not " & _
-        "applied to fields in the header row, though leading and trailing spaces are trimmed."
-    ArgDescs(9) = "The first row in the file that's included in the return. Optional and defaults to one more than " & _
-        "HeaderRowNum."
-    ArgDescs(10) = "The column in the file at which reading starts, as a number or a string matching one of the " & _
-        "file's headers. Optional and defaults to 1 to read from the first column."
-    ArgDescs(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the " & _
-        "end of the file are read."
-    ArgDescs(12) = "If a number, sets the number of columns to read from the file. If a string matching one of the " & _
-        "file's headers, sets the last column to be read. If omitted (or zero), all columns from " & _
-        "SkipToCol are read."
-    ArgDescs(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings " & _
-        "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
-    ArgDescs(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings " & _
-        "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
-    ArgDescs(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings " & _
-        "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
-        "considered missing."
-    ArgDescs(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the " & _
-        "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
-        "string or `#N/A!` error value can be good alternatives."
-    ArgDescs(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be " & _
-        "omitted and CSVRead will detect the file's encoding."
-    ArgDescs(18) = "The character that represents a decimal point. If omitted, then the value from Windows " & _
-        "regional settings is used."
-    ArgDescs(19) = "For use from VBA only."
-    'Code below written to not give compile error when host application is not Excel
-    If Application.Name = "Microsoft Exxel" Then
-        Dim o As Object
-        Set o = Application
-        o.MacroOptions "CSVRead", Description, , , , , , , , , ArgDescs
-    End If
-    Exit Sub
+2         ReDim ArgDescs(1 To 19)
+3         ArgDescs(1) = "The full name of the file, including the path, or else a URL of a file, or else a string in CSV " & _
+              "format."
+4         ArgDescs(2) = "Type conversion: Boolean or string. Allowed letters NDBETQK. N = Numbers, D = Dates, B = " & _
+              "Booleans, E = Excel errors, T = trim leading & trailing spaces, Q = quoted fields also " & _
+              "converted, K = quotes kept. TRUE = NDB, FALSE = no conversion."
+5         ArgDescs(3) = "Delimiter string. Defaults to the first instance of comma, tab, semi-colon, colon or pipe found " & _
+              "outside quoted regions within the first 10,000 characters. Enter FALSE to  see the file's " & _
+              "contents as would be displayed in a text editor."
+6         ArgDescs(4) = "Whether delimiters which appear at the start of a line, the end of a line or immediately after " & _
+              "another delimiter should be ignored while parsing; useful for fixed-width files with delimiter " & _
+              "padding between fields."
+7         ArgDescs(5) = "The format of dates in the file such as `Y-M-D` (the default), `M-D-Y` or `Y/M/D`. Also `ISO` " & _
+              "for ISO8601 (e.g., 2021-08-26T09:11:30) or `ISOZ` (time zone given e.g. " & _
+              "2021-08-26T13:11:30+05:00), in which case dates-with-time are returned in UTC time."
+8         ArgDescs(6) = "Rows that start with this string will be skipped while parsing."
+9         ArgDescs(7) = "Whether empty rows/lines in the file should be skipped while parsing (if `FALSE`, each column " & _
+              "will be assigned ShowMissingsAs for that empty row)."
+10        ArgDescs(8) = "The row in the file containing headers. Optional and defaults to 0. Type conversion is not " & _
+              "applied to fields in the header row, though leading and trailing spaces are trimmed."
+11        ArgDescs(9) = "The first row in the file that's included in the return. Optional and defaults to one more than " & _
+              "HeaderRowNum."
+12        ArgDescs(10) = "The column in the file at which reading starts, as a number or a string matching one of the " & _
+              "file's headers. Optional and defaults to 1 to read from the first column."
+13        ArgDescs(11) = "The number of rows to read from the file. If omitted (or zero), all rows from SkipToRow to the " & _
+              "end of the file are read."
+14        ArgDescs(12) = "If a number, sets the number of columns to read from the file. If a string matching one of the " & _
+              "file's headers, sets the last column to be read. If omitted (or zero), all columns from " & _
+              "SkipToCol are read."
+15        ArgDescs(13) = "Indicates how `TRUE` values are represented in the file. May be a string, an array of strings " & _
+              "or a range containing strings; by default, `TRUE`, `True` and `true` are recognised."
+16        ArgDescs(14) = "Indicates how `FALSE` values are represented in the file. May be a string, an array of strings " & _
+              "or a range containing strings; by default, `FALSE`, `False` and `false` are recognised."
+17        ArgDescs(15) = "Indicates how missing values are represented in the file. May be a string, an array of strings " & _
+              "or a range containing strings. By default, only an empty field (consecutive delimiters) is " & _
+              "considered missing."
+18        ArgDescs(16) = "Fields which are missing in the file (consecutive delimiters) or match one of the " & _
+              "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
+              "string or `#N/A!` error value can be good alternatives."
+19        ArgDescs(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be " & _
+              "omitted and CSVRead will detect the file's encoding."
+20        ArgDescs(18) = "The character that represents a decimal point. If omitted, then the value from Windows " & _
+              "regional settings is used."
+21        ArgDescs(19) = "For use from VBA only."
+          'Code below written to not give compile error when host application is not Excel
+22        If Application.Name = "Microsoft Exxel" Then
+              Dim o As Object
+23            Set o = Application
+24            o.MacroOptions "CSVRead", Description, , , , , , , , , ArgDescs
+25        End If
+26        Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVRead failed with error: " & Err.Description
+27        Debug.Print "Warning: Registration of function CSVRead failed with error: " & Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -4390,48 +4390,48 @@ End Sub
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
 Public Sub RegisterCSVWrite()
-    Const Description As String = "Creates a comma-separated file on disk containing Data. Any existing file of " & _
-        "the same name is overwritten. If successful, the function returns FileName, " & _
-        "otherwise an ""error string"" (starts with `#`, ends with `!`) describing what " & _
-        "went wrong."
-    Dim ArgDescs() As String
+          Const Description As String = "Creates a comma-separated file on disk containing Data. Any existing file of " & _
+              "the same name is overwritten. If successful, the function returns FileName, " & _
+              "otherwise an ""error string"" (starts with `#`, ends with `!`) describing what " & _
+              "went wrong."
+          Dim ArgDescs() As String
 
-    On Error GoTo ErrHandler
+1         On Error GoTo ErrHandler
 
-    ReDim ArgDescs(1 To 10)
-    ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
-        "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
-        "dimension then the output file has a single column, one field per row."
-    ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
-        "function returns Data converted CSV-style to a string."
-    ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
-        "FALSE only strings containing Delimiter, line feed, carriage return or quote are quoted. If " & _
-        """Raw"" no strings are quoted. The file may not be valid csv format."
-    ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
-        "file. If omitted, defaults to `yyyy-mm-dd`."
-    ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
-        "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
-        "inconsistent across the datetimes in data."
-    ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
-        "character."
-    ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8`, `UTF-16`, `UTF-8NOBOM` and `UTF-16NOBOM`. An " & _
-        "error will result if this argument is `ANSI` but Data contains characters with code point above " & _
-        "127."
-    ArgDescs(8) = "Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending " & _
-        "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
-        "is provided, or `Unix` if not."
-    ArgDescs(9) = "How the Boolean value True is to be represented in the file. Optional, defaulting to ""True""."
-    ArgDescs(10) = "How the Boolean value False is to be represented in the file. Optional, defaulting to " & _
-        """False""."
-    'Code below written to not give compile error when host application is not Excel
-    If Application.Name = "Microsoft Exxel" Then
-        Dim o As Object
-        Set o = Application
-        o.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
-    End If
-    Exit Sub
+2         ReDim ArgDescs(1 To 10)
+3         ArgDescs(1) = "An array of data, or an Excel range. Elements may be strings, numbers, dates, Booleans, empty, " & _
+              "Excel errors or null values. Data typically has two dimensions, but if Data has only one " & _
+              "dimension then the output file has a single column, one field per row."
+4         ArgDescs(2) = "The full name of the file, including the path. Alternatively, if FileName is omitted, then the " & _
+              "function returns Data converted CSV-style to a string."
+5         ArgDescs(3) = "If TRUE (the default) then all strings in Data are quoted before being written to file. If " & _
+              "FALSE only strings containing Delimiter, line feed, carriage return or quote are quoted. If " & _
+              """Raw"" no strings are quoted. The file may not be valid csv format."
+6         ArgDescs(4) = "A format string that determines how dates, including cells formatted as dates, appear in the " & _
+              "file. If omitted, defaults to `yyyy-mm-dd`."
+7         ArgDescs(5) = "Format for datetimes. Defaults to `ISO` which abbreviates `yyyy-mm-ddThh:mm:ss`. Use `ISOZ` for " & _
+              "ISO8601 format with time zone the same as the PC's clock. Use with care, daylight saving may be " & _
+              "inconsistent across the datetimes in data."
+8         ArgDescs(6) = "The delimiter string, if omitted defaults to a comma. Delimiter may have more than one " & _
+              "character."
+9         ArgDescs(7) = "Allowed entries are `ANSI` (the default), `UTF-8`, `UTF-16`, `UTF-8NOBOM` and `UTF-16NOBOM`. An " & _
+              "error will result if this argument is `ANSI` but Data contains characters with code point above " & _
+              "127."
+10        ArgDescs(8) = "Sets the file's line endings. Enter `Windows`, `Unix` or `Mac`. Also supports the line-ending " & _
+              "characters themselves or the strings `CRLF`, `LF` or `CR`. The default is `Windows` if FileName " & _
+              "is provided, or `Unix` if not."
+11        ArgDescs(9) = "How the Boolean value True is to be represented in the file. Optional, defaulting to ""True""."
+12        ArgDescs(10) = "How the Boolean value False is to be represented in the file. Optional, defaulting to " & _
+              """False""."
+          'Code below written to not give compile error when host application is not Excel
+13        If Application.Name = "Microsoft Exxel" Then
+              Dim o As Object
+14            Set o = Application
+15            o.MacroOptions "CSVWrite", Description, , , , , , , , , ArgDescs
+16        End If
+17        Exit Sub
 
 ErrHandler:
-    Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
+18        Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
 
