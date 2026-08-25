@@ -1,0 +1,37 @@
+﻿,"VBA-CSV GIFMaker",,,
+,,,,
+,"Keys","Delays",,"GIFMaker - Hints"
+,"{HOME}FileName~",0,,"Use in conjunction with ScreenToGif.exe"
+,"{RIGHT}'",0,,"This workbook must be open in a separate Excel instance, with VBA-CSV.xlsm open in the other instance"
+"Paste, VBA code in THIS Excel instance does the copy!","+{INSERT}",,,"Launch ScreenToGiF.exe, click the ""Record"" button"
+,"~",0,,"Click the ""Record"" button."
+,"{DOWN}{DOWN}{LEFT}CSVRead~",1.5,,"Position the recording area over cells A1 -> M14 of sheet GIF in workbook VBA-CSV.xlsm, adjust the top of the recording area to also show the formula bar."
+,"{RIGHT}",0,,"Hit the record button at the bottom right of the recording area overlay thingy"
+,"=",0.1,,"Run the method MakeGIF over here in this Excel instance, by clicking Button 1"
+,"C",0.1,,"That sends recorded keystrokes - more consistently than I'm ever able to type!"
+,"S",0.1,,"Don't forget to click the stop recording asap after send keys method MakeGIF exits."
+,"V",0.1,,"In ScreenToGIF, delete frames before action starts and after action ends"
+,"R",0.1,,"Delete duplicate frames but make timing be ""sum"""
+,"e",0.1,,"Save GIF!"
+,"a",0.1,,"Upload to GitHub etc."
+,"d",0.1,,
+,"{(}",0.1,,
+,"B",0.1,,
+,"1",0.1,,
+,",",0.1,,
+,"T",0.1,,
+,"R",0.1,,
+,"U",0.1,,
+,"E",0.1,,
+,",,,,,,,,,,,,,",0.1,,
+,"""",0.1,,
+,"N",0.1,,
+,"A",0.1,,
+,"""",0.1,,
+,",",0.1,,
+,"N",0.1,,
+,"A",0.1,,
+,"{(}",0.1,,
+,"{)}",0.1,,
+,"{)}",0.1,,
+,"~",0.1,,

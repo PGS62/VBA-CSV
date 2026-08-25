@@ -1,4 +1,9 @@
-AuditSheetComments.txt
-modClipboard.bas
-Module1.bas
+﻿AuditSheetComments.txt
+Values\Audit.csv
+Values\GIF.csv
+Values\GIF_OLD.csv
+Values\GIF2.csv
+Values\GIF3.csv
+VBA\modClipboard.bas
+VBA\Module1.bas
 VBA-CSV-GIFMaker.xlsm
