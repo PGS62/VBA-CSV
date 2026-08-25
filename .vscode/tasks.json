@@ -1,0 +1,66 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "VBA: Push to Excel (VBA-CSV)",
+            "detail": "Have a file open/focused inside the workbook's export folder (VBA/Formulas/Values) you want to push to.",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-File", "${workspaceFolder}/../SolumAddins/scripts/Sync-VbaModules.ps1",
+                "-Action", "Push",
+                "-ActiveFile", "${file}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VBA: Push Changed Modules to Excel (VBA-CSV)",
+            "detail": "Push only modules changed since the last Pull. Have a file open/focused inside the workbook's export folder (VBA/Formulas/Values) you want to push to.",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-File", "${workspaceFolder}/../SolumAddins/scripts/Sync-VbaModules.ps1",
+                "-Action", "Push",
+                "-ActiveFile", "${file}",
+                "-ChangedOnly"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "VBA: Pull from Excel (VBA-CSV)",
+            "detail": "Have a file open/focused inside the workbook's export folder (VBA/Formulas/Values) you want to pull from.",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-File", "${workspaceFolder}/../SolumAddins/scripts/Sync-VbaModules.ps1",
+                "-Action", "Pull",
+                "-ActiveFile", "${file}"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true,
+                "focus": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
