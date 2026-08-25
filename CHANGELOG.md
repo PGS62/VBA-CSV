@@ -1,7 +1,5 @@
 # Changelog
 
-All notable changes to VBA-CSV are documented here, compiled from the [GitHub releases](https://github.com/PGS62/VBA-CSV/releases).
-
 ## [v0.32] - 2025-09-10
 
 This release fixes some edge-cases:
