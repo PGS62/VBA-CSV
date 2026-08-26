@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.33] - 2026-08-26
+
+Performance work aided by Claude Sonnet 5, improving `CSVRead` by around 6% on a large, mostly-numeric file (tested on a 113Mb file, 1,462 rows x 5,742 columns, `ConvertTypes:=TRUE`):
+
+- Reduced per-field overhead in type conversion.
+- Internal buffers used while parsing now start closer to their final size (estimated from the file size, or from `NumRows` directly for a bounded read), needing fewer incremental reallocations while growing.
+
 ## [v0.32] - 2025-09-10
 
 This release fixes some edge-cases:

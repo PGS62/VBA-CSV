@@ -1,4 +1,5 @@
 ﻿Version	Date	Time	Author	Comment
+259	26-Aug-2026	15:15	Philip Swannell	Performance improvement of approx 6% (113Mb file, mostly numeric) aided by Claude Sonnet 5.
 258	10-Sep-2025	12:55	Philip Swannell	Ran performance measurements, generating worksheet 'Performace (11)'.
 257	10-Sep-2025	11:47	Philip Swannell	Replaced use of function TypeName with TypeOf.
 256	10-Sep-2025	10:29	Philip Swannell	When NumRows or NumCols are such that the returned array has more rows or columns than the file then the additional rows/columns are now padded with ShowMissingsAs rather than Empty.

@@ -4,7 +4,7 @@ Attribute VB_Name = "modCSVReadWrite"
 ' Copyright (C) 2025 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
 ' Document: https://github.com/PGS62/VBA-CSV#readme
-' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.32
+' This version at: https://github.com/PGS62/VBA-CSV/releases/tag/v0.33
 
 'Installation:
 '1) Import this module into your project (Open VBA Editor, Alt + F11; File > Import File).
@@ -30,7 +30,7 @@ Attribute VB_Name = "modCSVReadWrite"
 '5) An alternative (or additional) approach to providing help on CSVRead and CSVWrite is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
-'      https://github.com/PGS62/VBA-CSV/releases/download/v0.32/VBA-CSV-Intellisense.xlsx
+'      https://github.com/PGS62/VBA-CSV/releases/download/v0.33/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
 '6) If you envisage calling CSVRead and CSVWrite only from VBA code and not from worksheet formulas
@@ -72,6 +72,38 @@ Private Enum enmSourceType
     st_URL = 1
     st_String = 2
 End Enum
+
+' Experimental branch: bundles the ~22 settings that ConvertField previously received as separate
+' parameters but which are invariant across an entire CSVRead call (or, in the ColByColFormatting
+' path, across a single column) - only Field, FieldLength and quoteCount genuinely vary field-by-
+' field. Passed ByRef as a single parameter instead, since a micro-benchmark (modParamCountBenchmark,
+' also on this branch) showed VBA's per-call overhead scales with parameter count even when every
+' parameter is passed ByRef, and that reading a handful of fields back out of a UDT costs very little
+' by comparison.
+Private Type TConvertSettings
+    AnyConversion As Boolean
+    TrimFields As Boolean
+    QuoteChar As String
+    ConvertQuoted As Boolean
+    KeepQuotes As Boolean
+    ShowNumbersAsNumbers As Boolean
+    SepStandard As Boolean
+    DecimalSeparator As String
+    SysDecimalSeparator As String
+    ShowDatesAsDates As Boolean
+    ISO8601 As Boolean
+    AcceptWithoutTimeZone As Boolean
+    AcceptWithTimeZone As Boolean
+    DateOrder As Long
+    DateSeparator As String
+    SysDateSeparator As String
+    AnySentinels As Boolean
+    Sentinels As Scripting.Dictionary
+    MaxSentinelLength As Long
+    ShowMissingsAs As Variant
+    AscSeparator As Long
+    TryNumberFirst As Boolean
+End Type
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : CSVRead
@@ -256,6 +288,7 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
           Dim RowIndexes() As Long
           Dim Sentinels As Scripting.Dictionary
           Dim SepStandard As Boolean
+          Dim Settings As TConvertSettings
           Dim ShowBooleansAsBooleans As Boolean
           Dim ShowDatesAsDates As Boolean
           Dim ShowErrorsAsErrors As Boolean
@@ -267,8 +300,12 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
           Dim Stream As ADODB.Stream
           Dim SysDateSeparator As String
           Dim SysDecimalSeparator As String
+          Dim T0 As Double 'Diagnostic timers (Experimental branch), Parse = T1-T0, Convert = T2-T1
+          Dim t1 As Double
+          Dim t2 As Double
           Dim TempFile As String
           Dim TrimFields As Boolean
+          Dim TryNumberFirst As Boolean
           
 1         On Error GoTo ErrHandler
 
@@ -327,8 +364,9 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 
 43        Set Sentinels = New Scripting.Dictionary
 44        MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
-              ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
-          
+              ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings: TryNumberFirst = ShowNumbersAsNumbers _
+              And (Not AnySentinels Or SentinelsAreNumericSafe(Sentinels, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator))
+
 45        If ShowDatesAsDates Then
 46            ParseDateFormat DateFormat, DateOrder, DateSeparator, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone
 47            SysDateSeparator = SystemDateSeparator()
@@ -365,12 +403,13 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 69            CSVRead = ParseTextFile(FileName, SourceType <> st_String, CharSet, SkipToRow, NumRows, CallingFromWorksheet)
 70            Exit Function
 71        End If
+          'T0 = Timer 'Diagnostic timer (Experimental branch) - commented out, see Dim T0 above
                 
 72        If SourceType = st_String Then
 73            CSVContents = FileName
 74            ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                   IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, _
-                  NumFields, Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
+                  NumFields, Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow, EstNumChars
 75        Else
 76            If m_FSO Is Nothing Then Set m_FSO = New Scripting.FileSystemObject
                   
@@ -385,15 +424,16 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 84                Stream.Close
 85                ParseCSVContents CSVContents, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                       IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
-                      Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow
+                      Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow, EstNumChars
 86            Else
 87                CSVContents = ParseCSVContents(Stream, DQ, strDelimiter, Comment, IgnoreEmptyLines, _
                       IgnoreRepeated, SkipToRow, HeaderRowNum, NumRows, NumRowsFound, NumColsFound, NumFields, _
-                      Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow)
+                      Ragged, Starts, Lengths, RowIndexes, ColIndexes, QuoteCounts, HeaderRow, EstNumChars)
 88                Stream.Close
 89            End If
 90        End If
-                           
+          't1 = Timer 'Diagnostic timer (Experimental branch) - commented out
+
 91        If NumCols = 0 Then
 92            NumColsInReturn = NumColsFound - SkipToCol + 1
 93            If NumColsInReturn <= 0 Then
@@ -410,8 +450,18 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 103       End If
               
 104       AnyConversion = ShowNumbersAsNumbers Or ShowDatesAsDates Or _
-              ShowBooleansAsBooleans Or ShowErrorsAsErrors Or TrimFields
-              
+              ShowBooleansAsBooleans Or ShowErrorsAsErrors Or TrimFields: _
+              Settings.AnyConversion = AnyConversion: Settings.TrimFields = TrimFields: Settings.QuoteChar = DQ: _
+              Settings.ConvertQuoted = ConvertQuoted: Settings.KeepQuotes = KeepQuotes: Settings.ShowNumbersAsNumbers = ShowNumbersAsNumbers: _
+              Settings.SepStandard = SepStandard: Settings.DecimalSeparator = DecimalSeparator: _
+              Settings.SysDecimalSeparator = SysDecimalSeparator: Settings.ShowDatesAsDates = ShowDatesAsDates: _
+              Settings.ISO8601 = ISO8601: Settings.AcceptWithoutTimeZone = AcceptWithoutTimeZone: _
+              Settings.AcceptWithTimeZone = AcceptWithTimeZone: Settings.DateOrder = DateOrder: _
+              Settings.DateSeparator = DateSeparator: Settings.SysDateSeparator = SysDateSeparator: _
+              Settings.AnySentinels = AnySentinels: Settings.MaxSentinelLength = MaxSentinelLength: _
+              Settings.ShowMissingsAs = ShowMissingsAs: Settings.AscSeparator = AscSeparator: _
+              Settings.TryNumberFirst = TryNumberFirst: Set Settings.Sentinels = Sentinels
+
 105       Adj = m_LBound - 1
 106       ReDim ReturnArray(1 + Adj To NumRowsInReturn + Adj, 1 + Adj To NumColsInReturn + Adj)
 107       MSLIA = MaxStringLengthInArray()
@@ -443,15 +493,13 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 127               If ColByColFormatting Then
 128                   ReturnArray(i + Adj, j + Adj) = Mid$(CSVContents, Starts(k), Lengths(k))
 129               Else
-130                   ReturnArray(i + Adj, j + Adj) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), AnyConversion, _
-                          Lengths(k), TrimFields, DQ, QuoteCounts(k), ConvertQuoted, KeepQuotes, ShowNumbersAsNumbers, SepStandard, _
-                          DecimalSeparator, SysDecimalSeparator, ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, _
-                          AcceptWithTimeZone, DateOrder, DateSeparator, SysDateSeparator, AnySentinels, _
-                          Sentinels, MaxSentinelLength, ShowMissingsAs, AscSeparator)
+130                   ReturnArray(i + Adj, j + Adj) = ConvertField(Mid$(CSVContents, Starts(k), Lengths(k)), _
+                          Lengths(k), QuoteCounts(k), Settings)
 131               End If
 132           End If
 133       Next k
-          
+          't2 = Timer 'Diagnostic timer (Experimental branch) - commented out
+
 134       NumRowsPopulated = NumRowsFound
 135       NumColsPopulated = NumColsFound - SkipToCol + 1
           
@@ -560,23 +608,31 @@ Public Function CSVRead(ByVal FileName As String, Optional ByVal ConvertTypes As
 217               Set Sentinels = New Scripting.Dictionary
                   
 218               MakeSentinels Sentinels, ConvertQuoted, strDelimiter, MaxSentinelLength, AnySentinels, ShowBooleansAsBooleans, _
-                      ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings
+                      ShowErrorsAsErrors, ShowMissingsAs, TrueStrings, FalseStrings, MissingStrings: TryNumberFirst = ShowNumbersAsNumbers _
+                      And (Not AnySentinels Or SentinelsAreNumericSafe(Sentinels, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator)): _
+                      Settings.AnyConversion = AnyConversion: Settings.TrimFields = TrimFields: Settings.QuoteChar = DQ: _
+                      Settings.ConvertQuoted = ConvertQuoted: Settings.KeepQuotes = KeepQuotes: Settings.ShowNumbersAsNumbers = ShowNumbersAsNumbers: _
+                      Settings.SepStandard = SepStandard: Settings.DecimalSeparator = DecimalSeparator: _
+                      Settings.SysDecimalSeparator = SysDecimalSeparator: Settings.ShowDatesAsDates = ShowDatesAsDates: _
+                      Settings.ISO8601 = ISO8601: Settings.AcceptWithoutTimeZone = AcceptWithoutTimeZone: _
+                      Settings.AcceptWithTimeZone = AcceptWithTimeZone: Settings.DateOrder = DateOrder: _
+                      Settings.DateSeparator = DateSeparator: Settings.SysDateSeparator = SysDateSeparator: _
+                      Settings.AnySentinels = AnySentinels: Settings.MaxSentinelLength = MaxSentinelLength: _
+                      Settings.ShowMissingsAs = ShowMissingsAs: Settings.AscSeparator = AscSeparator: _
+                      Settings.TryNumberFirst = TryNumberFirst: Set Settings.Sentinels = Sentinels
 
 219               For i = 1 To NR
 220                   If Not IsEmpty(ReturnArray(i + Adj, j + Adj)) Then
 221                       Field = CStr(ReturnArray(i + Adj, j + Adj))
 222                       QC = CountQuotes(Field, DQ)
-223                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, AnyConversion, _
-                              Len(ReturnArray(i + Adj, j + Adj)), TrimFields, DQ, QC, ConvertQuoted, KeepQuotes, _
-                              ShowNumbersAsNumbers, SepStandard, DecimalSeparator, SysDecimalSeparator, _
-                              ShowDatesAsDates, ISO8601, AcceptWithoutTimeZone, AcceptWithTimeZone, DateOrder, _
-                              DateSeparator, SysDateSeparator, AnySentinels, Sentinels, _
-                              MaxSentinelLength, ShowMissingsAs, AscSeparator)
+223                       ReturnArray(i + Adj, j + Adj) = ConvertField(Field, _
+                              Len(ReturnArray(i + Adj, j + Adj)), QC, Settings)
 224                   End If
 225               Next i
 226           Next j
 227       End If
 
+          'Debug.Print "CSVRead: Parse=" & Format$(t1 - T0, "0.000") & "s  Convert=" & Format$(t2 - t1, "0.000") & "s  Total=" & Format$(Timer - T0, "0.000") & "s" 'Diagnostic - commented out
 228       CSVRead = ReturnArray
 
 229       Exit Function
@@ -1410,16 +1466,21 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
           IgnoreRepeated As Boolean, SkipToRow As Long, HeaderRowNum As Long, NumRows As Long, _
           ByRef NumRowsFound As Long, ByRef NumColsFound As Long, ByRef NumFields As Long, ByRef Ragged As Boolean, _
           ByRef Starts() As Long, ByRef Lengths() As Long, ByRef RowIndexes() As Long, ByRef ColIndexes() As Long, _
-          ByRef QuoteCounts() As Long, ByRef HeaderRow As Variant) As String
+          ByRef QuoteCounts() As Long, ByRef HeaderRow As Variant, EstNumChars As Long) As String
 
           Const Err_Delimiter As String = "Delimiter must not be the null string"
           Dim Buffer As String
           Dim BufferUpdatedTo As Long
           Dim ColNum As Long
           Dim DoSkipping As Boolean
+          Dim EstColsPerRow As Long
+          Dim EstFieldCount As Long
+          Dim EstRows As Long
           Dim EvenQuotes As Boolean
+          Dim FirstLineEnd As Long
           Dim HaveReachedSkipToRow As Boolean
           Dim i As Long 'Index to read from Buffer
+          Dim InitialSize As Long
           Dim j As Long 'Index to write to Starts, Lengths, RowIndexes and ColIndexes
           Dim LComment As Long
           Dim LDlm As Long
@@ -1436,6 +1497,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
           Dim Stream As Object
           Dim Streaming As Boolean
           Dim Tmp As Long
+          Dim TotalCharsForEstimate As Long
           Dim Which As Long
 
 1         On Error GoTo ErrHandler
@@ -1454,12 +1516,12 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
 13                Streaming = True
 14            End If
 15        End If
-             
+
 16        LComment = Len(Comment)
 17        If LComment > 0 Or IgnoreEmptyLines Then
 18            DoSkipping = True
 19        End If
-             
+
 20        If Streaming Then
 21            ReDim SearchFor(1 To 4)
 22            SearchFor(1) = Delimiter
@@ -1470,223 +1532,258 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
 27            QuoteArray(1) = QuoteChar
 28        End If
 
-29        ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
-30        ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
+          ' Estimate how many fields we'll actually collect, to reduce the number of ReDim Preserve
+          ' reallocations in the loop below - only an estimate (a poor one just costs a few extra
+          ' doublings, not correctness): count delimiters in the first line for columns-per-row, and
+          ' use NumRows directly for rows when the caller only wants a bounded read (e.g. NumRows:=1
+          ' to read just a header line) - critical so a small, bounded read never over-allocates on a
+          ' huge file. When NumRows=0 (read to EOF), estimate rows from total-chars/first-line-length
+          ' instead. Either way, capped at TotalCharsForEstimate - can't plausibly need more field
+          ' slots than there are characters in the (known or estimated) file, which also protects
+          ' against the opposite mistake: a huge/unrealistic NumRows requested against a small file.
+29        FirstLineEnd = InStr(1, Buffer, vbLf)
+30        If FirstLineEnd = 0 Then FirstLineEnd = InStr(1, Buffer, vbCr)
+31        If FirstLineEnd = 0 Or FirstLineEnd > Len(Buffer) Then FirstLineEnd = Len(Buffer)
+32        If FirstLineEnd < 1 Then FirstLineEnd = 1
+33        EstColsPerRow = (FirstLineEnd - Len(Replace$(Left$(Buffer, FirstLineEnd), Delimiter, vbNullString))) \ Len(Delimiter) + 1
+34        If Streaming Then
+35            TotalCharsForEstimate = EstNumChars
+36        Else
+37            TotalCharsForEstimate = Len(Buffer)
+38        End If
+39        If TotalCharsForEstimate <= 0 Then TotalCharsForEstimate = 10000
+40        If NumRows > 0 Then
+41            EstRows = NumRows
+42        Else
+43            EstRows = TotalCharsForEstimate \ FirstLineEnd
+44        End If
+45        If EstRows < 1 Then EstRows = 1
+46        EstFieldCount = EstColsPerRow * EstRows
+47        If EstFieldCount > TotalCharsForEstimate Then EstFieldCount = TotalCharsForEstimate
+48        If EstFieldCount < 8 Then EstFieldCount = 8
+49        If SkipToRow = 1 Then
+50            InitialSize = EstFieldCount
+51        Else
+52            InitialSize = 8
+53        End If
+
+54        ReDim Starts(1 To InitialSize): ReDim Lengths(1 To InitialSize): ReDim RowIndexes(1 To InitialSize)
+55        ReDim ColIndexes(1 To InitialSize): ReDim QuoteCounts(1 To InitialSize)
           
-31        LDlm = Len(Delimiter)
-32        If LDlm = 0 Then Throw Err_Delimiter 'Avoid infinite loop!
-33        OrigLen = Len(Buffer)
-34        If Not Streaming Then
+56        LDlm = Len(Delimiter)
+57        If LDlm = 0 Then Throw Err_Delimiter 'Avoid infinite loop!
+58        OrigLen = Len(Buffer)
+59        If Not Streaming Then
               'Ensure Buffer terminates with vbCrLf
-35            If Right$(Buffer, 1) <> vbCr And Right$(Buffer, 1) <> vbLf Then
-36                Buffer = Buffer & vbCrLf
-37            ElseIf Right$(Buffer, 1) = vbCr Then
-38                Buffer = Buffer & vbLf
-39            End If
-40            BufferUpdatedTo = Len(Buffer)
-41        End If
+60            If Right$(Buffer, 1) <> vbCr And Right$(Buffer, 1) <> vbLf Then
+61                Buffer = Buffer & vbCrLf
+62            ElseIf Right$(Buffer, 1) = vbCr Then
+63                Buffer = Buffer & vbLf
+64            End If
+65            BufferUpdatedTo = Len(Buffer)
+66        End If
           
-42        i = 0: j = 1
+67        i = 0: j = 1
           
-43        If DoSkipping Then
-44            SkipLines Streaming, Comment, LComment, IgnoreEmptyLines, _
+68        If DoSkipping Then
+69            SkipLines Streaming, Comment, LComment, IgnoreEmptyLines, _
                   Stream, Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
-45        End If
+70        End If
           
-46        If IgnoreRepeated Then
+71        If IgnoreRepeated Then
               'IgnoreRepeated: Handle repeated delimiters at the start of the first line
-47            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-48                i = i + LDlm
-49            Loop
-50        End If
+72            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+73                i = i + LDlm
+74            Loop
+75        End If
           
-51        ColNum = 1: RowNum = 1
-52        EvenQuotes = True
-53        Starts(1) = i + 1
-54        If SkipToRow = 1 Then HaveReachedSkipToRow = True
+76        ColNum = 1: RowNum = 1
+77        EvenQuotes = True
+78        Starts(1) = i + 1
+79        If SkipToRow = 1 Then HaveReachedSkipToRow = True
 
-55        Do
-56            If EvenQuotes Then
-57                If Not Streaming Then
-58                    If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
-59                    If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
-60                    If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
-61                    If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
-62                    i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
-63                Else
-64                    i = SearchInBuffer(SearchFor, i + 1, Stream, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
-65                End If
+80        Do
+81            If EvenQuotes Then
+82                If Not Streaming Then
+83                    If PosDL <= i Then PosDL = InStr(i + 1, Buffer, Delimiter): If PosDL = 0 Then PosDL = BufferUpdatedTo + 1
+84                    If PosLF <= i Then PosLF = InStr(i + 1, Buffer, vbLf): If PosLF = 0 Then PosLF = BufferUpdatedTo + 1
+85                    If PosCR <= i Then PosCR = InStr(i + 1, Buffer, vbCr): If PosCR = 0 Then PosCR = BufferUpdatedTo + 1
+86                    If PosQC <= i Then PosQC = InStr(i + 1, Buffer, QuoteChar): If PosQC = 0 Then PosQC = BufferUpdatedTo + 1
+87                    i = Min4(PosDL, PosLF, PosCR, PosQC, Which)
+88                Else
+89                    i = SearchInBuffer(SearchFor, i + 1, Stream, Delimiter, QuoteChar, Which, Buffer, BufferUpdatedTo)
+90                End If
 
-66                If i >= BufferUpdatedTo + 1 Then
-67                    Exit Do
-68                End If
+91                If i >= BufferUpdatedTo + 1 Then
+92                    Exit Do
+93                End If
 
-69                If j + 1 > UBound(Starts) Then
-70                    ReDim Preserve Starts(1 To UBound(Starts) * 2)
-71                    ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
-72                    ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
-73                    ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
-74                    ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
-75                End If
+94                If j + 1 > UBound(Starts) Then
+95                    ReDim Preserve Starts(1 To UBound(Starts) * 2)
+96                    ReDim Preserve Lengths(1 To UBound(Lengths) * 2)
+97                    ReDim Preserve RowIndexes(1 To UBound(RowIndexes) * 2)
+98                    ReDim Preserve ColIndexes(1 To UBound(ColIndexes) * 2)
+99                    ReDim Preserve QuoteCounts(1 To UBound(QuoteCounts) * 2)
+100                End If
 
-76                Select Case Which
+101                Select Case Which
                       Case 1
                           'Found Delimiter
-77                        Lengths(j) = i - Starts(j)
-78                        If IgnoreRepeated Then
-79                            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-80                                i = i + LDlm
-81                            Loop
-82                        End If
+102                        Lengths(j) = i - Starts(j)
+103                        If IgnoreRepeated Then
+104                            Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+105                                i = i + LDlm
+106                            Loop
+107                        End If
                           
-83                        Starts(j + 1) = i + LDlm
-84                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-85                        ColNum = ColNum + 1
-86                        QuoteCounts(j) = quoteCount: quoteCount = 0
-87                        j = j + 1
-88                        NumFields = NumFields + 1
-89                        i = i + LDlm - 1
-90                    Case 2, 3
+108                        Starts(j + 1) = i + LDlm
+109                        ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+110                        ColNum = ColNum + 1
+111                        QuoteCounts(j) = quoteCount: quoteCount = 0
+112                        j = j + 1
+113                        NumFields = NumFields + 1
+114                        i = i + LDlm - 1
+115                    Case 2, 3
                           'Found line ending
-91                        Lengths(j) = i - Starts(j)
-92                        If Which = 3 Then 'Found a vbCr
-93                            If Mid$(Buffer, i + 1, 1) = vbLf Then
+116                        Lengths(j) = i - Starts(j)
+117                        If Which = 3 Then 'Found a vbCr
+118                            If Mid$(Buffer, i + 1, 1) = vbLf Then
                                   'Ending is Windows rather than Mac or Unix.
-94                                i = i + 1
-95                            End If
-96                        End If
+119                                i = i + 1
+120                            End If
+121                        End If
                           
-97                        If DoSkipping Then
-98                            SkipLines Streaming, Comment, LComment, IgnoreEmptyLines, Stream, _
+122                        If DoSkipping Then
+123                            SkipLines Streaming, Comment, LComment, IgnoreEmptyLines, Stream, _
                                   Delimiter, Buffer, i, QuoteChar, PosLF, PosCR, BufferUpdatedTo
-99                        End If
+124                        End If
                           
-100                       If IgnoreRepeated Then
+125                       If IgnoreRepeated Then
                               'IgnoreRepeated: Handle repeated delimiters at the end of the line, _
                                all but one will have already been handled.
-101                           If Lengths(j) = 0 Then
-102                               If ColNum > 1 Then
-103                                   j = j - 1
-104                                   ColNum = ColNum - 1
-105                                   NumFields = NumFields - 1
-106                               End If
-107                           End If
+126                           If Lengths(j) = 0 Then
+127                               If ColNum > 1 Then
+128                                   j = j - 1
+129                                   ColNum = ColNum - 1
+130                                   NumFields = NumFields - 1
+131                               End If
+132                           End If
                               'IgnoreRepeated: handle delimiters at the start of the next line to be parsed
-108                           Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
-109                               i = i + LDlm
-110                           Loop
-111                       End If
-112                       Starts(j + 1) = i + 1
+133                           Do While Mid$(Buffer, i + LDlm, LDlm) = Delimiter
+134                               i = i + LDlm
+135                           Loop
+136                       End If
+137                       Starts(j + 1) = i + 1
 
-113                       If ColNum > NumColsFound Then
-114                           If NumColsFound > 0 Then
-115                               Ragged = True
-116                           End If
-117                           NumColsFound = ColNum
-118                       ElseIf ColNum < NumColsFound Then
-119                           Ragged = True
-120                       End If
+138                       If ColNum > NumColsFound Then
+139                           If NumColsFound > 0 Then
+140                               Ragged = True
+141                           End If
+142                           NumColsFound = ColNum
+143                       ElseIf ColNum < NumColsFound Then
+144                           Ragged = True
+145                       End If
                           
-121                       ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
-122                       QuoteCounts(j) = quoteCount: quoteCount = 0
+146                       ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+147                       QuoteCounts(j) = quoteCount: quoteCount = 0
                           
-123                       If HaveReachedSkipToRow Then
-124                           If RowNum + SkipToRow - 1 = HeaderRowNum Then
-125                               HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
+148                       If HaveReachedSkipToRow Then
+149                           If RowNum + SkipToRow - 1 = HeaderRowNum Then
+150                               HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
                                       ColIndexes, QuoteCounts, j, False) 'TODO need to consider whether passing KeepQuotes as false is correct behaviour in this case
-126                           End If
-127                       Else
-128                           If RowNum = HeaderRowNum Then
-129                               HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
+151                           End If
+152                       Else
+153                           If RowNum = HeaderRowNum Then
+154                               HeaderRow = GetLastParsedRow(Buffer, Starts, Lengths, _
                                       ColIndexes, QuoteCounts, j, False) 'TODO need to consider whether passing KeepQuotes as false is correct behaviour in this case
-130                           End If
-131                       End If
+155                           End If
+156                       End If
                           
-132                       ColNum = 1: RowNum = RowNum + 1
+157                       ColNum = 1: RowNum = RowNum + 1
                           
-133                       j = j + 1
-134                       NumFields = NumFields + 1
+158                       j = j + 1
+159                       NumFields = NumFields + 1
                           
-135                       If HaveReachedSkipToRow Then
-136                           If RowNum = NumRows + 1 Then
-137                               Exit Do
-138                           End If
-139                       Else
-140                           If RowNum = SkipToRow Then
-141                               HaveReachedSkipToRow = True
-142                               Tmp = Starts(j)
-143                               ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
-144                               ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
-145                               RowNum = 1: j = 1: NumFields = 0
-146                               Starts(1) = Tmp
-147                           End If
-148                       End If
-149                   Case 4
+160                       If HaveReachedSkipToRow Then
+161                           If RowNum = NumRows + 1 Then
+162                               Exit Do
+163                           End If
+164                       Else
+165                           If RowNum = SkipToRow Then
+166                               HaveReachedSkipToRow = True
+167                               Tmp = Starts(j)
+168                               ReDim Starts(1 To 8): ReDim Lengths(1 To 8): ReDim RowIndexes(1 To 8)
+169                               ReDim ColIndexes(1 To 8): ReDim QuoteCounts(1 To 8)
+170                               RowNum = 1: j = 1: NumFields = 0
+171                               Starts(1) = Tmp
+172                           End If
+173                       End If
+174                   Case 4
                           'Found QuoteChar
-150                       EvenQuotes = False
-151                       quoteCount = quoteCount + 1
-152               End Select
-153           Else
-154               If Not Streaming Then
-155                   PosQC = InStr(i + 1, Buffer, QuoteChar)
-156               Else
-157                   If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray, i + 1, Stream, _
+175                       EvenQuotes = False
+176                       quoteCount = quoteCount + 1
+177               End Select
+178           Else
+179               If Not Streaming Then
+180                   PosQC = InStr(i + 1, Buffer, QuoteChar)
+181               Else
+182                   If PosQC <= i Then PosQC = SearchInBuffer(QuoteArray, i + 1, Stream, _
                           Delimiter, QuoteChar, 0, Buffer, BufferUpdatedTo)
-158               End If
+183               End If
                   
-159               If PosQC = 0 Then
+184               If PosQC = 0 Then
                       'Malformed Buffer (not RFC4180 compliant). There should always be an even number of double quotes.
                       'If there are an odd number then all text after the last double quote in the file will be (part of)
                       'the last field in the last line.
-160                   Lengths(j) = OrigLen - Starts(j) + 1
-161                   ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
+185                   Lengths(j) = OrigLen - Starts(j) + 1
+186                   ColIndexes(j) = ColNum: RowIndexes(j) = RowNum
                       
-162                   RowNum = RowNum + 1
-163                   If ColNum > NumColsFound Then NumColsFound = ColNum
-164                   NumFields = NumFields + 1
-165                   Exit Do
-166               Else
-167                   i = PosQC
-168                   EvenQuotes = True
-169                   quoteCount = quoteCount + 1
-170               End If
-171           End If
-172       Loop
+187                   RowNum = RowNum + 1
+188                   If ColNum > NumColsFound Then NumColsFound = ColNum
+189                   NumFields = NumFields + 1
+190                   Exit Do
+191               Else
+192                   i = PosQC
+193                   EvenQuotes = True
+194                   quoteCount = quoteCount + 1
+195               End If
+196           End If
+197       Loop
 
-173       NumRowsFound = RowNum - 1
+198       NumRowsFound = RowNum - 1
           
-174       If HaveReachedSkipToRow Then
-175           NumRowsInFile = SkipToRow - 1 + RowNum - 1
-176       Else
-177           NumRowsInFile = RowNum - 1
-178       End If
+199       If HaveReachedSkipToRow Then
+200           NumRowsInFile = SkipToRow - 1 + RowNum - 1
+201       Else
+202           NumRowsInFile = RowNum - 1
+203       End If
           
-179       If SkipToRow > NumRowsInFile Then
-180           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or
+204       If SkipToRow > NumRowsInFile Then
+205           If NumRows = 0 Then 'Attempting to read from SkipToRow to the end of the file, but that would be zero or
                   'a negative number of rows. So throw an error.
                   Dim RowDescription As String
-181               If IgnoreEmptyLines And Len(Comment) > 0 Then
-182                   RowDescription = "not commented, not empty "
-183               ElseIf IgnoreEmptyLines Then
-184                   RowDescription = "not empty "
-185               ElseIf Len(Comment) > 0 Then
-186                   RowDescription = "not commented "
-187               End If
+206               If IgnoreEmptyLines And Len(Comment) > 0 Then
+207                   RowDescription = "not commented, not empty "
+208               ElseIf IgnoreEmptyLines Then
+209                   RowDescription = "not empty "
+210               ElseIf Len(Comment) > 0 Then
+211                   RowDescription = "not commented "
+212               End If
                                    
-188               Throw "SkipToRow (" & CStr(SkipToRow) & ") exceeds the number of " & RowDescription & _
+213               Throw "SkipToRow (" & CStr(SkipToRow) & ") exceeds the number of " & RowDescription & _
                       "rows in the file (" & CStr(NumRowsInFile) & ")"
-189           Else
+214           Else
                   'Attempting to read a set number of rows, function CSVRead will return an array of Empty values.
-190               NumFields = 0
-191               NumRowsFound = 0
-192           End If
-193       End If
+215               NumFields = 0
+216               NumRowsFound = 0
+217           End If
+218       End If
 
-194       ParseCSVContents = Buffer
+219       ParseCSVContents = Buffer
 
-195       Exit Function
+220       Exit Function
 ErrHandler:
-196       ReThrow "ParseCSVContents", Err
+221       ReThrow "ParseCSVContents", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2012,20 +2109,13 @@ End Function
 '                         MissingStrings argument then values matching those strings are also converted to
 '                         ShowMissingsAs, thanks to method MakeSentinels.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLength As Long, _
-          TrimFields As Boolean, QuoteChar As String, quoteCount As Long, ConvertQuoted As Boolean, KeepQuotes As Boolean, _
-          ShowNumbersAsNumbers As Boolean, SepStandard As Boolean, DecimalSeparator As String, _
-          SysDecimalSeparator As String, ShowDatesAsDates As Boolean, ISO8601 As Boolean, _
-          AcceptWithoutTimeZone As Boolean, AcceptWithTimeZone As Boolean, DateOrder As Long, _
-          DateSeparator As String, SysDateSeparator As String, _
-          AnySentinels As Boolean, Sentinels As Scripting.Dictionary, MaxSentinelLength As Long, _
-          ShowMissingsAs As Variant, AscSeparator As Long) As Variant
+Private Function ConvertField(Field As String, FieldLength As Long, quoteCount As Long, ByRef Settings As TConvertSettings) As Variant
 
           Dim Converted As Boolean
           Dim dblResult As Double
           Dim dtResult As Date
 
-1         If TrimFields Then
+1         If Settings.TrimFields Then
 2             If Left$(Field, 1) = " " Then
 3                 Field = Trim$(Field)
 4                 FieldLength = Len(Field)
@@ -2036,83 +2126,124 @@ Private Function ConvertField(Field As String, AnyConversion As Boolean, FieldLe
 9         End If
 
 10        If FieldLength = 0 Then
-11            ConvertField = ShowMissingsAs
+11            ConvertField = Settings.ShowMissingsAs
 12            Exit Function
 13        End If
 
-14        If Not AnyConversion Then
+          'Fast path for the common case (unquoted field, numeric conversion wanted, and - per
+          'Settings.TryNumberFirst, computed once per call to CSVRead rather than per field - no
+          'configured sentinel string could itself be mistaken for a number, so skipping straight to
+          'CastToDouble here can never change the result vs. the original ordering below, just reach
+          'it without first paying for a Sentinels.Exists lookup on every short numeric field.
+14        If Settings.TryNumberFirst Then
 15            If quoteCount = 0 Then
-16                ConvertField = Field
-17                Exit Function
-18            End If
-19        End If
+16                CastToDouble Field, dblResult, Settings.SepStandard, Settings.DecimalSeparator, Settings.AscSeparator, Settings.SysDecimalSeparator, Converted
+17                If Converted Then
+18                    ConvertField = dblResult
+19                    Exit Function
+20                End If
+21            End If
+22        End If
 
-20        If AnySentinels Then
-21            If FieldLength <= MaxSentinelLength Then
-22                If Sentinels.Exists(Field) Then
-23                    ConvertField = Sentinels.item(Field)
-24                    Exit Function
-25                End If
-26            End If
-27        End If
+23        If Not Settings.AnyConversion Then
+24            If quoteCount = 0 Then
+25                ConvertField = Field
+26                Exit Function
+27            End If
+28        End If
 
-28        If quoteCount > 0 Then
-29            If KeepQuotes Then
-30                ConvertField = Field
-31                Exit Function
-32            End If
-33            If Left$(Field, 1) = QuoteChar Then
-34                If Right$(Field, 1) = QuoteChar Then
-35                    Field = Mid$(Field, 2, FieldLength - 2)
-36                    If quoteCount > 2 Then
-37                        Field = Replace$(Field, QuoteChar & QuoteChar, QuoteChar)
-38                    End If
-39                    If ConvertQuoted Then
-40                        FieldLength = Len(Field)
-41                    Else
-42                        ConvertField = Field
-43                        Exit Function
-44                    End If
-45                End If
-46            End If
-47        End If
+29        If Settings.AnySentinels Then
+30            If FieldLength <= Settings.MaxSentinelLength Then
+31                If Settings.Sentinels.Exists(Field) Then
+32                    ConvertField = Settings.Sentinels.item(Field)
+33                    Exit Function
+34                End If
+35            End If
+36        End If
 
-48        If Not ConvertQuoted Then
-49            If quoteCount > 0 Then
-50                ConvertField = Field
-51                Exit Function
-52            End If
-53        End If
+37        If quoteCount > 0 Then
+38            If Settings.KeepQuotes Then
+39                ConvertField = Field
+40                Exit Function
+41            End If
+42            If Left$(Field, 1) = Settings.QuoteChar Then
+43                If Right$(Field, 1) = Settings.QuoteChar Then
+44                    Field = Mid$(Field, 2, FieldLength - 2)
+45                    If quoteCount > 2 Then
+46                        Field = Replace$(Field, Settings.QuoteChar & Settings.QuoteChar, Settings.QuoteChar)
+47                    End If
+48                    If Settings.ConvertQuoted Then
+49                        FieldLength = Len(Field)
+50                    Else
+51                        ConvertField = Field
+52                        Exit Function
+53                    End If
+54                End If
+55            End If
+56        End If
 
-54        If ShowNumbersAsNumbers Then
-55            CastToDouble Field, dblResult, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
-56            If Converted Then
-57                ConvertField = dblResult
-58                Exit Function
-59            End If
-60        End If
+57        If Not Settings.ConvertQuoted Then
+58            If quoteCount > 0 Then
+59                ConvertField = Field
+60                Exit Function
+61            End If
+62        End If
 
-61        If ShowDatesAsDates Then
-62            If ISO8601 Then
-63                CastISO8601 Field, dtResult, Converted, AcceptWithoutTimeZone, AcceptWithTimeZone
-64            Else
-65                CastToDate Field, dtResult, DateOrder, DateSeparator, SysDateSeparator, Converted
-66            End If
-67            If Not Converted Then
-68                If InStr(Field, ":") > 0 Then
-69                    CastToTime Field, dtResult, Converted
-70                    If Not Converted Then
-71                        CastToTimeB Field, dtResult, Converted
-72                    End If
-73                End If
-74            End If
-75            If Converted Then
-76                ConvertField = dtResult
-77                Exit Function
-78            End If
-79        End If
+63        If Settings.ShowNumbersAsNumbers Then
+64            CastToDouble Field, dblResult, Settings.SepStandard, Settings.DecimalSeparator, Settings.AscSeparator, Settings.SysDecimalSeparator, Converted
+65            If Converted Then
+66                ConvertField = dblResult
+67                Exit Function
+68            End If
+69        End If
 
-80        ConvertField = Field
+70        If Settings.ShowDatesAsDates Then
+71            If Settings.ISO8601 Then
+72                CastISO8601 Field, dtResult, Converted, Settings.AcceptWithoutTimeZone, Settings.AcceptWithTimeZone
+73            Else
+74                CastToDate Field, dtResult, Settings.DateOrder, Settings.DateSeparator, Settings.SysDateSeparator, Converted
+75            End If
+76            If Not Converted Then
+77                If InStr(Field, ":") > 0 Then
+78                    CastToTime Field, dtResult, Converted
+79                    If Not Converted Then
+80                        CastToTimeB Field, dtResult, Converted
+81                    End If
+82                End If
+83            End If
+84            If Converted Then
+85                ConvertField = dtResult
+86                Exit Function
+87            End If
+88        End If
+
+89        ConvertField = Field
+End Function
+
+' -----------------------------------------------------------------------------------------------------------------------
+' Procedure  : SentinelsAreNumericSafe
+' Purpose    : Sub-routine of ConvertField's TryNumberFirst fast path (Experimental branch, see also
+'              CSVRead). Returns True only if none of the keys currently in Sentinels would themselves
+'              parse as a number - i.e. it's safe for ConvertField to try CastToDouble before checking
+'              Sentinels, since doing so can never produce a different result than the original check
+'              order (Sentinels before numbers) would have. Computed once per call to CSVRead, not once
+'              per field, so a full scan of (normally a handful of) Sentinels keys here is cheap.
+' -----------------------------------------------------------------------------------------------------------------------
+Private Function SentinelsAreNumericSafe(Sentinels As Scripting.Dictionary, SepStandard As Boolean, _
+          DecimalSeparator As String, AscSeparator As Long, SysDecimalSeparator As String) As Boolean
+
+          Dim Converted As Boolean
+          Dim dblResult As Double
+          Dim Key As Variant
+
+1         SentinelsAreNumericSafe = True
+2         For Each Key In Sentinels.Keys
+3             CastToDouble CStr(Key), dblResult, SepStandard, DecimalSeparator, AscSeparator, SysDecimalSeparator, Converted
+4             If Converted Then
+5                 SentinelsAreNumericSafe = False
+6                 Exit Function
+7             End If
+8         Next Key
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -2175,7 +2306,7 @@ End Sub
 ' Purpose    : Amend in-place a two-digit "year part" of a date, paying attention to module-level constants
 '              m_2DigitYearIsFrom and m_2DigitYearIsTo
 ' -----------------------------------------------------------------------------------------------------------------------
-Sub TwoToFourDigitYear(ByRef y As String)
+Private Sub TwoToFourDigitYear(ByRef y As String)
           Dim y_lng As Long
 
           Static rx As VBScript_RegExp_55.RegExp
@@ -2726,8 +2857,8 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
           'Add "quoted versions" of the existing sentinels
 49        If ConvertQuoted Then
               Dim i As Long
-              Dim items
-              Dim Keys
+              Dim items As Variant
+              Dim Keys As Variant
               Dim NewKey As String
 50            Keys = Sentinels.Keys
 51            items = Sentinels.items
@@ -4434,4 +4565,5 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
 18        Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
+
 
