@@ -2849,7 +2849,7 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
 42            AddKeyToDict Sentinels, "#BLOCKED!", CVErr(2047)
 43            AddKeyToDict Sentinels, "#CONNECT!", CVErr(2046)
 44            AddKeyToDict Sentinels, "#UNKNOWN!", CVErr(2048)
-45            AddKeyToDict Sentinels, "#GETTING_DATA!", CVErr(2043)
+45            AddKeyToDict Sentinels, "#GETTING_DATA", CVErr(2043)
 46            AddKeyToDict Sentinels, "#FIELD!", CVErr(2049)
 47            AddKeyToDict Sentinels, "#CALC!", CVErr(2050)
 48        End If
@@ -3619,7 +3619,7 @@ Private Function MakeEncoder(TrueString As String, FalseString As String) As Scr
 9         d.Add CVErr(2029), "#NAME?"
 10        d.Add CVErr(2036), "#NUM!"
 11        d.Add CVErr(2042), "#N/A"
-12        d.Add CVErr(2043), "#GETTING_DATA!"
+12        d.Add CVErr(2043), "#GETTING_DATA"
 13        d.Add CVErr(2045), "#SPILL!"
 14        d.Add CVErr(2046), "#CONNECT!"
 15        d.Add CVErr(2047), "#BLOCKED!"
@@ -4064,20 +4064,22 @@ End Function
 ' https://stackoverflow.com/questions/1600875/how-to-get-the-current-datetime-in-utc-from-an-excel-vba-macro
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function GetLocalOffsetToUTC() As Double
-          Dim dt As Object
+          Static dt As Object
           Dim TimeNow As Date
           Dim UTC As Date
 1         On Error GoTo ErrHandler
-2         TimeNow = Now()
 
-3         Set dt = CreateObject("WbemScripting.SWbemDateTime")
-4         dt.SetVarDate TimeNow
-5         UTC = dt.GetVarDate(False)
-6         GetLocalOffsetToUTC = (TimeNow - UTC)
+2         If dt Is Nothing Then
+3             Set dt = CreateObject("WbemScripting.SWbemDateTime")
+4         End If
+5         TimeNow = Now()
+6         dt.SetVarDate TimeNow
+7         UTC = dt.GetVarDate(False)
+8         GetLocalOffsetToUTC = Round((TimeNow - UTC) * 96) / 96 'ensure result is exactly a multiple of 15 minutes
 
-7         Exit Function
+9         Exit Function
 ErrHandler:
-8         ReThrow "GetLocalOffsetToUTC", Err
+10        ReThrow "GetLocalOffsetToUTC", Err
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
