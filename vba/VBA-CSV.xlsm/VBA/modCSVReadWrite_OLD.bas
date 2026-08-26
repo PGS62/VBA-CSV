@@ -1,5 +1,10 @@
-﻿Attribute VB_Name = "modCSVReadWrite2"
+Attribute VB_Name = "modCSVReadWrite_OLD"
 ' VBA-CSV
+
+' NOTE: this module is a frozen copy of modCSVReadWrite.bas as it stood at release v0.32,
+' kept for comparison against the current implementation. It is not the live/canonical module -
+' see modCSVReadWrite.bas for that. Functions are suffixed _OLD and helper visibility reduced to
+' Private to avoid "Ambiguous name detected" collisions with modCSVReadWrite.bas in this project.
 
 ' Copyright (C) 2025 - Philip Swannell
 ' License MIT (https://opensource.org/licenses/MIT)
@@ -14,7 +19,7 @@
 '   Microsoft VBScript Regular Expressions 5.5 (or a later version if available)
 '   Microsoft Active X Data Objects 6.1 Library (or later version if available)
 
-'3) If you would prefer the arrays returned by CSVRead2 to be zero-based rather than one-based
+'3) If you would prefer the arrays returned by CSVRead_OLD to be zero-based rather than one-based
 '   then change constant m_LBound to 0.
 
 '4) If the host application is Excel and you plan to call the functions from worksheet formulas
@@ -27,13 +32,13 @@
 '            RegisterCSVWrite
 '        End Sub
 
-'5) An alternative (or additional) approach to providing help on CSVRead2 and CSVWrite2 is:
+'5) An alternative (or additional) approach to providing help on CSVRead_OLD and CSVWrite_OLD is:
 '   a) Install Excel-DNA Intellisense. See https://github.com/Excel-DNA/IntelliSense#getting-started
 '   b) Copy the worksheet _Intellisense_ from
 '      https://github.com/PGS62/VBA-CSV/releases/download/v0.32/VBA-CSV-Intellisense.xlsx
 '      into the workbook that contains this VBA code.
 
-'6) If you envisage calling CSVRead2 and CSVWrite2 only from VBA code and not from worksheet formulas
+'6) If you envisage calling CSVRead_OLD and CSVWrite_OLD only from VBA code and not from worksheet formulas
 '   then consider changing constant m_ErrorStyle to be es_RaiseError.
 '   https://github.com/PGS62/VBA-CSV#errors
 
@@ -74,7 +79,7 @@ Private Enum enmSourceType
 End Enum
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure : CSVRead2
+' Procedure : CSVRead_OLD
 ' Purpose   : Returns the contents of a comma-separated file on disk as an array.
 ' Arguments
 ' FileName  : The full name of the file, including the path, or else a URL of a file, or else a string in
@@ -112,7 +117,7 @@ End Enum
 '             For convenience when calling from VBA, you can pass an array of two element arrays such as
 '             `Array(Array(0,"N"),Array(3,""),Array("Phone",""))` to convert all numbers in a file into
 '             numbers in the return except for those in column 3 and in the column(s) headed "Phone".
-' Delimiter : By default, CSVRead2 will try to detect a file's delimiter as the first instance of comma, tab,
+' Delimiter : By default, CSVRead_OLD will try to detect a file's delimiter as the first instance of comma, tab,
 '             semi-colon, colon or pipe found in the first 10,000 characters of the file, searching only
 '             outside of quoted regions and outside of date-with-time fields (since these contain colons).
 '             If it can't auto-detect the delimiter, it will assume comma. If your file includes a
@@ -162,20 +167,20 @@ End Enum
 '             the value of ShowMissingsAs. Likewise, if NumCols is greater than the number of columns in
 '             the file.
 ' Encoding  : Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be
-'             omitted and CSVRead2 will detect the file's encoding. If auto-detection does not work, then
+'             omitted and CSVRead_OLD will detect the file's encoding. If auto-detection does not work, then
 '             it's possible that the file is encoded `UTF-8` or `UTF-16` but without a byte order mark to
 '             identify the encoding. Experiment with Encoding as each of `UTF-8` and `UTF-16`.
 '
 '             `ANSI` is taken to mean `Windows-1252` encoding.
 ' DecimalSeparator: In many places in the world, floating point number decimals are separated with a comma
-'             instead of a period (3,14 vs. 3.14). CSVRead2 can correctly parse these numbers by passing in
+'             instead of a period (3,14 vs. 3.14). CSVRead_OLD can correctly parse these numbers by passing in
 '             the DecimalSeparator as a comma, in which case comma ceases to be a candidate if the parser
 '             needs to guess the Delimiter.
 ' HeaderRow : This by-reference argument is for use from VBA (as opposed to from Excel formulas). It is
 '             populated with the contents of the header row, with no type conversion, though leading and
 '             trailing spaces are removed.
 '
-' Notes     : See also companion function CSVWrite2.
+' Notes     : See also companion function CSVWrite_OLD.
 '
 '             The function handles all csv files that conform to the standards described in RFC4180
 '             https://www.rfc-editor.org/rfc/rfc4180.txt including files with quoted fields.
@@ -190,7 +195,7 @@ End Enum
 '             supports files with Windows, Unix and (old) Mac line endings. Files may also have mixed line
 '             endings.
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function CSVRead2(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
+Public Function CSVRead_OLD(ByVal FileName As String, Optional ByVal ConvertTypes As Variant = False, _
           Optional ByVal Delimiter As Variant, Optional ByVal IgnoreRepeated As Boolean, _
           Optional ByVal DateFormat As String = "Y-M-D", Optional ByVal Comment As String, _
           Optional ByVal IgnoreEmptyLines As Boolean, Optional ByVal HeaderRowNum As Long, _
@@ -355,14 +360,14 @@ Public Function CSVRead2(ByVal FileName As String, Optional ByVal ConvertTypes A
           
 61        If CallingFromWorksheet Then
 62            If FunctionWizardActive() Then
-63                CSVRead2 = "#" & Err_FunctionWizard & "!"
+63                CSVRead_OLD = "#" & Err_FunctionWizard & "!"
 64                Exit Function
 65            End If
 66        End If
           
 67        If NotDelimited Then
 68            HeaderRow = Empty
-69            CSVRead2 = ParseTextFile(FileName, SourceType <> st_String, CharSet, SkipToRow, NumRows, CallingFromWorksheet)
+69            CSVRead_OLD = ParseTextFile(FileName, SourceType <> st_String, CharSet, SkipToRow, NumRows, CallingFromWorksheet)
 70            Exit Function
 71        End If
                 
@@ -577,12 +582,12 @@ Public Function CSVRead2(ByVal FileName As String, Optional ByVal ConvertTypes A
 226           Next j
 227       End If
 
-228       CSVRead2 = ReturnArray
+228       CSVRead_OLD = ReturnArray
 
 229       Exit Function
 
 ErrHandler:
-230       CSVRead2 = ReThrow("CSVRead2", Err, m_ErrorStyle = es_ReturnString)
+230       CSVRead_OLD = ReThrow("CSVRead_OLD", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -685,7 +690,7 @@ End Function
 ' Purpose    : Set by-ref arguments
 ' Parameters :
 '  FileName:
-'  Encoding: Optional argument passed in to CSVRead2. If not passed, we delegate to DetectEncoding.
+'  Encoding: Optional argument passed in to CSVRead_OLD. If not passed, we delegate to DetectEncoding.
 '            NB the encoding argument (which may be user input) is "standardised" by this method to one of
 '            "ASCII", "ANSI", "UTF-8", "UTF-16"
 '  CharSet : Set by reference.
@@ -808,7 +813,7 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : ParseConvertTypes
-' Purpose    : There is flexibility in how the ConvertTypes argument is provided to CSVRead2:
+' Purpose    : There is flexibility in how the ConvertTypes argument is provided to CSVRead_OLD:
 '              a) As a string or Boolean for the same type conversion rules for every field in the file; or
 '              b) An array to define different type conversion rules by column, in which case ConvertTypes can be passed
 '                 as a two-column or two-row array (convenient from Excel) or as an array of two-element arrays
@@ -826,7 +831,7 @@ End Function
 '  KeepQuotes            : Set only if ConvertTypes is not an array
 '  TrimFields            : Set only if ConvertTypes is not an array
 '  ColByColFormatting    : Set to True if ConvertTypes is an array
-'  HeaderRowNum          : As passed to CSVRead2, used to throw an error if HeaderRowNum has not been specified when
+'  HeaderRowNum          : As passed to CSVRead_OLD, used to throw an error if HeaderRowNum has not been specified when
 '                          it needs to have been.
 '  CTDict                : Set to a dictionary keyed on the elements of the left column (or top row) of ConvertTypes,
 '                          each element containing the corresponding right (or bottom) element.
@@ -953,7 +958,7 @@ End Sub
 ' Procedure  : ParseCTString
 ' Purpose    : Parse the input ConvertTypes to set seven Boolean flags which are passed by reference.
 ' Parameters :
-'  ConvertTypes          : The argument to CSVRead2
+'  ConvertTypes          : The argument to CSVRead_OLD
 '  ShowNumbersAsNumbers  : Should fields in the file that look like numbers be returned as Numbers? (Doubles)
 '  ShowDatesAsDates      : Should fields in the file that look like dates with the specified DateFormat be returned as
 '                          Dates?
@@ -1384,7 +1389,7 @@ End Sub
 '  IgnoreEmptyLines: If True, lines in the file with no characters will be ignored, handled by method SkipLines.
 '  IgnoreRepeated  : If True then parsing ignores delimiters at the start of lines, consecutive delimiters and delimiters
 '                    at the end of lines.
-'  SkipToRow       : The first line of the file to appear in the return from CSVRead2. However, we need to parse earlier
+'  SkipToRow       : The first line of the file to appear in the return from CSVRead_OLD. However, we need to parse earlier
 '                    lines to identify where SkipToRow starts in the file - see variable HaveReachedSkipToRow.
 '  HeaderRowNum    : The row number of the headers in the file, must be less than or equal to SkipToRow.
 '  NumRows         : The number of rows to parse. 0 for all rows from SkipToRow to the end of the file.
@@ -1397,9 +1402,9 @@ End Sub
 '                    kth field starts.
 '  Lengths         : Set to an array of size at least NumFields. Element k gives the length of the kth field.
 '  RowIndexes      : Set to an array of size at least NumFields. Element k gives the row at which the kth field should
-'                    appear in the return from CSVRead2.
+'                    appear in the return from CSVRead_OLD.
 '  ColIndexes      : Set to an array of size at least NumFields. Element k gives the column at which the kth field would
-'                    appear in the return from CSVRead2 under the assumption that argument SkipToCol is 1.
+'                    appear in the return from CSVRead_OLD under the assumption that argument SkipToCol is 1.
 '  QuoteCounts     : Set to an array of size at least NumFields. Element k gives the number of QuoteChars that appear in
 '                    the kth field.
 '  HeaderRow       : Set equal to the contents of the header row in the file, no type conversion, but quoted fields are
@@ -1676,7 +1681,7 @@ Private Function ParseCSVContents(ContentsOrStream As Variant, QuoteChar As Stri
 188               Throw "SkipToRow (" & CStr(SkipToRow) & ") exceeds the number of " & RowDescription & _
                       "rows in the file (" & CStr(NumRowsInFile) & ")"
 189           Else
-                  'Attempting to read a set number of rows, function CSVRead2 will return an array of Empty values.
+                  'Attempting to read a set number of rows, function CSVRead_OLD will return an array of Empty values.
 190               NumFields = 0
 191               NumRowsFound = 0
 192           End If
@@ -1885,7 +1890,7 @@ Private Sub GetMoreFromStream(Stream As ADODB.Stream, Delimiter As String, Quote
           ' Set to a small number for testing logic and a bigger number for
           ' performance, but not too high since a common use case is reading
           ' just the first line of a file. Suggest 5000? Note that when reading
-          ' an entire file (NumRows argument to CSVRead2 is zero) function
+          ' an entire file (NumRows argument to CSVRead_OLD is zero) function
           ' GetMoreFromStream is not called.
           Dim AtEndOfStream As Boolean
           Dim ExpandBufferBy As Long
@@ -2008,7 +2013,7 @@ End Function
 '  AnySentinels         : Does the sentinel dictionary have any elements?
 '  Sentinels            : A dictionary of Sentinels. If Sentinels.Exists(Field) Then ConvertField = Sentinels(Field)
 '  MaxSentinelLength    : The maximum length of the keys of Sentinels.
-'  ShowMissingsAs       : The value to which missing fields (consecutive delimiters) are converted. If CSVRead2 has a
+'  ShowMissingsAs       : The value to which missing fields (consecutive delimiters) are converted. If CSVRead_OLD has a
 '                         MissingStrings argument then values matching those strings are also converted to
 '                         ShowMissingsAs, thanks to method MakeSentinels.
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3008,7 +3013,7 @@ ErrHandler:
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
-' Procedure : CSVWrite2
+' Procedure : CSVWrite_OLD
 ' Purpose   : Creates a comma-separated file on disk containing Data. Any existing file of the same
 '             name is overwritten. If successful, the function returns FileName, otherwise an "error
 '             string" (starts with `#`, ends with `!`) describing what went wrong.
@@ -3042,12 +3047,12 @@ End Function
 ' FalseString: How the Boolean value False is to be represented in the file. Optional, defaulting to
 '             "False".
 '
-' Notes     : See also companion function CSVRead2.
+' Notes     : See also companion function CSVRead_OLD.
 '
 '             For discussion of the CSV format see
 '             https://tools.ietf.org/html/rfc4180#section-2
 ' -----------------------------------------------------------------------------------------------------------------------
-Public Function CSVWrite2(ByVal Data As Variant, Optional ByVal FileName As String, _
+Public Function CSVWrite_OLD(ByVal Data As Variant, Optional ByVal FileName As String, _
           Optional ByVal QuoteAllStrings As Variant = True, Optional ByVal DateFormat As String = "YYYY-MM-DD", _
           Optional ByVal DateTimeFormat As String = "ISO", Optional ByVal Delimiter As String = ",", _
           Optional ByVal Encoding As String = "ANSI", Optional ByVal EOL As String = vbNullString, _
@@ -3099,7 +3104,7 @@ Public Function CSVWrite2(ByVal Data As Variant, Optional ByVal FileName As Stri
 20        EOLIsWindows = EOL = vbCrLf
           
 21        If DateFormat = "" Or UCase(DateFormat) = "ISO" Then
-              'Avoid DateFormat being the null string as that would make CSVWrite2's _
+              'Avoid DateFormat being the null string as that would make CSVWrite_OLD's _
                behaviour depend on Windows locale (via calls to Format$ in function Encode).
 22            DateFormat = "yyyy-mm-dd"
 23        End If
@@ -3145,7 +3150,7 @@ Public Function CSVWrite2(ByVal Data As Variant, Optional ByVal FileName As Stri
 54        FileContents = VBA.Join(Lines, EOL)
           
 55        If WriteToFile Then
-56            CSVWrite2 = SaveTextFile(FileName, FileContents, Encoding)
+56            CSVWrite_OLD = SaveTextFile(FileName, FileContents, Encoding)
 57        Else
 58            If Len(FileContents) > MaxStringLengthInArray() Then
 59                If IsWorksheetCall() Then
@@ -3153,12 +3158,12 @@ Public Function CSVWrite2(ByVal Data As Variant, Optional ByVal FileName As Stri
                           " to a cell of an Excel worksheet"
 61                End If
 62            End If
-63            CSVWrite2 = FileContents
+63            CSVWrite_OLD = FileContents
 64        End If
           
 65        Exit Function
 ErrHandler:
-66        CSVWrite2 = ReThrow("CSVWrite2", Err, m_ErrorStyle = es_ReturnString)
+66        CSVWrite_OLD = ReThrow("CSVWrite_OLD", Err, m_ErrorStyle = es_ReturnString)
 End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
@@ -3504,7 +3509,7 @@ End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : Encode
-' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite2.
+' Purpose    : Encode arbitrary value as a string, sub-routine of CSVWrite_OLD.
 ' -----------------------------------------------------------------------------------------------------------------------
 Private Function Encode(ByVal x As Variant, QuoteSimpleStrings As Boolean, QuoteComplexStrings As Boolean, DateFormat As String, _
           DateTimeFormat As String, Delim As String, Encoder As Scripting.Dictionary) As String
@@ -3570,7 +3575,7 @@ ErrHandler:
 7                 If Not CanWriteCharToAscii(Mid$(text, i, 1)) Then
 8                     ErrDesc = "Data contains characters that cannot be written to an ascii file (first found is '" & _
                           Mid$(text, i, 1) & "' with unicode character code " & AscW(Mid$(text, i, 1)) & _
-                          "). Try calling CSVWrite2 with argument Encoding as ""UTF-8"" or ""UTF-16"""
+                          "). Try calling CSVWrite_OLD with argument Encoding as ""UTF-8"" or ""UTF-16"""
 9                     Throw ErrDesc
 10                    Exit For
 11                End If
@@ -4025,6 +4030,16 @@ End Function
 '             methods to be used from VBA code while keeping error handling robust
 '             MyVariable = ThrowIfError(MyFunctionThatReturnsAStringIfAnErrorHappens(...))
 ' -----------------------------------------------------------------------------------------------------------------------
+Private Function ThrowIfError(Data As Variant) As Variant
+1         ThrowIfError = Data
+2         If VarType(Data) = vbString Then
+3             If Left$(Data, 1) = "#" Then
+4                 If Right$(Data, 1) = "!" Then
+5                     Throw CStr(Data)
+6                 End If
+7             End If
+8         End If
+End Function
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure : IsNumber
@@ -4247,7 +4262,7 @@ Private Sub AmendSkipToColAndNumCols(ByVal FileName As String, ByRef SkipToCol A
           
 22        If Not ReadFile Then Exit Sub
           
-23        Headers = ThrowIfError(CSVRead2(FileName, False, Delimiter, IgnoreRepeated, , Comment, IgnoreEmptyLines, , _
+23        Headers = ThrowIfError(CSVRead_OLD(FileName, False, Delimiter, IgnoreRepeated, , Comment, IgnoreEmptyLines, , _
               HeaderRowNum, 1, 1, 0, , , , , Encoding))
 24        RealHeaderRowNum = IIf(HeaderRowNum = 0, 1, HeaderRowNum)
 25        If VarType(SkipToCol) = vbString Then
@@ -4309,10 +4324,10 @@ End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVRead
-' Purpose    : Register the function CSVRead2 with the Excel function wizard. Suggest this function is called from a
+' Purpose    : Register the function CSVRead_OLD with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub RegisterCSVRead()
+Private Sub RegisterCSVRead_OLD()
           Const Description As String = "Returns the contents of a comma-separated file on disk as an array."
           Dim ArgDescs() As String
 
@@ -4358,7 +4373,7 @@ Private Sub RegisterCSVRead()
               "MissingStrings are returned in the array as ShowMissingsAs. Defaults to Empty, but the null " & _
               "string or `#N/A!` error value can be good alternatives."
 19        ArgDescs(17) = "Allowed entries are `ASCII`, `ANSI`, `UTF-8`, or `UTF-16`. For most files this argument can be " & _
-              "omitted and CSVRead2 will detect the file's encoding."
+              "omitted and CSVRead_OLD will detect the file's encoding."
 20        ArgDescs(18) = "The character that represents a decimal point. If omitted, then the value from Windows " & _
               "regional settings is used."
 21        ArgDescs(19) = "For use from VBA only."
@@ -4366,20 +4381,20 @@ Private Sub RegisterCSVRead()
 22        If Application.Name = "Microsoft Exxel" Then
               Dim o As Object
 23            Set o = Application
-24            o.MacroOptions "CSVRead2", Description, , , , , , , , , ArgDescs
+24            o.MacroOptions "CSVRead_OLD", Description, , , , , , , , , ArgDescs
 25        End If
 26        Exit Sub
 
 ErrHandler:
-27        Debug.Print "Warning: Registration of function CSVRead2 failed with error: " & Err.Description
+27        Debug.Print "Warning: Registration of function CSVRead_OLD failed with error: " & Err.Description
 End Sub
 
 ' -----------------------------------------------------------------------------------------------------------------------
 ' Procedure  : RegisterCSVWrite
-' Purpose    : Register the function CSVWrite2 with the Excel function wizard. Suggest this function is called from a
+' Purpose    : Register the function CSVWrite_OLD with the Excel function wizard. Suggest this function is called from a
 '              WorkBook_Open event.
 ' -----------------------------------------------------------------------------------------------------------------------
-Private Sub RegisterCSVWrite()
+Private Sub RegisterCSVWrite_OLD()
           Const Description As String = "Creates a comma-separated file on disk containing Data. Any existing file of " & _
               "the same name is overwritten. If successful, the function returns FileName, " & _
               "otherwise an ""error string"" (starts with `#`, ends with `!`) describing what " & _
@@ -4417,11 +4432,11 @@ Private Sub RegisterCSVWrite()
 13        If Application.Name = "Microsoft Exxel" Then
               Dim o As Object
 14            Set o = Application
-15            o.MacroOptions "CSVWrite2", Description, , , , , , , , , ArgDescs
+15            o.MacroOptions "CSVWrite_OLD", Description, , , , , , , , , ArgDescs
 16        End If
 17        Exit Sub
 
 ErrHandler:
-18        Debug.Print "Warning: Registration of function CSVWrite2 failed with error: " & Err.Description
+18        Debug.Print "Warning: Registration of function CSVWrite_OLD failed with error: " & Err.Description
 End Sub
 

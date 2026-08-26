@@ -107,7 +107,7 @@ Private Sub RunSpeedTests()
     For Each n In ws.Names
         If InStr(n.Name, "PasteResultsHere") > 1 Then
             If NameRefersToRange(n) Then
-                Application.GoTo n.RefersToRange
+                Application.Goto n.RefersToRange
                 For Each c In n.RefersToRange.Cells
                     c.Resize(1, NumColsInTFPRet).ClearContents
                     TestResults = ThrowIfError(TimeParsers(ws.Range("ParserNames").value, c.Offset(0, -3).value, c.Offset(0, -2).value, _
@@ -329,7 +329,7 @@ Sub AddCharts(Optional Export As Boolean = True)
         End If
     Next n
 
-    Application.GoTo ws.Cells(1, 1)
+    Application.Goto ws.Cells(1, 1)
     ws.Protect , , prot
 
     Exit Sub
