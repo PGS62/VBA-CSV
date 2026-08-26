@@ -2857,8 +2857,8 @@ Private Sub MakeSentinels(ByRef Sentinels As Scripting.Dictionary, ConvertQuoted
           'Add "quoted versions" of the existing sentinels
 49        If ConvertQuoted Then
               Dim i As Long
-              Dim items
-              Dim Keys
+              Dim items As Variant
+              Dim Keys As Variant
               Dim NewKey As String
 50            Keys = Sentinels.Keys
 51            items = Sentinels.items
@@ -4565,4 +4565,5 @@ Public Sub RegisterCSVWrite()
 ErrHandler:
 18        Debug.Print "Warning: Registration of function CSVWrite failed with error: " & Err.Description
 End Sub
+
 

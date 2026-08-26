@@ -43,7 +43,6 @@ VBA\modCSVNotRFC4180.bas
 VBA\modCSVPerformance.bas
 VBA\modCSVPerformanceLowLevel.bas
 VBA\modCSVReadWrite.bas
-VBA\modCSVReadWrite_OLD.bas
 VBA\modCSVTest.bas
 VBA\modCSVTestDeps.bas
 VBA\modCSVTestRDatasets.bas
@@ -55,4 +54,3 @@ VBA\parserConfig.cls
 VBA\sdkn104_CSVUtils.bas
 VBA\shTest.cls
 VBA\ThisWorkbook.cls
-VBA-CSV.xlsm
